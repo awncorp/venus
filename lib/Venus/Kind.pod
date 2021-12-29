@@ -36,10 +36,15 @@ This package provides identity and methods common across all L<Venus> classes.
 This package integrates behaviors from:
 
 L<Venus::Role::Boxable>
+
 L<Venus::Role::Catchable>
+
 L<Venus::Role::Doable>
+
 L<Venus::Role::Dumpable>
+
 L<Venus::Role::Printable>
+
 L<Venus::Role::Throwable>
 
 =cut
