@@ -7,6 +7,11 @@ modular architecture, robust library of classes and methods, supports pure-Perl
 autoboxing, advanced exception handling, "true" and "false" keywords, package
 introspection, command-line options parsing, and more.
 
+
+**Demo:** Better Boolean Values
+
+![Venus Demo](https://github.com/cpanery/venus/raw/master/.github/assets/458966.gif)
+
 ## Installation
 
 Install Venus using [cpm](https://metacpan.org/pod/App::cpm):
