@@ -1,0 +1,358 @@
+
+=head1 NAME
+
+Venus::Name - Name Class
+
+=cut
+
+=head1 ABSTRACT
+
+Name Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Name;
+
+  my $name = Venus::Name->new('Foo/Bar');
+
+  # $name->package;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for parsing and formatting package namespace
+strings.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+L<Venus::Role::Explainable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (Str)
+
+The default method returns the default value, i.e. C<'Venus'>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $name->default;
+
+  # "Venus"
+
+=back
+
+=cut
+
+=head2 dist
+
+  dist() (Str)
+
+The dist method returns a package distribution representation of the name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item dist example 1
+
+  # given: synopsis;
+
+  my $dist = $name->dist;
+
+  # "Foo-Bar"
+
+=back
+
+=cut
+
+=head2 explain
+
+  explain() (Str)
+
+The explain method returns the package name and is used in stringification
+operations.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item explain example 1
+
+  # given: synopsis;
+
+  my $explain = $name->explain;
+
+  # "Foo/Bar"
+
+=back
+
+=cut
+
+=head2 file
+
+  file() (Str)
+
+The file method returns a file representation of the name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item file example 1
+
+  # given: synopsis;
+
+  my $file = $name->file;
+
+  # "foo__bar"
+
+=back
+
+=cut
+
+=head2 format
+
+  format(Str $method, Str $format) (Str)
+
+The format method calls the specified method passing the result to the core
+L</sprintf> function with itself as an argument.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item format example 1
+
+  # given: synopsis;
+
+  my $format = $name->format('file', '%s.t');
+
+  # "foo__bar.t"
+
+=back
+
+=cut
+
+=head2 label
+
+  label() (Str)
+
+The label method returns a label (or constant) representation of the name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item label example 1
+
+  # given: synopsis;
+
+  my $label = $name->label;
+
+  # "Foo_Bar"
+
+=back
+
+=cut
+
+=head2 lookslike_a_file
+
+  lookslike_a_file() (Str)
+
+The lookslike_a_file method returns truthy if its state resembles a filename.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lookslike_a_file example 1
+
+  # given: synopsis;
+
+  my $lookslike_a_file = $name->lookslike_a_file;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 lookslike_a_label
+
+  lookslike_a_label() (Str)
+
+The lookslike_a_label method returns truthy if its state resembles a label (or
+constant).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lookslike_a_label example 1
+
+  # given: synopsis;
+
+  my $lookslike_a_label = $name->lookslike_a_label;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 lookslike_a_package
+
+  lookslike_a_package() (Str)
+
+The lookslike_a_package method returns truthy if its state resembles a package
+name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lookslike_a_package example 1
+
+  # given: synopsis;
+
+  my $lookslike_a_package = $name->lookslike_a_package;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 lookslike_a_path
+
+  lookslike_a_path() (Str)
+
+The lookslike_a_path method returns truthy if its state resembles a file path.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lookslike_a_path example 1
+
+  # given: synopsis;
+
+  my $lookslike_a_path = $name->lookslike_a_path;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 lookslike_a_pragma
+
+  lookslike_a_pragma() (Str)
+
+The lookslike_a_pragma method returns truthy if its state resembles a pragma.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lookslike_a_pragma example 1
+
+  # given: synopsis;
+
+  my $lookslike_a_pragma = $name->lookslike_a_pragma;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 package
+
+  package() (Str)
+
+The package method returns a package name representation of the name given.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item package example 1
+
+  # given: synopsis;
+
+  my $package = $name->package;
+
+  # "Foo::Bar"
+
+=back
+
+=cut
+
+=head2 path
+
+  path() (Str)
+
+The path method returns a path representation of the name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item path example 1
+
+  # given: synopsis;
+
+  my $path = $name->path;
+
+  # "Foo/Bar"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

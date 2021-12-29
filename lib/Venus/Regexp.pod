@@ -1,0 +1,145 @@
+
+=head1 NAME
+
+Venus::Regexp - Regexp Class
+
+=cut
+
+=head1 ABSTRACT
+
+Regexp Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/(?<greet>\w+) (?<username>\w+)/,
+  );
+
+  # $regexp->search;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating regexp data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (Regexp)
+
+The default method returns the default value, i.e. C<qr//>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $regexp->default;
+
+  # qr/(?^u:)/
+
+=back
+
+=cut
+
+=head2 replace
+
+  replace(Str $string, Str $substr, Str $flags) (Replace)
+
+The replace method performs a regular expression substitution on the given
+string. The first argument is the string to match against. The second argument
+is the replacement string. The optional third argument might be a string
+representing flags to append to the s///x operator, such as 'g' or 'e'.  This
+method will always return a L<Venus::Replace> object which can be used to
+introspect the result of the operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item replace example 1
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/(?<username>\w+)$/,
+  );
+
+  my $replace = $regexp->replace('Hey, unknown', 'cpanery');
+
+  # bless({ ... }, 'Venus::Replace')
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Str $string) (Search)
+
+The search method performs a regular expression match against the given string,
+this method will always return a L<Venus::Search> object which can be used to
+introspect the result of the operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item search example 1
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/(?<greet>\w+), (?<username>\w+)/,
+  );
+
+  my $search = $regexp->search('hey, cpanery');
+
+  # bless({ ... }, 'Venus::Search')
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

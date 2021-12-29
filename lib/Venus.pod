@@ -1,0 +1,698 @@
+
+=head1 NAME
+
+Venus - OO Library
+
+=cut
+
+=head1 ABSTRACT
+
+OO Standard Library for Perl 5
+
+=cut
+
+=head1 VERSION
+
+0.01
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus qw(
+    catch
+    error
+    raise
+  );
+
+  # error handling
+  my ($error, $result) = catch {
+    error;
+  };
+
+  # boolean keywords
+  if ($result and $result eq false) {
+    true;
+  }
+
+  # raise exceptions
+  if (false) {
+    raise 'MyApp::Error';
+  }
+
+  # and much more!
+  true ne false ne true;
+
+=cut
+
+=head1 DESCRIPTION
+
+This library provides an object-orientation framework and extendible standard
+library for Perl 5, built on top of L<Moo> with classes which wrap most native
+Perl data types. Venus has a simple modular architecture, robust library of
+classes and methods, supports pure-Perl autoboxing, advanced exception
+handling, "true" and "false" keywords, package introspection, command-line
+options parsing, and more. This package will always automatically exports
+C<true> and C<false> keyword functions (unless existing routines of the same
+name already exist in the calling package), otherwise exports keyword functions
+as requested at import.
+
+=cut
+
+=head1 FUNCTIONS
+
+This package provides the following functions:
+
+=cut
+
+=head2 catch
+
+  catch(CodeRef $block) (Error, Any)
+
+The catch function executes the code block trapping errors and returning the
+caught exception in scalar context, and also returning the result as a second
+argument in list context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item catch example 1
+
+  package main;
+
+  use Venus 'catch';
+
+  my $error = catch {die};
+
+  $error; # 'Died at ...'
+
+=back
+
+=over 4
+
+=item catch example 2
+
+  package main;
+
+  use Venus 'catch';
+
+  my ($error, $result) = catch {error};
+
+  $error; # Venus::Error
+
+=back
+
+=over 4
+
+=item catch example 3
+
+  package main;
+
+  use Venus 'catch';
+
+  my ($error, $result) = catch {true};
+
+  $result; # 1
+
+=back
+
+=cut
+
+=head2 error
+
+  error(Maybe[HashRef] $args) (Error)
+
+The error function throws a L<Venus::Error> exception object using the
+exception object arguments provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item error example 1
+
+  package main;
+
+  use Venus 'error';
+
+  my $error = error;
+
+=back
+
+=over 4
+
+=item error example 2
+
+  package main;
+
+  use Venus 'error';
+
+  my $error = error {
+    message => 'Something failed!',
+  };
+
+=back
+
+=cut
+
+=head2 false
+
+  false() (Bool)
+
+The false function returns a falsy boolean value which is designed to be
+practically indistinguishable from the conventional numerical C<0> value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item false example 1
+
+  package main;
+
+  use Venus;
+
+  my $false = false;
+
+=back
+
+=over 4
+
+=item false example 2
+
+  package main;
+
+  use Venus;
+
+  my $true = !false;
+
+=back
+
+=cut
+
+=head2 raise
+
+  raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+
+The raise function generates and throws a named exception object derived from
+L<Venus::Error>, or provided base class, using the exception object arguments
+provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item raise example 1
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise 'MyApp::Error';
+
+=back
+
+=over 4
+
+=item raise example 2
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise ['MyApp::Error', 'Venus::Error'];
+
+=back
+
+=over 4
+
+=item raise example 3
+
+  package main;
+
+  use Venus 'raise';
+
+  my $error = raise ['MyApp::Error', 'Venus::Error'], {
+    message => 'Something failed!',
+  };
+
+=back
+
+=cut
+
+=head2 true
+
+  true() (Bool)
+
+The true function returns a truthy boolean value which is designed to be
+practically indistinguishable from the conventional numerical C<1> value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item true example 1
+
+  package main;
+
+  use Venus;
+
+  my $true = true;
+
+=back
+
+=over 4
+
+=item true example 2
+
+  package main;
+
+  use Venus;
+
+  my $false = !true;
+
+=back
+
+=cut
+
+=head1 FEATURES
+
+This package provides the following features:
+
+=cut
+
+=over 4
+
+=item standard-library
+
+This library provides a Perl object-oriented standard library with value
+classes and consistently named methods.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..4]);
+
+  # $array->all(sub{ $_ > 0 });
+  # $array->any(sub{ $_ > 0 });
+  # $array->each(sub{ $_ > 0 });
+  # $array->grep(sub{ $_ > 0 });
+  # $array->map(sub{ $_ > 0 });
+  # $array->none(sub{ $_ < 0 });
+  # $array->one(sub{ $_ == 0 });
+  # $array->random;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1..8});
+
+  # $hash->all(sub{ $_ > 0 });
+  # $hash->any(sub{ $_ > 0 });
+  # $hash->each(sub{ $_ > 0 });
+  # $hash->grep(sub{ $_ > 0 });
+  # $hash->map(sub{ $_ > 0 });
+  # $hash->none(sub{ $_ < 0 });
+  # $hash->one(sub{ $_ == 0 });
+  # $hash->random;
+
+  $array->count == $hash->count;
+
+=back
+
+=over 4
+
+=item value-classes
+
+This library provides value classes which wrap native Perl data types and
+provides methods for operating their values.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+B<example 2>
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+B<example 3>
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+B<example 4>
+
+  package main;
+
+  use Venus::Float;
+
+  my $float = Venus::Float->new;
+
+B<example 5>
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new;
+
+B<example 6>
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new;
+
+B<example 7>
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new;
+
+B<example 8>
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+B<example 9>
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new;
+
+B<example 10>
+
+  package main;
+
+  use Venus::Undef;
+
+  my $undef = Venus::Undef->new;
+
+=back
+
+=over 4
+
+=item builtin-autoboxing
+
+This library provides opt-in pure Perl autoboxing allowing you to chain methods
+calls across objects and values.
+
+B<example 1>
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello, world');
+
+  $string->box->split(', ')->join(' ')->titlecase->unbox->get; # Hello World
+
+=back
+
+=over 4
+
+=item utility-classes
+
+This library provides serveral essential utility classes for performing common
+programming tasks.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Args;
+
+  my $args = Venus::Args->new;
+
+B<example 2>
+
+  package main;
+
+  use Venus::Box;
+
+  my $box = Venus::Box->new;
+
+B<example 3>
+
+  package main;
+
+  use Venus::Data;
+
+  my $docs = Venus::Data->new->docs;
+
+B<example 4>
+
+  package main;
+
+  use Venus::Date;
+
+  my $date = Venus::Date->new;
+
+B<example 5>
+
+  package main;
+
+  use Venus::Error;
+
+  my $error = Venus::Error->new;
+
+B<example 6>
+
+  package main;
+
+  use Venus::Json;
+
+  my $json = Venus::Json->new;
+
+B<example 7>
+
+  package main;
+
+  use Venus::Name;
+
+  my $name = Venus::Name->new;
+
+B<example 8>
+
+  package main;
+
+  use Venus::Opts;
+
+  my $opts = Venus::Opts->new;
+
+B<example 9>
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new;
+
+B<example 10>
+
+  package main;
+
+  use Venus::Data;
+
+  my $text = Venus::Data->new->text;
+
+B<example 11>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new;
+
+B<example 12>
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new;
+
+B<example 13>
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+B<example 14>
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new;
+
+B<example 15>
+
+  package main;
+
+  use Venus::Vars;
+
+  my $vars = Venus::Vars->new;
+
+=back
+
+=over 4
+
+=item package-reflection
+
+This library provides a package reflection class, L<Venus::Space>, which can be
+used to perform meta-programming on package spaces.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus');
+
+  $space->do('tryload')->routines;
+
+=back
+
+=over 4
+
+=item exception-handling
+
+This library provides a framework for raising, i.e. generating and throwing,
+exception objects and catching them.
+
+B<example 1>
+
+  package MyApp;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Throwable';
+  with 'Venus::Role::Catchable';
+
+  sub execute {
+    my ($self) = @_;
+
+    $self->throw->error;
+  }
+
+  package main;
+
+  my $myapp = MyApp->new;
+
+  $myapp->catch('execute'); # catch MyApp::Error
+
+=back
+
+=over 4
+
+=item composable-standards
+
+This library provides a library of composable roles which can be used to extend
+core behaviors to custom objects.
+
+B<example 1>
+
+  package MyApp;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Dumpable';
+  with 'Venus::Role::Stashable';
+
+  package main;
+
+  my $myapp = MyApp->new;
+
+  $myapp->stash(greeting => 'hello world');
+
+  $myapp->dump('stash'); # '{"greeting" => "hello world"}'
+
+=back
+
+=over 4
+
+=item pluggable-library
+
+This library provides a mechanism for extending the standard library, i.e.
+value classes, using plugins which can be automatically discovered and invoked.
+(no monkey-patching necessary)
+
+B<example 1>
+
+  package Venus::String::Plugin::Base64;
+
+  sub new {
+    return bless {};
+  }
+
+  sub execute {
+    my ($self, $string, @args) = @_;
+
+    require MIME::Base64;
+
+    return MIME::Base64::encode_base64($string->value);
+  }
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello, world');
+
+  $string->base64;
+
+=back
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut
+
+=head1 PROJECT
+
+L<https://venus.cpanery.com>
+
+L<https://github.com/cpanery/venus/wiki>
+
+L<https://github.com/cpanery/venus/issues>
+
+L<https://cpanery.com>
+
+=cut

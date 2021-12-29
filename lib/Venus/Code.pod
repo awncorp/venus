@@ -1,0 +1,326 @@
+
+=head1 NAME
+
+Venus::Code - Code Class
+
+=cut
+
+=head1 ABSTRACT
+
+Code Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub {
+    my (@args) = @_;
+
+    return [@args];
+  });
+
+  # $code->call(1..4);
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating code data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 call
+
+  call(Any @data) (Any)
+
+The call method executes and returns the result of the code.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item call example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { ($_[0] // 0) + 1 });
+
+  my $call = $code->call;
+
+  # 1
+
+=back
+
+=over 4
+
+=item call example 2
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { ($_[0] // 0) + 1 });
+
+  my $call = $code->call(1);
+
+  # 2
+
+=back
+
+=over 4
+
+=item call example 3
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { ($_[0] // 0) + 1 });
+
+  my $call = $code->call(2);
+
+  # 3
+
+=back
+
+=cut
+
+=head2 compose
+
+  compose(CodeRef $code, Any @data) (CodeRef)
+
+The compose method creates a code reference which executes the first argument
+(another code reference) using the result from executing the code as it's
+argument, and returns a code reference which executes the created code
+reference passing it the remaining arguments when executed.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item compose example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { [@_] });
+
+  my $compose = $code->compose($code, 1, 2, 3);
+
+  # sub { ... }
+
+  # $compose->(4, 5, 6); # [[1,2,3,4,5,6]]
+
+=back
+
+=cut
+
+=head2 conjoin
+
+  conjoin(CodeRef $code) (CodeRef)
+
+The conjoin method creates a code reference which execute the code and the
+argument in a logical AND operation having the code as the lvalue and the
+argument as the rvalue.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item conjoin example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { $_[0] % 2 });
+
+  my $conjoin = $code->conjoin(sub { 1 });
+
+  # sub { ... }
+
+  # $conjoin->(0); # 0
+  # $conjoin->(1); # 1
+  # $conjoin->(2); # 0
+  # $conjoin->(3); # 1
+  # $conjoin->(4); # 0
+
+=back
+
+=cut
+
+=head2 curry
+
+  curry(Any @data) (CodeRef)
+
+The curry method returns a code reference which executes the code passing it
+the arguments and any additional parameters when executed.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item curry example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { [@_] });
+
+  my $curry = $code->curry(1, 2, 3);
+
+  # sub { ... }
+
+  # $curry->(4,5,6); # [1,2,3,4,5,6]
+
+=back
+
+=cut
+
+=head2 default
+
+  default() (CodeRef)
+
+The default method returns the default value, i.e. C<sub{}>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $code->default;
+
+  # sub {}
+
+=back
+
+=cut
+
+=head2 disjoin
+
+  disjoin(CodeRef $code) (CodeRef)
+
+The disjoin method creates a code reference which execute the code and the
+argument in a logical OR operation having the code as the lvalue and the
+argument as the rvalue.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item disjoin example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { $_[0] % 2 });
+
+  my $disjoin = $code->disjoin(sub { -1 });
+
+  # sub { ... }
+
+  # disjoin->(0); # -1
+  # disjoin->(1); #  1
+  # disjoin->(2); # -1
+  # disjoin->(3); #  1
+  # disjoin->(4); # -1
+
+=back
+
+=cut
+
+=head2 next
+
+  next(Any @data) (Any)
+
+The next method is an alias to the call method. The naming is especially useful
+(i.e. helps with readability) when used with closure-based iterators.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item next example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { $_[0] * 2 });
+
+  my $next = $code->next(72);
+
+  # 144
+
+=back
+
+=cut
+
+=head2 rcurry
+
+  rcurry(Any @data) (CodeRef)
+
+The rcurry method returns a code reference which executes the code passing it
+the any additional parameters and any arguments when executed.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rcurry example 1
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub { [@_] });
+
+  my $rcurry = $code->rcurry(1,2,3);
+
+  # sub { ... }
+
+  # $rcurry->(4,5,6); # [4,5,6,1,2,3]
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

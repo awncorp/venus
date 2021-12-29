@@ -1,0 +1,537 @@
+package main;
+
+use 5.014;
+
+use strict;
+use warnings;
+
+use lib 't/lib';
+
+use Test::More;
+use Test::Venus;
+
+my $test = test(__FILE__);
+
+=name
+
+Venus::Name
+
+=cut
+
+$test->for('name');
+
+=tagline
+
+Name Class
+
+=cut
+
+$test->for('tagline');
+
+=abstract
+
+Name Class for Perl 5
+
+=cut
+
+$test->for('abstract');
+
+=includes
+
+method: default
+method: dist
+method: explain
+method: file
+method: format
+method: label
+method: lookslike_a_file
+method: lookslike_a_label
+method: lookslike_a_package
+method: lookslike_a_path
+method: lookslike_a_pragma
+method: package
+method: path
+
+=cut
+
+$test->for('includes');
+
+=synopsis
+
+  package main;
+
+  use Venus::Name;
+
+  my $name = Venus::Name->new('Foo/Bar');
+
+  # $name->package;
+
+=cut
+
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+=description
+
+This package provides methods for parsing and formatting package namespace
+strings.
+
+=cut
+
+$test->for('description');
+
+=inherits
+
+Venus::Kind::Utility
+
+=cut
+
+$test->for('inherits');
+
+=integrates
+
+Venus::Role::Accessible
+Venus::Role::Explainable
+
+=cut
+
+$test->for('integrates');
+
+=method default
+
+The default method returns the default value, i.e. C<'Venus'>.
+
+=signature default
+
+  default() (Str)
+
+=metadata default
+
+{
+  since => '0.01',
+}
+
+=example-1 default
+
+  # given: synopsis;
+
+  my $default = $name->default;
+
+  # "Venus"
+
+=cut
+
+$test->for('example', 1, 'default', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Venus";
+
+  $result
+});
+
+=method dist
+
+The dist method returns a package distribution representation of the name.
+
+=signature dist
+
+  dist() (Str)
+
+=metadata dist
+
+{
+  since => '0.01',
+}
+
+=example-1 dist
+
+  # given: synopsis;
+
+  my $dist = $name->dist;
+
+  # "Foo-Bar"
+
+=cut
+
+$test->for('example', 1, 'dist', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Foo-Bar";
+
+  $result
+});
+
+=method explain
+
+The explain method returns the package name and is used in stringification
+operations.
+
+=signature explain
+
+  explain() (Str)
+
+=metadata explain
+
+{
+  since => '0.01',
+}
+
+=example-1 explain
+
+  # given: synopsis;
+
+  my $explain = $name->explain;
+
+  # "Foo/Bar"
+
+=cut
+
+$test->for('example', 1, 'explain', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Foo/Bar";
+
+  $result
+});
+
+=method file
+
+The file method returns a file representation of the name.
+
+=signature file
+
+  file() (Str)
+
+=metadata file
+
+{
+  since => '0.01',
+}
+
+=example-1 file
+
+  # given: synopsis;
+
+  my $file = $name->file;
+
+  # "foo__bar"
+
+=cut
+
+$test->for('example', 1, 'file', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "foo__bar";
+
+  $result
+});
+
+=method format
+
+The format method calls the specified method passing the result to the core
+L</sprintf> function with itself as an argument.
+
+=signature format
+
+  format(Str $method, Str $format) (Str)
+
+=metadata format
+
+{
+  since => '0.01',
+}
+
+=example-1 format
+
+  # given: synopsis;
+
+  my $format = $name->format('file', '%s.t');
+
+  # "foo__bar.t"
+
+=cut
+
+$test->for('example', 1, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "foo__bar.t";
+
+  $result
+});
+
+=method label
+
+The label method returns a label (or constant) representation of the name.
+
+=signature label
+
+  label() (Str)
+
+=metadata label
+
+{
+  since => '0.01',
+}
+
+=example-1 label
+
+  # given: synopsis;
+
+  my $label = $name->label;
+
+  # "Foo_Bar"
+
+=cut
+
+$test->for('example', 1, 'label', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Foo_Bar";
+
+  $result
+});
+
+=method lookslike_a_file
+
+The lookslike_a_file method returns truthy if its state resembles a filename.
+
+=signature lookslike_a_file
+
+  lookslike_a_file() (Str)
+
+=metadata lookslike_a_file
+
+{
+  since => '0.01',
+}
+
+=example-1 lookslike_a_file
+
+  # given: synopsis;
+
+  my $lookslike_a_file = $name->lookslike_a_file;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, 'lookslike_a_file', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=method lookslike_a_label
+
+The lookslike_a_label method returns truthy if its state resembles a label (or
+constant).
+
+=signature lookslike_a_label
+
+  lookslike_a_label() (Str)
+
+=metadata lookslike_a_label
+
+{
+  since => '0.01',
+}
+
+=example-1 lookslike_a_label
+
+  # given: synopsis;
+
+  my $lookslike_a_label = $name->lookslike_a_label;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, 'lookslike_a_label', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=method lookslike_a_package
+
+The lookslike_a_package method returns truthy if its state resembles a package
+name.
+
+=signature lookslike_a_package
+
+  lookslike_a_package() (Str)
+
+=metadata lookslike_a_package
+
+{
+  since => '0.01',
+}
+
+=example-1 lookslike_a_package
+
+  # given: synopsis;
+
+  my $lookslike_a_package = $name->lookslike_a_package;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, 'lookslike_a_package', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=method lookslike_a_path
+
+The lookslike_a_path method returns truthy if its state resembles a file path.
+
+=signature lookslike_a_path
+
+  lookslike_a_path() (Str)
+
+=metadata lookslike_a_path
+
+{
+  since => '0.01',
+}
+
+=example-1 lookslike_a_path
+
+  # given: synopsis;
+
+  my $lookslike_a_path = $name->lookslike_a_path;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'lookslike_a_path', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+=method lookslike_a_pragma
+
+The lookslike_a_pragma method returns truthy if its state resembles a pragma.
+
+=signature lookslike_a_pragma
+
+  lookslike_a_pragma() (Str)
+
+=metadata lookslike_a_pragma
+
+{
+  since => '0.01',
+}
+
+=example-1 lookslike_a_pragma
+
+  # given: synopsis;
+
+  my $lookslike_a_pragma = $name->lookslike_a_pragma;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, 'lookslike_a_pragma', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=method package
+
+The package method returns a package name representation of the name given.
+
+=signature package
+
+  package() (Str)
+
+=metadata package
+
+{
+  since => '0.01',
+}
+
+=example-1 package
+
+  # given: synopsis;
+
+  my $package = $name->package;
+
+  # "Foo::Bar"
+
+=cut
+
+$test->for('example', 1, 'package', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Foo::Bar";
+
+  $result
+});
+
+=method path
+
+The path method returns a path representation of the name.
+
+=signature path
+
+  path() (Str)
+
+=metadata path
+
+{
+  since => '0.01',
+}
+
+=example-1 path
+
+  # given: synopsis;
+
+  my $path = $name->path;
+
+  # "Foo/Bar"
+
+=cut
+
+$test->for('example', 1, 'path', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Foo/Bar";
+
+  $result
+});
+
+=license
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut
+
+=authors
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+# END
+
+$test->render('lib/Venus/Name.pod') if $ENV{RENDER};
+
+ok 1 and done_testing;

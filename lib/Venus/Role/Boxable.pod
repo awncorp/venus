@@ -1,0 +1,103 @@
+
+=head1 NAME
+
+Venus::Role::Boxable - Boxable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Boxable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Boxable';
+
+  has 'text';
+
+  package main;
+
+  my $example = Example->new(text => 'hello, world');
+
+  # $example->box('text')->lc->ucfirst->concat('.')->unbox->get;
+
+  # "Hello, world."
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides a method for boxing
+itself. This makes it possible to chain method calls across objects and values.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 box
+
+  box(Str | CodeRef $method, Any @args) (Self)
+
+The box method returns the invocant boxed, i.e. encapsulated, using
+L<Venus::Box>.
+
+
+
+
+I<Since C<0.01>>
+
+=over 4
+
+=item box example 1
+
+  package main;
+
+  my $example = Example->new(text => 'hello, world');
+
+  my $box = $example->box;
+
+  # bless({ value => bless(..., "Example") }, "Venus::Box")
+
+=back
+
+=over 4
+
+=item box example 2
+
+  package main;
+
+  my $example = Example->new(text => 'hello, world');
+
+  my $box = $example->box('text');
+
+  # bless({ value => bless(..., "Venus::String") }, "Venus::Box")
+
+  # $example->box('text')->lc->ucfirst->concat('.')->unbox->get;
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -1,0 +1,227 @@
+
+=head1 NAME
+
+Venus::Role::Buildable - Buildable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Buildable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Buildable';
+
+  has 'test';
+
+  package main;
+
+  my $example = Example->new;
+
+  # $example->test;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for hooking
+into object construction of the consuming class, e.g. handling single-arg
+object construction.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 build_arg
+
+  build_arg(Any $data) (HashRef)
+
+The build_arg method, if defined, is only called during object construction
+when a single non-hashref is provided.
+
+
+
+
+I<Since C<0.01>>
+
+=over 4
+
+=item build_arg example 1
+
+  package Example1;
+
+  use Venus::Class;
+
+  has 'x';
+  has 'y';
+
+  with 'Venus::Role::Buildable';
+
+  sub build_arg {
+    my ($self, $data) = @_;
+
+    $data = { x => $data, y => $data };
+
+    return $data;
+  }
+
+  package main;
+
+  my $example = Example1->new(10);
+
+  # $example->x;
+  # $example->y;
+
+=back
+
+=cut
+
+=head2 build_args
+
+  build_args(HashRef $data) (HashRef)
+
+The build_args method, if defined, is only called during object construction to
+hook into the handling of the arguments provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item build_args example 1
+
+  package Example2;
+
+  use Venus::Class;
+
+  has 'x';
+  has 'y';
+
+  with 'Venus::Role::Buildable';
+
+  sub build_args {
+    my ($self, $data) = @_;
+
+    $data->{x} ||= int($data->{x} || 100);
+    $data->{y} ||= int($data->{y} || 100);
+
+    return $data;
+  }
+
+  package main;
+
+  my $example = Example2->new(x => 10, y => 10);
+
+  # $example->x;
+  # $example->y;
+
+=back
+
+=cut
+
+=head2 build_nil
+
+  build_nil(HashRef $data) (Any)
+
+The build_nil method, if defined, is only called during object construction
+when a single empty hashref is provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item build_nil example 1
+
+  package Example4;
+
+  use Venus::Class;
+
+  has 'x';
+  has 'y';
+
+  with 'Venus::Role::Buildable';
+
+  sub build_nil {
+    my ($self, $data) = @_;
+
+    $data = { x => 10, y => 10 };
+
+    return $data;
+  }
+
+  package main;
+
+  my $example = Example4->new({});
+
+  # $example->x;
+  # $example->y;
+
+=back
+
+=cut
+
+=head2 build_self
+
+  build_self(HashRef $data) (Self)
+
+The build_self method, if defined, is only called during object construction
+after all arguments have been handled and set.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item build_self example 1
+
+  package Example3;
+
+  use Venus::Class;
+
+  has 'x';
+  has 'y';
+
+  with 'Venus::Role::Buildable';
+
+  sub build_self {
+    my ($self, $data) = @_;
+
+    die if !$self->x;
+    die if !$self->y;
+
+    return $self;
+  }
+
+  package main;
+
+  my $example = Example3->new(x => 10, y => 10);
+
+  # $example->x;
+  # $example->y;
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

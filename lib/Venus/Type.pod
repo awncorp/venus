@@ -1,0 +1,375 @@
+
+=head1 NAME
+
+Venus::Type - Type Class
+
+=cut
+
+=head1 ABSTRACT
+
+Type Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new([]);
+
+  # $type->code;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for casting native data types to objects and the
+reverse.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 code
+
+  code() (Str | Undef)
+
+The code method returns the name of the value's data type.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item code example 1
+
+  # given: synopsis;
+
+  my $code = $type->code;
+
+  # "ARRAY"
+
+=back
+
+=over 4
+
+=item code example 2
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => {});
+
+  my $code = $type->code;
+
+  # "HASH"
+
+=back
+
+=over 4
+
+=item code example 3
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => qr//);
+
+  my $code = $type->code;
+
+  # "REGEXP"
+
+=back
+
+=cut
+
+=head2 deduce
+
+  deduce() (Object)
+
+The deduce methods returns the argument as a data type object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item deduce example 1
+
+  # given: synopsis;
+
+  my $deduce = $type->deduce;
+
+  # bless({ value => [] }, "Venus::Array")
+
+=back
+
+=over 4
+
+=item deduce example 2
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => {});
+
+  my $deduce = $type->deduce;
+
+  # bless({ value => {} }, "Venus::Hash")
+
+=back
+
+=over 4
+
+=item deduce example 3
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => qr//);
+
+  my $deduce = $type->deduce;
+
+  # bless({ value => qr// }, "Venus::Regexp")
+
+=back
+
+=cut
+
+=head2 deduce_deep
+
+  deduce_deep() (Object)
+
+The deduce_deep function returns any arguments as data type objects, including
+nested data.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item deduce_deep example 1
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => [1..4]);
+
+  my $deduce_deep = $type->deduce_deep;
+
+  # bless({
+  #   value => [
+  #     bless({ value => 1 }, "Venus::Number"),
+  #     bless({ value => 2 }, "Venus::Number"),
+  #     bless({ value => 3 }, "Venus::Number"),
+  #     bless({ value => 4 }, "Venus::Number"),
+  #   ],
+  # }, "Venus::Array")
+
+=back
+
+=over 4
+
+=item deduce_deep example 2
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => {1..4});
+
+  my $deduce_deep = $type->deduce_deep;
+
+  # bless({
+  #   value => {
+  #     1 => bless({ value => 2 }, "Venus::Number"),
+  #     3 => bless({ value => 4 }, "Venus::Number"),
+  #   },
+  # }, "Venus::Hash")
+
+=back
+
+=cut
+
+=head2 detract
+
+  detract() (Any)
+
+The detract method returns the argument as native Perl data type value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item detract example 1
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Hash;
+
+  my $type = Venus::Type->new(Venus::Hash->new({1..4}));
+
+  my $detract = $type->detract;
+
+  # { 1 => 2, 3 => 4 }
+
+=back
+
+=over 4
+
+=item detract example 2
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Array;
+
+  my $type = Venus::Type->new(Venus::Array->new([1..4]));
+
+  my $detract = $type->detract;
+
+  # [1..4]
+
+=back
+
+=over 4
+
+=item detract example 3
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Regexp;
+
+  my $type = Venus::Type->new(Venus::Regexp->new(qr/\w+/));
+
+  my $detract = $type->detract;
+
+  # qr/\w+/
+
+=back
+
+=cut
+
+=head2 detract_deep
+
+  detract_deep() (Any)
+
+The detract_deep method returns any arguments as native Perl data type values,
+including nested data.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item detract_deep example 1
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Hash;
+
+  my $type = Venus::Type->new(Venus::Hash->new({1..4}));
+
+  my $detract_deep = Venus::Type->new($type->deduce_deep)->detract_deep;
+
+  # { 1 => 2, 3 => 4 }
+
+=back
+
+=over 4
+
+=item detract_deep example 2
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Array;
+
+  my $type = Venus::Type->new(Venus::Array->new([1..4]));
+
+  my $detract_deep = Venus::Type->new($type->deduce_deep)->detract_deep;
+
+  # [1..4]
+
+=back
+
+=cut
+
+=head2 package
+
+  package() (Str)
+
+The code method returns the package name of the objectified value, i.e.
+C<ref()>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item package example 1
+
+  # given: synopsis;
+
+  my $package = $type->package;
+
+  # "Venus::Array"
+
+=back
+
+=over 4
+
+=item package example 2
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => {});
+
+  my $package = $type->package;
+
+  # "Venus::Hash"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

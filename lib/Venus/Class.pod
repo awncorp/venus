@@ -1,0 +1,60 @@
+
+=head1 NAME
+
+Venus::Class - Class Builder
+
+=cut
+
+=head1 ABSTRACT
+
+Class Builder for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  sub handshake {
+    return true;
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # $example->handshake;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package making it a modified L<Moo> class.
+All functions in L<Venus> are automatically imported unless routines of the
+same name already exist.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Moo>
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

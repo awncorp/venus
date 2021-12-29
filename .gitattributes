@@ -1,0 +1,6 @@
+*.pl linguist-language=Perl
+*.pm linguist-language=Perl
+*.t linguist-language=Perl
+.github/* linguist-documentation
+build linguist-documentation
+release linguist-documentation

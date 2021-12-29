@@ -1,0 +1,1889 @@
+
+=head1 NAME
+
+Venus::Space - Space Class
+
+=cut
+
+=head1 ABSTRACT
+
+Space Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  # $space->package; # Foo::Bar
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for parsing and manipulating package namespaces.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Name>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 all
+
+  all(Str $method, Any @args) (ArrayRef[Tuple[Str, Any]])
+
+The all method executes any available method on the instance and all instances
+representing packages inherited by the package represented by the invocant.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item all example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus');
+
+  my $all = $space->all('id');
+
+  # [["Venus", "Venus"]]
+
+=back
+
+=over 4
+
+=item all example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus/Space');
+
+  my $all = $space->all('inherits');
+
+  # [
+  #   [
+  #     "Venus::Space", ["Venus::Name"]
+  #   ],
+  #   [
+  #     "Venus::Name", ["Venus::Kind::Utility"]
+  #   ],
+  # ]
+
+=back
+
+=over 4
+
+=item all example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus/Space');
+
+  my $all = $space->all('locate');
+
+  # [
+  #   [
+  #     "Venus::Space",
+  #     "/path/to/lib/Venus/Space.pm",
+  #   ],
+  #   [
+  #     "Venus::Name",
+  #     "/path/to/lib/Venus/Name.pm",
+  #   ],
+  # ]
+
+=back
+
+=cut
+
+=head2 append
+
+  append(Str @path) (Space)
+
+The append method modifies the object by appending to the package namespace
+parts.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item append example 1
+
+  # given: synopsis;
+
+  my $append = $space->append('baz');
+
+  # bless({ value => "Foo/Bar/Baz" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item append example 2
+
+  # given: synopsis;
+
+  my $append = $space->append('baz', 'bax');
+
+  # bless({ value => "Foo/Bar/Baz/Bax" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 array
+
+  array(Str $name) (ArrayRef)
+
+The array method returns the value for the given package array variable name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item array example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our @handler = 'start';
+
+  package main;
+
+  my $array = $space->array('handler');
+
+  # ["start"]
+
+=back
+
+=cut
+
+=head2 arrays
+
+  arrays() (ArrayRef)
+
+The arrays method searches the package namespace for arrays and returns their
+names.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item arrays example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our @handler = 'start';
+  our @initial = ('next', 'prev');
+
+  package main;
+
+  my $arrays = $space->arrays;
+
+  # ["handler", "initial"]
+
+=back
+
+=cut
+
+=head2 authority
+
+  authority() (Maybe[Str])
+
+The authority method returns the C<AUTHORITY> declared on the target package,
+if any.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item authority example 1
+
+  package Foo::Boo;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/boo');
+
+  my $authority = $space->authority;
+
+  # undef
+
+=back
+
+=over 4
+
+=item authority example 2
+
+  package Foo::Boo;
+
+  our $AUTHORITY = 'cpan:CPANERY';
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/boo');
+
+  my $authority = $space->authority;
+
+  # "cpan:CPANERY"
+
+=back
+
+=cut
+
+=head2 basename
+
+  basename() (Str)
+
+The basename method returns the last segment of the package namespace parts.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item basename example 1
+
+  # given: synopsis;
+
+  my $basename = $space->basename;
+
+  # "Bar"
+
+=back
+
+=cut
+
+=head2 blessed
+
+  blessed(Ref $data) (Object)
+
+The blessed method blesses the given value into the package namespace and
+returns an object. If no value is given, an empty hashref is used.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item blessed example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  sub import;
+
+  package main;
+
+  my $blessed = $space->blessed;
+
+  # bless({}, "Foo::Bar")
+
+=back
+
+=over 4
+
+=item blessed example 2
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  sub import;
+
+  package main;
+
+  my $blessed = $space->blessed({okay => 1});
+
+  # bless({ okay => 1 }, "Foo::Bar")
+
+=back
+
+=cut
+
+=head2 build
+
+  build(Any @args) (Object)
+
+The build method attempts to call C<new> on the package namespace and if
+successful returns the resulting object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item build example 1
+
+  # given: synopsis;
+
+  package Foo::Bar::Baz;
+
+  sub new {
+    bless {}, $_[0];
+  }
+
+  package main;
+
+  my $build = $space->child('baz')->build;
+
+  # bless({}, "Foo::Bar::Baz")
+
+=back
+
+=over 4
+
+=item build example 2
+
+  # given: synopsis;
+
+  package Foo::Bar::Bax;
+
+  sub new {
+    bless $_[1], $_[0];
+  }
+
+  package main;
+
+  my $build = $space->child('bax')->build({okay => 1});
+
+  # bless({ okay => 1 }, "Foo::Bar::Bax")
+
+=back
+
+=over 4
+
+=item build example 3
+
+  # given: synopsis;
+
+  package Foo::Bar::Bay;
+
+  sub new {
+    bless $_[1], $_[0];
+  }
+
+  package main;
+
+  my $build = $space->child('bay')->build([okay => 1]);
+
+  # bless(["okay", 1], "Foo::Bar::Bay")
+
+=back
+
+=cut
+
+=head2 call
+
+  call(Any @args) (Any)
+
+The call method attempts to call the given subroutine on the package namespace
+and if successful returns the resulting value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item call example 1
+
+  package Foo;
+
+  sub import;
+
+  sub start {
+    'started'
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $result = $space->call('start');
+
+  # "started"
+
+=back
+
+=over 4
+
+=item call example 2
+
+  package Zoo;
+
+  sub import;
+
+  sub AUTOLOAD {
+    bless {};
+  }
+
+  sub DESTROY {
+    ; # noop
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('zoo');
+
+  my $result = $space->call('start');
+
+  # bless({}, "Zoo")
+
+=back
+
+=cut
+
+=head2 chain
+
+  chain(Str | Tuple[Str, Any] @steps) (Any)
+
+The chain method chains one or more method calls and returns the result.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item chain example 1
+
+  package Chu::Chu0;
+
+  sub import;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Chu::Chu0');
+
+  my $result = $space->chain('blessed');
+
+  # bless({}, "Chu::Chu0")
+
+=back
+
+=over 4
+
+=item chain example 2
+
+  package Chu::Chu1;
+
+  sub new {
+    bless pop;
+  }
+
+  sub frame {
+    [@_]
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Chu::Chu1');
+
+  my $result = $space->chain(['blessed', {1..4}], 'frame');
+
+  # [bless({ 1 => 2, 3 => 4 }, "Chu::Chu1")]
+
+=back
+
+=over 4
+
+=item chain example 3
+
+  package Chu::Chu2;
+
+  sub new {
+    bless pop;
+  }
+
+  sub frame {
+    [@_]
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Chu::Chu2');
+
+  my $chain = $space->chain('blessed', ['frame', {1..4}]);
+
+  # [bless({}, "Chu::Chu2"), { 1 => 2, 3 => 4 }]
+
+=back
+
+=cut
+
+=head2 child
+
+  child(Str @path) (Space)
+
+The child method returns a new L<Venus::Space> object for the child
+package namespace.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item child example 1
+
+  # given: synopsis;
+
+  my $child = $space->child('baz');
+
+  # bless({ value => "Foo/Bar/Baz" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 children
+
+  children() (ArrayRef[Object])
+
+The children method searches C<%INC> and C<@INC> and retuns a list of
+L<Venus::Space> objects for each child namespace found (one level deep).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item children example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('c_p_a_n');
+
+  my $children = $space->children;
+
+  # [
+  #   bless({ value => "CPAN/Author" }, "Venus::Space"),
+  #   bless({ value => "CPAN/Bundle" }, "Venus::Space"),
+  #   bless({ value => "CPAN/CacheMgr" }, "Venus::Space"),
+  #   ...
+  # ]
+
+=back
+
+=cut
+
+=head2 cop
+
+  cop(Str $method, Any @args) (CodeRef)
+
+The cop method attempts to curry the given subroutine on the package namespace
+and if successful returns a closure.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item cop example 1
+
+  package Foo::Bar;
+
+  sub import;
+
+  sub handler {
+    [@_]
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  my $code = $space->cop('handler', $space->blessed);
+
+  # sub { Foo::Bar::handler(..., @_) }
+
+=back
+
+=cut
+
+=head2 data
+
+  data() (Str)
+
+The data method attempts to read and return any content stored in the C<DATA>
+section of the package namespace.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis;
+
+  my $data = $space->data;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 destroy
+
+  destroy() (Object)
+
+The destroy method attempts to wipe out a namespace and also remove it and its
+children from C<%INC>. B<NOTE:> This can cause catastrophic failures if used
+incorrectly.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item destroy example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('data/dumper');
+
+  $space->load; # Data/Dumper
+
+  my $destroy = $space->destroy;
+
+  # bless({ value => "data/dumper" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 eval
+
+  eval(Str @data) (Any)
+
+The eval method takes a list of strings and evaluates them under the namespace
+represented by the instance.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item eval example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $eval = $space->eval('our $VERSION = 0.01');
+
+  # 0.01
+
+=back
+
+=cut
+
+=head2 explain
+
+  explain() (Str)
+
+The explain method returns the package name and is used in stringification
+operations.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item explain example 1
+
+  # given: synopsis;
+
+  my $explain = $space->explain;
+
+  # "Foo::Bar"
+
+=back
+
+=cut
+
+=head2 hash
+
+  hash(Str $name) (HashRef)
+
+The hash method returns the value for the given package hash variable name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item hash example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our %settings = (
+    active => 1
+  );
+
+  package main;
+
+  my $hash = $space->hash('settings');
+
+  # { active => 1 }
+
+=back
+
+=cut
+
+=head2 hashes
+
+  hashes() (ArrayRef)
+
+The hashes method searches the package namespace for hashes and returns their
+names.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item hashes example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our %defaults = (
+    active => 0
+  );
+
+  our %settings = (
+    active => 1
+  );
+
+  package main;
+
+  my $hashes = $space->hashes;
+
+  # ["defaults", "settings"]
+
+=back
+
+=cut
+
+=head2 id
+
+  id() (Str)
+
+The id method returns the fully-qualified package name as a label.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item id example 1
+
+  # given: synopsis;
+
+  my $id = $space->id;
+
+  # "Foo_Bar"
+
+=back
+
+=cut
+
+=head2 included
+
+  included() (Str | Undef)
+
+The included method returns the path of the namespace if it exists in C<%INC>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item included example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus/Space');
+
+  my $included = $space->included;
+
+  # "/path/to/lib/Venus/Space.pm"
+
+=back
+
+=cut
+
+=head2 inherits
+
+  inherits() (ArrayRef)
+
+The inherits method returns the list of superclasses the target package is
+derived from.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item inherits example 1
+
+  package Bar;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('bar');
+
+  my $inherits = $space->inherits;
+
+  # []
+
+=back
+
+=over 4
+
+=item inherits example 2
+
+  package Foo;
+
+  sub import;
+
+  package Bar;
+
+  use base 'Foo';
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('bar');
+
+  my $inherits = $space->inherits;
+
+  # ["Foo"]
+
+=back
+
+=cut
+
+=head2 init
+
+  init() (Str)
+
+The init method ensures that the package namespace is loaded and, whether
+created in-memory or on-disk, is flagged as being loaded and loadable.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item init example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('kit');
+
+  my $init = $space->init;
+
+  # "Kit"
+
+=back
+
+=cut
+
+=head2 inject
+
+  inject(Str $name, Maybe[CodeRef] $coderef) (Any)
+
+The inject method monkey-patches the package namespace, installing a named
+subroutine into the package which can then be called normally, returning the
+fully-qualified subroutine name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item inject example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('kit');
+
+  my $inject = $space->inject('build', sub { 'finished' });
+
+  # *Kit::build
+
+=back
+
+=cut
+
+=head2 load
+
+  load() (Str)
+
+The load method checks whether the package namespace is already loaded and if
+not attempts to load the package. If the package is not loaded and is not
+loadable, this method will throw an exception using confess. If the package is
+loadable, this method returns truthy with the package name. As a workaround for
+packages that only exist in-memory, if the package contains a C<new>, C<with>,
+C<meta>, or C<import> routine it will be recognized as having been loaded.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item load example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('c_p_a_n');
+
+  my $load = $space->load;
+
+  # "CPAN"
+
+=back
+
+=cut
+
+=head2 loaded
+
+  loaded() (Int)
+
+The loaded method checks whether the package namespace is already loaded
+returns truthy or falsy.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item loaded example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('data/dumper');
+
+  $space->destroy;
+
+  my $loaded = $space->loaded;
+
+  # 0
+
+=back
+
+=over 4
+
+=item loaded example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('data/dumper');
+
+  $space->load;
+
+  my $loaded = $space->loaded;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 locate
+
+  locate() (Str)
+
+The locate method checks whether the package namespace is available in
+C<@INC>, i.e. on disk. This method returns the file if found or an empty
+string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item locate example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('xyz');
+
+  my $locate = $space->locate;
+
+  # ""
+
+=back
+
+=over 4
+
+=item locate example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('data/dumper');
+
+  $space->load;
+
+  my $locate = $space->locate;
+
+  # "/path/to/lib/Data/Dumper.pm"
+
+=back
+
+=cut
+
+=head2 name
+
+  name() (Str)
+
+The name method returns the fully-qualified package name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis;
+
+  my $name = $space->name;
+
+  # "Foo::Bar"
+
+=back
+
+=cut
+
+=head2 parent
+
+  parent() (Space)
+
+The parent method returns a new L<Venus::Space> object for the parent package
+namespace.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item parent example 1
+
+  # given: synopsis;
+
+  my $parent = $space->parent;
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 parse
+
+  parse() (ArrayRef)
+
+The parse method parses the string argument and returns an arrayref of package
+namespace segments (parts).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item parse example 1
+
+  # given: synopsis;
+
+  my $parse = $space->parse;
+
+  # ["Foo", "Bar"]
+
+=back
+
+=over 4
+
+=item parse example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo/Bar');
+
+  my $parse = $space->parse;
+
+  # ["Foo", "Bar"]
+
+=back
+
+=over 4
+
+=item parse example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo\Bar');
+
+  my $parse = $space->parse;
+
+  # ["Foo", "Bar"]
+
+=back
+
+=over 4
+
+=item parse example 4
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo-Bar');
+
+  my $parse = $space->parse;
+
+  # ["FooBar"]
+
+=back
+
+=over 4
+
+=item parse example 5
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo_Bar');
+
+  my $parse = $space->parse;
+
+  # ["FooBar"]
+
+=back
+
+=cut
+
+=head2 parts
+
+  parts() (ArrayRef)
+
+The parts method returns an arrayref of package namespace segments (parts).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item parts example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo');
+
+  my $parts = $space->parts;
+
+  # ["Foo"]
+
+=back
+
+=over 4
+
+=item parts example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo/Bar');
+
+  my $parts = $space->parts;
+
+  # ["Foo", "Bar"]
+
+=back
+
+=over 4
+
+=item parts example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Foo_Bar');
+
+  my $parts = $space->parts;
+
+  # ["FooBar"]
+
+=back
+
+=cut
+
+=head2 prepend
+
+  prepend(Str @path) (Space)
+
+The prepend method modifies the object by prepending to the package namespace
+parts.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item prepend example 1
+
+  # given: synopsis;
+
+  my $prepend = $space->prepend('etc');
+
+  # bless({ value => "Etc/Foo/Bar" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item prepend example 2
+
+  # given: synopsis;
+
+  my $prepend = $space->prepend('etc', 'tmp');
+
+  # bless({ value => "Etc/Tmp/Foo/Bar" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 rebase
+
+  rebase(Str @path) (Space)
+
+The rebase method returns an object by prepending the package namespace
+specified to the base of the current object's namespace.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rebase example 1
+
+  # given: synopsis;
+
+  my $rebase = $space->rebase('zoo');
+
+  # bless({ value => "Zoo/Bar" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 reload
+
+  reload() (Str)
+
+The reload method attempts to delete and reload the package namespace using the
+L</load> method. B<Note:> Reloading is additive and will overwrite existing
+symbols but does not remove symbols.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item reload example 1
+
+  package main;
+
+  use Venus::Space;
+
+  # Foo::Gen is generate with $VERSION as 0.01
+
+  my $space = Venus::Space->new('Foo/Gen');
+
+  my $reload = $space->reload;
+
+  # Foo::Gen
+  # Foo::Gen->VERSION is 0.01
+
+=back
+
+=over 4
+
+=item reload example 2
+
+  package main;
+
+  use Venus::Space;
+
+  # Foo::Gen is generate with $VERSION as 0.02
+
+  my $space = Venus::Space->new('Foo/Gen');
+
+  my $reload = $space->reload;
+
+  # Foo::Gen
+  # Foo::Gen->VERSION is 0.02
+
+=back
+
+=cut
+
+=head2 require
+
+  require(Str $target) (Any)
+
+The require method executes a C<require> statement within the package namespace
+specified.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item require example 1
+
+  # given: synopsis;
+
+  my $require = $space->require('Moo');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 root
+
+  root() (Str)
+
+The root method returns the root package namespace segments (parts). Sometimes
+separating the C<root> from the C<parts> helps identify how subsequent child
+objects were derived.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item root example 1
+
+  # given: synopsis;
+
+  my $root = $space->root;
+
+  # "Foo"
+
+=back
+
+=cut
+
+=head2 routine
+
+  routine(Str $name) (CodeRef)
+
+The routine method returns the subroutine reference for the given subroutine
+name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item routine example 1
+
+  package Foo;
+
+  sub cont {
+    [@_]
+  }
+
+  sub abort {
+    [@_]
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $routine = $space->routine('cont');
+
+  # sub { ... }
+
+=back
+
+=cut
+
+=head2 routines
+
+  routines() (ArrayRef)
+
+The routines method searches the package namespace for routines and returns
+their names.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item routines example 1
+
+  package Foo::Subs;
+
+  sub start {
+    1
+  }
+
+  sub abort {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/subs');
+
+  my $routines = $space->routines;
+
+  # ["abort", "start"]
+
+=back
+
+=cut
+
+=head2 scalar
+
+  scalar(Str $name) (Any)
+
+The scalar method returns the value for the given package scalar variable name.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item scalar example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our $root = '/path/to/file';
+
+  package main;
+
+  my $scalar = $space->scalar('root');
+
+  # "/path/to/file"
+
+=back
+
+=cut
+
+=head2 scalars
+
+  scalars() (ArrayRef)
+
+The scalars method searches the package namespace for scalars and returns their
+names.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item scalars example 1
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our $root = 'root';
+  our $base = 'path/to';
+  our $file = 'file';
+
+  package main;
+
+  my $scalars = $space->scalars;
+
+  # ["base", "file", "root"]
+
+=back
+
+=cut
+
+=head2 sibling
+
+  sibling(Str $path) (Space)
+
+The sibling method returns a new L<Venus::Space> object for the sibling package
+namespace.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sibling example 1
+
+  # given: synopsis;
+
+  my $sibling = $space->sibling('baz');
+
+  # bless({ value => "Foo/Baz" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 siblings
+
+  siblings() (ArrayRef[Object])
+
+The siblings method searches C<%INC> and C<@INC> and retuns a list of
+L<Venus::Space> objects for each sibling namespace found (one level deep).
+
+I<Since C<0.01>>
+
+=over 4
+
+=item siblings example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('encode/m_i_m_e');
+
+  my $siblings = $space->siblings;
+
+  # [
+  #   bless({ value => "Encode/MIME/Header" }, "Venus::Space"),
+  #   bless({ value => "Encode/MIME/Name" }, "Venus::Space"),
+  #   ...
+  # ]
+
+=back
+
+=cut
+
+=head2 tryload
+
+  tryload() (Bool)
+
+The tryload method attempt to C<load> the represented package using the
+L</load> method and returns truthy/falsy based on whether the package was
+loaded.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item tryload example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('c_p_a_n');
+
+  my $tryload = $space->tryload;
+
+  # 1
+
+=back
+
+=over 4
+
+=item tryload example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('n_a_p_c');
+
+  my $tryload = $space->tryload;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 use
+
+  use(Str | Tuple[Str, Str] $target, Any @params) (Space)
+
+The use method executes a C<use> statement within the package namespace
+specified.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item use example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/goo');
+
+  my $use = $space->use('Moo');
+
+  # bless({ value => "foo/goo" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item use example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/hoo');
+
+  my $use = $space->use('Moo', 'has');
+
+  # bless({ value => "foo/hoo" }, "Venus::Space")
+
+=back
+
+=over 4
+
+=item use example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/foo');
+
+  my $use = $space->use(['Moo', 9.99], 'has');
+
+=back
+
+=cut
+
+=head2 used
+
+  used() (Str)
+
+The used method searches C<%INC> for the package namespace and if found returns
+the filepath and complete filepath for the loaded package, otherwise returns
+falsy with an empty string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item used example 1
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/oof');
+
+  my $used = $space->used;
+
+  # ""
+
+=back
+
+=over 4
+
+=item used example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('c_p_a_n');
+
+  $space->load;
+
+  my $used = $space->used;
+
+  # "CPAN"
+
+=back
+
+=over 4
+
+=item used example 3
+
+  package Foo::Bar;
+
+  sub import;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  $space->load;
+
+  my $used = $space->used;
+
+  # "Foo/Bar"
+
+=back
+
+=cut
+
+=head2 variables
+
+  variables() (ArrayRef[Tuple[Str, ArrayRef]])
+
+The variables method searches the package namespace for variables and returns
+their names.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item variables example 1
+
+  package Etc;
+
+  our $init = 0;
+  our $func = 1;
+
+  our @does = (1..4);
+  our %sets = (1..4);
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('etc');
+
+  my $variables = $space->variables;
+
+  # [
+  #   ["arrays", ["does"]],
+  #   ["hashes", ["sets"]],
+  #   ["scalars", ["func", "init"]],
+  # ]
+
+=back
+
+=cut
+
+=head2 version
+
+  version() (Maybe[Str])
+
+The version method returns the C<VERSION> declared on the target package, if
+any.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item version example 1
+
+  package Foo::Boo;
+
+  sub import;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/boo');
+
+  my $version = $space->version;
+
+  # undef
+
+=back
+
+=over 4
+
+=item version example 2
+
+  package Foo::Boo;
+
+  our $VERSION = 0.01;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/boo');
+
+  my $version = $space->version;
+
+  # 0.01
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

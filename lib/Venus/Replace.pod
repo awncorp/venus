@@ -1,0 +1,442 @@
+
+=head1 NAME
+
+Venus::Replace - Replace Class
+
+=cut
+
+=head1 ABSTRACT
+
+Replace Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Replace;
+
+  my $replace = Venus::Replace->new(
+    string => 'hello world',
+    regexp => '(world)',
+    substr => 'universe',
+  );
+
+  # $replace->captures;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating regexp replacement data.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 flags
+
+  flags(Str)
+
+This attribute is read-write, accepts C<(Str)> values, is optional, and defaults to C<''>.
+
+=cut
+
+=head2 regexp
+
+  regexp(Regexp)
+
+This attribute is read-write, accepts C<(Regexp)> values, is optional, and defaults to C<qr//>.
+
+=cut
+
+=head2 string
+
+  string(Str)
+
+This attribute is read-write, accepts C<(Str)> values, is optional, and defaults to C<''>.
+
+=cut
+
+=head2 substr
+
+  substr(Str)
+
+This attribute is read-write, accepts C<(Str)> values, is optional, and defaults to C<''>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Explainable>
+L<Venus::Role::Stashable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 captures
+
+  captures() (ArrayRef)
+
+The captures method returns the capture groups from the result object which
+contains information about the results of the regular expression operation.
+This method can return a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item captures example 1
+
+  # given: synopsis;
+
+  my $captures = $replace->captures;
+
+  # ["world"]
+
+=back
+
+=cut
+
+=head2 count
+
+  count() (Num)
+
+The count method returns the number of match occurrences from the result object
+which contains information about the results of the regular expression
+operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item count example 1
+
+  # given: synopsis;
+
+  my $count = $replace->count;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 evaluate
+
+  evaluate() (ArrayRef)
+
+The evaluate method performs the regular expression operation and returns an
+arrayref representation of the results.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item evaluate example 1
+
+  # given: synopsis;
+
+  my $evaluate = $replace->evaluate;
+
+  # [
+  #   "(world)",
+  #   "hello universe",
+  #   1,
+  #   [6, 6],
+  #   [11, 11],
+  #   {},
+  #   "hello world",
+  # ]
+
+=back
+
+=cut
+
+=head2 explain
+
+  explain() (Str)
+
+The explain method returns the subject of the regular expression operation and
+is used in stringification operations.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item explain example 1
+
+  # given: synopsis;
+
+  my $explain = $replace->explain;
+
+  # "hello universe"
+
+=back
+
+=cut
+
+=head2 get
+
+  get() (Str)
+
+The get method returns the subject of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item get example 1
+
+  # given: synopsis;
+
+  my $get = $replace->get;
+
+  # "hello universe"
+
+=back
+
+=cut
+
+=head2 initial
+
+  initial() (Str)
+
+The initial method returns the unaltered string from the result object which
+contains information about the results of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item initial example 1
+
+  # given: synopsis;
+
+  my $initial = $replace->initial;
+
+  # "hello world"
+
+=back
+
+=cut
+
+=head2 last_match_end
+
+  last_match_end() (Maybe[ArrayRef[Int]])
+
+The last_match_end method returns an array of offset positions into the string
+where the capture(s) stopped matching from the result object which contains
+information about the results of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item last_match_end example 1
+
+  # given: synopsis;
+
+  my $last_match_end = $replace->last_match_end;
+
+  # [11, 11]
+
+=back
+
+=cut
+
+=head2 last_match_start
+
+  last_match_start() (Maybe[ArrayRef[Int]])
+
+The last_match_start method returns an array of offset positions into the
+string where the capture(s) matched from the result object which contains
+information about the results of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item last_match_start example 1
+
+  # given: synopsis;
+
+  my $last_match_start = $replace->last_match_start;
+
+  # [6, 6]
+
+=back
+
+=cut
+
+=head2 matched
+
+  matched() (Maybe[Str])
+
+The matched method returns the portion of the string that matched from the
+result object which contains information about the results of the regular
+expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item matched example 1
+
+  # given: synopsis;
+
+  my $matched = $replace->matched;
+
+  # "world"
+
+=back
+
+=cut
+
+=head2 named_captures
+
+  named_captures() (HashRef)
+
+The named_captures method returns a hash containing the requested named regular
+expressions and captured string pairs from the result object which contains
+information about the results of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item named_captures example 1
+
+  # given: synopsis;
+
+  my $named_captures = $replace->named_captures;
+
+  # {}
+
+=back
+
+=over 4
+
+=item named_captures example 2
+
+  package main;
+
+  use Venus::Replace;
+
+  my $replace = Venus::Replace->new(
+    string => 'hello world',
+    regexp => '(?<locale>world)',
+    substr => 'universe',
+  );
+
+  my $named_captures = $replace->named_captures;
+
+  # { locale => ["world"] }
+
+=back
+
+=cut
+
+=head2 postmatched
+
+  postmatched() (Maybe[Str)
+
+The postmatched method returns the portion of the string after the regular
+expression matched from the result object which contains information about the
+results of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item postmatched example 1
+
+  # given: synopsis;
+
+  my $postmatched = $replace->postmatched;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 prematched
+
+  prematched() (Maybe[Str)
+
+The prematched method returns the portion of the string before the regular
+expression matched from the result object which contains information about the
+results of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item prematched example 1
+
+  # given: synopsis;
+
+  my $prematched = $replace->prematched;
+
+  # "hello "
+
+=back
+
+=cut
+
+=head2 set
+
+  set(Str $data) (Str)
+
+The set method sets the subject of the regular expression operation.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set example 1
+
+  # given: synopsis;
+
+  my $set = $replace->set('hello universe');
+
+  # "hello universe"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -1,0 +1,227 @@
+
+=head1 NAME
+
+Venus::Throw - Throw Class
+
+=cut
+
+=head1 ABSTRACT
+
+Throw Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new;
+
+  # $throw->error;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for generating and raising errors (exception
+objects).
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 message
+
+  message(Str)
+
+This attribute is read-write, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 package
+
+  package(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 parent
+
+  parent(Str)
+
+This attribute is read-only, accepts C<(Str)> values, is optional, and defaults to C<'Venus::Error'>.
+
+=cut
+
+=head2 context
+
+  context(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Stashable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 error
+
+  error(HashRef $data) (Error)
+
+The error method throws the prepared error object.
+
+
+
+
+I<Since C<0.01>>
+
+=over 4
+
+=item error example 1
+
+  # given: synopsis;
+
+  my $error = $throw->error;
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Exception!",
+  # }, "Main::Error")
+
+=back
+
+=over 4
+
+=item error example 2
+
+  # given: synopsis;
+
+  my $error = $throw->error({
+    message => 'Something failed!',
+    context => 'Test.error',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  # }, "Main::Error")
+
+=back
+
+=over 4
+
+=item error example 3
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new('Example::Error');
+
+  my $error = $throw->error;
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Exception!",
+  # }, "Example::Error")
+
+=back
+
+=over 4
+
+=item error example 4
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error',
+    parent => 'Venus::Error',
+  );
+
+  my $error = $throw->error({
+    message => 'Example error!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Example error!",
+  # }, "Example::Error")
+
+=back
+
+=over 4
+
+=item error example 5
+
+  package Example::Error;
+
+  use base 'Venus::Error';
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error::Unknown',
+    parent => 'Example::Error',
+  );
+
+  my $error = $throw->error({
+    message => 'Example error (unknown)!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "(eval)",
+  #   "message"  => "Example error (unknown)!",
+  # }, "Example::Error::Unknown")
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

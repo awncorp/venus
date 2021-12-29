@@ -1,0 +1,395 @@
+
+=head1 NAME
+
+Venus::Data - Data Class
+
+=cut
+
+=head1 ABSTRACT
+
+Data Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Data;
+
+  my $data = Venus::Data->new('t/data/sections');
+
+  # $data->find(undef, 'name');
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for extracting C<DATA> sections and POD blocks
+from any file or package. The package can be configured to parse either POD or
+DATA blocks, and it defaults to being configured for POD blocks.
+
+=head2 DATA syntax
+
+  __DATA__
+
+  # data syntax
+
+  @@ name
+
+  Example Name
+
+  @@ end
+
+  @@ titles #1
+
+  Example Title #1
+
+  @@ end
+
+  @@ titles #2
+
+  Example Title #2
+
+  @@ end
+
+=cut
+
+=head2 DATA syntax (nested)
+
+  __DATA__
+
+  # data syntax (nested)
+
+  @@ nested
+
+  Example Nested
+
+  +@@ demo
+
+  blah blah blah
+
+  +@@ end
+
+  @@ end
+
+=cut
+
+=head2 POD syntax
+
+  # pod syntax
+
+  =head1 NAME
+
+  Example #1
+
+  =cut
+
+  =head1 NAME
+
+  Example #2
+
+  =cut
+
+  # pod-ish syntax
+
+  =name
+
+  Example #1
+
+  =cut
+
+  =name
+
+  Example #2
+
+  =cut
+
+=cut
+
+=head2 POD syntax (nested)
+
+  # pod syntax (nested)
+
+  =nested
+
+  Example #1
+
+  +=head1 WHY?
+
+  blah blah blah
+
+  +=cut
+
+  More information on the same topic as was previously mentioned in the
+  previous section demonstrating the topic, obviously from said section.
+
+  =cut
+
+=cut
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Path>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 count
+
+  count(HashRef $criteria) (Int)
+
+The count method uses the criteria provided to L</search> for and return the
+number of blocks found.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item count example 1
+
+  # given: synopsis;
+
+  my $count = $data->docs->count;
+
+  # 6
+
+=back
+
+=over 4
+
+=item count example 2
+
+  # given: synopsis;
+
+  my $count = $data->text->count;
+
+  # 3
+
+=back
+
+=cut
+
+=head2 data
+
+  data() (Str)
+
+The data method returns the text between the C<DATA> and C<END> sections of a
+Perl package or file.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis;
+
+  $data = $data->data;
+
+  # ...
+
+=back
+
+=cut
+
+=head2 docs
+
+  docs() (Data)
+
+The docs method configures the instance for parsing POD blocks.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item docs example 1
+
+  # given: synopsis;
+
+  my $docs = $data->docs;
+
+  # bless({ etag => "=cut", from => "read", stag => "=", ... }, "Venus::Data")
+
+=back
+
+=cut
+
+=head2 find
+
+  find(Maybe[Str] $list, Maybe[Str] $name) (ArrayRef)
+
+The find method is a wrapper around L</search> as shorthand for searching by
+C<list> and C<name>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item find example 1
+
+  # given: synopsis;
+
+  my $find = $data->docs->find(undef, 'name');
+
+  # [
+  #   { data => ["Example #1"], index => 4, list => undef, name => "name" },
+  #   { data => ["Example #2"], index => 5, list => undef, name => "name" },
+  # ]
+
+=back
+
+=over 4
+
+=item find example 2
+
+  # given: synopsis;
+
+  my $find = $data->docs->find('head1', 'NAME');
+
+  # [
+  #   { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
+  #   { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
+  # ]
+
+=back
+
+=over 4
+
+=item find example 3
+
+  # given: synopsis;
+
+  my $find = $data->text->find(undef, 'name');
+
+  # [
+  #   { data => ["Example Name"], index => 1, list => undef, name => "name" },
+  # ]
+
+=back
+
+=over 4
+
+=item find example 4
+
+  # given: synopsis;
+
+  my $find = $data->text->find('titles', '#1');
+
+  # [
+  #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
+  # ]
+
+=back
+
+=cut
+
+=head2 search
+
+The search method returns the set of blocks matching the criteria provided.
+This method can return a list of values in list-context.
+
+=over 4
+
+=item search example 1
+
+  # given: synopsis;
+
+  my $search = $data->docs->search({list => undef, name => 'name'});
+
+  # [
+  #   { data => ["Example #1"], index => 4, list => undef, name => "name" },
+  #   { data => ["Example #2"], index => 5, list => undef, name => "name" },
+  # ]
+
+=back
+
+=over 4
+
+=item search example 2
+
+  # given: synopsis;
+
+  my $search = $data->docs->search({list => 'head1', name => 'NAME'});
+
+  # [
+  #   { data => ["Example #1"], index => 1, list => "head1", name => "NAME" },
+  #   { data => ["Example #2"], index => 2, list => "head1", name => "NAME" },
+  # ]
+
+=back
+
+=over 4
+
+=item search example 3
+
+  # given: synopsis;
+
+  my $find = $data->text->search({list => undef, name => 'name'});
+
+  # [
+  #   { data => ["Example Name"], index => 1, list => undef, name => "name" },
+  # ]
+
+=back
+
+=over 4
+
+=item search example 4
+
+  # given: synopsis;
+
+  my $search = $data->text->search({list => 'titles', name => '#1'});
+
+  # [
+  #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
+  # ]
+
+=back
+
+=cut
+
+=head2 text
+
+  text() (Data)
+
+The text method configures the instance for parsing DATA blocks.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item text example 1
+
+  # given: synopsis;
+
+  my $text = $data->text;
+
+  # bless({ etag  => '@@ end', from  => 'data', stag  => '@@ ', ... }, "Venus::Data")
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

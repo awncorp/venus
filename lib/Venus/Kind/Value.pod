@@ -1,0 +1,139 @@
+
+=head1 NAME
+
+Venus::Kind::Value - Value Base Class
+
+=cut
+
+=head1 ABSTRACT
+
+Value Base Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind::Value';
+
+  package main;
+
+  my $example = Example->new;
+
+  # $example->defined;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides identity and methods common across all L<Venus> value
+classes.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+L<Venus::Role::Buildable>
+L<Venus::Role::Explainable>
+L<Venus::Role::Pluggable>
+L<Venus::Role::Valuable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 defined
+
+  defined() (Int)
+
+The defined method returns truthy or falsy if the underlying value is
+L</defined>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item defined example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $defined = $example->defined;
+
+  # 0
+
+=back
+
+=over 4
+
+=item defined example 2
+
+  package main;
+
+  my $example = Example->new(time);
+
+  my $defined = $example->defined;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 explain
+
+  explain() (Any)
+
+The explain method returns the value set and is used in stringification
+operations.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item explain example 1
+
+  package main;
+
+  my $example = Example->new('hello, there');
+
+  my $explain = $example->explain;
+
+  # "hello, there"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -1,0 +1,379 @@
+
+=head1 NAME
+
+Venus::Vars - Vars Class
+
+=cut
+
+=head1 ABSTRACT
+
+Vars Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Vars;
+
+  my $vars = Venus::Vars->new(
+    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    named => { iam => 'USER', root => 'HOME', },
+  );
+
+  # $vars->root; # $ENV{HOME}
+  # $vars->home; # $ENV{HOME}
+  # $vars->get('home'); # $ENV{HOME}
+  # $vars->get('HOME'); # $ENV{HOME}
+
+  # $vars->iam; # $ENV{USER}
+  # $vars->user; # $ENV{USER}
+  # $vars->get('user'); # $ENV{USER}
+  # $vars->get('USER'); # $ENV{USER}
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for accessing C<%ENV> items.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 named
+
+  named(HashRef)
+
+This attribute is read-write, accepts C<(HashRef)> values, is optional, and defaults to C<{}>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+L<Venus::Role::Proxyable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (HashRef)
+
+The default method returns the default value, i.e. C<{%ENV}>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $vars->default;
+
+  # { USER => 'cpanery', HOME => '/home/cpanery', ... }
+
+=back
+
+=cut
+
+=head2 exists
+
+  exists(Str $key) (Bool)
+
+The exists method takes a name or index and returns truthy if an associated
+value exists.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item exists example 1
+
+  # given: synopsis;
+
+  my $exists = $vars->exists('iam');;
+
+  # 1
+
+=back
+
+=over 4
+
+=item exists example 2
+
+  # given: synopsis;
+
+  my $exists = $vars->exists('USER');;
+
+  # 1
+
+=back
+
+=over 4
+
+=item exists example 3
+
+  # given: synopsis;
+
+  my $exists = $vars->exists('PATH');
+
+  # undef
+
+=back
+
+=over 4
+
+=item exists example 4
+
+  # given: synopsis;
+
+  my $exists = $vars->exists('user');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 get
+
+  get(Str $key) (Any)
+
+The get method takes a name or index and returns the associated value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item get example 1
+
+  # given: synopsis;
+
+  my $get = $vars->get('iam');
+
+  # "cpanery"
+
+=back
+
+=over 4
+
+=item get example 2
+
+  # given: synopsis;
+
+  my $get = $vars->get('USER');
+
+  # "cpanery"
+
+=back
+
+=over 4
+
+=item get example 3
+
+  # given: synopsis;
+
+  my $get = $vars->get('PATH');
+
+  # undef
+
+=back
+
+=over 4
+
+=item get example 4
+
+  # given: synopsis;
+
+  my $get = $vars->get('user');
+
+  # "cpanery"
+
+=back
+
+=cut
+
+=head2 name
+
+  name(Str $key) (Str | Undef)
+
+The name method takes a name or index and returns index if the the associated
+value exists.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis;
+
+  my $name = $vars->name('iam');
+
+  # "USER"
+
+=back
+
+=over 4
+
+=item name example 2
+
+  # given: synopsis;
+
+  my $name = $vars->name('USER');
+
+  # "USER"
+
+=back
+
+=over 4
+
+=item name example 3
+
+  # given: synopsis;
+
+  my $name = $vars->name('PATH');
+
+  # undef
+
+=back
+
+=over 4
+
+=item name example 4
+
+  # given: synopsis;
+
+  my $name = $vars->name('user');
+
+  # "USER"
+
+=back
+
+=cut
+
+=head2 set
+
+  set(Str $key, Any $value) (Any)
+
+The set method takes a name or index and sets the value provided if the
+associated argument exists.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set example 1
+
+  # given: synopsis;
+
+  my $set = $vars->set('iam', 'root');
+
+  # "root"
+
+=back
+
+=over 4
+
+=item set example 2
+
+  # given: synopsis;
+
+  my $set = $vars->set('USER', 'root');
+
+  # "root"
+
+=back
+
+=over 4
+
+=item set example 3
+
+  # given: synopsis;
+
+  my $set = $vars->set('PATH', '/tmp');
+
+  # undef
+
+=back
+
+=over 4
+
+=item set example 4
+
+  # given: synopsis;
+
+  my $set = $vars->set('user', 'root');
+
+  # "root"
+
+=back
+
+=cut
+
+=head2 unnamed
+
+  unnamed() (HashRef)
+
+The unnamed method returns an arrayref of values which have not been named
+using the C<named> attribute.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item unnamed example 1
+
+  package main;
+
+  use Venus::Vars;
+
+  my $vars = Venus::Vars->new(
+    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    named => { root => 'HOME', },
+  );
+
+  my $unnamed = $vars->unnamed;
+
+  # { USER => "cpanery" }
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

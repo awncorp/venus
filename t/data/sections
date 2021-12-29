@@ -1,0 +1,49 @@
+# pod syntax
+
+=head1 NAME
+
+Example #1
+
+=cut
+
+=head1 NAME
+
+Example #2
+
+=cut
+
+# pod-ish syntax
+
+=name
+
+Example #1
+
+=cut
+
+=name
+
+Example #2
+
+=cut
+
+__DATA__
+
+# data syntax
+
+@@ name
+
+Example Name
+
+@@ end
+
+@@ titles #1
+
+Example Title #1
+
+@@ end
+
+@@ titles #2
+
+Example Title #2
+
+@@ end
