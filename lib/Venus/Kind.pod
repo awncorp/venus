@@ -1,0 +1,131 @@
+
+=head1 NAME
+
+Venus::Kind - Kind Base Class
+
+=cut
+
+=head1 ABSTRACT
+
+Kind Base Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  package main;
+
+  my $example = Example->new;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides identity and methods common across all L<Venus> classes.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Boxable>
+L<Venus::Role::Catchable>
+L<Venus::Role::Doable>
+L<Venus::Role::Dumpable>
+L<Venus::Role::Printable>
+L<Venus::Role::Throwable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 class
+
+  class() (Str)
+
+The class method returns the class name for the given class or object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item class example 1
+
+  # given: synopsis;
+
+  my $class = $example->class;
+
+  # "Example"
+
+=back
+
+=cut
+
+=head2 space
+
+  space() (Space)
+
+The space method returns a L<Venus::Space> object for the given object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item space example 1
+
+  # given: synopsis;
+
+  my $space = $example->space;
+
+  # bless({ value => "Example" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 type
+
+  type() (Type)
+
+The type method returns a L<Venus::Type> object for the given object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item type example 1
+
+  # given: synopsis;
+
+  my $type = $example->type;
+
+  # bless({ value => bless({}, "Example") }, "Venus::Type")
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

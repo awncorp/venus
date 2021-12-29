@@ -1,0 +1,172 @@
+
+=head1 NAME
+
+Venus::Boolean - Boolean Class
+
+=cut
+
+=head1 ABSTRACT
+
+Boolean Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  # $boolean->negate;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a representation for boolean values.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (Bool)
+
+The default method returns the default value, i.e. C<0>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $boolean->default;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 is_false
+
+  is_false() (Bool)
+
+The is_false method returns C<false> if the boolean is falsy, otherwise returns
+C<true>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item is_false example 1
+
+  # given: synopsis;
+
+  my $is_false = $boolean->is_false;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 is_true
+
+  is_true() (Bool)
+
+The is_true method returns C<true> if the boolean is truthy, otherwise returns
+C<false>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item is_true example 1
+
+  # given: synopsis;
+
+  my $is_true = $boolean->is_true;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 negate
+
+  negate() (Bool)
+
+The negate method returns C<true> if the boolean is falsy, otherwise returns
+C<false>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item negate example 1
+
+  # given: synopsis;
+
+  my $negate = $boolean->negate;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 type
+
+  type() (Str)
+
+The type method returns the word C<'true'> if the boolean is truthy, otherwise
+returns C<'false'>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item type example 1
+
+  # given: synopsis;
+
+  my $type = $boolean->type;
+
+  # "false"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

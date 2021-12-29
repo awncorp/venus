@@ -1,0 +1,141 @@
+
+=head1 NAME
+
+Venus::Role::Catchable - Catchable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Catchable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  use Venus 'error';
+
+  with 'Venus::Role::Catchable';
+
+  sub pass {
+    true;
+  }
+
+  sub fail {
+    error;
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # my $error = $example->catch('fail');
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for trapping
+errors thrown from dispatched method calls.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Tryable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 catch
+
+  catch(Str $method, Any @args) (Any)
+
+The catch method traps any errors raised by executing the dispatched method
+call and returns the error string or error object. This method can return a
+list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item catch example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('fail');
+
+  # bless({...}, "Venus::Error")
+
+=back
+
+=over 4
+
+=item catch example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $catch = $example->catch('pass');
+
+  # undef
+
+=back
+
+=over 4
+
+=item catch example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my ($catch, $result) = $example->catch('pass');
+
+  # (undef, 1)
+
+=back
+
+=over 4
+
+=item catch example 4
+
+  package main;
+
+  my $example = Example->new;
+
+  my ($catch, $result) = $example->catch('fail');
+
+  # (bless({...}, "Venus::Error"), undef)
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

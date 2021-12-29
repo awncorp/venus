@@ -1,0 +1,200 @@
+name: Releasing
+
+on:
+  push:
+    tags:
+    - cpan
+
+jobs:
+  Perl-5300:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Perlbrew
+      run: sudo apt install -y perlbrew
+    - name: Initial Perlbrew
+      run: sudo perlbrew init
+    - name: Install CPANM
+      run: sudo perlbrew install-cpanm
+    - name: Install Perl 5.30
+      run: sudo perlbrew install -n perl-5.30.0
+    - name: Verify Perl Version
+      run: sudo perlbrew exec --with perl-5.30.0 perl -V
+    - name: Install Perl::Critic
+      run: sudo perlbrew exec --with perl-5.30.0 cpanm -qn Perl::Critic
+    - name: Install Perl Dependencies
+      run: sudo perlbrew exec --with perl-5.30.0 cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: sudo perlbrew exec --with perl-5.30.0 perlcritic lib t
+    - name: Testing Project
+      run: sudo perlbrew exec --with perl-5.30.0 prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Perl-5280:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Perlbrew
+      run: sudo apt install -y perlbrew
+    - name: Initial Perlbrew
+      run: sudo perlbrew init
+    - name: Install CPANM
+      run: sudo perlbrew install-cpanm
+    - name: Install Perl 5.28
+      run: sudo perlbrew install -n perl-5.28.0
+    - name: Verify Perl Version
+      run: sudo perlbrew exec --with perl-5.28.0 perl -V
+    - name: Install Perl::Critic
+      run: sudo perlbrew exec --with perl-5.28.0 cpanm -qn Perl::Critic
+    - name: Install Perl Dependencies
+      run: sudo perlbrew exec --with perl-5.28.0 cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: sudo perlbrew exec --with perl-5.28.0 perlcritic lib t
+    - name: Testing Project
+      run: sudo perlbrew exec --with perl-5.28.0 prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Perl-5260:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Perlbrew
+      run: sudo apt install -y perlbrew
+    - name: Initial Perlbrew
+      run: sudo perlbrew init
+    - name: Install CPANM
+      run: sudo perlbrew install-cpanm
+    - name: Install Perl 5.26
+      run: sudo perlbrew install -n perl-5.26.0
+    - name: Verify Perl Version
+      run: sudo perlbrew exec --with perl-5.26.0 perl -V
+    - name: Install Perl::Critic
+      run: sudo perlbrew exec --with perl-5.26.0 cpanm -qn Perl::Critic
+    - name: Install Perl Dependencies
+      run: sudo perlbrew exec --with perl-5.26.0 cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: sudo perlbrew exec --with perl-5.26.0 perlcritic lib t
+    - name: Testing Project
+      run: sudo perlbrew exec --with perl-5.26.0 prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Perl-5240:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Perlbrew
+      run: sudo apt install -y perlbrew
+    - name: Initial Perlbrew
+      run: sudo perlbrew init
+    - name: Install CPANM
+      run: sudo perlbrew install-cpanm
+    - name: Install Perl 5.24
+      run: sudo perlbrew install -n perl-5.24.0
+    - name: Verify Perl Version
+      run: sudo perlbrew exec --with perl-5.24.0 perl -V
+    - name: Install Perl::Critic
+      run: sudo perlbrew exec --with perl-5.24.0 cpanm -qn Perl::Critic
+    - name: Install Perl Dependencies
+      run: sudo perlbrew exec --with perl-5.24.0 cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: sudo perlbrew exec --with perl-5.24.0 perlcritic lib t
+    - name: Testing Project
+      run: sudo perlbrew exec --with perl-5.24.0 prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Perl-5220:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Perlbrew
+      run: sudo apt install -y perlbrew
+    - name: Initial Perlbrew
+      run: sudo perlbrew init
+    - name: Install CPANM
+      run: sudo perlbrew install-cpanm
+    - name: Install Perl 5.22
+      run: sudo perlbrew install -n perl-5.22.0
+    - name: Verify Perl Version
+      run: sudo perlbrew exec --with perl-5.22.0 perl -V
+    - name: Install Perl::Critic
+      run: sudo perlbrew exec --with perl-5.22.0 cpanm -qn Perl::Critic
+    - name: Install Perl Dependencies
+      run: sudo perlbrew exec --with perl-5.22.0 cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: sudo perlbrew exec --with perl-5.22.0 perlcritic lib t
+    - name: Testing Project
+      run: sudo perlbrew exec --with perl-5.22.0 prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Perl-5182:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Perlbrew
+      run: sudo apt install -y perlbrew
+    - name: Initial Perlbrew
+      run: sudo perlbrew init
+    - name: Install CPANM
+      run: sudo perlbrew install-cpanm
+    - name: Install Perl 5.18
+      run: sudo perlbrew install -n perl-5.18.2
+    - name: Verify Perl Version
+      run: sudo perlbrew exec --with perl-5.18.2 perl -V
+    - name: Install Perl::Critic
+      run: sudo perlbrew exec --with perl-5.18.2 cpanm -qn Perl::Critic
+    - name: Install Perl Dependencies
+      run: sudo perlbrew exec --with perl-5.18.2 cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: sudo perlbrew exec --with perl-5.18.2 perlcritic lib t
+    - name: Testing Project
+      run: sudo perlbrew exec --with perl-5.18.2 prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Dist-Upload:
+    runs-on: ubuntu-latest
+    needs: ["Perl-5300", "Perl-5280", "Perl-5260", "Perl-5240", "Perl-5220", "Perl-5182"]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup Git User
+      run: git config --global user.name "Cpanery"
+    - name: Setup Git Email
+      run: git config --global user.email "cpanery@cpan.org"
+    - name: Setup GitHub User
+      run: git config --global github.user ${{ secrets.GithubUser }}
+    - name: Setup GitHub Token
+      run: git config --global github.token ${{ secrets.GithubToken }}
+    - name: Install CPANM
+      run: sudo apt install -y cpanminus
+    - name: Install Dist::Zilla
+      run: sudo cpanm -qn Dist::Zilla
+    - name: Install Dist::Zilla Dependencies
+      run: dzil authordeps | sudo cpanm -qn
+    - name: Install Project Dependencies
+      run: sudo cpanm -qn --reinstall --installdeps .
+    - name: Cleanup Build Environment
+      run: dzil clean
+    - name: Build Project Distribution
+      run: V=$(cat VERSION) DZIL_RELEASING=1 dzil build
+    - name: Discard Generated Changelog
+      run: git checkout CHANGES
+    - name: Discard Generated Tarball
+      run: rm $(ls *.tar.gz)
+    - name: Copy CHANGES to Build Directory
+      run: cp -f CHANGES $(echo *-$(cat VERSION))
+    - name: Manually Create Release Tarball
+      run: tar czf $(echo *-$(cat VERSION)).tar.gz $(echo *-$(cat VERSION))
+    - name: Upload to CPAN
+      run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)

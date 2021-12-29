@@ -1,0 +1,35 @@
+name: Testing
+
+on:
+  push:
+    branches:
+    - issue-*
+    - milestone-*
+    - project-*
+
+jobs:
+  Perl-0000:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup Git User
+      run: git config --global user.name "Cpanery"
+    - name: Setup Git Email
+      run: git config --global user.email "cpanery@cpan.org"
+    - name: Setup GitHub User
+      run: git config --global github.user ${{ secrets.GithubUser }}
+    - name: Setup GitHub Token
+      run: git config --global github.user ${{ secrets.GithubToken }}
+    - name: Install CPANM
+      run: sudo apt install -y cpanminus
+    - name: Install Perl::Critic
+      run: sudo cpanm -qn Perl::Critic
+    - name: Install Project Dependencies
+      run: sudo cpanm -qn --reinstall --installdeps .
+    - name: Critiquing Project
+      run: perlcritic lib t
+    - name: Testing Project
+      run: prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9

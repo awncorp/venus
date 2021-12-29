@@ -1,0 +1,88 @@
+
+=head1 NAME
+
+Venus::Role::Doable - Doable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Doable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Doable';
+
+  has 'time';
+
+  sub execute {
+    return;
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # $example->do(time => time)->execute;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for chaining
+any chainable and non-chainable methods (by ignoring their return values).
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 do
+
+  do(Str | CodeRef $method, Any @args) (Self)
+
+The do method dispatches the method call or executes the callback and returns
+the invocant.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item do example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  $example = $example->do(time => time);
+
+  # bless({ time => 0000000000 }, "Example")
+
+  # $example->execute;
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

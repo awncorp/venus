@@ -1,0 +1,108 @@
+
+=head1 NAME
+
+Venus::Role::Dumpable - Dumpable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Dumpable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  has 'test';
+
+  with 'Venus::Role::Dumpable';
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  # $example->dump;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for dumping
+the object or the return value of a dispatched method call.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 dump
+
+  dump(Str | CodeRef $method, Any @args) (Str)
+
+The dump method returns a string representation of the underlying data.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item dump example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $dump = $example->dump;
+
+  # "bless( {test => 123}, 'Example' )"
+
+=back
+
+=cut
+
+=head2 dump_pretty
+
+  dump_pretty(Str | CodeRef $method, Any @args) (Str)
+
+The dump_pretty method returns a string representation of the underlying data
+that is human-readable and useful for debugging.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item dump_pretty example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $dump_pretty = $example->dump_pretty;
+
+  # bless( {
+  #          test => 123
+  #        }, 'Example' )
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

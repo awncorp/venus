@@ -1,0 +1,895 @@
+
+=head1 NAME
+
+Venus::Hash - Hash Class
+
+=cut
+
+=head1 ABSTRACT
+
+Hash Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1..8});
+
+  # $hash->random;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating hash data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Mappable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 all
+
+  all(CodeRef $code) (Bool)
+
+The all method returns true if the callback returns true for all of the
+elements.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item all example 1
+
+  # given: synopsis;
+
+  my $all = $hash->all(sub {
+    $_ > 1
+  });
+
+  # 1
+
+=back
+
+=over 4
+
+=item all example 2
+
+  # given: synopsis;
+
+  my $all = $hash->all(sub {
+    my ($key, $value) = @_;
+
+    $value > 1
+  });
+
+  # 1
+
+=back
+
+=cut
+
+=head2 any
+
+  any(CodeRef $code) (Bool)
+
+The any method returns true if the callback returns true for any of the
+elements.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item any example 1
+
+  # given: synopsis;
+
+  my $any = $hash->any(sub {
+    $_ < 1
+  });
+
+  # 0
+
+=back
+
+=over 4
+
+=item any example 2
+
+  # given: synopsis;
+
+  my $any = $hash->any(sub {
+    my ($key, $value) = @_;
+
+    $value < 1
+  });
+
+  # 0
+
+=back
+
+=cut
+
+=head2 count
+
+  count() (Int)
+
+The count method returns the total number of keys defined.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item count example 1
+
+  # given: synopsis;
+
+  my $count = $hash->count;
+
+  # 4
+
+=back
+
+=cut
+
+=head2 default
+
+  default() (HashRef)
+
+The default method returns the default value, i.e. C<{}>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $hash->default;
+
+  # {}
+
+=back
+
+=cut
+
+=head2 delete
+
+  delete(Str $key) (Any)
+
+The delete method returns the value matching the key specified in the argument
+and returns the value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item delete example 1
+
+  # given: synopsis;
+
+  my $delete = $hash->delete(1);
+
+  # 2
+
+=back
+
+=cut
+
+=head2 each
+
+  each(CodeRef $code) (ArrayRef)
+
+The each method executes callback for each element in the hash passing the
+routine the key and value at the current position in the loop. This method can
+return a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item each example 1
+
+  # given: synopsis;
+
+  my $each = $hash->each(sub {
+    [$_]
+  });
+
+  # [[2], [4], [6], [8]]
+
+=back
+
+=over 4
+
+=item each example 2
+
+  # given: synopsis;
+
+  my $each = $hash->each(sub {
+    my ($key, $value) = @_;
+
+    [$key, $value]
+  });
+
+  # [[1, 2], [3, 4], [5, 6], [7, 8]]
+
+=back
+
+=cut
+
+=head2 empty
+
+  empty() (HashRef)
+
+The empty method drops all elements from the hash.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item empty example 1
+
+  # given: synopsis;
+
+  my $empty = $hash->empty;
+
+  # {}
+
+=back
+
+=cut
+
+=head2 exists
+
+  exists(Str $key) (Bool)
+
+The exists method returns true if the value matching the key specified in the
+argument exists, otherwise returns false.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item exists example 1
+
+  # given: synopsis;
+
+  my $exists = $hash->exists(1);
+
+  # 1
+
+=back
+
+=over 4
+
+=item exists example 2
+
+  # given: synopsis;
+
+  my $exists = $hash->exists(0);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 find
+
+  find(Str @data) (Any)
+
+The find method traverses the data structure using the keys and indices
+provided, returning the value found or undef. In list-context, this method
+returns a tuple, i.e. the value found and boolean representing whether the
+match was successful.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item find example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my $find = $hash->find('foo', 'bar');
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item find example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my $find = $hash->find('bar', 0);
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item find example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my $find = $hash->find('bar');
+
+  # ["baz"]
+
+=back
+
+=over 4
+
+=item find example 4
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my ($find, $exists) = $hash->find('baz');
+
+  # (undef, 0)
+
+=back
+
+=cut
+
+=head2 grep
+
+  grep(CodeRef $code) (ArrayRef)
+
+The grep method executes callback for each key/value pair in the hash passing
+the routine the key and value at the current position in the loop and returning
+a new hash reference containing the elements for which the argument evaluated
+true. This method can return a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item grep example 1
+
+  # given: synopsis;
+
+  my $grep = $hash->grep(sub {
+    $_ >= 3
+  });
+
+  # [3..8]
+
+=back
+
+=over 4
+
+=item grep example 2
+
+  # given: synopsis;
+
+  my $grep = $hash->grep(sub {
+    my ($key, $value) = @_;
+
+    $value >= 3
+  });
+
+  # [3..8]
+
+=back
+
+=cut
+
+=head2 iterator
+
+  iterator() (CodeRef)
+
+The iterator method returns a code reference which can be used to iterate over
+the hash. Each time the iterator is executed it will return the values of the
+next element in the hash until all elements have been seen, at which point the
+iterator will return an undefined value. This method can return a tuple with
+the key and value in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item iterator example 1
+
+  # given: synopsis;
+
+  my $iterator = $hash->iterator;
+
+  # sub { ... }
+
+  # while (my $value = $iterator->()) {
+  #   say $value; # 1
+  # }
+
+=back
+
+=over 4
+
+=item iterator example 2
+
+  # given: synopsis;
+
+  my $iterator = $hash->iterator;
+
+  # sub { ... }
+
+  # while (grep defined, my ($key, $value) = $iterator->()) {
+  #   say $value; # 1
+  # }
+
+=back
+
+=cut
+
+=head2 keys
+
+  keys() (ArrayRef)
+
+The keys method returns an array reference consisting of all the keys in the
+hash.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item keys example 1
+
+  # given: synopsis;
+
+  my $keys = $hash->keys;
+
+  # [1, 3, 5, 7]
+
+=back
+
+=cut
+
+=head2 list
+
+  list() (Any)
+
+The list method returns a shallow copy of the underlying hash reference as an
+array reference.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item list example 1
+
+  # given: synopsis;
+
+  my $list = $hash->list;
+
+  # 4
+
+=back
+
+=over 4
+
+=item list example 2
+
+  # given: synopsis;
+
+  my @list = $hash->list;
+
+  # (1..8)
+
+=back
+
+=cut
+
+=head2 map
+
+  map(CodeRef $code) (ArrayRef)
+
+The map method executes callback for each key/value in the hash passing the
+routine the value at the current position in the loop and returning a new hash
+reference containing the elements for which the argument returns a value or
+non-empty list. This method can return a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item map example 1
+
+  # given: synopsis;
+
+  my $map = $hash->map(sub {
+    $_ * 2
+  });
+
+  # [4, 8, 12, 16]
+
+=back
+
+=over 4
+
+=item map example 2
+
+  # given: synopsis;
+
+  my $map = $hash->map(sub {
+    my ($key, $value) = @_;
+
+    [$key, ($value * 2)]
+  });
+
+  # [[1, 4], [3, 8], [5, 12], [7, 16]]
+
+=back
+
+=cut
+
+=head2 merge
+
+  merge(HashRef @data) (HashRef)
+
+The merge method returns a hash reference where the elements in the hash and
+the elements in the argument(s) are merged. This operation performs a deep
+merge and clones the datasets to ensure no side-effects. The merge behavior
+merges hash references only, all other data types are assigned with precendence
+given to the value being merged.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item merge example 1
+
+  # given: synopsis;
+
+  my $merge = $hash->merge({1 => 'a'});
+
+  # { 1 => "a", 3 => 4, 5 => 6, 7 => 8 }
+
+=back
+
+=over 4
+
+=item merge example 2
+
+  # given: synopsis;
+
+  my $merge = $hash->merge({1 => 'a'}, {5 => 'b'});
+
+  # { 1 => "a", 3 => 4, 5 => "b", 7 => 8 }
+
+=back
+
+=cut
+
+=head2 none
+
+  none(CodeRef $code) (Bool)
+
+The none method returns true if none of the elements in the array meet the
+criteria set by the operand and rvalue.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item none example 1
+
+  # given: synopsis;
+
+  my $none = $hash->none(sub {
+    $_ < 1
+  });
+
+  # 1
+
+=back
+
+=over 4
+
+=item none example 2
+
+  # given: synopsis;
+
+  my $none = $hash->none(sub {
+    my ($key, $value) = @_;
+
+    $value < 1
+  });
+
+  # 1
+
+=back
+
+=cut
+
+=head2 one
+
+  one(CodeRef $code) (Bool)
+
+The one method returns true if only one of the elements in the array meet the
+criteria set by the operand and rvalue.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item one example 1
+
+  # given: synopsis;
+
+  my $one = $hash->one(sub {
+    $_ == 2
+  });
+
+  # 1
+
+=back
+
+=over 4
+
+=item one example 2
+
+  # given: synopsis;
+
+  my $one = $hash->one(sub {
+    my ($key, $value) = @_;
+
+    $value == 2
+  });
+
+  # 1
+
+=back
+
+=cut
+
+=head2 pairs
+
+  pairs() (ArrayRef)
+
+The pairs method is an alias to the pairs_array method. This method can return
+a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item pairs example 1
+
+  # given: synopsis;
+
+  my $pairs = $hash->pairs;
+
+  # [[1, 2], [3, 4], [5, 6], [7, 8]]
+
+=back
+
+=cut
+
+=head2 path
+
+  path(Str $expr) (Any)
+
+The path method traverses the data structure using the path expr provided,
+returning the value found or undef. In list-context, this method returns a
+tuple, i.e. the value found and boolean representing whether the match was
+successful.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item path example 1
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my $path = $hash->path('/foo/bar');
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item path example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my $path = $hash->path('/bar/0');
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item path example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my $path = $hash->path('/bar');
+
+  # ["baz"]
+
+=back
+
+=over 4
+
+=item path example 4
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({'foo' => {'bar' => 'baz'},'bar' => ['baz']});
+
+  my ($path, $exists) = $hash->path('/baz');
+
+  # (undef, 0)
+
+=back
+
+=cut
+
+=head2 random
+
+  random() (Any)
+
+The random method returns a random element from the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item random example 1
+
+  # given: synopsis;
+
+  my $random = $hash->random;
+
+  # 6
+
+  # my $random = $hash->random;
+
+  # 4
+
+=back
+
+=cut
+
+=head2 reset
+
+  reset() (ArrayRef)
+
+The reset method returns nullifies the value of each element in the hash.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item reset example 1
+
+  # given: synopsis;
+
+  my $reset = $hash->reset;
+
+  # { 1 => undef, 3 => undef, 5 => undef, 7 => undef }
+
+=back
+
+=cut
+
+=head2 reverse
+
+  reverse() (HashRef)
+
+The reverse method returns a hash reference consisting of the hash's keys and
+values inverted. Note, keys with undefined values will be dropped.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item reverse example 1
+
+  # given: synopsis;
+
+  my $reverse = $hash->reverse;
+
+  # { 2 => 1, 4 => 3, 6 => 5, 8 => 7 }
+
+=back
+
+=cut
+
+=head2 slice
+
+  slice(Str @keys) (ArrayRef)
+
+The slice method returns an array reference of the values that correspond to
+the key(s) specified in the arguments.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item slice example 1
+
+  # given: synopsis;
+
+  my $slice = $hash->slice(1, 3);
+
+  # [2, 4]
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

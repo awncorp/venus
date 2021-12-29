@@ -1,0 +1,80 @@
+
+=head1 NAME
+
+Venus::Float - Float Class
+
+=cut
+
+=head1 ABSTRACT
+
+Float Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Float;
+
+  my $float = Venus::Float->new(1.23);
+
+  # $float->int;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating float data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Number>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (Str)
+
+The default method returns the default value, i.e. C<0.0>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $float->default;
+
+  # "0.0"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

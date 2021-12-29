@@ -1,0 +1,86 @@
+
+=head1 NAME
+
+Venus::Role::Explainable - Explainable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Explainable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  has 'test';
+
+  sub explain {
+    "okay"
+  }
+
+  with 'Venus::Role::Explainable';
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  # $example->explain;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for making the
+object stringifiable.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 explain
+
+  explain() (Any)
+
+The explain method takes no arguments and returns the value to be used in
+stringification operations.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item explain example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $explain = $example->explain;
+
+  # "okay"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -1,0 +1,254 @@
+
+=head1 NAME
+
+Venus::Role::Printable - Printable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Printable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Printable';
+
+  has 'test';
+
+  sub execute {
+    return [@_];
+  }
+
+  sub printer {
+    return [@_];
+  }
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  # $example->say;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for outputting (printing) objects or the
+return value of a dispatched method call to STDOUT.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Dumpable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 print
+
+  print(Any @data) (Any)
+
+The print method prints a stringified representation of the underlying data.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item print example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print = $example->print;
+
+  # bless({test => 123}, 'Example')
+
+  # 1
+
+=back
+
+=over 4
+
+=item print example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print = $example->print('execute', 1, 2, 3);
+
+  # [bless({test => 123}, 'Example'),1,2,3]
+
+  # 1
+
+=back
+
+=cut
+
+=head2 print_pretty
+
+  print_pretty(Any @data) (Any)
+
+The print_pretty method prints a stringified human-readable representation of
+the underlying data.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item print_pretty example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_pretty = $example->print_pretty;
+
+  # bless({ test => 123 }, 'Example')
+
+  # 1
+
+=back
+
+=over 4
+
+=item print_pretty example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_pretty = $example->print_pretty('execute', 1, 2, 3);
+
+  # [
+  #   bless({ test => 123 }, 'Example'),
+  #   1,
+  #   2,
+  #   3
+  # ]
+
+  # 1
+
+=back
+
+=cut
+
+=head2 say
+
+  say(Any @data) (Any)
+
+The say method prints a stringified representation of the underlying data, with
+a trailing newline.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item say example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say = $example->say;
+
+  # bless({test => 123}, 'Example')\n
+
+  # 1
+
+=back
+
+=over 4
+
+=item say example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say = $example->say;
+
+  # [bless({test => 123}, 'Example'),1,2,3]\n
+
+  # 1
+
+=back
+
+=cut
+
+=head2 say_pretty
+
+  say_pretty(Any @data) (Any)
+
+The say_pretty method prints a stringified human-readable representation of the
+underlying data, with a trailing newline.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item say_pretty example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_pretty = $example->say_pretty;
+
+  # bless({ test => 123 }, 'Example')\n
+
+  # 1
+
+=back
+
+=over 4
+
+=item say_pretty example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_pretty = $example->say_pretty;
+
+  # [
+  #   bless({ test => 123 }, 'Example'),
+  #   1,
+  #   2,
+  #   3
+  # ]\n
+
+  # 1
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

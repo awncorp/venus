@@ -1,0 +1,343 @@
+
+=head1 NAME
+
+Venus::Args - Args Class
+
+=cut
+
+=head1 ABSTRACT
+
+Args Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Args;
+
+  my $args = Venus::Args->new(
+    named => { flag => 0, command => 1 }, # optional
+    value => ['--help', 'execute'],
+  );
+
+  # $args->flag; # $ARGV[0]
+  # $args->get(0); # $ARGV[0]
+  # $args->get(1); # $ARGV[1]
+  # $args->action; # $ARGV[1]
+  # $args->exists(0); # exists $ARGV[0]
+  # $args->exists('flag'); # exists $ARGV[0]
+  # $args->get('flag'); # $ARGV[0]
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for accessing C<@ARGS> items.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 named
+
+  named(HashRef)
+
+This attribute is read-write, accepts C<(HashRef)> values, is optional, and defaults to C<{}>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+L<Venus::Role::Proxyable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 default
+
+  default() (ArrayRef)
+
+The default method returns the default value, i.e. C<@ARGV>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $args->default;
+
+  # [@ARGV]
+
+  # ["--help", "execute"]
+
+=back
+
+=cut
+
+=head2 exists
+
+  exists(Str $key) (Bool)
+
+The exists method returns truthy or falsy if an index or alias value exists.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item exists example 1
+
+  # given: synopsis;
+
+  my $exists = $args->exists(0);
+
+  # 1
+
+=back
+
+=over 4
+
+=item exists example 2
+
+  # given: synopsis;
+
+  my $exists = $args->exists('flag');
+
+  # 1
+
+=back
+
+=over 4
+
+=item exists example 3
+
+  # given: synopsis;
+
+  my $exists = $args->exists(2);
+
+  # undef
+
+=back
+
+=cut
+
+=head2 get
+
+  get(Str $key) (Any)
+
+The get method returns the value of the index or alias.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item get example 1
+
+  # given: synopsis;
+
+  my $get = $args->get(0);
+
+  # "--help"
+
+=back
+
+=over 4
+
+=item get example 2
+
+  # given: synopsis;
+
+  my $get = $args->get('flag');
+
+  # "--help"
+
+=back
+
+=over 4
+
+=item get example 3
+
+  # given: synopsis;
+
+  my $get = $args->get(2);
+
+  # undef
+
+=back
+
+=cut
+
+=head2 indexed
+
+  indexed() (HashRef)
+
+The indexed method returns a set of indices and values.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item indexed example 1
+
+  # given: synopsis;
+
+  my $indexed = $args->indexed;
+
+  # { "0" => "--help", "1" => "execute" }
+
+=back
+
+=cut
+
+=head2 name
+
+  name(Str $key) (Str | Undef)
+
+The name method resolves and returns the index for an index or alias, and
+returns undefined if not found.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis;
+
+  my $name = $args->name('flag');
+
+=back
+
+=cut
+
+=head2 set
+
+  set(Str $key, Any $data) (Any)
+
+The set method sets and returns the value of an index or alias.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set example 1
+
+  # given: synopsis;
+
+  my $set = $args->set(0, '-?');
+
+  # "-?"
+
+=back
+
+=over 4
+
+=item set example 2
+
+  # given: synopsis;
+
+  my $set = $args->set('flag', '-?');
+
+  # "-?"
+
+=back
+
+=over 4
+
+=item set example 3
+
+  # given: synopsis;
+
+  my $set = $args->set('verbose', 1);
+
+  # undef
+
+=back
+
+=cut
+
+=head2 unnamed
+
+  unnamed() (ArrayRef)
+
+The unnamed method returns a list of unaliases indices.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item unnamed example 1
+
+  package main;
+
+  use Venus::Args;
+
+  my $args = Venus::Args->new(
+    named => { flag => 0, command => 1 },
+    value => ['--help', 'execute', '--format', 'markdown'],
+  );
+
+  my $unnamed = $args->unnamed;
+
+  # ["--format", "markdown"]
+
+=back
+
+=over 4
+
+=item unnamed example 2
+
+  package main;
+
+  use Venus::Args;
+
+  my $args = Venus::Args->new(
+    named => { command => 1 },
+    value => ['execute', 'phase-1', '--format', 'markdown'],
+  );
+
+  my $unnamed = $args->unnamed;
+
+  # ["execute", "--format", "markdown"]
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -1,0 +1,84 @@
+
+=head1 NAME
+
+Venus::Box - Box Class
+
+=cut
+
+=head1 ABSTRACT
+
+Box Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Box;
+
+  my $box = Venus::Box->new(
+    value => {},
+  );
+
+  # $box->keys->count->unbox;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a pure Perl boxing mechanism for wrapping objects and
+values, and chaining method calls across all objects.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+L<Venus::Role::Proxyable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 unbox
+
+  unbox() (Any)
+
+The unbox method returns the un-boxed underlying object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item unbox example 1
+
+  # given: synopsis;
+
+  my $unbox = $box->unbox;
+
+  # bless({ value => {} }, "Venus::Hash")
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

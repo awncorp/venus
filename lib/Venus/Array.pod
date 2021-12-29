@@ -1,0 +1,1176 @@
+
+=head1 NAME
+
+Venus::Array - Array Class
+
+=cut
+
+=head1 ABSTRACT
+
+Array Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..9]);
+
+  # $array->random;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating array data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Mappable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 all
+
+  all(CodeRef $code) (Bool)
+
+The all method returns true if the callback returns true for all of the
+elements.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item all example 1
+
+  # given: synopsis;
+
+  my $all = $array->all(sub {
+    $_ > 0;
+  });
+
+  # 1
+
+=back
+
+=over 4
+
+=item all example 2
+
+  # given: synopsis;
+
+  my $all = $array->all(sub {
+    my ($key, $value) = @_;
+
+    $value > 0;
+  });
+
+  # 1
+
+=back
+
+=cut
+
+=head2 any
+
+  any(CodeRef $code) (Bool)
+
+The any method returns true if the callback returns true for any of the
+elements.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item any example 1
+
+  # given: synopsis;
+
+  my $any = $array->any(sub {
+    $_ > 4;
+  });
+
+=back
+
+=over 4
+
+=item any example 2
+
+  # given: synopsis;
+
+  my $any = $array->any(sub {
+    my ($key, $value) = @_;
+
+    $value > 4;
+  });
+
+=back
+
+=cut
+
+=head2 count
+
+  count() (Int)
+
+The count method returns the number of elements within the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item count example 1
+
+  # given: synopsis;
+
+  my $count = $array->count;
+
+  # 9
+
+=back
+
+=cut
+
+=head2 default
+
+  default() (ArrayRef)
+
+The default method returns the default value, i.e. C<[]>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $array->default;
+
+  # []
+
+=back
+
+=cut
+
+=head2 delete
+
+  delete(Int $index) (Any)
+
+The delete method returns the value of the element at the index specified after
+removing it from the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item delete example 1
+
+  # given: synopsis;
+
+  my $delete = $array->delete(2);
+
+  # 3
+
+=back
+
+=cut
+
+=head2 each
+
+  each(CodeRef $code) (ArrayRef)
+
+The each method executes a callback for each element in the array passing the
+index and value as arguments. This method can return a list of values in
+list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item each example 1
+
+  # given: synopsis;
+
+  my $each = $array->each(sub {
+    [$_]
+  });
+
+  # [[1], [2], [3], [4], [5], [6], [7], [8], [9]]
+
+=back
+
+=over 4
+
+=item each example 2
+
+  # given: synopsis;
+
+  my $each = $array->each(sub {
+    my ($key, $value) = @_;
+
+    [$key, $value]
+  });
+
+  # [
+  #   [0, 1],
+  #   [1, 2],
+  #   [2, 3],
+  #   [3, 4],
+  #   [4, 5],
+  #   [5, 6],
+  #   [6, 7],
+  #   [7, 8],
+  #   [8, 9],
+  # ]
+
+=back
+
+=cut
+
+=head2 empty
+
+  empty() (Array)
+
+The empty method drops all elements from the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item empty example 1
+
+  # given: synopsis;
+
+  my $empty = $array->empty;
+
+  # bless({ value => [] }, "Venus::Array")
+
+=back
+
+=cut
+
+=head2 exists
+
+  exists(Int $index) (Bool)
+
+The exists method returns true if the element at the index specified exists,
+otherwise it returns false.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item exists example 1
+
+  # given: synopsis;
+
+  my $exists = $array->exists(0);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 find
+
+  find(Str @keys) (Any)
+
+The find method traverses the data structure using the keys and indices
+provided, returning the value found or undef. In list-context, this method
+returns a tuple, i.e. the value found and boolean representing whether the
+match was successful.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item find example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my $find = $array->find(0, 'foo');
+
+  # { bar => "baz" }
+
+=back
+
+=over 4
+
+=item find example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my $find = $array->find(0, 'foo', 'bar');
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item find example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my $find = $array->find(2, 0);
+
+  # "baz"
+
+=back
+
+=cut
+
+=head2 first
+
+  first() (Any)
+
+The first method returns the value of the first element.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item first example 1
+
+  # given: synopsis;
+
+  my $first = $array->first;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 grep
+
+  grep(CodeRef $code) (ArrayRef)
+
+The grep method executes a callback for each element in the array passing the
+value as an argument, returning a new array reference containing the elements
+for which the returned true. This method can return a list of values in
+list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item grep example 1
+
+  # given: synopsis;
+
+  my $grep = $array->grep(sub {
+    $_ > 3
+  });
+
+  # [4..9]
+
+=back
+
+=over 4
+
+=item grep example 2
+
+  # given: synopsis;
+
+  my $grep = $array->grep(sub {
+    my ($key, $value) = @_;
+
+    $value > 3
+  });
+
+  # [4..9]
+
+=back
+
+=cut
+
+=head2 iterator
+
+  iterator() (CodeRef)
+
+The iterator method returns a code reference which can be used to iterate over
+the array. Each time the iterator is executed it will return the next element
+in the array until all elements have been seen, at which point the iterator
+will return an undefined value. This method can return a tuple with the key and
+value in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item iterator example 1
+
+  # given: synopsis;
+
+  my $iterator = $array->iterator;
+
+  # sub { ... }
+
+  # while (my $value = $iterator->()) {
+  #   say $value; # 1
+  # }
+
+=back
+
+=over 4
+
+=item iterator example 2
+
+  # given: synopsis;
+
+  my $iterator = $array->iterator;
+
+  # sub { ... }
+
+  # while (grep defined, my ($key, $value) = $iterator->()) {
+  #   say $value; # 1
+  # }
+
+=back
+
+=cut
+
+=head2 join
+
+  join(Str $seperator) (Str)
+
+The join method returns a string consisting of all the elements in the array
+joined by the join-string specified by the argument. Note: If the argument is
+omitted, an empty string will be used as the join-string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item join example 1
+
+  # given: synopsis;
+
+  my $join = $array->join;
+
+  # 123456789
+
+=back
+
+=over 4
+
+=item join example 2
+
+  # given: synopsis;
+
+  my $join = $array->join(', ');
+
+  # "1, 2, 3, 4, 5, 6, 7, 8, 9"
+
+=back
+
+=cut
+
+=head2 keyed
+
+  keyed(Str @keys) (HashRef)
+
+The keyed method returns a hash reference where the arguments become the keys,
+and the elements of the array become the values.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item keyed example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..4]);
+
+  my $keyed = $array->keyed('a'..'d');
+
+  # { a => 1, b => 2, c => 3, d => 4 }
+
+=back
+
+=cut
+
+=head2 keys
+
+  keys() (ArrayRef)
+
+The keys method returns an array reference consisting of the indicies of the
+array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item keys example 1
+
+  # given: synopsis;
+
+  my $keys = $array->keys;
+
+  # [0..8]
+
+=back
+
+=cut
+
+=head2 last
+
+  last() (Any)
+
+The last method returns the value of the last element in the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item last example 1
+
+  # given: synopsis;
+
+  my $last = $array->last;
+
+  # 9
+
+=back
+
+=cut
+
+=head2 list
+
+  list() (Any)
+
+The list method returns a shallow copy of the underlying array reference as an
+array reference.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item list example 1
+
+  # given: synopsis;
+
+  my $list = $array->list;
+
+  # 9
+
+=back
+
+=over 4
+
+=item list example 2
+
+  # given: synopsis;
+
+  my @list = $array->list;
+
+  # (1..9)
+
+=back
+
+=cut
+
+=head2 map
+
+  map(CodeRef $code) (ArrayRef)
+
+The map method iterates over each element in the array, executing the code
+reference supplied in the argument, passing the routine the value at the
+current position in the loop and returning a new array reference containing the
+elements for which the argument returns a value or non-empty list. This method
+can return a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item map example 1
+
+  # given: synopsis;
+
+  my $map = $array->map(sub {
+    $_ * 2
+  });
+
+  # [2, 4, 6, 8, 10, 12, 14, 16, 18]
+
+=back
+
+=over 4
+
+=item map example 2
+
+  # given: synopsis;
+
+  my $map = $array->map(sub {
+    my ($key, $value) = @_;
+
+    [$key, ($value * 2)]
+  });
+
+  # [
+  #   [0, 2],
+  #   [1, 4],
+  #   [2, 6],
+  #   [3, 8],
+  #   [4, 10],
+  #   [5, 12],
+  #   [6, 14],
+  #   [7, 16],
+  #   [8, 18],
+  # ]
+
+=back
+
+=cut
+
+=head2 none
+
+  none(CodeRef $code) (Bool)
+
+The none method returns true if none of the elements in the array meet the
+criteria set by the operand and rvalue.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item none example 1
+
+  # given: synopsis;
+
+  my $none = $array->none(sub {
+    $_ < 1
+  });
+
+  # 1
+
+=back
+
+=over 4
+
+=item none example 2
+
+  # given: synopsis;
+
+  my $none = $array->none(sub {
+    my ($key, $value) = @_;
+
+    $value < 1
+  });
+
+  # 1
+
+=back
+
+=cut
+
+=head2 one
+
+  one(CodeRef $code) (Bool)
+
+The one method returns true if only one of the elements in the array meet the
+criteria set by the operand and rvalue.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item one example 1
+
+  # given: synopsis;
+
+  my $one = $array->one(sub {
+    $_ == 1
+  });
+
+  # 1
+
+=back
+
+=over 4
+
+=item one example 2
+
+  # given: synopsis;
+
+  my $one = $array->one(sub {
+    my ($key, $value) = @_;
+
+    $value == 1
+  });
+
+  # 1
+
+=back
+
+=cut
+
+=head2 pairs
+
+  pairs() (ArrayRef)
+
+The pairs method is an alias to the pairs_array method. This method can return
+a list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item pairs example 1
+
+  # given: synopsis;
+
+  my $pairs = $array->pairs;
+
+  # [
+  #   [0, 1],
+  #   [1, 2],
+  #   [2, 3],
+  #   [3, 4],
+  #   [4, 5],
+  #   [5, 6],
+  #   [6, 7],
+  #   [7, 8],
+  #   [8, 9],
+  # ]
+
+=back
+
+=cut
+
+=head2 part
+
+  part(CodeRef $code) (Tuple[ArrayRef, ArrayRef])
+
+The part method iterates over each element in the array, executing the code
+reference supplied in the argument, using the result of the code reference to
+partition to array into two distinct array references. This method can return a
+list of values in list-context.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item part example 1
+
+  # given: synopsis;
+
+  my $part = $array->part(sub {
+    $_ > 5
+  });
+
+  # [[6..9], [1..5]]
+
+=back
+
+=over 4
+
+=item part example 2
+
+  # given: synopsis;
+
+  my $part = $array->part(sub {
+    my ($key, $value) = @_;
+
+    $value < 5
+  });
+
+  # [[1..4], [5..9]]
+
+=back
+
+=cut
+
+=head2 path
+
+  path(Str $expr) (Any)
+
+The path method traverses the data structure using the path expr provided,
+returning the value found or undef. In list-context, this method returns a
+tuple, i.e. the value found and boolean representing whether the match was
+successful.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item path example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my $path = $array->path('/0/foo');
+
+  # { bar => "baz" }
+
+=back
+
+=over 4
+
+=item path example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my $path = $array->path('/0/foo/bar');
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item path example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my $path = $array->path('/2/0');
+
+  # "baz"
+
+=back
+
+=over 4
+
+=item path example 4
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([{'foo' => {'bar' => 'baz'}}, 'bar', ['baz']]);
+
+  my @path = $array->path('/3/0');
+
+  # (undef, 0)
+
+=back
+
+=cut
+
+=head2 pop
+
+  pop() (Any)
+
+The pop method returns the last element of the array shortening it by one.
+Note, this method modifies the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item pop example 1
+
+  # given: synopsis;
+
+  my $pop = $array->pop;
+
+  # 9
+
+=back
+
+=cut
+
+=head2 push
+
+  push(Any @data) (ArrayRef)
+
+The push method appends the array by pushing the agruments onto it and returns
+itself.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item push example 1
+
+  # given: synopsis;
+
+  my $push = $array->push(10);
+
+  # [1..10]
+
+=back
+
+=cut
+
+=head2 random
+
+  random() (Any)
+
+The random method returns a random element from the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item random example 1
+
+  # given: synopsis;
+
+  my $random = $array->random;
+
+  # 2
+
+  # my $random = $array->random;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 reverse
+
+  reverse() (ArrayRef)
+
+The reverse method returns an array reference containing the elements in the
+array in reverse order.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item reverse example 1
+
+  # given: synopsis;
+
+  my $reverse = $array->reverse;
+
+  # [9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+=back
+
+=cut
+
+=head2 rotate
+
+  rotate() (ArrayRef)
+
+The rotate method rotates the elements in the array such that first elements
+becomes the last element and the second element becomes the first element each
+time this method is called.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rotate example 1
+
+  # given: synopsis;
+
+  my $rotate = $array->rotate;
+
+  # [2..9, 1]
+
+=back
+
+=cut
+
+=head2 rsort
+
+  rsort() (ArrayRef)
+
+The rsort method returns an array reference containing the values in the array
+sorted alphanumerically in reverse.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rsort example 1
+
+  # given: synopsis;
+
+  my $rsort = $array->rsort;
+
+  # [9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+=back
+
+=cut
+
+=head2 shift
+
+  shift() (Any)
+
+The shift method returns the first element of the array shortening it by one.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item shift example 1
+
+  # given: synopsis;
+
+  my $shift = $array->shift;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 slice
+
+  slice(Str @keys) (ArrayRef)
+
+The slice method returns a hash reference containing the elements in the array
+at the index(es) specified in the arguments.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item slice example 1
+
+  # given: synopsis;
+
+  my $slice = $array->slice(2, 4);
+
+  # [3, 5]
+
+=back
+
+=cut
+
+=head2 sort
+
+  sort() (ArrayRef)
+
+The sort method returns an array reference containing the values in the array
+sorted alphanumerically.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item sort example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new(['d','c','b','a']);
+
+  my $sort = $array->sort;
+
+  # ["a".."d"]
+
+=back
+
+=cut
+
+=head2 unique
+
+  unique() (ArrayRef)
+
+The unique method returns an array reference consisting of the unique elements
+in the array.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item unique example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1,1,1,1,2,3,1]);
+
+  my $unique = $array->unique;
+
+  # [1, 2, 3]
+
+=back
+
+=cut
+
+=head2 unshift
+
+  unshift(Any @data) (ArrayRef)
+
+The unshift method prepends the array by pushing the agruments onto it and
+returns itself.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item unshift example 1
+
+  # given: synopsis;
+
+  my $unshift = $array->unshift(-2,-1,0);
+
+  # [-2..9]
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

@@ -1,0 +1,63 @@
+
+=head1 NAME
+
+Venus::Kind::Utility - Utility Base Class
+
+=cut
+
+=head1 ABSTRACT
+
+Utility Base Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind::Utility';
+
+  package main;
+
+  my $example = Example->new;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides identity and methods common across all L<Venus> utility
+classes.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

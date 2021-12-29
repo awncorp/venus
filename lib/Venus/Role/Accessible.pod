@@ -1,0 +1,110 @@
+
+=head1 NAME
+
+Venus::Role::Accessible - Accessible Role
+
+=cut
+
+=head1 ABSTRACT
+
+Accessible Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Accessible';
+
+  package main;
+
+  my $example = Example->new('hello, there');
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides a C<value> attribute
+as well as C<get> and C<set> methods for modifying the value.
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+L<Venus::Role::Valuable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 get
+
+  get() (Any)
+
+The get method gets and returns the value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item get example 1
+
+  package main;
+
+  my $example = Example->new(value => 'hey, there');
+
+  my $get = $example->get;
+
+  # "hey, there"
+
+=back
+
+=cut
+
+=head2 set
+
+  set(Any $value) (Any)
+
+The set method set the value and returns the value set.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item set example 1
+
+  package main;
+
+  my $example = Example->new(value => 'hey, there');
+
+  my $set = $example->set('hi, there');
+
+  # "hi, there"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

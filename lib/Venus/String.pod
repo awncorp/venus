@@ -1,0 +1,924 @@
+
+=head1 NAME
+
+Venus::String - String Class
+
+=cut
+
+=head1 ABSTRACT
+
+String Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  # $string->camelcase;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for manipulating string data.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Value>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 append
+
+  append(Str @parts) (Str)
+
+The append method appends arugments to the string using spaces.
+
+
+
+
+I<Since C<0.01>>
+
+=over 4
+
+=item append example 1
+
+  # given: synopsis;
+
+  my $append = $string->append('welcome');
+
+  # "hello world welcome"
+
+=back
+
+=cut
+
+=head2 camelcase
+
+  camelcase() (Str)
+
+The camelcase method converts the string to camelcase.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item camelcase example 1
+
+  # given: synopsis;
+
+  my $camelcase = $string->camelcase;
+
+  # "HelloWorld"
+
+=back
+
+=cut
+
+=head2 chomp
+
+  chomp() (Str)
+
+The chomp method removes the newline (or the current value of $/) from the end
+of the string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item chomp example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new("name, age, dob, email\n");
+
+  my $chomp = $string->chomp;
+
+  # "name, age, dob, email"
+
+=back
+
+=over 4
+
+=item chomp example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new("name, age, dob, email\n\n");
+
+  my $chomp = $string->chomp;
+
+  # "name, age, dob, email\n"
+
+=back
+
+=cut
+
+=head2 chop
+
+  chop() (Str)
+
+The chop method removes and returns the last character of the string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item chop example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new("this is just a test.");
+
+  my $chop = $string->chop;
+
+  # "this is just a test"
+
+=back
+
+=cut
+
+=head2 concat
+
+  concat(Str @parts) (Str)
+
+The concat method returns the string with the argument list appended to it.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item concat example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('ABC');
+
+  my $concat = $string->concat('DEF', 'GHI');
+
+  # "ABCDEFGHI"
+
+=back
+
+=cut
+
+=head2 contains
+
+  contains(Str $expr) (Bool)
+
+The contains method searches the string for a substring or expression returns
+true or false if found.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item contains example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Nullam ultrices placerat.');
+
+  my $contains = $string->contains('trices');
+
+  # 1
+
+=back
+
+=over 4
+
+=item contains example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Nullam ultrices placerat.');
+
+  my $contains = $string->contains('itrices');
+
+  # 0
+
+=back
+
+=over 4
+
+=item contains example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Nullam ultrices placerat.');
+
+  my $contains = $string->contains(qr/trices/);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 default
+
+  default() (Str)
+
+The default method returns the default value, i.e. C<''>.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item default example 1
+
+  # given: synopsis;
+
+  my $default = $string->default;
+
+  # ""
+
+=back
+
+=cut
+
+=head2 hex
+
+  hex() (Str)
+
+The hex method returns the value resulting from interpreting the string as a
+hex string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item hex example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('0xaf');
+
+  my $hex = $string->hex;
+
+  # 175
+
+=back
+
+=cut
+
+=head2 index
+
+  index(Str $substr, Int $start) (Str)
+
+The index method searches for the argument within the string and returns the
+position of the first occurrence of the argument.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item index example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('unexplainable');
+
+  my $index = $string->index('explain');
+
+  # 2
+
+=back
+
+=over 4
+
+=item index example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('unexplainable');
+
+  my $index = $string->index('explain', 1);
+
+  # 2
+
+=back
+
+=over 4
+
+=item index example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('unexplainable');
+
+  my $index = $string->index('explained');
+
+  # -1
+
+=back
+
+=cut
+
+=head2 lc
+
+  lc() (Str)
+
+The lc method returns a lowercased version of the string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lc example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Hello World');
+
+  my $lc = $string->lc;
+
+  # "hello world"
+
+=back
+
+=cut
+
+=head2 lcfirst
+
+  lcfirst() (Str)
+
+The lcfirst method returns a the string with the first character lowercased.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lcfirst example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Hello World');
+
+  my $lcfirst = $string->lcfirst;
+
+  # "hello World"
+
+=back
+
+=cut
+
+=head2 length
+
+  length() (Int)
+
+The length method returns the number of characters within the string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item length example 1
+
+  # given: synopsis;
+
+  my $length = $string->length;
+
+  # 11
+
+=back
+
+=cut
+
+=head2 lines
+
+  lines() (ArrayRef[Str])
+
+The lines method returns an arrayref of parts by splitting on 1 or more newline
+characters.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lines example 1
+
+  # given: synopsis;
+
+  my $lines = $string->lines;
+
+  # ["hello world"]
+
+=back
+
+=over 4
+
+=item lines example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new("who am i?\nwhere am i?\nhow did I get here");
+
+  my $lines = $string->lines;
+
+  # ["who am i?", "where am i?", "how did I get here"]
+
+=back
+
+=cut
+
+=head2 lowercase
+
+  lowercase() (Str)
+
+The lowercase method is an alias to the lc method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item lowercase example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Hello World');
+
+  my $lowercase = $string->lowercase;
+
+  # "hello world"
+
+=back
+
+=cut
+
+=head2 render
+
+  render(HashRef $tokens) (Str)
+
+The render method treats the string as a template and performs a simple token
+replacement using the argument provided.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item render example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('Hi, {name}!');
+
+  my $render = $string->render({name => 'Friend'});
+
+  # "Hi, Friend!"
+
+=back
+
+=cut
+
+=head2 replace
+
+  replace(Regexp $regexp, Str $replace, Str $flags) (Replace)
+
+The replace method performs a search and replace operation and returns the
+L<Venus::Replace> object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item replace example 1
+
+  # given: synopsis;
+
+  my $replace = $string->replace('world', 'universe');
+
+  # bless({
+  #   ...,
+  #   "flags"   => "",
+  #   "regexp"  => "world",
+  #   "string"  => "hello world",
+  #   "substr"  => "universe",
+  # }, "Venus::Replace")
+
+=back
+
+=cut
+
+=head2 reverse
+
+  reverse() (Str)
+
+The reverse method returns a string where the characters in the string are in
+the opposite order.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item reverse example 1
+
+  # given: synopsis;
+
+  my $reverse = $string->reverse;
+
+  # "dlrow olleh"
+
+=back
+
+=cut
+
+=head2 rindex
+
+  rindex(Str $substr, Int $start) (Str)
+
+The rindex method searches for the argument within the string and returns the
+position of the last occurrence of the argument.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rindex example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('explain the unexplainable');
+
+  my $rindex = $string->rindex('explain');
+
+  # 14
+
+=back
+
+=over 4
+
+=item rindex example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('explain the unexplainable');
+
+  my $rindex = $string->rindex('explained');
+
+  # -1
+
+=back
+
+=over 4
+
+=item rindex example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('explain the unexplainable');
+
+  my $rindex = $string->rindex('explain', 21);
+
+  # 14
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Regexp $regexp) (Search)
+
+The search method performs a search operation and returns the L<Venus::Search>
+object.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item search example 1
+
+  # given: synopsis;
+
+  my $search = $string->search('world');
+
+  # bless({
+  #   ...,
+  #   "flags"   => "",
+  #   "regexp"  => "world",
+  #   "string"  => "hello world",
+  # }, "Venus::Search")
+
+=back
+
+=cut
+
+=head2 snakecase
+
+  snakecase() (Str)
+
+The snakecase method converts the string to snakecase.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item snakecase example 1
+
+  # given: synopsis;
+
+  my $snakecase = $string->snakecase;
+
+  # "hello_world"
+
+=back
+
+=cut
+
+=head2 split
+
+  split(Str | Regexp $expr, Maybe[Int] $limit) (ArrayRef)
+
+The split method returns an arrayref by splitting the string on the argument.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item split example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('name, age, dob, email');
+
+  my $split = $string->split(', ');
+
+  # ["name", "age", "dob", "email"]
+
+=back
+
+=over 4
+
+=item split example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('name, age, dob, email');
+
+  my $split = $string->split(', ', 2);
+
+  # ["name", "age, dob, email"]
+
+=back
+
+=over 4
+
+=item split example 3
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('name, age, dob, email');
+
+  my $split = $string->split(qr/\,\s*/);
+
+  # ["name", "age", "dob", "email"]
+
+=back
+
+=cut
+
+=head2 strip
+
+  strip() (Str)
+
+The strip method returns the string replacing occurences of 2 or more
+whitespaces with a single whitespace.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item strip example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('one,  two,  three');
+
+  my $strip = $string->strip;
+
+  # "one, two, three"
+
+=back
+
+=cut
+
+=head2 titlecase
+
+  titlecase() (Str)
+
+The titlecase method returns the string capitalizing the first character of
+each word.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item titlecase example 1
+
+  # given: synopsis;
+
+  my $titlecase = $string->titlecase;
+
+  # "Hello World"
+
+=back
+
+=cut
+
+=head2 trim
+
+  trim() (Str)
+
+The trim method removes one or more consecutive leading and/or trailing spaces
+from the string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item trim example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('   system is   ready   ');
+
+  my $trim = $string->trim;
+
+  # "system is   ready"
+
+=back
+
+=cut
+
+=head2 uc
+
+  uc() (Str)
+
+The uc method returns an uppercased version of the string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item uc example 1
+
+  # given: synopsis;
+
+  my $uc = $string->uc;
+
+  # "HELLO WORLD"
+
+=back
+
+=cut
+
+=head2 ucfirst
+
+  ucfirst() (Str)
+
+The ucfirst method returns a the string with the first character uppercased.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item ucfirst example 1
+
+  # given: synopsis;
+
+  my $ucfirst = $string->ucfirst;
+
+  # "Hello world"
+
+=back
+
+=cut
+
+=head2 uppercase
+
+  uppercase() (Str)
+
+The uppercase method is an alias to the uc method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item uppercase example 1
+
+  # given: synopsis;
+
+  my $uppercase = $string->uppercase;
+
+  # "HELLO WORLD"
+
+=back
+
+=cut
+
+=head2 words
+
+  words() (ArrayRef[Str])
+
+The words method returns an arrayref by splitting on 1 or more consecutive
+spaces.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item words example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new(
+    'is this a bug we\'re experiencing'
+  );
+
+  my $words = $string->words;
+
+  # ["is", "this", "a", "bug", "we're", "experiencing"]
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

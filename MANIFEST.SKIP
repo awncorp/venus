@@ -1,0 +1,1 @@
+^(?!CHANGES|INSTALL|LICENSE|Makefile.PL|META*|README*|cpanfile|lib\/.*|t\/.*).*$
