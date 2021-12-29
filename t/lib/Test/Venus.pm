@@ -553,10 +553,12 @@ sub pdml_for_inherits {
 
   my $text = $self->text('inherits');
 
-  my @output = map $self->link($_), grep defined,
+  my @output = map +($self->link($_), ""), grep defined,
     split /\n/, $self->text('inherits');
 
   return '' if !@output;
+
+  pop @output;
 
   return $self->head1('inherits',
     "This package inherits behaviors from:",
@@ -570,10 +572,12 @@ sub pdml_for_integrates {
 
   my $text = $self->text('integrates');
 
-  my @output = map $self->link($_), grep defined,
+  my @output = map +($self->link($_), ""), grep defined,
     split /\n/, $self->text('integrates');
 
   return '' if !@output;
+
+  pop @output;
 
   return $self->head1('integrates',
     "This package integrates behaviors from:",
@@ -587,10 +591,12 @@ sub pdml_for_libraries {
 
   my $text = $self->text('libraries');
 
-  my @output = map $self->link($_), grep defined,
+  my @output = map +($self->link($_), ""), grep defined,
     split /\n/, $self->text('libraries');
 
   return '' if !@output;
+
+  pop @output;
 
   return $self->head1('libraries',
     "This package uses type constraints from:",
