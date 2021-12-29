@@ -60,7 +60,7 @@ sub error (;$) {
 sub false () {
   require Venus::Boolean;
 
-  return Venus::Boolean::TO_FALSE();
+  return Venus::Boolean::FALSE();
 }
 
 sub raise ($;$) {
@@ -83,7 +83,7 @@ sub raise ($;$) {
 sub true () {
   require Venus::Boolean;
 
-  return Venus::Boolean::TO_TRUE();
+  return Venus::Boolean::TRUE();
 }
 
 1;
