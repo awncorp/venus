@@ -10,6 +10,8 @@ introspection, command-line options parsing, and more.
 
 **Demo:** Better Boolean Values
 
+_i.e. knowing the difference between boolean `0`, numerical `0`, and the string `'0'`_
+
 ![Venus Demo](https://github.com/cpanery/venus/raw/master/.github/assets/458966.gif)
 
 ## Installation
