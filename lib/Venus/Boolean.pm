@@ -65,18 +65,7 @@ sub build_nil {
 sub build_self {
   my ($self, $data) = @_;
 
-  my $value = $data->{value};
-  my $isdual = Scalar::Util::isdual($value);
-
-  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
-    $self->{value} = $true;
-  }
-  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
-    $self->{value} = $false;
-  }
-  else {
-    $self->{value} = $value ? $true : $false;
-  }
+  $data->{value} = BOOL(TO_BOOL($data->{value}));
 
   return $self;
 }
@@ -111,8 +100,48 @@ sub type {
   return $self->get ? $true_type : $false_type;
 }
 
-sub TO_FALSE {
+sub BOOL {
+  return $_[0] ? $true : $false;
+}
+
+sub BOOL_REF {
+  return $_[0] ? $true_ref : $false_ref;
+}
+
+sub FALSE {
   return $false;
+}
+
+sub TO_BOOL {
+  my ($value) = @_;
+
+  my $isdual = Scalar::Util::isdual($value);
+
+  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
+    return $true;
+  }
+  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
+    return $false;
+  }
+  else {
+    return $value;
+  }
+}
+
+sub TO_BOOL_REF {
+  my ($value) = @_;
+
+  my $isdual = Scalar::Util::isdual($value);
+
+  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
+    return $true_ref;
+  }
+  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
+    return $false_ref;
+  }
+  else {
+    return $value;
+  }
 }
 
 sub TO_JSON {
@@ -123,7 +152,7 @@ sub TO_JSON {
   return $self->get ? $true_ref : $false_ref;
 }
 
-sub TO_TRUE {
+sub TRUE {
   return $true;
 }
 

@@ -38,9 +38,11 @@ sub config {
   }
 
   require Scalar::Util;
+  require Venus::Boolean;
+
   $engine->boolean_values(
-    Scalar::Util::dualvar(0, "0"),
-    Scalar::Util::dualvar(1, "1")
+    Venus::Boolean::FALSE(),
+    Venus::Boolean::TRUE(),
   );
 
   return $self->engine($engine);
@@ -55,7 +57,12 @@ sub decode {
 sub encode {
   my ($self) = @_;
 
-  return $self->engine->encode($self->get);
+  my $engine = $self->engine;
+  my $convert = $engine->get_boolean_values
+    && !grep ref, $engine->get_boolean_values;
+
+  # double-traversing the data structure due to lack of serialization hooks
+  return $self->engine->encode($convert ? TO_BOOL($self->get) : $self->get);
 }
 
 sub explain {
@@ -87,6 +94,28 @@ sub package {
   }
 
   return $engine;
+}
+
+sub TO_BOOL {
+  my ($value) = @_;
+
+  require Venus::Boolean;
+
+  if (ref($value) eq 'HASH') {
+    for my $key (keys %$value) {
+      $value->{$key} = TO_BOOL($value->{$key});
+    }
+    return $value;
+  }
+
+  if (ref($value) eq 'ARRAY') {
+    for my $key (keys @$value) {
+      $value->[$key] = TO_BOOL($value->[$key]);
+    }
+    return $value;
+  }
+
+  return Venus::Boolean::TO_BOOL_REF($value);
 }
 
 1;

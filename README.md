@@ -13,7 +13,7 @@ introspection, command-line options parsing, and more.
 _i.e. Venus knows the difference between boolean `0`, numerical `0`, and the
 string `'0'`._
 
-![Venus Demo](https://github.com/cpanery/venus/raw/master/.github/assets/459025.gif)
+![Venus Demo](https://github.com/cpanery/venus/raw/master/.github/assets/459060.gif)
 
 ## Installation
 
@@ -236,7 +236,9 @@ package main;
 
 my $myapp = MyApp->new;
 
-$myapp->catch('execute'); # catch MyApp::Error
+$myapp->catch('execute');
+
+# caught MyApp::Error
 ```
 
 ### Feature: Composable Standards
@@ -255,7 +257,7 @@ my $myapp = MyApp->new;
 
 $myapp->stash(greeting => 'hello world');
 
-$myapp->dump('stash'); # '{"greeting" => "hello world"}'
+$myapp->dump('stash');
 ```
 
 ### Feature: Pluggable Library
@@ -344,17 +346,16 @@ see below:
 ## Contributing
 
 We rely on your contributions and feedback to improve Venus, and we love
-hearing about your experiences and about what may be unclear and we can improve
-upon.
+hearing about your experiences and what we can improve upon.
 
-Contributions are always welcome! See the [contributing
+All contributions are always welcome! See the [contributing
 guide](https://github.com/cpanery/venus/blob/master/CONTRIBUTING.md) for ways
 to get started, and please adhere to this project's [code of
 conduct](https://github.com/cpanery/venus/blob/master/CODE_OF_CONDUCT.md).
 
 ## Support
 
-For support, feel free to report an [issue](issues).
+For support, feel free to report an [issue](https://github.com/cpanery/venus/issues).
 
 ## License
 
