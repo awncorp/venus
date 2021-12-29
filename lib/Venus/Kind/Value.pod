@@ -47,9 +47,13 @@ L<Venus::Kind>
 This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
+
 L<Venus::Role::Buildable>
+
 L<Venus::Role::Explainable>
+
 L<Venus::Role::Pluggable>
+
 L<Venus::Role::Valuable>
 
 =cut

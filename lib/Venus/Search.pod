@@ -75,6 +75,7 @@ L<Venus::Kind::Utility>
 This package integrates behaviors from:
 
 L<Venus::Role::Explainable>
+
 L<Venus::Role::Stashable>
 
 =cut
