@@ -29,4 +29,10 @@ sub explain {
   return $self->get;
 }
 
+sub TO_JSON {
+  my ($self) = @_;
+
+  return $self->get;
+}
+
 1;
