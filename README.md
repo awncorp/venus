@@ -7,6 +7,14 @@ modular architecture, robust library of classes and methods, supports pure-Perl
 autoboxing, advanced exception handling, "true" and "false" keywords, package
 introspection, command-line options parsing, and more.
 
+
+**Demo:** Better Boolean Values
+
+_i.e. Venus knows the difference between boolean `0`, numerical `0`, and the
+string `'0'`._
+
+![Venus Demo](https://github.com/cpanery/venus/raw/master/.github/assets/459025.gif)
+
 ## Installation
 
 Install Venus using [cpm](https://metacpan.org/pod/App::cpm):
@@ -281,53 +289,53 @@ $string->base64;
 For documentation and usage information on specific classes or roles (traits),
 see below:
 
-- [Venus](https://github.com/cpanery/blob/main/lib/Venus.pod)
-- [Venus::Args](https://github.com/cpanery/blob/main/lib/Venus/Args.pod)
-- [Venus::Array](https://github.com/cpanery/blob/main/lib/Venus/Array.pod)
-- [Venus::Boolean](https://github.com/cpanery/blob/main/lib/Venus/Boolean.pod)
-- [Venus::Box](https://github.com/cpanery/blob/main/lib/Venus/Box.pod)
-- [Venus::Class](https://github.com/cpanery/blob/main/lib/Venus/Class.pod)
-- [Venus::Code](https://github.com/cpanery/blob/main/lib/Venus/Code.pod)
-- [Venus::Data](https://github.com/cpanery/blob/main/lib/Venus/Data.pod)
-- [Venus::Date](https://github.com/cpanery/blob/main/lib/Venus/Date.pod)
-- [Venus::Error](https://github.com/cpanery/blob/main/lib/Venus/Error.pod)
-- [Venus::Float](https://github.com/cpanery/blob/main/lib/Venus/Float.pod)
-- [Venus::Hash](https://github.com/cpanery/blob/main/lib/Venus/Hash.pod)
-- [Venus::Json](https://github.com/cpanery/blob/main/lib/Venus/Json.pod)
-- [Venus::Kind](https://github.com/cpanery/blob/main/lib/Venus/Kind.pod)
-- [Venus::Kind::Utility](https://github.com/cpanery/blob/main/lib/Venus/Kind/Utility.pod)
-- [Venus::Kind::Value](https://github.com/cpanery/blob/main/lib/Venus/Kind/Value.pod)
-- [Venus::Name](https://github.com/cpanery/blob/main/lib/Venus/Name.pod)
-- [Venus::Number](https://github.com/cpanery/blob/main/lib/Venus/Number.pod)
-- [Venus::Opts](https://github.com/cpanery/blob/main/lib/Venus/Opts.pod)
-- [Venus::Path](https://github.com/cpanery/blob/main/lib/Venus/Path.pod)
-- [Venus::Regexp](https://github.com/cpanery/blob/main/lib/Venus/Regexp.pod)
-- [Venus::Replace](https://github.com/cpanery/blob/main/lib/Venus/Replace.pod)
-- [Venus::Role](https://github.com/cpanery/blob/main/lib/Venus/Role.pod)
-- [Venus::Role::Accessible](https://github.com/cpanery/blob/main/lib/Venus/Role/Accessible.pod)
-- [Venus::Role::Boxable](https://github.com/cpanery/blob/main/lib/Venus/Role/Boxable.pod)
-- [Venus::Role::Buildable](https://github.com/cpanery/blob/main/lib/Venus/Role/Buildable.pod)
-- [Venus::Role::Catchable](https://github.com/cpanery/blob/main/lib/Venus/Role/Catchable.pod)
-- [Venus::Role::Doable](https://github.com/cpanery/blob/main/lib/Venus/Role/Doable.pod)
-- [Venus::Role::Dumpable](https://github.com/cpanery/blob/main/lib/Venus/Role/Dumpable.pod)
-- [Venus::Role::Explainable](https://github.com/cpanery/blob/main/lib/Venus/Role/Explainable.pod)
-- [Venus::Role::Mappable](https://github.com/cpanery/blob/main/lib/Venus/Role/Mappable.pod)
-- [Venus::Role::Pluggable](https://github.com/cpanery/blob/main/lib/Venus/Role/Pluggable.pod)
-- [Venus::Role::Printable](https://github.com/cpanery/blob/main/lib/Venus/Role/Printable.pod)
-- [Venus::Role::Proxyable](https://github.com/cpanery/blob/main/lib/Venus/Role/Proxyable.pod)
-- [Venus::Role::Stashable](https://github.com/cpanery/blob/main/lib/Venus/Role/Stashable.pod)
-- [Venus::Role::Throwable](https://github.com/cpanery/blob/main/lib/Venus/Role/Throwable.pod)
-- [Venus::Role::Tryable](https://github.com/cpanery/blob/main/lib/Venus/Role/Tryable.pod)
-- [Venus::Role::Valuable](https://github.com/cpanery/blob/main/lib/Venus/Role/Valuable.pod)
-- [Venus::Scalar](https://github.com/cpanery/blob/main/lib/Venus/Scalar.pod)
-- [Venus::Search](https://github.com/cpanery/blob/main/lib/Venus/Search.pod)
-- [Venus::Space](https://github.com/cpanery/blob/main/lib/Venus/Space.pod)
-- [Venus::String](https://github.com/cpanery/blob/main/lib/Venus/String.pod)
-- [Venus::Throw](https://github.com/cpanery/blob/main/lib/Venus/Throw.pod)
-- [Venus::Try](https://github.com/cpanery/blob/main/lib/Venus/Try.pod)
-- [Venus::Type](https://github.com/cpanery/blob/main/lib/Venus/Type.pod)
-- [Venus::Undef](https://github.com/cpanery/blob/main/lib/Venus/Undef.pod)
-- [Venus::Vars](https://github.com/cpanery/blob/main/lib/Venus/Vars.pod)
+- [Venus](https://github.com/cpanery/venus/blob/master/lib/Venus.pod#name)
+- [Venus::Args](https://github.com/cpanery/venus/blob/master/lib/Venus/Args.pod#name)
+- [Venus::Array](https://github.com/cpanery/venus/blob/master/lib/Venus/Array.pod#name)
+- [Venus::Boolean](https://github.com/cpanery/venus/blob/master/lib/Venus/Boolean.pod#name)
+- [Venus::Box](https://github.com/cpanery/venus/blob/master/lib/Venus/Box.pod#name)
+- [Venus::Class](https://github.com/cpanery/venus/blob/master/lib/Venus/Class.pod#name)
+- [Venus::Code](https://github.com/cpanery/venus/blob/master/lib/Venus/Code.pod#name)
+- [Venus::Data](https://github.com/cpanery/venus/blob/master/lib/Venus/Data.pod#name)
+- [Venus::Date](https://github.com/cpanery/venus/blob/master/lib/Venus/Date.pod#name)
+- [Venus::Error](https://github.com/cpanery/venus/blob/master/lib/Venus/Error.pod#name)
+- [Venus::Float](https://github.com/cpanery/venus/blob/master/lib/Venus/Float.pod#name)
+- [Venus::Hash](https://github.com/cpanery/venus/blob/master/lib/Venus/Hash.pod#name)
+- [Venus::Json](https://github.com/cpanery/venus/blob/master/lib/Venus/Json.pod#name)
+- [Venus::Kind](https://github.com/cpanery/venus/blob/master/lib/Venus/Kind.pod#name)
+- [Venus::Kind::Utility](https://github.com/cpanery/venus/blob/master/lib/Venus/Kind/Utility.pod#name)
+- [Venus::Kind::Value](https://github.com/cpanery/venus/blob/master/lib/Venus/Kind/Value.pod#name)
+- [Venus::Name](https://github.com/cpanery/venus/blob/master/lib/Venus/Name.pod#name)
+- [Venus::Number](https://github.com/cpanery/venus/blob/master/lib/Venus/Number.pod#name)
+- [Venus::Opts](https://github.com/cpanery/venus/blob/master/lib/Venus/Opts.pod#name)
+- [Venus::Path](https://github.com/cpanery/venus/blob/master/lib/Venus/Path.pod#name)
+- [Venus::Regexp](https://github.com/cpanery/venus/blob/master/lib/Venus/Regexp.pod#name)
+- [Venus::Replace](https://github.com/cpanery/venus/blob/master/lib/Venus/Replace.pod#name)
+- [Venus::Role](https://github.com/cpanery/venus/blob/master/lib/Venus/Role.pod#name)
+- [Venus::Role::Accessible](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Accessible.pod#name)
+- [Venus::Role::Boxable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Boxable.pod#name)
+- [Venus::Role::Buildable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Buildable.pod#name)
+- [Venus::Role::Catchable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Catchable.pod#name)
+- [Venus::Role::Doable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Doable.pod#name)
+- [Venus::Role::Dumpable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Dumpable.pod#name)
+- [Venus::Role::Explainable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Explainable.pod#name)
+- [Venus::Role::Mappable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Mappable.pod#name)
+- [Venus::Role::Pluggable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Pluggable.pod#name)
+- [Venus::Role::Printable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Printable.pod#name)
+- [Venus::Role::Proxyable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Proxyable.pod#name)
+- [Venus::Role::Stashable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Stashable.pod#name)
+- [Venus::Role::Throwable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Throwable.pod#name)
+- [Venus::Role::Tryable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Tryable.pod#name)
+- [Venus::Role::Valuable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Valuable.pod#name)
+- [Venus::Scalar](https://github.com/cpanery/venus/blob/master/lib/Venus/Scalar.pod#name)
+- [Venus::Search](https://github.com/cpanery/venus/blob/master/lib/Venus/Search.pod#name)
+- [Venus::Space](https://github.com/cpanery/venus/blob/master/lib/Venus/Space.pod#name)
+- [Venus::String](https://github.com/cpanery/venus/blob/master/lib/Venus/String.pod#name)
+- [Venus::Throw](https://github.com/cpanery/venus/blob/master/lib/Venus/Throw.pod#name)
+- [Venus::Try](https://github.com/cpanery/venus/blob/master/lib/Venus/Try.pod#name)
+- [Venus::Type](https://github.com/cpanery/venus/blob/master/lib/Venus/Type.pod#name)
+- [Venus::Undef](https://github.com/cpanery/venus/blob/master/lib/Venus/Undef.pod#name)
+- [Venus::Vars](https://github.com/cpanery/venus/blob/master/lib/Venus/Vars.pod#name)
 
 ## Founder
 
@@ -340,9 +348,9 @@ hearing about your experiences and about what may be unclear and we can improve
 upon.
 
 Contributions are always welcome! See the [contributing
-guide](https://github.com/cpanery/venus/blob/main/CONTRIBUTING.md) for ways to
-get started, and please adhere to this project's [code of
-conduct](https://github.com/cpanery/venus/blob/main/CODE_OF_CONDUCT.md).
+guide](https://github.com/cpanery/venus/blob/master/CONTRIBUTING.md) for ways
+to get started, and please adhere to this project's [code of
+conduct](https://github.com/cpanery/venus/blob/master/CODE_OF_CONDUCT.md).
 
 ## Support
 

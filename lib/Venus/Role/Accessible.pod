@@ -37,6 +37,7 @@ as well as C<get> and C<set> methods for modifying the value.
 This package integrates behaviors from:
 
 L<Venus::Role::Buildable>
+
 L<Venus::Role::Valuable>
 
 =cut

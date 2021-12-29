@@ -40,7 +40,7 @@ sub deduce {
   my $data = $self->get;
 
   return $self->object_undef if not(defined($data));
-  return $self->deduce_blessed if Scalar::Util::blessed($data);
+  return $self->deduce_blessed if scalar_is_blessed($data);
   return $self->deduce_defined;
 }
 
@@ -92,8 +92,8 @@ sub deduce_defined {
   my $data = $self->get;
 
   return $self->deduce_references if ref($data);
-  return $self->deduce_boolean if Scalar::Util::isdual($data);
-  return $self->deduce_numberlike if Scalar::Util::looks_like_number($data);
+  return $self->deduce_boolean if scalar_is_dualvar($data);
+  return $self->deduce_numberlike if scalar_is_numeric($data);
   return $self->deduce_stringlike;
 }
 
@@ -130,7 +130,7 @@ sub detract {
 
   my $data = $self->get;
 
-  return $data if not(Scalar::Util::blessed($data));
+  return $data if not(scalar_is_blessed($data));
 
   return $data->value if UNIVERSAL::isa($data, 'Venus::Kind');
 
@@ -145,7 +145,7 @@ sub detract_deep {
   if ($data and ref($data) and ref($data) eq 'HASH') {
     for my $i (keys %{$data}) {
       my $val = $data->{$i};
-      $data->{$i} = Scalar::Util::blessed($val)
+      $data->{$i} = scalar_is_blessed($val)
         ? $self->class->new(value => $val)->detract_deep
         : $self->class->new(value => $val)->detract;
     }
@@ -153,7 +153,7 @@ sub detract_deep {
   if ($data and ref($data) and ref($data) eq 'ARRAY') {
     for (my $i = 0; $i < @{$data}; $i++) {
       my $val = $data->[$i];
-      $data->[$i] = Scalar::Util::blessed($val)
+      $data->[$i] = scalar_is_blessed($val)
         ? $self->class->new(value => $val)->detract_deep
         : $self->class->new(value => $val)->detract;
     }
@@ -248,6 +248,28 @@ sub object_undef {
   require Venus::Undef;
 
   return Venus::Undef->new($self->get);
+}
+
+sub scalar_is_blessed {
+  my ($value) = @_;
+
+  return Scalar::Util::blessed($value);
+}
+
+sub scalar_is_dualvar {
+  my ($value) = @_;
+
+  return Scalar::Util::isdual($value);
+}
+
+sub scalar_is_numeric {
+  my ($value) = @_;
+
+  return Scalar::Util::looks_like_number($value) && length(do{
+    no if $] >= 5.022, "feature", "bitwise";
+    no warnings "numeric";
+    $value & ""
+  });
 }
 
 1;

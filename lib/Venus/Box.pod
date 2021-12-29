@@ -37,6 +37,7 @@ values, and chaining method calls across all objects.
 This package integrates behaviors from:
 
 L<Venus::Role::Buildable>
+
 L<Venus::Role::Proxyable>
 
 =cut
