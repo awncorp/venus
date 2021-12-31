@@ -10,13 +10,14 @@
 !CONTRIBUTING.md
 !INSTALL
 !LICENSE
-!Makefile.PL
 !MANIFEST.SKIP
 !META.json
 !META.yml
+!Makefile.PL
 !README
 !README.md
 !STABILITY.md
+!VERSION
 !build
 !cpanfile
 !dist.ini
