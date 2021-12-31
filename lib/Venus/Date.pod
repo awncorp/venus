@@ -1453,6 +1453,188 @@ I<Since C<0.01>>
 
 =cut
 
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(!=)>
+
+This package overloads the C<!=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date != 570672001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(+)>
+
+This package overloads the C<+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date + 0;
+
+  # 570672000
+
+=back
+
+=over 4
+
+=item operation: C<(-)>
+
+This package overloads the C<-> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date - 0;
+
+  # 570672000
+
+=back
+
+=over 4
+
+=item operation: C<(0+)>
+
+This package overloads the C<0+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = 0 + $date;
+
+  # 570672000
+
+=back
+
+=over 4
+
+=item operation: C<(<)>
+
+This package overloads the C<<> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date < 570672001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(<=)>
+
+This package overloads the C<<=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date <= 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(==)>
+
+This package overloads the C<==> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date == 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>)>
+
+This package overloads the C<>> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date > 570671999;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>=)>
+
+This package overloads the C<>=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date >= 570672000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date eq '570672000';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date ne '560672000';
+
+  # 1
+
+=back
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>

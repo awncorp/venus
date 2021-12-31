@@ -11,7 +11,6 @@ extends 'Venus::Kind::Value';
 
 use overload (
   '.' => sub{$_[0]->value . "$_[1]"},
-  '.=' => sub{$_[0]->value($_[0]->value . "$_[1]")},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
