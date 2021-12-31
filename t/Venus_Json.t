@@ -10,6 +10,11 @@ use lib 't/lib';
 use Test::More;
 use Test::Venus;
 
+if (require Venus::Json && not Venus::Json->new->package) {
+  warn 'No suitable JSON library found';
+  goto SKIP;
+}
+
 my $test = test(__FILE__);
 
 =name
@@ -266,7 +271,7 @@ handlers.
 $test->for('example', 1, 'package', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "JSON::PP";
+  ok +($result eq "JSON::PP") || +($result eq "JSON::XS");
 
   $result
 });
@@ -287,6 +292,7 @@ Cpanery, C<cpanery@cpan.org>
 
 # END
 
+SKIP:
 $test->render('lib/Venus/Json.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

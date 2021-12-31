@@ -8,7 +8,7 @@ autoboxing, advanced exception handling, "true" and "false" keywords, package
 introspection, command-line options parsing, and more.
 
 
-**Demo:** Better Boolean Values
+**Demo:** [Better Boolean Values](https://asciinema.org/a/aHmHDhmcd3zkyFW7qtVLAnDg8)
 
 _i.e. Venus knows the difference between boolean `0`, numerical `0`, and the
 string `'0'`._
