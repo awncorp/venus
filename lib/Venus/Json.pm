@@ -24,45 +24,33 @@ has engine => (
 sub config {
   my ($self) = @_;
 
-  my $engine = $self->package;
+  my $engine = $self->package or $self->throw->error({
+    message => 'No available JSON compatible package',
+  });
 
   $engine = $engine->new
     ->canonical
     ->allow_nonref
     ->allow_unknown
     ->allow_blessed
-    ->convert_blessed;
+    ->convert_blessed
+    if grep $engine->isa($_), qw(Cpanel::JSON::XS JSON::XS JSON::PP);
 
-  if ($engine->can('escape_slash')) {
-    $engine = $engine->escape_slash;
-  }
-
-  require Scalar::Util;
-  require Venus::Boolean;
-
-  $engine->boolean_values(
-    Venus::Boolean::FALSE(),
-    Venus::Boolean::TRUE(),
-  );
-
-  return $self->engine($engine);
+  return $engine->can('escape_slash') ? $engine->escape_slash : $engine;
 }
 
 sub decode {
   my ($self, $data) = @_;
 
-  return $self->set($self->engine->decode($data));
+  # double-traversing the data structure due to lack of serialization hooks
+  return $self->set(FROM_BOOL($self->engine->decode($data)));
 }
 
 sub encode {
   my ($self) = @_;
 
-  my $engine = $self->engine;
-  my $convert = $engine->get_boolean_values
-    && !grep ref, $engine->get_boolean_values;
-
   # double-traversing the data structure due to lack of serialization hooks
-  return $self->engine->encode($convert ? TO_BOOL($self->get) : $self->get);
+  return $self->engine->encode(TO_BOOL($self->get));
 }
 
 sub explain {
@@ -80,9 +68,10 @@ sub package {
 
   my %packages = (
     'JSON::XS' => '3.0',
-    'JSON::PP' => '4.00',
+    'JSON::PP' => '0',
+    'Cpanel::JSON::XS' => '0',
   );
-  for my $package (qw(JSON::XS JSON::PP)) {
+  for my $package (qw(Cpanel::JSON::XS JSON::XS JSON::PP)) {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
     if (do {local $@; eval "$criteria"; $@}) {
       next;
@@ -94,6 +83,28 @@ sub package {
   }
 
   return $engine;
+}
+
+sub FROM_BOOL {
+  my ($value) = @_;
+
+  require Venus::Boolean;
+
+  if (ref($value) eq 'HASH') {
+    for my $key (keys %$value) {
+      $value->{$key} = FROM_BOOL($value->{$key});
+    }
+    return $value;
+  }
+
+  if (ref($value) eq 'ARRAY') {
+    for my $key (keys @$value) {
+      $value->[$key] = FROM_BOOL($value->[$key]);
+    }
+    return $value;
+  }
+
+  return Venus::Boolean::TO_BOOL(Venus::Boolean::FROM_BOOL($value));
 }
 
 sub TO_BOOL {
