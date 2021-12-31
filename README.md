@@ -35,6 +35,12 @@ Install Venus using Perl:
 $ curl -L https://cpanmin.us | perl - -qn Venus
 ```
 
+Install Venus using Perl (from GitHub):
+
+```bash
+$ curl -ssL https://cpanmin.us | perl - -qn git://github.com/cpanery/venus.git
+```
+
 ## Features
 
 - One Dependency
