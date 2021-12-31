@@ -271,7 +271,7 @@ handlers.
 $test->for('example', 1, 'package', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "JSON::PP";
+  ok +($result eq "JSON::PP") || +($result eq "JSON::XS");
 
   $result
 });
