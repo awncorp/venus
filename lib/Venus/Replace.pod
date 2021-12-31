@@ -428,6 +428,76 @@ I<Since C<0.01>>
 
 =cut
 
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(.)>
+
+This package overloads the C<.> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $replace . ', welcome';
+
+  # "hello universe, welcome"
+
+=back
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $replace eq 'hello universe';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $replace ne 'Hello universe';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = 'hello universe, welcome' =~ qr/$replace/;
+
+  # 1
+
+=back
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>

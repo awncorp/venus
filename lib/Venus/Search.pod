@@ -409,6 +409,76 @@ I<Since C<0.01>>
 
 =cut
 
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(.)>
+
+This package overloads the C<.> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $search . ', welcome';
+
+  # "hello world, welcome"
+
+=back
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $search eq 'hello world';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $search ne 'Hello world';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = 'hello world, welcome' =~ qr/$search/;
+
+  # 1
+
+=back
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>

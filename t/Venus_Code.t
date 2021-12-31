@@ -456,6 +456,32 @@ $test->for('example', 1, 'rcurry', sub {
   $result
 });
 
+=operator (&{})
+
+This package overloads the C<&{}> operator.
+
+=cut
+
+$test->for('operator', '(&{})');
+
+=example-1 (&{})
+
+  # given: synopsis;
+
+  my $result = &$code(1..4);
+
+  # [1..4]
+
+=cut
+
+$test->for('example', 1, '(&{})', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1..4];
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery
