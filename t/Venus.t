@@ -82,7 +82,7 @@ $test->for('includes');
   }
 
   # and much more!
-  true ne false ne true;
+  (true) ne (false) ne (true);
 
 =cut
 
