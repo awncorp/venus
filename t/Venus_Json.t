@@ -77,8 +77,9 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON library is installed,
-e.g. I<JSON::XS C<3.0>> or I<JSON::PP C<4.00>>.
+data. B<Note:> This package requires that a suitable JSON library is installed
+or provided as the engine attribute. A proper engine is any object that has
+C<encode> and C<decode> methods which return encoded and decoded values.
 
 =cut
 
@@ -138,7 +139,9 @@ The config method returns the L<JSON::PP> compatible JSON client.
 $test->for('example', 1, 'config', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('JSON::XS') || $result->isa('JSON::PP');
+  ok +($result->isa("JSON::PP"))
+  || +($result->isa("JSON::XS"))
+  || +($result->isa("Cpanel::JSON::XS"));
 
   $result
 });
@@ -272,7 +275,9 @@ handlers.
 $test->for('example', 1, 'package', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok +($result eq "JSON::PP") || +($result eq "JSON::XS");
+  ok +($result eq "JSON::PP")
+  || +($result eq "JSON::XS")
+  || +($result eq "Cpanel::JSON::XS");
 
   $result
 });
