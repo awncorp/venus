@@ -111,6 +111,66 @@ $test->for('example', 1, 'default', sub {
   $result
 });
 
+=operator (${})
+
+This package overloads the C<${}> operator.
+
+=cut
+
+$test->for('operator', '(${})');
+
+=example-1 (${})
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new(\*STDOUT);
+
+  my $value = $$scalar;
+
+  # *::STDOUT
+
+=cut
+
+$test->for('example', 1, '(${})', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq '*main::STDOUT';
+
+  $result
+});
+
+=operator (*{})
+
+This package overloads the C<*{}> operator.
+
+=cut
+
+$test->for('operator', '(*{})');
+
+=example-1 (*{})
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new(\*STDOUT);
+
+  my $value = *$scalar;
+
+  # *::STDOUT
+
+=cut
+
+$test->for('example', 1, '(*{})', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq '*main::STDOUT';
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery

@@ -279,6 +279,110 @@ $test->for('example', 3, 'trace', sub {
   $result
 });
 
+=operator (.)
+
+This package overloads the C<.> operator.
+
+=cut
+
+$test->for('operator', '(.)');
+
+=example-1 (.)
+
+  # given: synopsis;
+
+  my $string = $error . ' Unknown';
+
+  # "Exception! Unknown"
+
+=cut
+
+$test->for('example', 1, '(.)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Exception! Unknown";
+
+  $result
+});
+
+=operator (eq)
+
+This package overloads the C<eq> operator.
+
+=cut
+
+$test->for('operator', '(eq)');
+
+=example-1 (eq)
+
+  # given: synopsis;
+
+  my $result = $error eq 'Exception!';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(eq)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (ne)
+
+This package overloads the C<ne> operator.
+
+=cut
+
+$test->for('operator', '(ne)');
+
+=example-1 (ne)
+
+  # given: synopsis;
+
+  my $result = $error ne 'exception!';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(ne)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (qr)
+
+This package overloads the C<qr> operator.
+
+=cut
+
+$test->for('operator', '(qr)');
+
+=example-1 (qr)
+
+  # given: synopsis;
+
+  my $test = 'Exception!' =~ qr/$error/;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(qr)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery

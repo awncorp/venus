@@ -130,6 +130,60 @@ I<Since C<0.01>>
 
 =cut
 
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $regexp eq '(?^u:(?<greet>\\w+) (?<username>\\w+))';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $regexp ne '(?<greet>\w+) (?<username>\w+)';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = 'Hello Friend' =~  $regexp;
+
+  # 1
+
+=back
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>

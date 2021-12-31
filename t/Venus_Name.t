@@ -516,6 +516,156 @@ $test->for('example', 1, 'path', sub {
   $result
 });
 
+=operator (.)
+
+This package overloads the C<.> operator.
+
+=cut
+
+$test->for('operator', '(.)');
+
+=example-1 (.)
+
+  # given: synopsis;
+
+  my $package = $name . 'Baz';
+
+  # "Foo::BarBaz"
+
+=cut
+
+$test->for('example', 1, '(.)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Foo/BarBaz";
+
+  $result
+});
+
+=operator (eq)
+
+This package overloads the C<eq> operator.
+
+=cut
+
+$test->for('operator', '(eq)');
+
+=example-1 (eq)
+
+  # given: synopsis;
+
+  $name eq 'Foo/Bar';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(eq)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 (eq)
+
+  package main;
+
+  use Venus::Name;
+
+  my $name1 = Venus::Name->new('Foo\Bar');
+  my $name2 = Venus::Name->new('Foo\Bar');
+
+  $name1 eq $name2;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, '(eq)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (ne)
+
+This package overloads the C<ne> operator.
+
+=cut
+
+$test->for('operator', '(ne)');
+
+=example-1 (ne)
+
+  # given: synopsis;
+
+  $name ne 'Foo\Bar';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(ne)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 (ne)
+
+  package main;
+
+  use Venus::Name;
+
+  my $name1 = Venus::Name->new('FooBar');
+  my $name2 = Venus::Name->new('Foo_Bar');
+
+  $name1 ne $name2;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, '(ne)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (qr)
+
+This package overloads the C<qr> operator.
+
+=cut
+
+$test->for('operator', '(qr)');
+
+=example-1 (qr)
+
+  # given: synopsis;
+
+  "Foo/Bar" =~ qr/$name/;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(qr)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery

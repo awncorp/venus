@@ -94,7 +94,7 @@ sub data_for_example {
 
   my $data = $self->search({
     list => "example-$number",
-    name => $name,
+    name => quotemeta($name),
   });
 
   $self->throw->error if !@$data;
@@ -222,6 +222,19 @@ sub data_for_name {
   my ($self) = @_;
 
   my $data = $self->find(undef, 'name');
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_operator {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'operator',
+    name => quotemeta($name),
+  });
 
   $self->throw->error if !@$data;
 
@@ -680,6 +693,42 @@ sub pdml_for_name {
   return $name ? ($self->head1('name', $name)) : ();
 }
 
+sub pdml_for_operator {
+  my ($self, $name) = @_;
+
+  my @output;
+
+  my $text = $self->text('operator', $name);
+
+  return () if !$text;
+
+  my @results = $self->search({name => quotemeta($name)});
+
+  for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+    push @output, "B<example $i>", $self->text('example', $i, $name);
+  }
+
+  return ($self->over($self->item("operation: C<$name>", join "\n\n", $text, @output)));
+}
+
+sub pdml_for_operators {
+  my ($self) = @_;
+
+  my @output;
+
+  for my $list ($self->search({list => 'operator'})) {
+    push @output, $self->pdml('operator', $list->{name});
+  }
+
+  if (@output) {
+    unshift @output, $self->head1('operators',
+      "This package overloads the following operators:",
+    );
+  }
+
+  return join "\n", @output;
+}
+
 sub pdml_for_project {
   my ($self) = @_;
 
@@ -742,6 +791,7 @@ sub render {
     functions
     methods
     features
+    operators
     authors
     license
     project
@@ -986,6 +1036,20 @@ sub test_for_name {
   return;
 }
 
+sub test_for_operator {
+  my ($self, $name, $code) = @_;
+
+  my $data = $self->data('operator', $name);
+
+  $code ||= sub {
+    length($data) > 1;
+  };
+
+  ok($code->(), "=operator $name");
+
+  return;
+}
+
 sub test_for_project {
   my ($self, $name, $code) = @_;
 
@@ -1118,7 +1182,7 @@ sub text_for_example {
 
   my $data = $self->search({
     list => "example-$number",
-    name => $name,
+    name => quotemeta($name),
   });
 
   push @$output, join "\n\n", @{$data->[0]{data}} if @$data;
@@ -1270,6 +1334,20 @@ sub text_for_name {
   my ($self) = @_;
 
   my ($error, $result) = $self->catch('data', 'name');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_operator {
+  my ($self, $name) = @_;
+
+  my ($error, $result) = $self->catch('data', 'operator', $name);
 
   my $output = [];
 

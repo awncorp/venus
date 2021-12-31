@@ -14,7 +14,6 @@ with 'Venus::Role::Stashable';
 
 use overload (
   '.' => sub{$_[0]->message . "$_[1]"},
-  '.=' => sub{$_[0]->message($_[0]->message . "$_[1]")},
   'eq' => sub{$_[0]->message eq "$_[1]"},
   'ne' => sub{$_[0]->message ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->message)]}/},

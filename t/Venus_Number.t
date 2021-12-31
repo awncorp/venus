@@ -865,6 +865,500 @@ $test->for('example', 1, 'sqrt', sub {
   $result
 });
 
+=operator (!)
+
+This package overloads the C<!> operator.
+
+=cut
+
+$test->for('operator', '(!)');
+
+=example-1 (!)
+
+  # given: synopsis;
+
+  my $result = $number = !$number;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, '(!)', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result eq '';
+
+  !$result
+});
+
+=operator (!=)
+
+This package overloads the C<!=> operator.
+
+=cut
+
+$test->for('operator', '(!=)');
+
+=example-1 (!=)
+
+  # given: synopsis;
+
+  my $result = $number != 100;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(!=)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (%)
+
+This package overloads the C<%> operator.
+
+=cut
+
+$test->for('operator', '(%)');
+
+=example-1 (%)
+
+  # given: synopsis;
+
+  my $result = $number % 2_000;
+
+  # 1_000
+
+=cut
+
+$test->for('example', 1, '(%)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1_000;
+
+  $result
+});
+
+=operator (*)
+
+This package overloads the C<*> operator.
+
+=cut
+
+$test->for('operator', '(*)');
+
+=example-1 (*)
+
+  # given: synopsis;
+
+  my $result = $number * 2;
+
+  # 2_000
+
+=cut
+
+$test->for('example', 1, '(*)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 2_000;
+
+  $result
+});
+
+=operator (+)
+
+This package overloads the C<+> operator.
+
+=cut
+
+$test->for('operator', '(+)');
+
+=example-1 (+)
+
+  # given: synopsis;
+
+  my $result = $number + 100;
+
+  # 1100
+
+=cut
+
+$test->for('example', 1, '(+)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1100;
+
+  $result
+});
+
+=operator (-)
+
+This package overloads the C<-> operator.
+
+=cut
+
+$test->for('operator', '(-)');
+
+=example-1 (-)
+
+  # given: synopsis;
+
+  my $result = $number - 100;
+
+  # 900
+
+=cut
+
+$test->for('example', 1, '(-)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 900;
+
+  $result
+});
+
+=operator (.)
+
+This package overloads the C<.> operator.
+
+=cut
+
+$test->for('operator', '(.)');
+
+=example-1 (.)
+
+  # given: synopsis;
+
+  my $result = $number . 0;
+
+  # 10_000
+
+=cut
+
+$test->for('example', 1, '(.)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 10_000;
+
+  $result
+});
+
+=operator (/)
+
+This package overloads the C</> operator.
+
+=cut
+
+$test->for('operator', '(/)');
+
+=example-1 (/)
+
+  # given: synopsis;
+
+  my $result = $number / 10;
+
+  # 100
+
+=cut
+
+$test->for('example', 1, '(/)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 100;
+
+  $result
+});
+
+=operator (0+)
+
+This package overloads the C<0+> operator.
+
+=cut
+
+$test->for('operator', '(0+)');
+
+=example-1 (0+)
+
+  # given: synopsis;
+
+  my $result = $number + 0;
+
+  # 1_000
+
+=cut
+
+$test->for('example', 1, '(0+)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1_000;
+
+  $result
+});
+
+=operator (<)
+
+This package overloads the C<<> operator.
+
+=cut
+
+$test->for('operator', '(<)');
+
+=example-1 (<)
+
+  # given: synopsis;
+
+  my $result = $number < 1001;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(<)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (<=)
+
+This package overloads the C<<=> operator.
+
+=cut
+
+$test->for('operator', '(<=)');
+
+=example-1 (<=)
+
+  # given: synopsis;
+
+  my $result = $number <= 1000;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(<=)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (==)
+
+This package overloads the C<==> operator.
+
+=cut
+
+$test->for('operator', '(==)');
+
+=example-1 (==)
+
+  # given: synopsis;
+
+  my $result = $number == 1000;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(==)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (>)
+
+This package overloads the C<>> operator.
+
+=cut
+
+$test->for('operator', '(>)');
+
+=example-1 (>)
+
+  # given: synopsis;
+
+  my $result = $number > 999;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(>)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (>=)
+
+This package overloads the C<>=> operator.
+
+=cut
+
+$test->for('operator', '(>=)');
+
+=example-1 (>=)
+
+  # given: synopsis;
+
+  my $result = $number >= 1000;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(>=)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (bool)
+
+This package overloads the C<bool> operator.
+
+=cut
+
+$test->for('operator', '(bool)');
+
+=example-1 (bool)
+
+  # given: synopsis;
+
+  my $result = !!$number;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(bool)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (eq)
+
+This package overloads the C<eq> operator.
+
+=cut
+
+$test->for('operator', '(eq)');
+
+=example-1 (eq)
+
+  # given: synopsis;
+
+  my $result = $number eq "1000";
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(eq)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (ne)
+
+This package overloads the C<ne> operator.
+
+=cut
+
+$test->for('operator', '(ne)');
+
+=example-1 (ne)
+
+  # given: synopsis;
+
+  my $result = $number ne "1_000";
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(ne)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (qr)
+
+This package overloads the C<qr> operator.
+
+=cut
+
+$test->for('operator', '(qr)');
+
+=example-1 (qr)
+
+  # given: synopsis;
+
+  my $result = '1000' =~ qr/$number/;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(qr)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (x)
+
+This package overloads the C<x> operator.
+
+=cut
+
+$test->for('operator', '(x)');
+
+=example-1 (x)
+
+  # given: synopsis;
+
+  my $result = $number x 2;
+
+  # 10001000
+
+=cut
+
+$test->for('example', 1, '(x)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1_000_1_000;
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery
