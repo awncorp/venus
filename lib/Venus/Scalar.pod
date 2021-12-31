@@ -65,6 +65,52 @@ I<Since C<0.01>>
 
 =cut
 
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(${})>
+
+This package overloads the C<${}> operator.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new(\*STDOUT);
+
+  my $value = $$scalar;
+
+  # *::STDOUT
+
+=back
+
+=over 4
+
+=item operation: C<(*{})>
+
+This package overloads the C<*{}> operator.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new(\*STDOUT);
+
+  my $value = *$scalar;
+
+  # *::STDOUT
+
+=back
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>

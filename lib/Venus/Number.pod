@@ -600,6 +600,316 @@ I<Since C<0.01>>
 
 =cut
 
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(!)>
+
+This package overloads the C<!> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number = !$number;
+
+  # ""
+
+=back
+
+=over 4
+
+=item operation: C<(!=)>
+
+This package overloads the C<!=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number != 100;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(%)>
+
+This package overloads the C<%> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number % 2_000;
+
+  # 1_000
+
+=back
+
+=over 4
+
+=item operation: C<(*)>
+
+This package overloads the C<*> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number * 2;
+
+  # 2_000
+
+=back
+
+=over 4
+
+=item operation: C<(+)>
+
+This package overloads the C<+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number + 100;
+
+  # 1100
+
+=back
+
+=over 4
+
+=item operation: C<(-)>
+
+This package overloads the C<-> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number - 100;
+
+  # 900
+
+=back
+
+=over 4
+
+=item operation: C<(.)>
+
+This package overloads the C<.> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number . 0;
+
+  # 10_000
+
+=back
+
+=over 4
+
+=item operation: C<(/)>
+
+This package overloads the C</> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number / 10;
+
+  # 100
+
+=back
+
+=over 4
+
+=item operation: C<(0+)>
+
+This package overloads the C<0+> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number + 0;
+
+  # 1_000
+
+=back
+
+=over 4
+
+=item operation: C<(<)>
+
+This package overloads the C<<> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number < 1001;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(<=)>
+
+This package overloads the C<<=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number <= 1000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(==)>
+
+This package overloads the C<==> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number == 1000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>)>
+
+This package overloads the C<>> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number > 999;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(>=)>
+
+This package overloads the C<>=> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number >= 1000;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(bool)>
+
+This package overloads the C<bool> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = !!$number;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number eq "1000";
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number ne "1_000";
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = '1000' =~ qr/$number/;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(x)>
+
+This package overloads the C<x> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $number x 2;
+
+  # 10001000
+
+=back
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>
