@@ -119,6 +119,59 @@ $test->for('example', 1, 'explain', sub {
   $result
 });
 
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+$test->for('operator', '("")');
+
+=example-1 ("")
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $string = "$example";
+
+  # "okay"
+
+=cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'okay';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $result = $example ~~ 'okay';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  diag 'smatchmatch deprecated';
+  1;
+});
+
 =license
 
 Copyright (C) 2021, Cpanery

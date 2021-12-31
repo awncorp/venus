@@ -2131,6 +2131,292 @@ $test->for('example', 3, 'sub_years', sub {
   $result
 });
 
+=operator (!=)
+
+This package overloads the C<!=> operator.
+
+=cut
+
+$test->for('operator', '(!=)');
+
+=example-1 (!=)
+
+  # given: synopsis;
+
+  my $result = $date != 570672001;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(!=)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (+)
+
+This package overloads the C<+> operator.
+
+=cut
+
+$test->for('operator', '(+)');
+
+=example-1 (+)
+
+  # given: synopsis;
+
+  my $result = $date + 0;
+
+  # 570672000
+
+=cut
+
+$test->for('example', 1, '(+)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 570672000;
+
+  $result
+});
+
+=operator (-)
+
+This package overloads the C<-> operator.
+
+=cut
+
+$test->for('operator', '(-)');
+
+=example-1 (-)
+
+  # given: synopsis;
+
+  my $result = $date - 0;
+
+  # 570672000
+
+=cut
+
+$test->for('example', 1, '(-)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 570672000;
+
+  $result
+});
+
+=operator (0+)
+
+This package overloads the C<0+> operator.
+
+=cut
+
+$test->for('operator', '(0+)');
+
+=example-1 (0+)
+
+  # given: synopsis;
+
+  my $result = 0 + $date;
+
+  # 570672000
+
+=cut
+
+$test->for('example', 1, '(0+)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 570672000;
+
+  $result
+});
+
+=operator (<)
+
+This package overloads the C<<> operator.
+
+=cut
+
+$test->for('operator', '(<)');
+
+=example-1 (<)
+
+  # given: synopsis;
+
+  my $result = $date < 570672001;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(<)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (<=)
+
+This package overloads the C<<=> operator.
+
+=cut
+
+$test->for('operator', '(<=)');
+
+=example-1 (<=)
+
+  # given: synopsis;
+
+  my $result = $date <= 570672000;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(<=)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (==)
+
+This package overloads the C<==> operator.
+
+=cut
+
+$test->for('operator', '(==)');
+
+=example-1 (==)
+
+  # given: synopsis;
+
+  my $result = $date == 570672000;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(==)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (>)
+
+This package overloads the C<>> operator.
+
+=cut
+
+$test->for('operator', '(>)');
+
+=example-1 (>)
+
+  # given: synopsis;
+
+  my $result = $date > 570671999;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(>)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (>=)
+
+This package overloads the C<>=> operator.
+
+=cut
+
+$test->for('operator', '(>=)');
+
+=example-1 (>=)
+
+  # given: synopsis;
+
+  my $result = $date >= 570672000;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(>=)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (eq)
+
+This package overloads the C<eq> operator.
+
+=cut
+
+$test->for('operator', '(eq)');
+
+=example-1 (eq)
+
+  # given: synopsis;
+
+  my $result = $date eq '570672000';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(eq)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=operator (ne)
+
+This package overloads the C<ne> operator.
+
+=cut
+
+$test->for('operator', '(ne)');
+
+=example-1 (ne)
+
+  # given: synopsis;
+
+  my $result = $date ne '560672000';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(ne)', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery
