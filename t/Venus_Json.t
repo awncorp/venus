@@ -77,7 +77,8 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data.
+data. B<Note:> This package requires that a suitable JSON library is installed,
+e.g. I<JSON::XS C<3.0>> or I<JSON::PP C<4.00>>.
 
 =cut
 
