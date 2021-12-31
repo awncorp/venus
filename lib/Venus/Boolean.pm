@@ -112,6 +112,26 @@ sub FALSE {
   return $false;
 }
 
+sub FROM_BOOL {
+  my ($value) = @_;
+
+  my $object = Scalar::Util::blessed($value);
+  my $scalar = ((Scalar::Util::reftype($value) // '') eq 'SCALAR') ? 1 : 0;
+
+  if ($object && $scalar && defined($$value) && !ref($$value) && $$value == 1) {
+    return $true;
+  }
+  elsif ($object && $scalar && defined($$value) && !ref($$value) && $$value == 0) {
+    return $false;
+  }
+  elsif ($object && $value->isa('Venus::Boolean')) {
+    return $value->get;
+  }
+  else {
+    return $value;
+  }
+}
+
 sub TO_BOOL {
   my ($value) = @_;
 
