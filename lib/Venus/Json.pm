@@ -80,7 +80,7 @@ sub package {
 
   my %packages = (
     'JSON::XS' => '3.0',
-    'JSON::PP' => '0',
+    'JSON::PP' => '4.00',
   );
   for my $package (qw(JSON::XS JSON::PP)) {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
