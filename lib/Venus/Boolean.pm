@@ -20,13 +20,12 @@ state $false_ref = \$false;
 state $false_type = 'false';
 
 use overload (
-  '!' => sub{"$_[0]" ? $false : $true},
+  '!' => sub{$_[0]->get ? $false : $true},
   '<' => sub{!!$_[0] < !!$_[1] ? $true : $false},
-  '<=' => sub{!!$_[0] <= $_[1] ? $true : $false},
+  '<=' => sub{!!$_[0] <= !!$_[1] ? $true : $false},
   '>' => sub{!!$_[0] > !!$_[1] ? $true : $false},
   '>=' => sub{!!$_[0] >= !!$_[1] ? $true : $false},
   '!=' => sub{!!$_[0] != !!$_[1] ? $true : $false},
-  '0+' => sub{"$_[0]" ? $true : $false},
   '==' => sub{!!$_[0] == !!$_[1] ? $true : $false},
   'bool' => sub{!!$_[0] ? $true : $false},
   'eq' => sub{"$_[0]" eq "$_[1]" ? $true : $false},
