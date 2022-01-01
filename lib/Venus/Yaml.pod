@@ -1,0 +1,141 @@
+
+=head1 NAME
+
+Venus::Yaml - Yaml Class
+
+=cut
+
+=head1 ABSTRACT
+
+Yaml Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Yaml;
+
+  my $yaml = Venus::Yaml->new(
+    value => { name => ['Ready', 'Robot'], version => 0.12, stable => !!1, }
+  );
+
+  # $yaml->encode;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for reading and writing L<YAML|https://yaml.org>
+data. B<Note:> This package requires that a suitable YAML is installed,
+currently either C<YAML::XS> C<0.67+>, C<YAML::PP::LibYAML> C<0.004+>, or
+C<YAML::PP> C<0.23+>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 decoder
+
+  decoder(CodeRef)
+
+This attribute is read-write, accepts C<(CodeRef)> values, and is optional.
+
+=cut
+
+=head2 encoder
+
+  encoder(CodeRef)
+
+This attribute is read-write, accepts C<(CodeRef)> values, and is optional.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+
+L<Venus::Role::Explainable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 decode
+
+  decode(Str $yaml) (Any)
+
+The decode method decodes the YAML string, sets the object value, and returns
+the decoded value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item decode example 1
+
+  # given: synopsis;
+
+  my $decode = $yaml->decode("codename: ['Ready','Robot']\nstable: true");
+
+  # { codename => ["Ready", "Robot"], stable => 1 }
+
+=back
+
+=cut
+
+=head2 encode
+
+  encode() (Str)
+
+The encode method encodes the objects value as a YAML string and returns the
+encoded string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item encode example 1
+
+  # given: synopsis;
+
+  my $encode = $yaml->encode;
+
+  # "---\nname:\n- Ready\n- Robot\nstable: true\nversion: 0.12\n"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut
