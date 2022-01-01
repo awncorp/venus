@@ -110,7 +110,7 @@ sub package {
   my %packages = (
     'YAML::XS' => '0.67',
     'YAML::PP::LibYAML' => '0.004',
-    'YAML::PP' => '0.23',
+    'YAML::PP' => '0.023',
   );
   for my $package (qw(YAML::XS YAML::PP::LibYAML YAML::PP)) {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
