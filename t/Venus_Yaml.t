@@ -11,7 +11,7 @@ use Test::More;
 use Test::Venus;
 
 if (require Venus::Yaml && not Venus::Yaml->package) {
-  warn 'No suitable YAML library found';
+  diag 'No suitable YAML library found';
   goto SKIP;
 }
 
