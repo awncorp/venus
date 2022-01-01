@@ -18,7 +18,7 @@ Json Class for Perl 5
   use Venus::Json;
 
   my $json = Venus::Json->new(
-    value => { name => ['Ready', 'Robot'], version => 0.12, stable => \1, }
+    value => { name => ['Ready', 'Robot'], version => 0.12, stable => !!1, }
   );
 
   # $json->encode;
@@ -28,8 +28,9 @@ Json Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON library is installed,
-e.g. I<JSON::XS C<3.0>> or I<JSON::PP C<4.00>>.
+data. B<Note:> This package requires that a suitable JSON is installed,
+currently either C<JSON::XS> C<3.0+>, C<JSON::PP> C<2.27105+>, or
+C<Cpanel::JSON::XS> C<4.09+>.
 
 =cut
 
@@ -39,11 +40,19 @@ This package has the following attributes:
 
 =cut
 
-=head2 engine
+=head2 decoder
 
-  engine(Object)
+  decoder(CodeRef)
 
-This attribute is read-write, accepts C<(Object)> values, and is optional.
+This attribute is read-write, accepts C<(CodeRef)> values, and is optional.
+
+=cut
+
+=head2 encoder
+
+  encoder(CodeRef)
+
+This attribute is read-write, accepts C<(CodeRef)> values, and is optional.
 
 =cut
 
@@ -68,30 +77,6 @@ L<Venus::Role::Explainable>
 =head1 METHODS
 
 This package provides the following methods:
-
-=cut
-
-=head2 config
-
-  config() (Object)
-
-The config method returns the L<JSON::PP> compatible JSON client.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item config example 1
-
-  # given: synopsis;
-
-  my $config = $json->config;
-
-  # bless({ ...  }, "...") # e.g. JSON::PP
-
-  # $json->config->canonical->pretty;
-
-=back
 
 =cut
 
@@ -136,54 +121,6 @@ I<Since C<0.01>>
   my $encode = $json->encode;
 
   # '{ "name": ["Ready", "Robot"], "stable": true, "version": 0.12 }'
-
-=back
-
-=cut
-
-=head2 explain
-
-  explain() (Str)
-
-The explain method returns the encoded JSON string and is used in
-stringification operations.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item explain example 1
-
-  # given: synopsis;
-
-  my $explain = $json->explain;
-
-  # '{ "name": ["Ready", "Robot"], "stable": true, "version": 0.12 }'
-
-=back
-
-=cut
-
-=head2 package
-
-  package() (Str)
-
-The package method returns the package name of the first JSON client found.
-Those clients (in this order) are L<JSON::XS>, and L<JSON::PP>. This package
-does not support L<Cpanel::JSON::XS> because it does not support custom boolean
-handlers.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item package example 1
-
-  # given: synopsis;
-
-  my $package = $json->package;
-
-  # "JSON::PP"
 
 =back
 

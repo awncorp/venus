@@ -10,8 +10,8 @@ use lib 't/lib';
 use Test::More;
 use Test::Venus;
 
-if (require Venus::Json && not Venus::Json->new->package) {
-  warn 'No suitable JSON library found';
+if (require Venus::Json && not Venus::Json->package) {
+  diag 'No suitable JSON library found';
   goto SKIP;
 }
 
@@ -43,11 +43,8 @@ $test->for('abstract');
 
 =includes
 
-method: config
 method: decode
 method: encode
-method: explain
-method: package
 
 =cut
 
@@ -60,7 +57,7 @@ $test->for('includes');
   use Venus::Json;
 
   my $json = Venus::Json->new(
-    value => { name => ['Ready', 'Robot'], version => 0.12, stable => \1, }
+    value => { name => ['Ready', 'Robot'], version => 0.12, stable => !!1, }
   );
 
   # $json->encode;
@@ -77,9 +74,9 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON library is installed
-or provided as the engine attribute. A proper engine is any object that has
-C<encode> and C<decode> methods which return encoded and decoded values.
+data. B<Note:> This package requires that a suitable JSON is installed,
+currently either C<JSON::XS> C<3.0+>, C<JSON::PP> C<2.27105+>, or
+C<Cpanel::JSON::XS> C<4.09+>.
 
 =cut
 
@@ -104,47 +101,12 @@ $test->for('integrates');
 
 =attributes
 
-engine: rw, opt, Object
+decoder: rw, opt, CodeRef
+encoder: rw, opt, CodeRef
 
 =cut
 
 $test->for('attributes');
-
-=method config
-
-The config method returns the L<JSON::PP> compatible JSON client.
-
-=signature config
-
-  config() (Object)
-
-=metadata config
-
-{
-  since => '0.01',
-}
-
-=example-1 config
-
-  # given: synopsis;
-
-  my $config = $json->config;
-
-  # bless({ ...  }, "...") # e.g. JSON::PP
-
-  # $json->config->canonical->pretty;
-
-=cut
-
-$test->for('example', 1, 'config', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok +($result->isa("JSON::PP"))
-  || +($result->isa("JSON::XS"))
-  || +($result->isa("Cpanel::JSON::XS"));
-
-  $result
-});
 
 =method decode
 
@@ -207,77 +169,8 @@ encoded string.
 $test->for('example', 1, 'encode', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
+  $result =~ s/[\n\s]//g;
   ok $result eq '{"name":["Ready","Robot"],"stable":true,"version":0.12}';
-
-  $result
-});
-
-=method explain
-
-The explain method returns the encoded JSON string and is used in
-stringification operations.
-
-=signature explain
-
-  explain() (Str)
-
-=metadata explain
-
-{
-  since => '0.01',
-}
-
-=example-1 explain
-
-  # given: synopsis;
-
-  my $explain = $json->explain;
-
-  # '{ "name": ["Ready", "Robot"], "stable": true, "version": 0.12 }'
-
-=cut
-
-$test->for('example', 1, 'explain', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq '{"name":["Ready","Robot"],"stable":true,"version":0.12}';
-
-  $result
-});
-
-=method package
-
-The package method returns the package name of the first JSON client found.
-Those clients (in this order) are L<JSON::XS>, and L<JSON::PP>. This package
-does not support L<Cpanel::JSON::XS> because it does not support custom boolean
-handlers.
-
-=signature package
-
-  package() (Str)
-
-=metadata package
-
-{
-  since => '0.01',
-}
-
-=example-1 package
-
-  # given: synopsis;
-
-  my $package = $json->package;
-
-  # "JSON::PP"
-
-=cut
-
-$test->for('example', 1, 'package', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok +($result eq "JSON::PP")
-  || +($result eq "JSON::XS")
-  || +($result eq "Cpanel::JSON::XS");
 
   $result
 });
