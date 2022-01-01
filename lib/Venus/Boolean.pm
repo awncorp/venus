@@ -164,6 +164,24 @@ sub TO_BOOL_REF {
   }
 }
 
+sub TO_BOOL_OBJ {
+  my ($value) = @_;
+
+  require JSON::PP;
+
+  my $isdual = Scalar::Util::isdual($value);
+
+  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
+    return JSON::PP::true();
+  }
+  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
+    return JSON::PP::false();
+  }
+  else {
+    return $value;
+  }
+}
+
 sub TO_JSON {
   my ($self) = @_;
 

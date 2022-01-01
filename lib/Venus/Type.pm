@@ -92,7 +92,7 @@ sub deduce_defined {
   my $data = $self->get;
 
   return $self->deduce_references if ref($data);
-  return $self->deduce_boolean if scalar_is_dualvar($data);
+  return $self->deduce_boolean if scalar_is_boolean($data);
   return $self->deduce_numberlike if scalar_is_numeric($data);
   return $self->deduce_stringlike;
 }
@@ -175,7 +175,7 @@ sub object_array {
 
   require Venus::Array;
 
-  return Venus::Array->new($self->get);
+  return Venus::Array->new([@{$self->get}]);
 }
 
 sub object_boolean {
@@ -207,7 +207,7 @@ sub object_hash {
 
   require Venus::Hash;
 
-  return Venus::Hash->new($self->get);
+  return Venus::Hash->new({%{$self->get}});
 }
 
 sub object_number {
@@ -256,10 +256,13 @@ sub scalar_is_blessed {
   return Scalar::Util::blessed($value);
 }
 
-sub scalar_is_dualvar {
+sub scalar_is_boolean {
   my ($value) = @_;
 
-  return Scalar::Util::isdual($value);
+  return Scalar::Util::isdual($value) && (
+    ("$value" == "1" && ($value + 0) == 1) ||
+    ("$value" == "0" && ($value + 0) == 0)
+  );
 }
 
 sub scalar_is_numeric {
