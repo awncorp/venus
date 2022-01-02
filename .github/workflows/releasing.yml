@@ -2,8 +2,8 @@ name: Releasing
 
 on:
   push:
-    tags:
-    - cpan
+    branches:
+    - release-*
 
 jobs:
   Perl-5300:
@@ -178,23 +178,42 @@ jobs:
       run: git config --global github.token ${{ secrets.GithubToken }}
     - name: Install CPANM
       run: sudo apt install -y cpanminus
-    - name: Install Dist::Zilla
-      run: sudo cpanm -qn Dist::Zilla
-    - name: Install Dist::Zilla Dependencies
-      run: dzil authordeps | sudo cpanm -qn
+    - name: Install App::plx
+      run: sudo cpanm -qn App::plx
+    - name: Install App::cpm
+      run: sudo cpanm -qn App::cpm
+    - name: Initialize plx
+      run: sudo plx --init
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Cleanup Build Environment
-      run: dzil clean
-    - name: Build Project Distribution
-      run: V=$(cat VERSION) DZIL_RELEASING=1 dzil build
-    - name: Discard Generated Changelog
-      run: git checkout CHANGES
-    - name: Discard Generated Tarball
-      run: rm $(ls *.tar.gz)
-    - name: Copy CHANGES to Build Directory
-      run: cp -f CHANGES $(echo *-$(cat VERSION))
-    - name: Manually Create Release Tarball
-      run: tar czf $(echo *-$(cat VERSION)).tar.gz $(echo *-$(cat VERSION))
-    - name: Upload to CPAN
-      run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)
+      run: sudo plx cpanfile
+    - name: Install Dist::Zilla Dependencies
+      run: sudo plx cpanfile dzil
+    - name: Build Changelog
+      run: sudo plx latest
+    - name: Build Release Distribution
+      run: sudo plx release $(cat VERSION)
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "*.tar.gz"
+        bodyFile: "LATEST.md"
+        token: ${{ secrets.GithubToken }}
+    # - name: Install Dist::Zilla
+    #   run: sudo cpanm -qn Dist::Zilla
+    # - name: Install Dist::Zilla Dependencies
+    #   run: dzil authordeps | sudo cpanm -qn
+    # - name: Install Project Dependencies
+    #   run: sudo cpanm -qn --reinstall --installdeps .
+    # - name: Cleanup Build Environment
+    #   run: dzil clean
+    # - name: Build Project Distribution
+    #   run: V=$(cat VERSION) DZIL_RELEASING=1 dzil build
+    # - name: Discard Generated Changelog
+    #   run: git checkout CHANGES
+    # - name: Discard Generated Tarball
+    #   run: rm $(ls *.tar.gz)
+    # - name: Copy CHANGES to Build Directory
+    #   run: cp -f CHANGES $(echo *-$(cat VERSION))
+    # - name: Manually Create Release Tarball
+    #   run: tar czf $(echo *-$(cat VERSION)).tar.gz $(echo *-$(cat VERSION))
+    # - name: Upload to CPAN
+    #   run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)

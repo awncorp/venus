@@ -11,7 +11,7 @@ robust set of methods for dealing with common computing tasks when operating on
 primitive data types. Venus is concerned about developer ergonomics much more
 than speed or conciseness.
 
-## Features / Aspirations
+## Aspirations
 
 The following feeatures and goals should anchor the direction and development
 of this project:
@@ -44,6 +44,12 @@ $ curl -L https://cpanmin.us | perl - -qn App::plx
 $ curl -L https://cpanmin.us | perl - -qn App::cpm
 ```
 
+**[reply](https://metacpan.org/pod/Reply)**
+
+```bash
+$ plx cpanfile reply
+```
+
 ## Installation
 
 The following steps configures the local environment for developing on this
@@ -64,7 +70,7 @@ git clone git@github.com:cpanery/venus.git .
 **Build**
 
 ```bash
-plx cpm install
+plx cpanfile
 ```
 
 **Validate**
@@ -73,7 +79,27 @@ plx cpm install
 plx prove -r t
 ```
 
-## Prequisites (Releasing)
+## Testing
+
+Running the test suite using `prove`:
+
+```bash
+$ plx prove -r t
+```
+
+Testing the code using the `reply` (REPL):
+
+```bash
+$ plx reply -e 'use Venus'
+```
+
+Building the code using `dzil`:
+
+```bash
+$ plx build
+```
+
+## Releasing
 
 This project uses [Dist::Zilla](https://github.com/rjbs/Dist-Zilla) to manage
 its build and release processes. The following tools are prerquisites for
@@ -82,9 +108,7 @@ releasing this project.
 **[dzil](https://metacpan.org/pod/Dist::Zilla)**
 
 ```bash
-plx cpm install Dist::Zilla
-
-plx cpm install $(plx dzil authordeps --missing)
+plx cpanfile dzil
 ```
 
 ## Directory Structure
@@ -110,6 +134,12 @@ changes are made in their respective test files under the `t` directory.
 POD isn't created or maintained manually, and is instead generated at-will (and
 typically before release). Altering POD files will almost certainly result in
 those changes being lost.
+
+Releasing the code using `dzil`:
+
+```bash
+$ plx release 0.01
+```
 
 ## Support
 
