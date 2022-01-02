@@ -344,6 +344,7 @@ see below:
 - [Venus::Type](https://github.com/cpanery/venus/blob/master/lib/Venus/Type.pod#name)
 - [Venus::Undef](https://github.com/cpanery/venus/blob/master/lib/Venus/Undef.pod#name)
 - [Venus::Vars](https://github.com/cpanery/venus/blob/master/lib/Venus/Vars.pod#name)
+- [Venus::Yaml](https://github.com/cpanery/venus/blob/master/lib/Venus/Yaml.pod#name)
 
 ## Founder
 

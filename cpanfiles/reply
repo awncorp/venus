@@ -1,0 +1,9 @@
+# reply
+requires "Reply";
+requires "App::Nopaste";
+requires "B::Keywords";
+requires "Class::Refresh";
+requires "IO::Pager";
+requires "Proc::InvokeEditor";
+requires "Term::ReadKey";
+requires "Term::ReadLine::Gnu";
