@@ -1,0 +1,3 @@
+# perl
+requires "Perl::Critic";
+requires "Perl::Tidy";
