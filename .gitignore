@@ -2,6 +2,8 @@
 
 !/.github
 !/bin
+!/cpanfiles
+!/dev
 !/lib
 !/t
 
@@ -9,6 +11,7 @@
 !CODE_OF_CONDUCT.md
 !CONTRIBUTING.md
 !INSTALL
+!LATEST.md
 !LICENSE
 !MANIFEST.SKIP
 !META.json
@@ -18,10 +21,8 @@
 !README.md
 !STABILITY.md
 !VERSION
-!build
 !cpanfile
 !dist.ini
-!release
 
 !.editorconfig
 !.gitattributes
@@ -30,4 +31,3 @@
 !.perltidyrc
 !.perlcriticrc
 !.replyrc
-!.replydeps

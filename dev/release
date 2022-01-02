@@ -29,8 +29,10 @@ git push origin :refs/tags/cpan :refs/tags/$V 2> /dev/null
 # Persist Release VERSION
 echo $V > VERSION
 
-# Regenerate all necessary POD documents
-prove -r t
+# Run test suite and regenerate all POD documents
+if ! prove -r t; then
+  echo "Test suite failed!" && exit 0;
+fi
 
 # Push generated POD changes
 if ! git diff-index --quiet HEAD --; then
