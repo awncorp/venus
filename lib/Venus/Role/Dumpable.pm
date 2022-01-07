@@ -25,7 +25,9 @@ sub dump {
   local $Data::Dumper::Terse = 1;
   local $Data::Dumper::Useqq = 1;
 
-  my $data = Data::Dumper->Dump([$method ? $self->$method(@args) : $self]);
+  my $data = Data::Dumper->Dump([
+    $method ? scalar($self->$method(@args)) : $self
+  ]);
 
   $data =~ s/^"|"$//g;
 
@@ -59,7 +61,9 @@ sub dump_pretty {
   local $Data::Dumper::Deparse = 1;
   local $Data::Dumper::Sparseseen = 0;
 
-  my $data = Data::Dumper->Dump([$method ? $self->$method(@args) : $self]);
+  my $data = Data::Dumper->Dump([
+    $method ? scalar($self->$method(@args)) : $self
+  ]);
 
   $data =~ s/^'|'$//g;
 
