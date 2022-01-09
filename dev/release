@@ -14,36 +14,36 @@ if ! git diff-index --quiet HEAD --; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
-# Test fake build before release
+# Persist release version
+echo $V > VERSION
+
+# Test fake build before build
 if ! dzil test; then
   echo "Build test failed!" && exit 0;
 fi
 
-# Cleanup the mess
+# Cleanup build
 dzil clean
 
 # Delete existing release tag (if exists)
-git tag -d cpan $V 2> /dev/null
-git push origin :refs/tags/cpan :refs/tags/$V 2> /dev/null
+git tag -d $V 2> /dev/null
+git push origin :refs/tags/$V 2> /dev/null
 
-# Persist Release VERSION
-echo $V > VERSION
-
-# Run test suite and regenerate all POD documents
-if ! prove -r t; then
-  echo "Test suite failed!" && exit 0;
-fi
-
-# Push generated POD changes
+# Commit updated release version
 if ! git diff-index --quiet HEAD --; then
-  git add . && git commit -m 'Add release updates'
+  git add . && git commit -m 'Update version'
 fi
 
-# Build, Tag, and Push Package Release
-dzil release
+# Build Package
+dzil build
 
-# Tag as CPAN for releasing
-git tag cpan 2> /dev/null
+# Commit generated POD changes
+if ! git diff-index --quiet HEAD --; then
+  git add . && git commit -m 'Update documentation'
+fi
+
+# Tag as $version for releasing
+git tag $(cat VERSION) 2> /dev/null
 
 # Re-push all tags (just in case)
 git push --tags 2> /dev/null

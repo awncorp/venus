@@ -221,7 +221,7 @@ sub keys {
 sub list {
   my ($self) = @_;
 
-  return (%{$self->value});
+  return wantarray ? (%{$self->value}) : scalar(CORE::keys(%{$self->value}));
 }
 
 sub map {

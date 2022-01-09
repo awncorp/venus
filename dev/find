@@ -1,0 +1,5 @@
+#!/bin/bash
+
+expr=${1-:*}
+
+find bin dev local/bin script scripts 2>/dev/null -type f | grep $expr

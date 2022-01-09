@@ -8,11 +8,11 @@ on:
     - project-*
 
 jobs:
-  Perl-0000:
+  Test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup Git User
       run: git config --global user.name "Cpanery"
     - name: Setup Git Email
@@ -32,15 +32,29 @@ jobs:
     - name: Critiquing Project
       run: perlcritic lib t
     - name: Testing Project
-      run: prove -Ilib -r t
+      run: RENDER=1 prove -Ilib -r t
+    - name: Check Documentation
+      run: test -n "$(git status --porcelain)" && (git status --porcelain && false) || true
       env:
         HARNESS_OPTIONS: j9
 
-  Perl-CPANEL-JSON-XS:
+  Variant:
     runs-on: ubuntu-latest
+    needs:
+      - Test
+    strategy:
+      matrix:
+        package:
+        - JSON::PP@2.27105
+        - Cpanel::JSON::XS@4.09
+        - JSON::PP@4.07
+        - JSON::XS@3.0
+        - YAML::PP::LibYAML@0.004
+        - YAML::PP@0.023
+        - YAML::XS@0.67
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup Git User
       run: git config --global user.name "Cpanery"
     - name: Setup Git Email
@@ -57,161 +71,11 @@ jobs:
       run: sudo cpanm -qn Perl::Critic
     - name: Install Project Dependencies
       run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install Cpanel::JSON::XS
-      run: sudo cpanm -qn Cpanel::JSON::XS
+    - name: Install Non-Core ${{ matrix.package }}
+      run: cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
       run: perlcritic lib t
     - name: Testing Project
-      run: prove -Ilib -r t
-      env:
-        HARNESS_OPTIONS: j9
-
-  Perl-JSON-PP:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.user ${{ secrets.GithubToken }}
-    - name: Advertise Perl Version
-      run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install JSON::PP
-      run: sudo cpanm -qn JSON::PP
-    - name: Critiquing Project
-      run: perlcritic lib t
-    - name: Testing Project
-      run: prove -Ilib -r t
-      env:
-        HARNESS_OPTIONS: j9
-
-  Perl-JSON-XS:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.user ${{ secrets.GithubToken }}
-    - name: Advertise Perl Version
-      run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install JSON::XS
-      run: sudo cpanm -qn JSON::XS
-    - name: Critiquing Project
-      run: perlcritic lib t
-    - name: Testing Project
-      run: prove -Ilib -r t
-      env:
-        HARNESS_OPTIONS: j9
-
-  Perl-YAML-XS:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.user ${{ secrets.GithubToken }}
-    - name: Advertise Perl Version
-      run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install YAML::XS
-      run: sudo cpanm -qn YAML::XS
-    - name: Critiquing Project
-      run: perlcritic lib t
-    - name: Testing Project
-      run: prove -Ilib -r t
-      env:
-        HARNESS_OPTIONS: j9
-
-  Perl-YAML-PP-LIBYAML:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.user ${{ secrets.GithubToken }}
-    - name: Advertise Perl Version
-      run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install YAML::PP::LibYAML
-      run: sudo cpanm -qn YAML::PP::LibYAML
-    - name: Critiquing Project
-      run: perlcritic lib t
-    - name: Testing Project
-      run: prove -Ilib -r t
-      env:
-        HARNESS_OPTIONS: j9
-
-  Perl-YAML-PP:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v1
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.user ${{ secrets.GithubToken }}
-    - name: Advertise Perl Version
-      run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install YAML::PP
-      run: sudo cpanm -qn YAML::PP
-    - name: Critiquing Project
-      run: perlcritic lib t
-    - name: Testing Project
-      run: prove -Ilib -r t
+      run: RENDER=1 prove -Ilib -r t
       env:
         HARNESS_OPTIONS: j9

@@ -138,7 +138,7 @@ sub glob {
   $expr ||= '*';
 
   my @paths = map $self->class->new($_),
-    CORE::glob(File::Spec->catfile($self->absolute, $expr));
+    CORE::glob +File::Spec->catfile($self->absolute, $expr);
 
   return wantarray ? (@paths) : \@paths;
 }
