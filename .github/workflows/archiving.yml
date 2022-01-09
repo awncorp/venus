@@ -1,0 +1,36 @@
+name: Archiving
+
+on:
+  push:
+    tags:
+    - cpan
+
+jobs:
+  Dist-Upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup Git User
+      run: git config --global user.name "Cpanery"
+    - name: Setup Git Email
+      run: git config --global user.email "cpanery@cpan.org"
+    - name: Setup GitHub User
+      run: git config --global github.user ${{ secrets.GithubUser }}
+    - name: Setup GitHub Token
+      run: git config --global github.token ${{ secrets.GithubToken }}
+    - name: Install CPANM
+      run: sudo apt install -y cpanminus
+    - name: Install Dist::Zilla
+      run: sudo cpanm -qn Dist::Zilla
+    - name: Install Dist::Zilla Dependencies
+      run: dzil authordeps | sudo cpanm -qn
+    - name: Install Project Dependencies
+      run: sudo cpanm -qn --reinstall --installdeps .
+    - name: Cleanup Environment
+      run: dzil clean
+    - name: Build Distribution
+      run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
+    - name: Upload to CPAN
+      run: echo cpan-upload -u ... -p ... $(ls *.tar.gz)
+    #   run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)

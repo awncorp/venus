@@ -240,7 +240,7 @@ sub last {
 sub list {
   my ($self) = @_;
 
-  return (@{$self->value});
+  return wantarray ? (@{$self->value}) : scalar(@{$self->value});
 }
 
 sub map {
