@@ -1073,7 +1073,7 @@ e.g. C<year>, C<quarter>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
 
 $test->for('example', 1, 'restart', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart requires Perl 5.28+';
+    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1096,7 +1096,7 @@ $test->for('example', 1, 'restart', sub {
 
 $test->for('example', 2, 'restart', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart requires Perl 5.28+';
+    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1119,7 +1119,7 @@ $test->for('example', 2, 'restart', sub {
 
 $test->for('example', 3, 'restart', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart requires Perl 5.28+';
+    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{DEBUG};
     return 1;
   }
   my ($tryable) = @_;

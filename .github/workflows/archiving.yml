@@ -6,11 +6,11 @@ on:
     - cpan
 
 jobs:
-  Dist-Upload:
+  Upload:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup Git User
       run: git config --global user.name "Cpanery"
     - name: Setup Git Email
@@ -32,5 +32,5 @@ jobs:
     - name: Build Distribution
       run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
     - name: Upload to CPAN
-      run: echo cpan-upload -u ... -p ... $(ls *.tar.gz)
+      run: echo cpan-upload -u '***' -p '***' $(ls *.tar.gz)
     #   run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)

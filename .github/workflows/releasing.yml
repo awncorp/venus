@@ -2,15 +2,15 @@ name: Releasing
 
 on:
   push:
-    branches:
-    - release-*
+    tags:
+    - *.**
 
 jobs:
   Test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup Git User
       run: git config --global user.name "Cpanery"
     - name: Setup Git Email
@@ -49,17 +49,11 @@ jobs:
         - 5.24.0
         - 5.22.0
         - 5.18.2
-        package:
-        - JSON::PP@2.27105
-        - Cpanel::JSON::XS@4.09
-        - JSON::PP@4.07
-        - JSON::XS@3.0
-        - YAML::PP::LibYAML@0.004
-        - YAML::PP@0.023
-        - YAML::XS@0.67
+        - 5.16.0
+        - 5.14.2
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Install Perlbrew
       run: sudo apt install -y perlbrew
     - name: Initial Perlbrew
@@ -74,8 +68,6 @@ jobs:
       run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn Perl::Critic
     - name: Install Perl Dependencies
       run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn --reinstall --installdeps .
-    - name: Install Non-Core ${{ matrix.package }}
-      run: sudo cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
       run: perlbrew exec --with perl-${{ matrix.version }} perlcritic lib t
     - name: Testing Project
@@ -89,7 +81,7 @@ jobs:
       - Variant
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Setup Git User
       run: git config --global user.name "Cpanery"
     - name: Setup Git Email
@@ -112,7 +104,7 @@ jobs:
       run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
     - name: Generate Changelog
       run: bash ./dev/latest
-    - uses: ncipollo/release-action@v1
+    - uses: ncipollo/release-action@v2
       with:
         artifacts: "*.tar.gz"
         bodyFile: "LATEST.md"
