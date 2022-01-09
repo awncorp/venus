@@ -191,7 +191,7 @@ Cpanery, C<cpanery@cpan.org>
 
 # END
 
-SKIP:
 $test->render('lib/Venus/Yaml.pod') if $ENV{RENDER};
 
+SKIP:
 ok 1 and done_testing;
