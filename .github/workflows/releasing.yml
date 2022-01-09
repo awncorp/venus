@@ -75,7 +75,7 @@ jobs:
     - name: Install Perl Dependencies
       run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn --reinstall --installdeps .
     - name: Install Non-Core ${{ matrix.package }}
-      run: sudo cpanm -qn ${{ matrix.package }}
+      run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
       run: perlbrew exec --with perl-${{ matrix.version }} perlcritic lib t
     - name: Testing Project
