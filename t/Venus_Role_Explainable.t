@@ -168,7 +168,6 @@ $test->for('operator', '(~~)');
 =cut
 
 $test->for('example', 1, '(~~)', sub {
-  diag 'smatchmatch deprecated';
   1;
 });
 
