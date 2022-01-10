@@ -1,6 +1,6 @@
 package Venus::Role::Valuable;
 
-use 5.014;
+use 5.018;
 
 use strict;
 use warnings;
