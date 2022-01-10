@@ -1,6 +1,6 @@
 package main;
 
-use 5.014;
+use 5.018;
 
 use strict;
 use warnings;
@@ -103,7 +103,7 @@ handling, "true" and "false" keywords, package introspection, command-line
 options parsing, and more. This package will always automatically exports
 C<true> and C<false> keyword functions (unless existing routines of the same
 name already exist in the calling package), otherwise exports keyword functions
-as requested at import.
+as requested at import. This library requires Perl C<5.18+>.
 
 =cut
 
