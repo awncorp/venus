@@ -102,7 +102,7 @@ jobs:
       run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
     - name: Generate Changelog
       run: bash ./dev/latest
-    - uses: ncipollo/release-action@v2
+    - uses: ncipollo/release-action@v1
       with:
         artifacts: "*.tar.gz"
         bodyFile: "LATEST.md"
