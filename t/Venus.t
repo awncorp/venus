@@ -1117,7 +1117,7 @@ L<https://cpanery.com>
 
 subtest version => sub {
   use_ok 'Venus';
-  my $version = do './VERSION';
+  my $version = do './VERSION' || do '../../VERSION';
   is +Venus->VERSION, $version, "Venus.pm ($version)";
   is +$test->data('version'), $version, "Venus.t ($version)";
 };
