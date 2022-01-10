@@ -1,6 +1,6 @@
 package main;
 
-use 5.014;
+use 5.018;
 
 use strict;
 use warnings;
@@ -1156,7 +1156,7 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 $test->for('example', 1, 'rfc822', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq 'Mon, 01 Feb 1988 00:00:00 +0000';
+  like $result, qr/Mon, 01 Feb 1988 00:00:00 [-+]\d{4}/;
 
   $result
 });
