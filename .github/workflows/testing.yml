@@ -10,6 +10,8 @@ on:
 jobs:
   Test:
     runs-on: ubuntu-latest
+    container:
+      image: perl:5.32
 
     steps:
     - uses: actions/checkout@v2
@@ -23,23 +25,24 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubToken }}
     - name: Advertise Perl Version
       run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
     - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
+      run: cpanm -qn Perl::Critic
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn --reinstall --installdeps .
     - name: Critiquing Project
       run: perlcritic lib t
     - name: Testing Project
-      run: RENDER=1 prove -Ilib -r t
+      run: prove -Ilib -r t
     - name: Check Documentation
       run: test -n "$(git status --porcelain)" && (git status --porcelain && false) || true
       env:
         HARNESS_OPTIONS: j9
+        RENDER: 1
 
   Variant:
     runs-on: ubuntu-latest
+    container:
+      image: perl:5.32
     needs:
       - Test
     strategy:
@@ -65,17 +68,16 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubToken }}
     - name: Advertise Perl Version
       run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
     - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
+      run: cpanm -qn Perl::Critic
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Install Non-Core ${{ matrix.package }}
+      run: cpanm -qn --reinstall --installdeps .
+    - name: Install Package ${{ matrix.package }}
       run: cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
       run: perlcritic lib t
     - name: Testing Project
-      run: RENDER=1 prove -Ilib -r t
+      run: prove -Ilib -r t
       env:
         HARNESS_OPTIONS: j9
+        RENDER: 1

@@ -8,6 +8,8 @@ on:
 jobs:
   Upload:
     runs-on: ubuntu-latest
+    container:
+      image: perl:5.32
 
     steps:
     - uses: actions/checkout@v2
@@ -19,14 +21,14 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubUser }}
     - name: Setup GitHub Token
       run: git config --global github.token ${{ secrets.GithubToken }}
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
+    - name: Advertise Perl Version
+      run: perl -V
     - name: Install Dist::Zilla
-      run: sudo cpanm -qn Dist::Zilla
+      run: cpanm -qn Dist::Zilla
     - name: Install Dist::Zilla Dependencies
-      run: dzil authordeps | sudo cpanm -qn
+      run: dzil authordeps | cpanm -qn
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn --reinstall --installdeps .
     - name: Cleanup Environment
       run: dzil clean
     - name: Build Distribution
