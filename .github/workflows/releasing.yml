@@ -2,8 +2,8 @@ name: Releasing
 
 on:
   push:
-    tags:
-    - '*.*'
+    branches:
+    - release-*
 
 jobs:
   Test:
@@ -49,6 +49,14 @@ jobs:
         - 5.24.0
         - 5.22.0
         - 5.18.0
+        package:
+        - JSON::PP@2.27105
+        - Cpanel::JSON::XS@4.09
+        - JSON::PP@4.07
+        - JSON::XS@3.0
+        - YAML::PP::LibYAML@0.004
+        - YAML::PP@0.023
+        - YAML::XS@0.67
 
     steps:
     - uses: actions/checkout@v2
@@ -66,6 +74,8 @@ jobs:
       run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn Perl::Critic
     - name: Install Perl Dependencies
       run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn --reinstall --installdeps .
+    - name: Install Non-Core ${{ matrix.package }}
+      run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
       run: perlbrew exec --with perl-${{ matrix.version }} perlcritic lib t
     - name: Testing Project
@@ -88,26 +98,9 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubUser }}
     - name: Setup GitHub Token
       run: git config --global github.token ${{ secrets.GithubToken }}
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Dist::Zilla
-      run: sudo cpanm -qn Dist::Zilla
-    - name: Install Dist::Zilla Dependencies
-      run: dzil authordeps | sudo cpanm -qn
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Cleanup Environment
-      run: dzil clean
-    - name: Build Distribution
-      run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
-    - name: Generate Changelog
-      run: bash ./dev/latest
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "*.tar.gz"
         bodyFile: "LATEST.md"
         token: ${{ secrets.GithubToken }}
-    - name: Reset repo state
-      run: git reset --hard HEAD
     - name: Tag HEAD as "cpan" (trigger archiving pipeline)
       run: git tag cpan && git push --tags
