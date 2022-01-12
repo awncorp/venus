@@ -24,13 +24,13 @@ jobs:
     - name: Advertise Perl Version
       run: perl -V
     - name: Install CPANM
-      run: sudo apt install -y cpanminus
+      run: apt install -y cpanminus
     - name: Install Dist::Zilla
-      run: sudo cpanm -qn Dist::Zilla
+      run: cpanm -qn Dist::Zilla
     - name: Install Dist::Zilla Dependencies
-      run: dzil authordeps | sudo cpanm -qn
+      run: dzil authordeps | cpanm -qn
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn --reinstall --installdeps .
     - name: Cleanup Environment
       run: dzil clean
     - name: Build Distribution

@@ -26,11 +26,11 @@ jobs:
     - name: Advertise Perl Version
       run: perl -V
     - name: Install CPANM
-      run: sudo apt install -y cpanminus
+      run: apt install -y cpanminus
     - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
+      run: cpanm -qn Perl::Critic
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn --reinstall --installdeps .
     - name: Critiquing Project
       run: perlcritic lib t
     - name: Testing Project
@@ -71,11 +71,11 @@ jobs:
     - name: Advertise Perl Version
       run: perl -V
     - name: Install CPANM
-      run: sudo apt install -y cpanminus
+      run: apt install -y cpanminus
     - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
+      run: cpanm -qn Perl::Critic
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn --reinstall --installdeps .
     - name: Install Package ${{ matrix.package }}
       run: cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
