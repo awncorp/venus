@@ -23,8 +23,6 @@ jobs:
       run: git config --global github.token ${{ secrets.GithubToken }}
     - name: Advertise Perl Version
       run: perl -V
-    - name: Install CPANM
-      run: apt install -y cpanminus
     - name: Install Dist::Zilla
       run: cpanm -qn Dist::Zilla
     - name: Install Dist::Zilla Dependencies
