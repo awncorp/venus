@@ -42,4 +42,4 @@ for COMMIT in $COMMITS; do
 done
 
 # Save our markdown to a file
-echo -e "$MARKDOWN" > LATEST.md
+echo -e "$MARKDOWN" > CHANGES.md

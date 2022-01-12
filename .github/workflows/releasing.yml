@@ -3,11 +3,13 @@ name: Releasing
 on:
   push:
     tags:
-    - '*.*'
+    - '*.**'
 
 jobs:
   Test:
     runs-on: ubuntu-latest
+    container:
+      image: perl:5.32
 
     steps:
     - uses: actions/checkout@v2
@@ -21,57 +23,61 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubToken }}
     - name: Advertise Perl Version
       run: perl -V
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
     - name: Install Perl::Critic
-      run: sudo cpanm -qn Perl::Critic
+      run: cpanm -qn Perl::Critic
     - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn --reinstall --installdeps .
     - name: Critiquing Project
       run: perlcritic lib t
     - name: Testing Project
-      run: RENDER=1 prove -Ilib -r t
+      run: prove -Ilib -r t
     - name: Check Documentation
       run: test -n "$(git status --porcelain)" && (git status --porcelain && false) || true
       env:
         HARNESS_OPTIONS: j9
+        RENDER: 1
 
   Variant:
     runs-on: ubuntu-latest
+    container:
+      image: perl:${{ matrix.version }}
     needs:
       - Test
     strategy:
       matrix:
         version:
-        - 5.30.0
-        - 5.28.0
-        - 5.26.0
-        - 5.24.0
-        - 5.22.0
-        - 5.18.0
+        - '5.30'
+        - '5.28'
+        - '5.26'
+        - '5.24'
+        - '5.22'
+        - '5.18'
+        package:
+        - JSON::PP@2.27105
+        - Cpanel::JSON::XS@4.09
+        - JSON::PP@4.07
+        - JSON::XS@3.0
+        - YAML::PP::LibYAML@0.004
+        - YAML::PP@0.023
+        - YAML::XS@0.67
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install Perlbrew
-      run: sudo apt install -y perlbrew
-    - name: Initial Perlbrew
-      run: perlbrew init
-    - name: Install CPANM
-      run: perlbrew install-cpanm
-    - name: Install Perl ${{ matrix.version }}
-      run: perlbrew install -n perl-${{ matrix.version }}
-    - name: Verify Perl Version
-      run: perlbrew exec --with perl-${{ matrix.version }} perl -V
+    - name: Advertise Perl Version
+      run: perl -V
     - name: Install Perl::Critic
-      run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn Perl::Critic
-    - name: Install Perl Dependencies
-      run: perlbrew exec --with perl-${{ matrix.version }} cpanm -qn --reinstall --installdeps .
+      run: cpanm -qn Perl::Critic
+    - name: Install Project Dependencies
+      run: cpanm -qn --reinstall --installdeps .
+    - name: Install Package ${{ matrix.package }}
+      run: cpanm -qn ${{ matrix.package }}
     - name: Critiquing Project
-      run: perlbrew exec --with perl-${{ matrix.version }} perlcritic lib t
+      run: perlcritic lib t
     - name: Testing Project
-      run: perlbrew exec --with perl-${{ matrix.version }} prove -Ilib -r t
+      run: prove -Ilib -r t
       env:
         HARNESS_OPTIONS: j9
+        RENDER: 1
 
   Release:
     runs-on: ubuntu-latest
@@ -88,26 +94,9 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubUser }}
     - name: Setup GitHub Token
       run: git config --global github.token ${{ secrets.GithubToken }}
-    - name: Install CPANM
-      run: sudo apt install -y cpanminus
-    - name: Install Dist::Zilla
-      run: sudo cpanm -qn Dist::Zilla
-    - name: Install Dist::Zilla Dependencies
-      run: dzil authordeps | sudo cpanm -qn
-    - name: Install Project Dependencies
-      run: sudo cpanm -qn --reinstall --installdeps .
-    - name: Cleanup Environment
-      run: dzil clean
-    - name: Build Distribution
-      run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
-    - name: Generate Changelog
-      run: bash ./dev/latest
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "*.tar.gz"
-        bodyFile: "LATEST.md"
+        bodyFile: "CHANGES.md"
         token: ${{ secrets.GithubToken }}
-    - name: Reset repo state
-      run: git reset --hard HEAD
     - name: Tag HEAD as "cpan" (trigger archiving pipeline)
       run: git tag cpan && git push --tags
