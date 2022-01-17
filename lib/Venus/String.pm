@@ -21,9 +21,15 @@ use overload (
 sub append {
   my ($self, @args) = @_;
 
+  return $self->append_with(' ', @args);
+}
+
+sub append_with {
+  my ($self, $delimiter, @args) = @_;
+
   my $data = $self->get;
 
-  return CORE::join(' ', $data, @args);
+  return CORE::join($delimiter // '', $data, @args);
 }
 
 sub camelcase {
@@ -145,9 +151,15 @@ sub lowercase {
 sub prepend {
   my ($self, @args) = @_;
 
+  return $self->prepend_with(' ', @args);
+}
+
+sub prepend_with {
+  my ($self, $delimiter, @args) = @_;
+
   my $data = $self->get;
 
-  return CORE::join(' ', @args, $data);
+  return CORE::join($delimiter // '', @args, $data);
 }
 
 sub repeat {
