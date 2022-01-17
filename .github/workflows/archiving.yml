@@ -34,5 +34,4 @@ jobs:
     - name: Build Distribution
       run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
     - name: Upload to CPAN
-      run: echo cpan-upload -u '***' -p '***' $(ls *.tar.gz)
-    #   run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)
+      run: cpan-upload -u ${{ secrets.CpanUser }} -p ${{ secrets.CpanPass }} $(ls *.tar.gz)
