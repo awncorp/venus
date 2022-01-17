@@ -142,6 +142,14 @@ sub lowercase {
   return CORE::lc($data);
 }
 
+sub prepend {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join(' ', @args, $data);
+}
+
 sub render {
   my ($self, $tokens) = @_;
 
