@@ -85,8 +85,8 @@ $test->for('description');
 =method box
 
 The box method returns the invocant boxed, i.e. encapsulated, using
-L<Venus::Box>.
-
+L<Venus::Box>. This method supports dispatching, i.e. providing a method name
+and arguments whose return value will be acted on by this method.
 
 =signature box
 

@@ -99,7 +99,8 @@ $test->for('description');
 
 The digest method returns a hexadecimal formatted digest of a dump of the
 object or return value of a dispatched method call. The algorithm defaults to
-C<SHA-1>.
+C<SHA-1>. This method supports dispatching, i.e. providing a method name and
+arguments whose return value will be acted on by this method.
 
 =signature digest
 
@@ -175,7 +176,8 @@ $test->for('example', 3, 'digest', sub {
 
 The digester method returns a L<Digest> object with a dump of the object or
 return value of a dispatched method call as the message. The algorithm defaults
-to C<SHA-1>.
+to C<SHA-1>. This method supports dispatching, i.e. providing a method name and
+arguments whose return value will be acted on by this method.
 
 =signature digester
 
@@ -230,7 +232,9 @@ $test->for('example', 2, 'digester', sub {
 =method b64digest
 
 The b64digest method returns a base64 formatted digest of the object or return
-value of a dispatched method call. The algorithm defaults to C<SHA-1>.
+value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
 
 =signature b64digest
 
@@ -305,7 +309,9 @@ $test->for('example', 3, 'b64digest', sub {
 =method bindigest
 
 The bindigest method returns a binary formatted digest of the object or return
-value of a dispatched method call. The algorithm defaults to C<SHA-1>.
+value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
 
 =signature bindigest
 
@@ -379,9 +385,10 @@ $test->for('example', 3, 'bindigest', sub {
 
 =method hexdigest
 
-The hexdigest method returns a ... formatted digest of the object or
-return value of a dispatched method call. The algorithm defaults
-to C<SHA-1>.
+The hexdigest method returns a ... formatted digest of the object or return
+value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
 
 =signature hexdigest
 
