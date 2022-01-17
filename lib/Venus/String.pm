@@ -256,6 +256,21 @@ sub strip {
   return $data;
 }
 
+sub substr {
+  my ($self, $offset, $length, $replace) = @_;
+
+  my $data = $self->get;
+
+  if (CORE::defined($replace)) {
+    my $result = CORE::substr($data, $offset // 0, $length // 0, $replace);
+    return wantarray ? ($result, $data) : $data;
+  }
+  else {
+    my $result = CORE::substr($data, $offset // 0, $length // 0);
+    return wantarray ? ($result, $data) : $result;
+  }
+}
+
 sub titlecase {
   my ($self) = @_;
 

@@ -1261,6 +1261,110 @@ $test->for('example', 1, 'strip', sub {
   $result
 });
 
+=method substr
+
+The substr method calls the core L</substr> function with the object's string
+value. In list context returns the result and the subject.
+
+=signature substr
+
+  substr(Num $offset, Num $length, Str $replace) (Str)
+
+=metadata substr
+
+{
+  since => '0.01',
+}
+
+=example-1 substr
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my $substr = $string->substr(0, 5);
+
+  # "hello"
+
+=cut
+
+$test->for('example', 1, 'substr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "hello";
+
+  $result
+});
+
+=example-2 substr
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my $substr = $string->substr(6, 5);
+
+  # "world"
+
+=cut
+
+$test->for('example', 2, 'substr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "world";
+
+  $result
+});
+
+=example-3 substr
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my $substr = $string->substr(6, 5, 'universe');
+
+  # "hello universe"
+
+=cut
+
+$test->for('example', 3, 'substr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "hello universe";
+
+  $result
+});
+
+=example-4 substr
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello world');
+
+  my ($result, $subject) = $string->substr(6, 5, 'universe');
+
+  # ("world", "hello universe")
+
+=cut
+
+$test->for('example', 4, 'substr', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0] eq "world";
+  ok $result[1] eq "hello universe";
+
+  @result
+});
+
 =method titlecase
 
 The titlecase method returns the string capitalizing the first character of
