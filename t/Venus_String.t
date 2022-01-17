@@ -692,6 +692,38 @@ $test->for('example', 2, 'lines', sub {
   $result
 });
 
+=method prepend
+
+The prepend method prepends arugments to the string using spaces.
+
+=signature prepend
+
+  prepend(Str @parts) (Str)
+
+=metadata prepend
+
+{
+  since => '0.01',
+}
+
+=example-1 prepend
+
+  # given: synopsis;
+
+  my $prepend = $string->prepend('welcome');
+
+  # "welcome hello world"
+
+=cut
+
+$test->for('example', 1, 'prepend', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "welcome hello world";
+
+  $result
+});
+
 =method lowercase
 
 The lowercase method is an alias to the lc method.
