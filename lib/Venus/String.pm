@@ -150,6 +150,14 @@ sub prepend {
   return CORE::join(' ', @args, $data);
 }
 
+sub repeat {
+  my ($self, $count, $delimiter) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', CORE::map $data, 1..($count || 1));
+}
+
 sub render {
   my ($self, $tokens) = @_;
 
