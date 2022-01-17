@@ -80,6 +80,7 @@ $test->for('description');
 
 Venus::Role::Boxable
 Venus::Role::Catchable
+Venus::Role::Digestable
 Venus::Role::Doable
 Venus::Role::Dumpable
 Venus::Role::Printable
