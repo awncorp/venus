@@ -9,6 +9,7 @@ use Moo;
 
 with 'Venus::Role::Boxable';
 with 'Venus::Role::Catchable';
+with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';
 with 'Venus::Role::Dumpable';
 with 'Venus::Role::Printable';
