@@ -100,7 +100,9 @@ $test->for('integrates');
 
 The catch method traps any errors raised by executing the dispatched method
 call and returns the error string or error object. This method can return a
-list of values in list-context.
+list of values in list-context. This method supports dispatching, i.e.
+providing a method name and arguments whose return value will be acted on by
+this method.
 
 =signature catch
 
