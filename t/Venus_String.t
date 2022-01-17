@@ -110,7 +110,6 @@ $test->for('inherits');
 
 The append method appends arugments to the string using spaces.
 
-
 =signature append
 
   append(Str @parts) (Str)
@@ -135,6 +134,38 @@ $test->for('example', 1, 'append', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "hello world welcome";
+
+  $result
+});
+
+=method append_with
+
+The append_with method appends arugments to the string using the delimiter provided.
+
+=signature append_with
+
+  append_with(Str $delimiter, Str @parts) (Str)
+
+=metadata append_with
+
+{
+  since => '0.01',
+}
+
+=example-1 append_with
+
+  # given: synopsis;
+
+  my $append = $string->append_with(', ', 'welcome');
+
+  # "hello world, welcome"
+
+=cut
+
+$test->for('example', 1, 'append_with', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "hello world, welcome";
 
   $result
 });
@@ -720,6 +751,39 @@ $test->for('example', 1, 'prepend', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "welcome hello world";
+
+  $result
+});
+
+=method prepend_with
+
+The prepend_with method prepends arugments to the string using the delimiter
+provided.
+
+=signature prepend_with
+
+  prepend_with(Str $delimiter, Str @parts) (Str)
+
+=metadata prepend_with
+
+{
+  since => '0.01',
+}
+
+=example-1 prepend_with
+
+  # given: synopsis;
+
+  my $prepend = $string->prepend_with(', ', 'welcome');
+
+  # "welcome, hello world"
+
+=cut
+
+$test->for('example', 1, 'prepend_with', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "welcome, hello world";
 
   $result
 });
