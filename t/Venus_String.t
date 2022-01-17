@@ -760,6 +760,66 @@ $test->for('example', 1, 'lowercase', sub {
   $result
 });
 
+=method repeat
+
+The repeat method repeats the string value N times based on the number provided
+and returns a new concatenated string. Optionally, a delimiter can be provided
+and be place between the occurences.
+
+=signature repeat
+
+  repeat(Num $number, Str $delimiter) (Str)
+
+=metadata repeat
+
+{
+  since => '0.01',
+}
+
+=example-1 repeat
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('999');
+
+  my $repeat = $string->repeat(2);
+
+  # "999999"
+
+=cut
+
+$test->for('example', 1, 'repeat', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "999999";
+
+  $result
+});
+
+=example-2 repeat
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('999');
+
+  my $repeat = $string->repeat(2, ',');
+
+  # "999,999"
+
+=cut
+
+$test->for('example', 2, 'repeat', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "999,999";
+
+  $result
+});
+
 =method render
 
 The render method treats the string as a template and performs a simple token
