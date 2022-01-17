@@ -86,7 +86,8 @@ $test->for('description');
 =method try
 
 The try method returns a L<Venus::Try> object having the invocant, callback,
-arguments pre-configured.
+arguments pre-configured. This method supports dispatching, i.e. providing a
+method name and arguments whose return value will be acted on by this method.
 
 =signature try
 

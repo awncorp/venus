@@ -83,7 +83,9 @@ $test->for('description');
 
 =method dump
 
-The dump method returns a string representation of the underlying data.
+The dump method returns a string representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
 
 =signature dump
 
@@ -118,7 +120,9 @@ $test->for('example', 1, 'dump', sub {
 =method dump_pretty
 
 The dump_pretty method returns a string representation of the underlying data
-that is human-readable and useful for debugging.
+that is human-readable and useful for debugging. This method supports
+dispatching, i.e. providing a method name and arguments whose return value will
+be acted on by this method.
 
 =signature dump_pretty
 

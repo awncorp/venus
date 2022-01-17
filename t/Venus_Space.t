@@ -131,6 +131,8 @@ $test->for('inherits');
 
 The all method executes any available method on the instance and all instances
 representing packages inherited by the package represented by the invocant.
+This method supports dispatching, i.e. providing a method name and arguments
+whose return value will be acted on by this method.
 
 =signature all
 
@@ -896,7 +898,9 @@ $test->for('example', 1, 'children', sub {
 =method cop
 
 The cop method attempts to curry the given subroutine on the package namespace
-and if successful returns a closure.
+and if successful returns a closure. This method supports dispatching, i.e.
+providing a method name and arguments whose return value will be acted on by
+this method.
 
 =signature cop
 

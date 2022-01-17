@@ -87,7 +87,8 @@ $test->for('description');
 =method do
 
 The do method dispatches the method call or executes the callback and returns
-the invocant.
+the invocant. This method supports dispatching, i.e. providing a method name
+and arguments whose return value will be acted on by this method.
 
 =signature do
 

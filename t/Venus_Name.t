@@ -233,7 +233,9 @@ $test->for('example', 1, 'file', sub {
 =method format
 
 The format method calls the specified method passing the result to the core
-L</sprintf> function with itself as an argument.
+L</sprintf> function with itself as an argument. This method supports
+dispatching, i.e. providing a method name and arguments whose return value will
+be acted on by this method.
 
 =signature format
 
