@@ -242,9 +242,9 @@ package main;
 
 my $myapp = MyApp->new;
 
-$myapp->catch('execute');
+my $error = $myapp->catch('execute');
 
-# caught MyApp::Error
+# $error->isa('MyApp::Error');
 ```
 
 ### Feature: Composable Standards

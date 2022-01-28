@@ -1000,7 +1000,9 @@ $test->for('feature', 'exception-handling');
 
   my $myapp = MyApp->new;
 
-  $myapp->catch('execute'); # catch MyApp::Error
+  my $error = $myapp->catch('execute');
+
+  # $error->isa('MyApp::Error');
 
 =cut
 
@@ -1114,13 +1116,6 @@ L<https://github.com/cpanery/venus/issues>
 L<https://cpanery.com>
 
 =cut
-
-subtest version => sub {
-  use_ok 'Venus';
-  my $version = do './VERSION' || do '../../VERSION';
-  is +Venus->VERSION, $version, "Venus.pm ($version)";
-  is +$test->data('version'), $version, "Venus.t ($version)";
-};
 
 # END
 
