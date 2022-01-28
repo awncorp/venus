@@ -324,6 +324,8 @@ see below:
 - [Venus::Role::Boxable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Boxable.pod#name)
 - [Venus::Role::Buildable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Buildable.pod#name)
 - [Venus::Role::Catchable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Catchable.pod#name)
+- [Venus::Role::Coercible](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Coercible.pod#name)
+- [Venus::Role::Digestable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Digestable.pod#name)
 - [Venus::Role::Doable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Doable.pod#name)
 - [Venus::Role::Dumpable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Dumpable.pod#name)
 - [Venus::Role::Explainable](https://github.com/cpanery/venus/blob/master/lib/Venus/Role/Explainable.pod#name)
