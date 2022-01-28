@@ -1,0 +1,329 @@
+
+=head1 NAME
+
+Venus::Role::Digestable - Digestable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Digestable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  has 'test';
+
+  with 'Venus::Role::Digestable';
+
+  sub execute {
+    my ($self, @args) = @_;
+
+    return [$self->test, @args];
+  }
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  # $example->digest;
+
+  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for producing
+message digests from a dump of the object or the return value of a dispatched
+method call. All algorithms supported by L<Digest> are supported, e.g.
+C<SHA-1>, C<SHA-224>, C<SHA-256>, C<SHA-384>, C<SHA-512>, C<HMAC-MD5>,
+C<HMAC-SHA-1>, etc.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 b64digest
+
+  b64digest(Str $algo, Str $method, Any @args) (Str)
+
+The b64digest method returns a base64 formatted digest of the object or return
+value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item b64digest example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $b64digest = $example->b64digest;
+
+  # "psPZrlnzFpDt290VJx6FamtvFdU"
+
+=back
+
+=over 4
+
+=item b64digest example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $b64digest = $example->b64digest('sha-1', 'execute');
+
+  # "T+raai5I0suKC3VpiZ8bqt0WXE0"
+
+=back
+
+=over 4
+
+=item b64digest example 3
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $b64digest = $example->b64digest('sha-1', 'execute', '456');
+
+  # "5Vf077AO11mZZfaQknfOtzfhzPc"
+
+=back
+
+=cut
+
+=head2 bindigest
+
+  bindigest(Str $algo, Str $method, Any @args) (Str)
+
+The bindigest method returns a binary formatted digest of the object or return
+value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item bindigest example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $bindigest = $example->bindigest;
+
+  # pack("H*","a6c3d9ae59f31690eddbdd15271e856a6b6f15d5")
+
+=back
+
+=over 4
+
+=item bindigest example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $bindigest = $example->bindigest('sha-1', 'execute');
+
+  # pack("H*","4feada6a2e48d2cb8a0b7569899f1baadd165c4d")
+
+=back
+
+=over 4
+
+=item bindigest example 3
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $bindigest = $example->bindigest('sha-1', 'execute', '456');
+
+  # pack("H*","e557f4efb00ed7599965f6909277ceb737e1ccf7")
+
+=back
+
+=cut
+
+=head2 digest
+
+  digest(Str $algo, Str $method, Any @args) (Str)
+
+The digest method returns a hexadecimal formatted digest of a dump of the
+object or return value of a dispatched method call. The algorithm defaults to
+C<SHA-1>. This method supports dispatching, i.e. providing a method name and
+arguments whose return value will be acted on by this method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item digest example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $digest = $example->digest;
+
+  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+
+=back
+
+=over 4
+
+=item digest example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $digest = $example->digest('sha-1', 'execute');
+
+  # "4feada6a2e48d2cb8a0b7569899f1baadd165c4d"
+
+=back
+
+=over 4
+
+=item digest example 3
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $digest = $example->digest('sha-1', 'execute', '456');
+
+  # "e557f4efb00ed7599965f6909277ceb737e1ccf7"
+
+=back
+
+=cut
+
+=head2 digester
+
+  digester(Str $algo, Str $method, Any @args) (Str)
+
+The digester method returns a L<Digest> object with a dump of the object or
+return value of a dispatched method call as the message. The algorithm defaults
+to C<SHA-1>. This method supports dispatching, i.e. providing a method name and
+arguments whose return value will be acted on by this method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item digester example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $digester = $example->digester;
+
+  # bless(..., "Digest::SHA")
+
+=back
+
+=over 4
+
+=item digester example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $digester = $example->digester('md5');
+
+  # bless(..., "Digest::MD5")
+
+=back
+
+=cut
+
+=head2 hexdigest
+
+  hexdigest(Str $algo, Str $method, Any @args) (Str)
+
+The hexdigest method returns a ... formatted digest of the object or return
+value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item hexdigest example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $hexdigest = $example->hexdigest;
+
+  # "a6c3d9ae59f31690eddbdd15271e856a6b6f15d5"
+
+=back
+
+=over 4
+
+=item hexdigest example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $hexdigest = $example->hexdigest('sha-1', 'execute');
+
+  # "4feada6a2e48d2cb8a0b7569899f1baadd165c4d"
+
+=back
+
+=over 4
+
+=item hexdigest example 3
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $hexdigest = $example->hexdigest('sha-1', 'execute', '456');
+
+  # "e557f4efb00ed7599965f6909277ceb737e1ccf7"
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

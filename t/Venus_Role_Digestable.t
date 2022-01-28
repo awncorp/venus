@@ -476,6 +476,6 @@ Cpanery, C<cpanery@cpan.org>
 
 # END
 
-$test->render('lib/Venus/Role/Dumpable.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Role/Digestable.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;
