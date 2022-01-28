@@ -14,9 +14,9 @@ if ! git diff-index --quiet HEAD --; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
-# Test fake build before build
-if ! dzil test; then
-  echo "Build test failed!" && exit 0;
+# Test source before build
+if ! prove -r t; then
+  echo "Test suite failed!" && exit 0;
 fi
 
 # Cleanup build
@@ -29,9 +29,9 @@ git push origin :refs/tags/$V 2> /dev/null
 # Persist release version
 echo $V > VERSION
 
-# Commit updated release version
+# Check the repo is in ready-state
 if ! git diff-index --quiet HEAD --; then
-  git add . && git commit -m 'Update version'
+  echo "Uncommitted changes!" && exit 0;
 fi
 
 # Cleanup build
@@ -40,9 +40,9 @@ dzil clean
 # Build Package
 dzil build
 
-# Commit generated POD changes
+# Check the repo is in ready-state
 if ! git diff-index --quiet HEAD --; then
-  git add . && git commit -m 'Update documentation'
+  echo "Uncommitted changes!" && exit 0;
 fi
 
 # Tag as $version for releasing
