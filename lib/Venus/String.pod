@@ -49,9 +49,6 @@ This package provides the following methods:
 
 The append method appends arugments to the string using spaces.
 
-
-
-
 I<Since C<0.01>>
 
 =over 4
@@ -508,7 +505,7 @@ I<Since C<0.01>>
 
   use Venus::String;
 
-  my $string = Venus::String->new('Hi, {name}!');
+  my $string = Venus::String->new('Hi, {{name}}!');
 
   my $render = $string->render({name => 'Friend'});
 

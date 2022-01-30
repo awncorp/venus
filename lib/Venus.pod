@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut
 
@@ -57,7 +57,7 @@ handling, "true" and "false" keywords, package introspection, command-line
 options parsing, and more. This package will always automatically exports
 C<true> and C<false> keyword functions (unless existing routines of the same
 name already exist in the calling package), otherwise exports keyword functions
-as requested at import.
+as requested at import. This library requires Perl C<5.18+>.
 
 =cut
 
@@ -607,7 +607,9 @@ B<example 1>
 
   my $myapp = MyApp->new;
 
-  $myapp->catch('execute'); # catch MyApp::Error
+  my $error = $myapp->catch('execute');
+
+  # $error->isa('MyApp::Error');
 
 =back
 
@@ -633,7 +635,9 @@ B<example 1>
 
   $myapp->stash(greeting => 'hello world');
 
-  $myapp->dump('stash'); # '{"greeting" => "hello world"}'
+  $myapp->dump('stash');
+
+  # '{"greeting" => "hello world"}'
 
 =back
 
@@ -668,6 +672,30 @@ B<example 1>
   my $string = Venus::String->new('hello, world');
 
   $string->base64;
+
+=back
+
+=over 4
+
+=item template-system
+
+This library provides a minimalistic templating system.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new(q(
+    {{ if user.name }}
+    Welcome, {{ user.name }}!
+    {{ else user.name }}
+    Welcome, friend!
+    {{ end user.name }}
+  ));
+
+  $template->render;
 
 =back
 

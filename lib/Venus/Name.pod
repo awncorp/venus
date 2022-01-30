@@ -148,7 +148,9 @@ I<Since C<0.01>>
   format(Str $method, Str $format) (Str)
 
 The format method calls the specified method passing the result to the core
-L</sprintf> function with itself as an argument.
+L</sprintf> function with itself as an argument. This method supports
+dispatching, i.e. providing a method name and arguments whose return value will
+be acted on by this method.
 
 I<Since C<0.01>>
 
