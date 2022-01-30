@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    0.01
+    0.02
 
 SYNOPSIS
 
@@ -49,7 +49,7 @@ DESCRIPTION
     package will always automatically exports true and false keyword
     functions (unless existing routines of the same name already exist in
     the calling package), otherwise exports keyword functions as requested
-    at import.
+    at import. This library requires Perl 5.18+.
 
 FUNCTIONS
 
@@ -515,7 +515,9 @@ FEATURES
       
         my $myapp = MyApp->new;
       
-        $myapp->catch('execute'); # catch MyApp::Error
+        my $error = $myapp->catch('execute');
+      
+        # $error->isa('MyApp::Error');
 
     composable-standards
 
@@ -537,7 +539,9 @@ FEATURES
       
         $myapp->stash(greeting => 'hello world');
       
-        $myapp->dump('stash'); # '{"greeting" => "hello world"}'
+        $myapp->dump('stash');
+      
+        # '{"greeting" => "hello world"}'
 
     pluggable-library
 
@@ -568,6 +572,26 @@ FEATURES
         my $string = Venus::String->new('hello, world');
       
         $string->base64;
+
+    template-system
+
+      This library provides a minimalistic templating system.
+
+      example 1
+
+        package main;
+      
+        use Venus::Template;
+      
+        my $template = Venus::Template->new(q(
+          {{ if user.name }}
+          Welcome, {{ user.name }}!
+          {{ else user.name }}
+          Welcome, friend!
+          {{ end user.name }}
+        ));
+      
+        $template->render;
 
 AUTHORS
 
