@@ -905,7 +905,7 @@ replacement using the argument provided.
 
   use Venus::String;
 
-  my $string = Venus::String->new('Hi, {name}!');
+  my $string = Venus::String->new('Hi, {{name}}!');
 
   my $render = $string->render({name => 'Friend'});
 
