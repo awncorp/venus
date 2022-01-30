@@ -91,7 +91,8 @@ This package provides the following methods:
 
 The coerce method, if defined, is called during object construction, or by the
 L</coercion> method, and returns key/value pairs where the keys map to class
-attributes and the values are L<Venus::Space> compatible package names.
+attributes (or input parameters) and the values are L<Venus::Space> compatible
+package names.
 
 I<Since C<0.01>>
 
