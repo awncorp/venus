@@ -98,5 +98,3 @@ jobs:
       with:
         bodyFile: "CHANGES.md"
         token: ${{ secrets.GithubToken }}
-    - name: Tag HEAD as "cpan" (trigger archiving pipeline)
-      run: git tag cpan && git push --tags
