@@ -178,9 +178,9 @@ sub render {
   $tokens ||= {};
 
   while (my($key, $value) = each(%$tokens)) {
-    my $token = quotemeta "{$key}";
+    my $token = quotemeta $key;
 
-    $data =~ s/$token/$value/g;
+    $data =~ s/\{\{\s*$token\s*\}\}/$value/g;
   }
 
   return $data;
