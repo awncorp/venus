@@ -1,1 +1,25 @@
-Changelog for Venus
+0.02 2022-01-30
+
+- [update] (5fe004f) Update String#render token syntax (https://github.com/cpanery/venus/pull/60)
+- [feature] (ee96851) Implement Venus::Template (https://github.com/cpanery/venus/pull/59)
+- [feature] (d6630f5) Implement Venus::Role::Coercible (https://github.com/cpanery/venus/pull/51)
+- [update] (3b13f24) Document all proxyable methods (https://github.com/cpanery/venus/pull/50)
+- [feature] (b91ee13) Implement String#substr (https://github.com/cpanery/venus/pull/49)
+- [feature] (d9fde97) Implement String#append_with,prepend_with (https://github.com/cpanery/venus/pull/48)
+- [feature] (592c005) Implement String#repeat (https://github.com/cpanery/venus/pull/46)
+- [feature] (47e0790) Implement String#prepend (https://github.com/cpanery/venus/pull/45)
+- [feature] (d49a65a) Implement Venus::Role::Digestable (https://github.com/cpanery/venus/pull/44)
+- [update] (1c5fad0) Require Perl version 5.18+ (https://github.com/cpanery/venus/pull/33)
+- [defect] (983e947) Fix Dumpable method calls in list context (https://github.com/cpanery/venus/pull/24)
+- [update] (3b9bd15) Minor refactors to source, documentation, and automation (https://github.com/cpanery/venus/pull/20)
+- [update] (a78b196) Document overrides in Venus::Boolean (https://github.com/cpanery/venus/pull/19)
+- [update] (598ef32) Update Venus::Json to use encoder/decoder callbacks (https://github.com/cpanery/venus/pull/18)
+- [feature] (a2c1aae) Support any YAML library, deduce booleans (https://github.com/cpanery/venus/pull/16)
+- [feature] (355d747) Support any JSON library via encode/decode callbacks (https://github.com/cpanery/venus/pull/15)
+- [update] (e2dfd48) Document overrides, i.e. overloaded operators (https://github.com/cpanery/venus/pull/13)
+- [update] (18af4cd) Update CONTRIBUTING.md (https://github.com/cpanery/venus/pull/12)
+- [update] (c5bfd06) JSON::PP support requires 4.00 (https://github.com/cpanery/venus/pull/11)
+
+0.01 2021-12-28
+
+- [update] (4724f15) Initial implementation 
