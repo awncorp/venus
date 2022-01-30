@@ -85,13 +85,12 @@ sub render {
     );
   }
 
+  $content =~ s/^\n//;
+  $content =~ s/\n\ *$//;
+
   $content = $self->render_blocks($content, $variables);
 
-  $content =~ s/^\s*|\s*$//g;
-
   $content = $self->render_tokens($content, $variables);
-
-  $content =~ s/^\s*|\s*$//g;
 
   return $content;
 }
