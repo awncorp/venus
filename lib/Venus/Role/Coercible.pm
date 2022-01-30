@@ -9,13 +9,13 @@ use Moo::Role;
 
 with 'Venus::Role::Buildable';
 
-# BUILDERS
+# MODIFIERS
 
-sub build_args {
-  my ($self, $data) = @_;
+around BUILDARGS => sub {
+  my ($orig, $class, @args) = @_;
 
-  return $self->coercion($data);
-}
+  return $class->coercion($class->$orig(@args));
+};
 
 # METHODS
 

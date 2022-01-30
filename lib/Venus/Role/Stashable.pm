@@ -10,7 +10,6 @@ use Moo::Role;
 # BUILDERS
 
 sub BUILD {
-
   return $_[0];
 }
 
