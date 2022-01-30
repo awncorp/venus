@@ -50,7 +50,8 @@ This package provides the following methods:
   try(Str | CodeRef $method, Any @args) (Try)
 
 The try method returns a L<Venus::Try> object having the invocant, callback,
-arguments pre-configured.
+arguments pre-configured. This method supports dispatching, i.e. providing a
+method name and arguments whose return value will be acted on by this method.
 
 I<Since C<0.01>>
 

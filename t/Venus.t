@@ -22,7 +22,7 @@ $test->for('name');
 
 =version
 
-0.01
+0.02
 
 =cut
 
