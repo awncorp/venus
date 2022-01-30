@@ -10,7 +10,7 @@ if [ ! -n "$V" ]; then
 fi
 
 # Check the repo is in ready-state
-if ! git diff-index --quiet HEAD --; then
+if [[ -n $(git status --porcelain) ]]; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
@@ -26,6 +26,6 @@ dzil clean
 dzil build
 
 # Check the repo is in ready-state
-if ! git diff-index --quiet HEAD --; then
+if [[ -n $(git status --porcelain) ]]; then
   echo "Uncommitted changes!" && exit 0;
 fi

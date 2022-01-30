@@ -10,7 +10,7 @@ if [ ! -n "$V" ]; then
 fi
 
 # Check the repo is in ready-state
-if ! git diff-index --quiet HEAD --; then
+if [[ -n $(git status --porcelain) ]]; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
@@ -18,9 +18,6 @@ fi
 if ! prove -r t; then
   echo "Test suite failed!" && exit 0;
 fi
-
-# Cleanup build
-dzil clean
 
 # Delete existing release tag (if exists)
 git tag -d $V 2> /dev/null
@@ -30,7 +27,7 @@ git push origin :refs/tags/$V 2> /dev/null
 echo $V > VERSION
 
 # Check the repo is in ready-state
-if ! git diff-index --quiet HEAD --; then
+if [[ -n $(git status --porcelain) ]]; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
@@ -41,7 +38,7 @@ dzil clean
 dzil build
 
 # Check the repo is in ready-state
-if ! git diff-index --quiet HEAD --; then
+if [[ -n $(git status --porcelain) ]]; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
