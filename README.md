@@ -264,6 +264,8 @@ my $myapp = MyApp->new;
 $myapp->stash(greeting => 'hello world');
 
 $myapp->dump('stash');
+
+# '{"greeting" => "hello world"}'
 ```
 
 ### Feature: Pluggable Library
@@ -288,6 +290,24 @@ use Venus::String;
 my $string = Venus::String->new('hello, world');
 
 $string->base64;
+```
+
+### Feature: Template System
+
+```perl
+package main;
+
+use Venus::Template;
+
+my $template = Venus::Template->new(q(
+  {{ if user.name }}
+  Welcome, {{ user.name }}!
+  {{ else user.name }}
+  Welcome, friend!
+  {{ end user.name }}
+));
+
+$template->render;
 ```
 
 ## Documentation
@@ -341,6 +361,7 @@ see below:
 - [Venus::Search](https://github.com/cpanery/venus/blob/master/lib/Venus/Search.pod#name)
 - [Venus::Space](https://github.com/cpanery/venus/blob/master/lib/Venus/Space.pod#name)
 - [Venus::String](https://github.com/cpanery/venus/blob/master/lib/Venus/String.pod#name)
+- [Venus::Template](https://github.com/cpanery/venus/blob/master/lib/Venus/Template.pod#name)
 - [Venus::Throw](https://github.com/cpanery/venus/blob/master/lib/Venus/Throw.pod#name)
 - [Venus::Try](https://github.com/cpanery/venus/blob/master/lib/Venus/Try.pod#name)
 - [Venus::Type](https://github.com/cpanery/venus/blob/master/lib/Venus/Type.pod#name)
