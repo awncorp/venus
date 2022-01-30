@@ -231,7 +231,8 @@ $test->for('example', 3, 'render', sub {
 $test->for('example', 4, 'render', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply [split /\n/, $result], [
+
+  is_deeply [map {s/^[\n\s]*|[\n\s]*$//gr} split /\n/, $result], [
     'user1: ready?',
     'user2: ready!',
     'user1: lets begin!',
@@ -275,7 +276,7 @@ $test->for('example', 4, 'render', sub {
 $test->for('example', 5, 'render', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply [split /\n/, $result], [
+  is_deeply [map {s/^[\n\s]*|[\n\s]*$//gr} split /\n/, $result], [
     'user1 [18+]: ready?',
     'user2 [-18]: ready!',
     'user1 [18+]: lets begin!',
@@ -315,7 +316,7 @@ $test->for('example', 5, 'render', sub {
 $test->for('example', 6, 'render', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply [split /\n/, $result], [
+  is_deeply [map {s/^[\n\s]*|[\n\s]*$//gr} split /\n/, $result], [
     '@user1: ready?',
     'user2: ready!',
     '@user1: lets begin!',
