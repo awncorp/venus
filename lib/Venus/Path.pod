@@ -383,7 +383,7 @@ I<Since C<0.01>>
 
   # given: synopsis;
 
-  my $find = $path->find('\/m.*');
+  my $find = $path->find('[:\/\\\.]+m.*');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
@@ -857,7 +857,7 @@ I<Since C<0.01>>
 
 =head2 read
 
-  read() (Str)
+  read(Str $binmode) (Str)
 
 The read method reads the file and returns its contents.
 
@@ -1142,7 +1142,7 @@ I<Since C<0.01>>
 
 =head2 write
 
-  write(Str $data) (Path)
+  write(Str $data, Str $binmode) (Path)
 
 The write method write the data provided to the file.
 

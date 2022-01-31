@@ -85,8 +85,8 @@ sub render {
     );
   }
 
-  $content =~ s/^\n//;
-  $content =~ s/\n\ *$//;
+  $content =~ s/^\r?\n//;
+  $content =~ s/\r?\n\ *$//;
 
   $content = $self->render_blocks($content, $variables);
 

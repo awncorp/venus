@@ -1,14 +1,20 @@
 #!/bin/bash
 
-# Check the repo is in ready-state
+# Ensure we're on the default branch
+git checkout master
+
+# Check that the repo is in a ready-state
 if [[ -n $(git status --porcelain) ]]; then
   echo "Uncommitted changes!" && exit 0;
 fi
 
-# Delete existing release tag (if exists)
+# Delete the existing archive tag (if exists)
 git tag -d cpan 2> /dev/null
 git push origin :refs/tags/cpan 2> /dev/null
 
-# Push archival release tag
+# Push all changes
+git push
+
+# Push archive tag
 git tag cpan
 git push --tags

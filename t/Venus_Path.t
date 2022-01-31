@@ -11,6 +11,7 @@ use Test::More;
 use Test::Venus;
 
 my $test = test(__FILE__);
+my $fsds = qr/[:\\\/\.]+/;
 
 =name
 
@@ -153,7 +154,7 @@ The absolute method returns a path object where the value (path) is absolute.
 $test->for('example', 1, 'absolute', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ m{t/data/planets};
+  ok $result =~ m{t${fsds}data${fsds}planets};
 
   $result
 });
@@ -217,7 +218,7 @@ The child method returns a path object representing the child path provided.
 $test->for('example', 1, 'child', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ m{t/data/planets/earth};
+  ok $result =~ m{t${fsds}data${fsds}planets${fsds}earth};
 
   $result
 });
@@ -249,7 +250,7 @@ The chmod method changes the file permissions of the file or directory.
 $test->for('example', 1, 'chmod', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ m{t/data/planets};
+  ok $result =~ m{t${fsds}data${fsds}planets};
 
   $result
 });
@@ -281,7 +282,7 @@ The chown method changes the group and/or owner or the file or directory.
 $test->for('example', 1, 'chown', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ m{t/data/planets};
+  ok $result =~ m{t${fsds}data${fsds}planets};
 
   $result
 });
@@ -332,43 +333,43 @@ $test->for('example', 1, 'children', sub {
   ok @$result == 13;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets/ceres};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/planets/earth};
+  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}earth};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/planets/eris};
+  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}eris};
 
   ok $result->[3]->isa('Venus::Path');
-  ok $result->[3] =~ m{t/data/planets/haumea};
+  ok $result->[3] =~ m{t${fsds}data${fsds}planets${fsds}haumea};
 
   ok $result->[4]->isa('Venus::Path');
-  ok $result->[4] =~ m{t/data/planets/jupiter};
+  ok $result->[4] =~ m{t${fsds}data${fsds}planets${fsds}jupiter};
 
   ok $result->[5]->isa('Venus::Path');
-  ok $result->[5] =~ m{t/data/planets/makemake};
+  ok $result->[5] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[6]->isa('Venus::Path');
-  ok $result->[6] =~ m{t/data/planets/mars};
+  ok $result->[6] =~ m{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[7]->isa('Venus::Path');
-  ok $result->[7] =~ m{t/data/planets/mercury};
+  ok $result->[7] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
 
   ok $result->[8]->isa('Venus::Path');
-  ok $result->[8] =~ m{t/data/planets/neptune};
+  ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t/data/planets/pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t/data/planets/saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t/data/planets/uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t/data/planets/venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -515,7 +516,7 @@ operations.
 $test->for('example', 1, 'explain', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ m{t/data/planets};
+  ok $result =~ m{t${fsds}data${fsds}planets};
 
   $result
 });
@@ -567,43 +568,43 @@ $test->for('example', 1, 'find', sub {
   ok @$result == 13;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets/ceres};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/planets/earth};
+  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}earth};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/planets/eris};
+  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}eris};
 
   ok $result->[3]->isa('Venus::Path');
-  ok $result->[3] =~ m{t/data/planets/haumea};
+  ok $result->[3] =~ m{t${fsds}data${fsds}planets${fsds}haumea};
 
   ok $result->[4]->isa('Venus::Path');
-  ok $result->[4] =~ m{t/data/planets/jupiter};
+  ok $result->[4] =~ m{t${fsds}data${fsds}planets${fsds}jupiter};
 
   ok $result->[5]->isa('Venus::Path');
-  ok $result->[5] =~ m{t/data/planets/makemake};
+  ok $result->[5] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[6]->isa('Venus::Path');
-  ok $result->[6] =~ m{t/data/planets/mars};
+  ok $result->[6] =~ m{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[7]->isa('Venus::Path');
-  ok $result->[7] =~ m{t/data/planets/mercury};
+  ok $result->[7] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
 
   ok $result->[8]->isa('Venus::Path');
-  ok $result->[8] =~ m{t/data/planets/neptune};
+  ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t/data/planets/pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t/data/planets/saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t/data/planets/uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t/data/planets/venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -612,7 +613,7 @@ $test->for('example', 1, 'find', sub {
 
   # given: synopsis;
 
-  my $find = $path->find('\/m.*');
+  my $find = $path->find('[:\/\\\.]+m.*');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
@@ -629,13 +630,13 @@ $test->for('example', 2, 'find', sub {
   ok @$result == 3;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets/makemake};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/planets/mars};
+  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/planets/mercury};
+  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
 
   $result
 });
@@ -659,7 +660,7 @@ $test->for('example', 3, 'find', sub {
   ok @$result == 1;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets/earth};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}earth};
 
   $result
 });
@@ -710,43 +711,43 @@ $test->for('example', 1, 'files', sub {
   ok @$result == 13;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets/ceres};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/planets/earth};
+  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}earth};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/planets/eris};
+  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}eris};
 
   ok $result->[3]->isa('Venus::Path');
-  ok $result->[3] =~ m{t/data/planets/haumea};
+  ok $result->[3] =~ m{t${fsds}data${fsds}planets${fsds}haumea};
 
   ok $result->[4]->isa('Venus::Path');
-  ok $result->[4] =~ m{t/data/planets/jupiter};
+  ok $result->[4] =~ m{t${fsds}data${fsds}planets${fsds}jupiter};
 
   ok $result->[5]->isa('Venus::Path');
-  ok $result->[5] =~ m{t/data/planets/makemake};
+  ok $result->[5] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[6]->isa('Venus::Path');
-  ok $result->[6] =~ m{t/data/planets/mars};
+  ok $result->[6] =~ m{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[7]->isa('Venus::Path');
-  ok $result->[7] =~ m{t/data/planets/mercury};
+  ok $result->[7] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
 
   ok $result->[8]->isa('Venus::Path');
-  ok $result->[8] =~ m{t/data/planets/neptune};
+  ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t/data/planets/pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t/data/planets/saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t/data/planets/uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t/data/planets/venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -798,43 +799,43 @@ $test->for('example', 1, 'glob', sub {
   ok @$result == 13;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets/ceres};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/planets/earth};
+  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}earth};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/planets/eris};
+  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}eris};
 
   ok $result->[3]->isa('Venus::Path');
-  ok $result->[3] =~ m{t/data/planets/haumea};
+  ok $result->[3] =~ m{t${fsds}data${fsds}planets${fsds}haumea};
 
   ok $result->[4]->isa('Venus::Path');
-  ok $result->[4] =~ m{t/data/planets/jupiter};
+  ok $result->[4] =~ m{t${fsds}data${fsds}planets${fsds}jupiter};
 
   ok $result->[5]->isa('Venus::Path');
-  ok $result->[5] =~ m{t/data/planets/makemake};
+  ok $result->[5] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[6]->isa('Venus::Path');
-  ok $result->[6] =~ m{t/data/planets/mars};
+  ok $result->[6] =~ m{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[7]->isa('Venus::Path');
-  ok $result->[7] =~ m{t/data/planets/mercury};
+  ok $result->[7] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
 
   ok $result->[8]->isa('Venus::Path');
-  ok $result->[8] =~ m{t/data/planets/neptune};
+  ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t/data/planets/pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t/data/planets/saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t/data/planets/uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t/data/planets/venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -1003,10 +1004,10 @@ $test->for('example', 1, 'lineage', sub {
   ok @$result == 3;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/planets$};
+  ok $result->[0] =~ m{t${fsds}data${fsds}planets$};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data$};
+  ok $result->[1] =~ m{t${fsds}data$};
 
   ok $result->[2]->isa('Venus::Path');
   ok $result->[2] =~ m{t$};
@@ -1230,7 +1231,7 @@ $test->for('example', 1, 'mkdirs', sub {
   ok @$result == 1;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/systems$};
+  ok $result->[0] =~ m{t${fsds}data${fsds}systems$};
 
   rmdir 't/data/systems';
   $result
@@ -1261,10 +1262,10 @@ $test->for('example', 2, 'mkdirs', sub {
   ok @$result == 2;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/systems$};
+  ok $result->[0] =~ m{t${fsds}data${fsds}systems$};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/systems/solar$};
+  ok $result->[1] =~ m{t${fsds}data${fsds}systems${fsds}solar$};
 
   rmdir 't/data/systems/solar';
   rmdir 't/data/systems';
@@ -1334,7 +1335,7 @@ The name method returns the path as an absolute path.
 $test->for('example', 1, 'name', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ m{.+t/data/planets$};
+  ok $result =~ m{.+t${fsds}data${fsds}planets$};
 
   $result
 });
@@ -1367,7 +1368,7 @@ $test->for('example', 1, 'parent', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
-  ok $result =~ m{t/data$};
+  ok $result =~ m{t${fsds}data$};
 
   $result
 });
@@ -1406,7 +1407,7 @@ $test->for('example', 1, 'parents', sub {
   ok @$result == 2;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data$};
+  ok $result->[0] =~ m{t${fsds}data$};
 
   ok $result->[1]->isa('Venus::Path');
   ok $result->[1] =~ m{t$};
@@ -1452,7 +1453,7 @@ The read method reads the file and returns its contents.
 
 =signature read
 
-  read() (Str)
+  read(Str $binmode) (Str)
 
 =metadata read
 
@@ -1513,7 +1514,7 @@ $test->for('example', 1, 'relative', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
-  ok $result =~ m{to/t/data/planets/mars$};
+  ok $result =~ m{to${fsds}t${fsds}data${fsds}planets${fsds}mars$};
 
   $result
 });
@@ -1536,7 +1537,7 @@ $test->for('example', 2, 'relative', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
-  ok $result =~ m{data/planets/mars$};
+  ok $result =~ m{data${fsds}planets${fsds}mars$};
 
   $result
 });
@@ -1619,10 +1620,10 @@ $test->for('example', 1, 'rmdirs', sub {
   ok @$result == 2;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/stars/dwarfs$};
+  ok $result->[0] =~ m{t${fsds}data${fsds}stars${fsds}dwarfs$};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/stars$};
+  ok $result->[1] =~ m{t${fsds}data${fsds}stars$};
 
   $result
 });
@@ -1675,19 +1676,19 @@ $test->for('example', 1, 'rmfiles', sub {
   ok @$result == 5;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/stars/arcturus$};
+  ok $result->[0] =~ m{t${fsds}data${fsds}stars${fsds}arcturus$};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/stars/canopus$};
+  ok $result->[1] =~ m{t${fsds}data${fsds}stars${fsds}canopus$};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/stars/capella$};
+  ok $result->[2] =~ m{t${fsds}data${fsds}stars${fsds}capella$};
 
   ok $result->[3]->isa('Venus::Path');
-  ok $result->[3] =~ m{t/data/stars/sirius$};
+  ok $result->[3] =~ m{t${fsds}data${fsds}stars${fsds}sirius$};
 
   ok $result->[4]->isa('Venus::Path');
-  ok $result->[4] =~ m{t/data/stars/vega$};
+  ok $result->[4] =~ m{t${fsds}data${fsds}stars${fsds}vega$};
 
   rmdir 't/data/stars';
   $result
@@ -1721,7 +1722,7 @@ $test->for('example', 1, 'sibling', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
-  ok $result =~ m{t/data/galaxies$};
+  ok $result =~ m{t${fsds}data${fsds}galaxies$};
 
   $result
 });
@@ -1760,13 +1761,13 @@ $test->for('example', 1, 'siblings', sub {
   ok @$result == 3;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t/data/moon$};
+  ok $result->[0] =~ m{t${fsds}data${fsds}moon$};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t/data/sections$};
+  ok $result->[1] =~ m{t${fsds}data${fsds}sections$};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t/data/sun$};
+  ok $result->[2] =~ m{t${fsds}data${fsds}sun$};
 
   $result
 });
@@ -1863,7 +1864,7 @@ $test->for('example', 1, 'unlink', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
-  ok $result =~ m{t/data/asteroid$};
+  ok $result =~ m{t${fsds}data${fsds}asteroid$};
 
   $result
 });
@@ -1874,7 +1875,7 @@ The write method write the data provided to the file.
 
 =signature write
 
-  write(Str $data) (Path)
+  write(Str $data, Str $binmode) (Path)
 
 =metadata write
 
@@ -1898,7 +1899,7 @@ $test->for('example', 1, 'write', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
-  ok $result =~ m{t/data/asteroid$};
+  ok $result =~ m{t${fsds}data${fsds}asteroid$};
   ok $result->read =~ m{asteroid};
 
   unlink $result;

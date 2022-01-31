@@ -84,8 +84,8 @@ sub explode {
     my @info = split /\s/, $meta, 2;
     my ($list, $name) = @info == 2 ? @info : (undef, @info);
 
-    $data =~ s/\n\+$stag/\n$stag/g; # auto-escape nested syntax
-    $data = [split /\n\n/, $data];
+    $data =~ s/(\r?\n)\+$stag/$1$stag/g; # auto-escape nested syntax
+    $data = [split /\r?\n\r?\n/, $data];
 
     my $item = {name => $name, data => $data, index => @$items + 1, list => $list};
 
