@@ -1,133 +1,193 @@
 [
   {
-    "date": "2022-01-30",
-    "version": "0.02",
+    "date": "2022-02-01",
+    "version": "0.03",
     "changes": [
       {
-        "type":"update",
-        "name":"Update String#render token syntax",
-        "link":"https://github.com/cpanery/venus/pull/60",
-        "hash":"5fe004f"
-      },
-      {
-        "type":"feature",
-        "name":"Implement Venus::Template",
-        "link":"https://github.com/cpanery/venus/pull/59",
-        "hash":"ee96851"
-      },
-      {
-        "type":"feature",
-        "name":"Implement Venus::Role::Coercible",
-        "link":"https://github.com/cpanery/venus/pull/51",
-        "hash":"d6630f5"
-      },
-      {
-        "type":"update",
-        "name":"Document all proxyable methods",
-        "link":"https://github.com/cpanery/venus/pull/50",
-        "hash":"3b13f24"
-      },
-      {
-        "type":"feature",
-        "name":"Implement String#substr",
-        "link":"https://github.com/cpanery/venus/pull/49",
-        "hash":"b91ee13"
-      },
-      {
-        "type":"feature",
-        "name":"Implement String#append_with,prepend_with",
-        "link":"https://github.com/cpanery/venus/pull/48",
-        "hash":"d9fde97"
-      },
-      {
-        "type":"feature",
-        "name":"Implement String#repeat",
-        "link":"https://github.com/cpanery/venus/pull/46",
-        "hash":"592c005"
-      },
-      {
-        "type":"feature",
-        "name":"Implement String#prepend",
-        "link":"https://github.com/cpanery/venus/pull/45",
-        "hash":"47e0790"
-      },
-      {
-        "type":"feature",
-        "name":"Implement Venus::Role::Digestable",
-        "link":"https://github.com/cpanery/venus/pull/44",
-        "hash":"d49a65a"
-      },
-      {
-        "type":"update",
-        "name":"Require Perl version 5.18+",
-        "link":"https://github.com/cpanery/venus/pull/33",
-        "hash":"1c5fad0"
-      },
-      {
-        "type":"defect",
-        "name":"Fix Dumpable method calls in list context",
-        "link":"https://github.com/cpanery/venus/pull/24",
-        "hash":"983e947"
-      },
-      {
-        "type":"update",
-        "name":"Minor refactors to source, documentation, and automation",
-        "link":"https://github.com/cpanery/venus/pull/20",
-        "hash":"3b9bd15"
-      },
-      {
-        "type":"update",
-        "name":"Document overrides in Venus::Boolean",
-        "link":"https://github.com/cpanery/venus/pull/19",
-        "hash":"a78b196"
-      },
-      {
-        "type":"update",
-        "name":"Update Venus::Json to use encoder/decoder callbacks",
-        "link":"https://github.com/cpanery/venus/pull/18",
-        "hash":"598ef32"
-      },
-      {
-        "type":"feature",
-        "name":"Support any YAML library, deduce booleans",
-        "link":"https://github.com/cpanery/venus/pull/16",
-        "hash":"a2c1aae"
-      },
-      {
-        "type":"feature",
-        "name":"Support any JSON library via encode/decode callbacks",
-        "link":"https://github.com/cpanery/venus/pull/15",
-        "hash":"355d747"
-      },
-      {
-        "type":"update",
-        "name":"Document overrides, i.e. overloaded operators",
-        "link":"https://github.com/cpanery/venus/pull/13",
-        "hash":"e2dfd48"
-      },
-      {
-        "type":"update",
-        "name":"Update CONTRIBUTING.md",
-        "link":"https://github.com/cpanery/venus/pull/12",
-        "hash":"18af4cd"
-      },
-      {
-        "type":"update",
-        "name":"JSON::PP support requires 4.00",
-        "link":"https://github.com/cpanery/venus/pull/11",
-        "hash":"c5bfd06"
+        "type": "update",
+        "name": "Address CPAN Testers reports",
+        "hash": "afacfa0",
+        "github": {
+          "issue": 69,
+          "pull_request": 70
+        }
       }
     ]
   },
   {
-    "date": "2021-12-28",
-    "version": "0.01",
+    "date": "2022-01-30",
+    "version": "0.02",
     "changes": [
       {
-        "type":"update",
-        "name":"Initial implementation",
-        "link":"",
-        "hash":"4724f15"
+        "type": "update",
+        "name": "Update String#render token syntax",
+        "hash": "5fe004f",
+        "github": {
+          "issue": 58,
+          "pull_request": 60
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Template",
+        "hash": "ee96851",
+        "github": {
+          "issue": 56,
+          "pull_request": 59
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Role::Coercible",
+        "hash": "d6630f5",
+        "github": {
+          "issue": 8,
+          "pull_request": 51
+        }
+      },
+      {
+        "type": "update",
+        "name": "Document all proxyable methods",
+        "hash": "3b13f24",
+        "github": {
+          "issue": 27,
+          "pull_request": 50
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement String#substr",
+        "hash": "b91ee13",
+        "github": {
+          "issue": 42,
+          "pull_request": 49
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement String#append_with,prepend_with",
+        "hash": "d9fde97",
+        "github": {
+          "issue": 47,
+          "pull_request": 48
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement String#repeat",
+        "hash": "592c005",
+        "github": {
+          "issue": 43,
+          "pull_request": 46
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement String#prepend",
+        "hash": "47e0790",
+        "github": {
+          "issue": 41,
+          "pull_request": 45
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Role::Digestable",
+        "hash": "d49a65a",
+        "github": {
+          "issue": 3,
+          "pull_request": 44
+        }
+      },
+      {
+        "type": "update",
+        "name": "Require Perl version 5.18+",
+        "hash": "1c5fad0",
+        "github": {
+          "issue": 29,
+          "pull_request": 33
+        }
+      },
+      {
+        "type": "defect",
+        "name": "Fix Dumpable method calls in list context",
+        "hash": "983e947",
+        "github": {
+          "issue": 23,
+          "pull_request": 24
+        }
+      },
+      {
+        "type": "update",
+        "name": "Minor refactors to source, documentation, and automation",
+        "hash": "3b9bd15",
+        "github": {
+          "issue": 10,
+          "pull_request": 20
+        }
+      },
+      {
+        "type": "update",
+        "name": "Document overrides in Venus::Boolean",
+        "hash": "a78b196",
+        "github": {
+          "issue": 14,
+          "pull_request": 19
+        }
+      },
+      {
+        "type": "update",
+        "name": "Update Venus::Json to use encoder/decoder callbacks",
+        "hash": "598ef32",
+        "github": {
+          "issue": 17,
+          "pull_request": 18
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Support any YAML library, deduce booleans",
+        "hash": "a2c1aae",
+        "github": {
+          "issue": 2,
+          "pull_request": 16
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Support any JSON library via encode/decode callbacks",
+        "hash": "355d747",
+        "github": {
+          "issue": 1,
+          "pull_request": 15
+        }
+      },
+      {
+        "type": "update",
+        "name": "Document overrides, i.e. overloaded operators",
+        "hash": "e2dfd48",
+        "github": {
+          "issue": 4,
+          "pull_request": 13
+        }
+      },
+      {
+        "type": "update",
+        "name": "Update CONTRIBUTING.md",
+        "hash": "18af4cd",
+        "github": {
+          "issue": 5,
+          "pull_request": 12
+        }
+      },
+      {
+        "type": "update",
+        "name": "JSON::PP support requires 4.00",
+        "hash": "c5bfd06",
+        "github": {
+          "issue": 9,
+          "pull_request": 11
+        }
       }
     ]
   }
