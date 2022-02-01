@@ -16,7 +16,7 @@ my $cpan = q(
 {{version}} {{date}}
 
 {{for changes}}
-- [{{type}}] ({{hash}}) {{name}} {{if link}}({{link}}){{end link}}
+- [{{type}}] (#{{github.issue}}) {{name}}
 {{end changes}}
 
 {{end releases}}
@@ -27,7 +27,7 @@ my $markdown = q(
 ## Release [{{version}}](https://github.com/cpanery/venus/releases/tag/{{version}})
 
 {{for changes}}
-- [{{type}}] {{name}} {{if link}}([{{hash}}]({{link}})){{end link}}
+- [{{type}}] {{name}} {{if github.issue}}([#{{github.issue}}](https://github.com/cpanery/venus/issues/{{github.issue}})){{end github.issue}}
 {{end changes}}
 
 {{end releases}}
