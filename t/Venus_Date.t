@@ -858,7 +858,7 @@ rules.
 $test->for('example', 1, 'format', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq 'Monday, February  1, 1988';
+  like $result, qr/^[^\s]+, [^\s]+ [\s0]1, 1988$/;
 
   $result
 });
@@ -876,7 +876,7 @@ $test->for('example', 1, 'format', sub {
 $test->for('example', 2, 'format', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq 'Feb  1 Mon';
+  like $result, qr/^[^\s]+ [\s0]1 [^\s]+$/;
 
   $result
 });
@@ -908,7 +908,7 @@ The hms method returns the time formatted as C<hh:mm:ss>.
 $test->for('example', 1, 'hms', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '00:00:00';
+  is $result, '00:00:00';
 
   $result
 });
@@ -940,7 +940,7 @@ The iso8601 method returns the date and time formatted as an ISO8601 string.
 $test->for('example', 1, 'iso8601', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '1988-02-01T00:00:00';
+  is $result, '1988-02-01T00:00:00';
 
   $result
 });
@@ -972,7 +972,7 @@ The mdy method returns the date formatted as C<mm-dd-yyyy>.
 $test->for('example', 1, 'mdy', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '02-01-1988';
+  is $result, '02-01-1988';
 
   $result
 });
@@ -1156,7 +1156,7 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 $test->for('example', 1, 'rfc822', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/Mon, 01 Feb 1988 00:00:00 [-+]\d{4}/;
+  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 [-+]\d{4}$/;
 
   $result
 });
@@ -1188,7 +1188,7 @@ The rfc1123 method returns the date and time formatted as an RFC1123 string.
 $test->for('example', 1, 'rfc1123', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq 'Mon, 01 Feb 1988 00:00:00 GMT';
+  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 GMT$/;
 
   $result
 });
@@ -1220,7 +1220,7 @@ The rfc3339 method returns the date and time formatted as an RFC3339 string.
 $test->for('example', 1, 'rfc3339', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '1988-02-01T00:00:00Z';
+  is $result, '1988-02-01T00:00:00Z';
 
   $result
 });
@@ -1252,7 +1252,7 @@ The rfc7231 method returns the date and time formatted as an RFC7231 string.
 $test->for('example', 1, 'rfc7231', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq 'Mon, 01 Feb 1988 00:00:00 UTC';
+  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 UTC$/;
 
   $result
 });
@@ -1510,7 +1510,7 @@ L</rfc3339>.
 $test->for('example', 1, 'string', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '1988-02-01T00:00:00Z';
+  is $result, '1988-02-01T00:00:00Z';
 
   $result
 });
