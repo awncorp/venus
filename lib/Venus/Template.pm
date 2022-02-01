@@ -250,7 +250,7 @@ sub render_tokens {
   $content =~ s{
     $regexp
   }{
-    scalar($variables->path($1)) || ''
+    scalar($variables->path($1)) // ''
   }gsex;
 
   return $content;
