@@ -6,7 +6,7 @@ on:
     - cpan
 
 jobs:
-  Upload:
+  Archive:
     runs-on: ubuntu-latest
     container:
       image: perl:5.32

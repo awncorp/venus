@@ -33,13 +33,53 @@ jobs:
       run: perlcritic lib t
     - name: Testing Project
       run: prove -Ilib -r t
-    - name: Check Documentation
-      run: test -n "$(git status --porcelain)" && (git status --porcelain && false) || true
       env:
         HARNESS_OPTIONS: j9
-        RENDER: 1
 
-  Variant:
+  Test-Locale:
+    runs-on: ubuntu-latest
+    needs:
+      - Test
+    strategy:
+      matrix:
+        locale:
+        - en_US.UTF-8 # English
+        - en_GB.UTF-8 # English (UK)
+        - es_ES.UTF-8 # Spanish
+        - de_DE.UTF-8 # German
+        - ru_RU.UTF-8 # Russian
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Git User
+      run: git config --global user.name "Cpanery"
+    - name: Setup Git Email
+      run: git config --global user.email "cpanery@cpan.org"
+    - name: Setup GitHub User
+      run: git config --global github.user ${{ secrets.GithubUser }}
+    - name: Setup GitHub Token
+      run: git config --global github.user ${{ secrets.GithubToken }}
+    - name: Update Packages Index
+      run: sudo apt-get update -y
+    - name: Install Locales
+      run: sudo apt-get install -y locales locales-all
+    - name: Generate Locale
+      run: sudo locale-gen ${{ matrix.locale }}
+    - name: Configure Locale
+      run: sudo update-locale LANG=${{ matrix.locale }}
+    - name: Advertise Perl Version
+      run: perl -V
+    - name: Install App::cpanminus
+      run: curl -L https://cpanmin.us | sudo perl - App::cpanminus
+    - name: Install Project Dependencies
+      run: sudo cpanm -qn --reinstall --installdeps .
+    - name: Testing Project
+      run: prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+        LANG: ${{ matrix.locale }}
+
+  Test-Package:
     runs-on: ubuntu-latest
     container:
       image: perl:5.32
@@ -68,16 +108,71 @@ jobs:
       run: git config --global github.user ${{ secrets.GithubToken }}
     - name: Advertise Perl Version
       run: perl -V
-    - name: Install Perl::Critic
-      run: cpanm -qn Perl::Critic
     - name: Install Project Dependencies
       run: cpanm -qn --reinstall --installdeps .
     - name: Install Package ${{ matrix.package }}
       run: cpanm -qn ${{ matrix.package }}
-    - name: Critiquing Project
-      run: perlcritic lib t
     - name: Testing Project
       run: prove -Ilib -r t
       env:
         HARNESS_OPTIONS: j9
-        RENDER: 1
+
+  Test-MacOs:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Git User
+      run: git config --global user.name "Cpanery"
+    - name: Setup Git Email
+      run: git config --global user.email "cpanery@cpan.org"
+    - name: Setup GitHub User
+      run: git config --global github.user ${{ secrets.GithubUser }}
+    - name: Setup GitHub Token
+      run: git config --global github.user ${{ secrets.GithubToken }}
+    - name: Setup GitHub (autocrlf)
+      run: git config --global core.autocrlf false
+    - name: Setup GitHub (eol)
+      run: git config --global core.eol lf
+    - name: Setup Perl
+      run: brew install perl
+    - name: Advertise Perl Version
+      run: perl -V
+    - name: Install App::cpanminus
+      run: brew install cpanminus
+    - name: Install Project Dependencies
+      run: cpanm -qn --reinstall --installdeps .
+    - name: Testing Project
+      run: prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
+
+  Test-Windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Git User
+      run: git config --global user.name "Cpanery"
+    - name: Setup Git Email
+      run: git config --global user.email "cpanery@cpan.org"
+    - name: Setup GitHub User
+      run: git config --global github.user ${{ secrets.GithubUser }}
+    - name: Setup GitHub Token
+      run: git config --global github.user ${{ secrets.GithubToken }}
+    - name: Setup GitHub (autocrlf)
+      run: git config --global core.autocrlf false
+    - name: Setup GitHub (eol)
+      run: git config --global core.eol lf
+    - name: Setup Perl
+      run: choco install strawberryperl
+    - name: Advertise Perl Version
+      run: perl -V
+    - name: Install App::cpanminus
+      run: curl -L https://cpanmin.us | perl - App::cpanminus
+    - name: Install Project Dependencies
+      run: cpanm -qn --reinstall --installdeps .
+    - name: Testing Project
+      run: prove -Ilib -r t
+      env:
+        HARNESS_OPTIONS: j9
