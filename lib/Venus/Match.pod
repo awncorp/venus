@@ -101,7 +101,7 @@ This package provides the following methods:
 
   just(Str $topic) (Self)
 
-The just method registers a C</when> condition that check if the match value is
+The just method registers a L</when> condition that check if the match value is
 an exact string match of the C<$topic> provided.
 
 I<Since C<0.03>>
@@ -292,7 +292,7 @@ I<Since C<0.03>>
   only(CodeRef $code) (Self)
 
 The only method registers a special condition that only allows matching on the
-match value if the code returns truthy.
+match value only if the code provided returns truthy.
 
 I<Since C<0.03>>
 
