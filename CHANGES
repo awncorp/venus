@@ -1,5 +1,6 @@
 0.03 2022-02-01
 
+- [feature] (#7) Implement Venus::Match
 - [update] (#69) Address CPAN Testers reports
 
 0.02 2022-01-30

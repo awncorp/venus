@@ -1,5 +1,6 @@
 ## Release [0.03](https://github.com/cpanery/venus/releases/tag/0.03)
 
+- [feature] Implement Venus::Match ([#7](https://github.com/cpanery/venus/issues/7))
 - [update] Address CPAN Testers reports ([#69](https://github.com/cpanery/venus/issues/69))
 
 ## Release [0.02](https://github.com/cpanery/venus/releases/tag/0.02)
