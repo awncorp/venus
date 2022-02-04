@@ -43,6 +43,8 @@ jobs:
     strategy:
       matrix:
         locale:
+        - C
+        - C.UTF-8
         - en_US.UTF-8 # English
         - en_GB.UTF-8 # English (UK)
         - es_ES.UTF-8 # Spanish
@@ -64,9 +66,11 @@ jobs:
     - name: Install Locales
       run: sudo apt-get install -y locales locales-all
     - name: Generate Locale
-      run: sudo locale-gen ${{ matrix.locale }}
+      run: sudo locale-gen ${{ matrix.locale }} >/dev/null | true
     - name: Configure Locale
-      run: sudo update-locale LANG=${{ matrix.locale }}
+      run: sudo update-locale LANG=${{ matrix.locale }} LC_ALL=${{ matrix.locale }}
+    - name: Advertise Locale
+      run: sudo locale
     - name: Advertise Perl Version
       run: perl -V
     - name: Install App::cpanminus
@@ -74,10 +78,11 @@ jobs:
     - name: Install Project Dependencies
       run: sudo cpanm -qn --reinstall --installdeps .
     - name: Testing Project
-      run: prove -Ilib -r t
+      run: sudo prove -Ilib -r t
       env:
         HARNESS_OPTIONS: j9
         LANG: ${{ matrix.locale }}
+        LC_ALL: ${{ matrix.locale }}
 
   Test-Package:
     runs-on: ubuntu-latest

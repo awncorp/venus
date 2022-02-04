@@ -568,43 +568,43 @@ $test->for('example', 1, 'find', sub {
   ok @$result == 13;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
+  like $result->[0], qr{t${fsds}data${fsds}planets${fsds}ceres};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}earth};
+  like $result->[1], qr{t${fsds}data${fsds}planets${fsds}earth};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}eris};
+  like $result->[2], qr{t${fsds}data${fsds}planets${fsds}eris};
 
   ok $result->[3]->isa('Venus::Path');
-  ok $result->[3] =~ m{t${fsds}data${fsds}planets${fsds}haumea};
+  like $result->[3], qr{t${fsds}data${fsds}planets${fsds}haumea};
 
   ok $result->[4]->isa('Venus::Path');
-  ok $result->[4] =~ m{t${fsds}data${fsds}planets${fsds}jupiter};
+  like $result->[4], qr{t${fsds}data${fsds}planets${fsds}jupiter};
 
   ok $result->[5]->isa('Venus::Path');
-  ok $result->[5] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
+  like $result->[5], qr{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[6]->isa('Venus::Path');
-  ok $result->[6] =~ m{t${fsds}data${fsds}planets${fsds}mars};
+  like $result->[6], qr{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[7]->isa('Venus::Path');
-  ok $result->[7] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
+  like $result->[7], qr{t${fsds}data${fsds}planets${fsds}mercury};
 
   ok $result->[8]->isa('Venus::Path');
-  ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
+  like $result->[8], qr{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
+  like $result->[9], qr{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
+  like $result->[10], qr{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+  like $result->[11], qr{t${fsds}data${fsds}planets${fsds}uranus};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
+  like $result->[12], qr{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -630,13 +630,13 @@ $test->for('example', 2, 'find', sub {
   ok @$result == 3;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}makemake};
+  like $result->[0], qr{t${fsds}data${fsds}planets${fsds}makemake};
 
   ok $result->[1]->isa('Venus::Path');
-  ok $result->[1] =~ m{t${fsds}data${fsds}planets${fsds}mars};
+  like $result->[1], qr{t${fsds}data${fsds}planets${fsds}mars};
 
   ok $result->[2]->isa('Venus::Path');
-  ok $result->[2] =~ m{t${fsds}data${fsds}planets${fsds}mercury};
+  like $result->[2], qr{t${fsds}data${fsds}planets${fsds}mercury};
 
   $result
 });
@@ -660,7 +660,7 @@ $test->for('example', 3, 'find', sub {
   ok @$result == 1;
 
   ok $result->[0]->isa('Venus::Path');
-  ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}earth};
+  like $result->[0], qr{t${fsds}data${fsds}planets${fsds}earth};
 
   $result
 });

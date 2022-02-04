@@ -85,6 +85,7 @@ $test->for('includes');
   my $date = Venus::Date->new(570672000);
 
   # $date->string;
+
   # '1988-02-01T00:00:00Z'
 
 =cut
@@ -160,7 +161,9 @@ The add method increments the date and time attributes specified.
   });
 
   # $date->string; # 1989-03-03T16:17:54Z
+
   # $date->epoch; # 604945074
+
 
 =cut
 
@@ -184,6 +187,7 @@ $test->for('example', 1, 'add', sub {
   });
 
   # $date->string; # 1988-02-01T01:01:01Z
+
   # $date->epoch; # 570675661
 
 =cut
@@ -218,6 +222,7 @@ The add_days method increments the C<day> attribute.
   $date = $date->add_days(1);
 
   # $date->string; # 1988-02-02T00:00:00Z
+
   # $date->epoch; # 570758400
 
 =cut
@@ -237,6 +242,7 @@ $test->for('example', 1, 'add_days', sub {
   $date = $date->add_days(40);
 
   # $date->string; # 1988-03-12T00:00:00Z
+
   # $date->epoch; # 574128000
 
 =cut
@@ -256,6 +262,7 @@ $test->for('example', 2, 'add_days', sub {
   $date = $date->add_days(-1);
 
   # $date->string; # 1988-01-31T00:00:00Z
+
   # $date->epoch; # 570585600
 
 =cut
@@ -289,6 +296,7 @@ The add_hours method increments the C<hour> attribute.
   $date = $date->add_hours(1);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =cut
@@ -308,6 +316,7 @@ $test->for('example', 1, 'add_hours', sub {
   $date = $date->add_hours(25);
 
   # $date->string; # 1988-02-02T01:00:00Z
+
   # $date->epoch; # 570762000
 
 =cut
@@ -327,6 +336,7 @@ $test->for('example', 2, 'add_hours', sub {
   $date = $date->add_hours(-1);
 
   # $date->string; # 1988-01-31T23:00:00Z
+
   # $date->epoch; # 570668400
 
 =cut
@@ -360,6 +370,7 @@ The add_hms method increments the C<hour>, C<minute>, and C<second> attributes.
   $date = $date->add_hms(1, 0, 0);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =cut
@@ -379,6 +390,7 @@ $test->for('example', 1, 'add_hms', sub {
   $date = $date->add_hms(undef, 1, 1);
 
   # $date->string; # 1988-02-01T00:01:01Z
+
   # $date->epoch; # 570672061
 
 =cut
@@ -398,6 +410,7 @@ $test->for('example', 2, 'add_hms', sub {
   $date = $date->add_hms(1, 1);
 
   # $date->string; # 1988-02-01T01:01:00Z
+
   # $date->epoch; # 570675660
 
 =cut
@@ -431,6 +444,7 @@ The add_mdy method increments the C<month>, C<day>, and C<years> attributes.
   $date = $date->add_mdy(1, 0, 0);
 
   # $date->string; # 1988-03-02T10:29:04Z
+
   # $date->epoch; # 573301744
 
 =cut
@@ -450,6 +464,7 @@ $test->for('example', 1, 'add_mdy', sub {
   $date = $date->add_mdy(undef, 1, 1);
 
   # $date->string; # 1989-02-01T05:48:50Z
+
   # $date->epoch; # 602315330
 
 =cut
@@ -469,6 +484,7 @@ $test->for('example', 2, 'add_mdy', sub {
   $date = $date->add_mdy(1, 1);
 
   # $date->string; # 1988-03-03T10:29:04Z
+
   # $date->epoch; # 573388144
 
 =cut
@@ -502,6 +518,7 @@ The add_minutes method increments the C<minute> attribute.
   $date = $date->add_minutes(1);
 
   # $date->string; # 1988-02-01T00:01:00Z
+
   # $date->epoch; # 570672060
 
 =cut
@@ -521,6 +538,7 @@ $test->for('example', 1, 'add_minutes', sub {
   $date = $date->add_minutes(61);
 
   # $date->string; # 1988-02-01T01:01:00Z
+
   # $date->epoch; # 570675660
 
 =cut
@@ -540,6 +558,7 @@ $test->for('example', 2, 'add_minutes', sub {
   $date = $date->add_minutes(-1);
 
   # $date->string; # 1988-01-31T23:59:00Z
+
   # $date->epoch; # 570671940
 
 =cut
@@ -573,6 +592,7 @@ The add_months method increments the C<month> attribute.
   $date = $date->add_months(1);
 
   # $date->string; # 1988-03-02T10:29:04Z
+
   # $date->epoch; # 573301744
 
 =cut
@@ -592,6 +612,7 @@ $test->for('example', 1, 'add_months', sub {
   $date = $date->add_months(13);
 
   # $date->string; # 1989-03-02T16:17:52Z
+
   # $date->epoch; # 604858672
 
 =cut
@@ -611,6 +632,7 @@ $test->for('example', 2, 'add_months', sub {
   $date = $date->add_months(-1);
 
   # $date->string; # 1988-01-01T13:30:56Z
+
   # $date->epoch; # 568042256
 
 =cut
@@ -644,6 +666,7 @@ The add_seconds method increments the C<second> attribute.
   $date = $date->add_seconds(1);
 
   # $date->string; # 1988-02-01T00:00:01Z
+
   # $date->epoch; # 570672001
 
 =cut
@@ -663,6 +686,7 @@ $test->for('example', 1, 'add_seconds', sub {
   $date = $date->add_seconds(61);
 
   # $date->string; # 1988-02-01T00:01:01Z
+
   # $date->epoch; # 570672061
 
 =cut
@@ -682,6 +706,7 @@ $test->for('example', 2, 'add_seconds', sub {
   $date = $date->add_seconds(-1);
 
   # $date->string; # 1988-01-31T23:59:59Z
+
   # $date->epoch; # 570671999
 
 =cut
@@ -715,6 +740,7 @@ The add_years method increments the C<year> attribute.
   $date = $date->add_years(1);
 
   # $date->string; # 1989-01-31T05:48:50Z
+
   # $date->epoch; # 602228930
 
 =cut
@@ -734,6 +760,7 @@ $test->for('example', 1, 'add_years', sub {
   $date = $date->add_years(50);
 
   # $date->string; # 2038-01-31T02:41:40Z
+
   # $date->epoch; # 2148518500
 
 =cut
@@ -753,6 +780,7 @@ $test->for('example', 2, 'add_years', sub {
   $date = $date->add_years(-1);
 
   # $date->string; # 1987-01-31T18:11:10Z
+
   # $date->epoch; # 539115070
 
 =cut
@@ -855,6 +883,10 @@ rules.
 
 =cut
 
+SKIP: {
+if ($^O =~ /Win32/i) {
+  skip '=example-1 format';
+}
 $test->for('example', 1, 'format', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
@@ -862,6 +894,7 @@ $test->for('example', 1, 'format', sub {
 
   $result
 });
+}
 
 =example-2 format
 
@@ -873,6 +906,10 @@ $test->for('example', 1, 'format', sub {
 
 =cut
 
+SKIP: {
+if ($^O =~ /Win32/i) {
+  skip '=example-2 format';
+}
 $test->for('example', 2, 'format', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
@@ -880,6 +917,7 @@ $test->for('example', 2, 'format', sub {
 
   $result
 });
+}
 
 =method hms
 
@@ -1000,6 +1038,7 @@ parsing rules.
   $date = $date->parse('Monday, February  1, 1988', '%A, %B %e, %Y');
 
   # $date->string; # 1988-02-01T00:00:00Z
+
   # $date->epoch; # 570672000
 
 =cut
@@ -1033,6 +1072,7 @@ The reset method resets all attributes to correspond with the epoch provided.
   $date = $date->reset(631152000);
 
   # $date->string; # 1990-01-01T00:00:00Z
+
   # $date->epoch; # 631152000
 
 =cut
@@ -1067,6 +1107,7 @@ e.g. C<year>, C<quarter>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
   $date = $date->restart('year');
 
   # $date->string; # 1988-01-01T00:00:00Z
+
   # $date->epoch; # 567993600
 
 =cut
@@ -1090,6 +1131,7 @@ $test->for('example', 1, 'restart', sub {
   $date = $date->restart('quarter');
 
   # $date->string; # 1988-01-01T00:00:00Z
+
   # $date->epoch; # 567993600
 
 =cut
@@ -1113,6 +1155,7 @@ $test->for('example', 2, 'restart', sub {
   $date = $date->restart('month');
 
   # $date->string; # 1988-02-01T00:00:00Z
+
   # $date->epoch; # 570672000
 
 =cut
@@ -1185,6 +1228,10 @@ The rfc1123 method returns the date and time formatted as an RFC1123 string.
 
 =cut
 
+SKIP: {
+if ($^O =~ /Win32/i) {
+  skip '=example-1 rfc1132';
+}
 $test->for('example', 1, 'rfc1123', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
@@ -1192,6 +1239,7 @@ $test->for('example', 1, 'rfc1123', sub {
 
   $result
 });
+}
 
 =method rfc3339
 
@@ -1282,6 +1330,7 @@ The set method sets the date and time attributes specified.
   });
 
   # $date->string; # 2000-01-01T00:00:00Z
+
   # $date->epoch; # 946684800
 
 =cut
@@ -1304,6 +1353,7 @@ $test->for('example', 1, 'set', sub {
   });
 
   # $date->string; # 1988-12-01T00:00:00Z
+
   # $date->epoch; # 596937600
 
 =cut
@@ -1327,6 +1377,7 @@ $test->for('example', 2, 'set', sub {
   });
 
   # $date->string; # 1979-12-01T00:00:00Z
+
   # $date->epoch; # 312854400
 
 =cut
@@ -1360,6 +1411,7 @@ The set_hms method sets the C<hour>, C<minute>, and C<second> attributes.
   $date = $date->set_hms(1, 0, 0);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =cut
@@ -1379,6 +1431,7 @@ $test->for('example', 1, 'set_hms', sub {
   $date = $date->set_hms(undef, 30, 30);
 
   # $date->string; # 1988-02-01T00:30:30Z
+
   # $date->epoch; # 570673830
 
 =cut
@@ -1398,6 +1451,7 @@ $test->for('example', 2, 'set_hms', sub {
   $date = $date->set_hms(0, 59, 59);
 
   # $date->string; # 1988-02-01T00:59:59Z
+
   # $date->epoch; # 570675599
 
 =cut
@@ -1432,6 +1486,7 @@ The set_mdy method sets the C<month>, C<day>, and C<year> attributes.
   $date = $date->set_mdy(4, 30, 1990);
 
   # $date->string; # 1990-04-30T00:00:00Z
+
   # $date->epoch; # 641433600
 
 =cut
@@ -1451,6 +1506,7 @@ $test->for('example', 1, 'set_mdy', sub {
   $date = $date->set_mdy(4, 30, undef);
 
   # $date->string; # 1988-04-30T00:00:00Z
+
   # $date->epoch; # 578361600
 
 =cut
@@ -1470,6 +1526,7 @@ $test->for('example', 2, 'set_mdy', sub {
   $date = $date->set_mdy(undef, 15, undef);
 
   # $date->string; # 1988-02-15T00:00:00Z
+
   # $date->epoch; # 571881600
 
 =cut
@@ -1540,6 +1597,7 @@ The sub method method decrements the date and time attributes specified.
   });
 
   # $date->string; # 1986-12-31T07:42:06Z
+
   # $date->epoch; # 536398926
 
 =cut
@@ -1563,6 +1621,7 @@ $test->for('example', 1, 'sub', sub {
   });
 
   # $date->string; # 1988-01-31T22:58:59Z
+
   # $date->epoch; # 570668339
 
 =cut
@@ -1596,6 +1655,7 @@ The sub_days method decrements the C<day> attribute.
   $date = $date->sub_days(1);
 
   # $date->string; # 1988-01-31T00:00:00Z
+
   # $date->epoch; # 570585600
 
 =cut
@@ -1615,6 +1675,7 @@ $test->for('example', 1, 'sub_days', sub {
   $date = $date->sub_days(32);
 
   # $date->string; # 1987-12-31T00:00:00Z
+
   # $date->epoch; # 567907200
 
 =cut
@@ -1634,6 +1695,7 @@ $test->for('example', 2, 'sub_days', sub {
   $date = $date->sub_days(-1);
 
   # $date->string; # 1988-02-02T00:00:00Z
+
   # $date->epoch; # 570758400
 
 =cut
@@ -1667,6 +1729,7 @@ The sub_hours method decrements the C<hour> attribute.
   $date = $date->sub_hours(1);
 
   # $date->string; # 1988-01-31T23:00:00Z
+
   # $date->epoch; # 570668400
 
 =cut
@@ -1686,6 +1749,7 @@ $test->for('example', 1, 'sub_hours', sub {
   $date = $date->sub_hours(25);
 
   # $date->string; # 1988-01-30T23:00:00Z
+
   # $date->epoch; # 570582000
 
 =cut
@@ -1705,6 +1769,7 @@ $test->for('example', 2, 'sub_hours', sub {
   $date = $date->sub_hours(-1);
 
   # $date->string; # 1988-02-01T01:00:00Z
+
   # $date->epoch; # 570675600
 
 =cut
@@ -1738,6 +1803,7 @@ The sub_hms method decrements the C<hour>, C<minute>, and C<second> attributes.
   $date = $date->sub_hms(1, 0, 0);
 
   # $date->string; # 1988-01-31T23:00:00Z
+
   # $date->epoch; # 570668400
 
 =cut
@@ -1757,6 +1823,7 @@ $test->for('example', 1, 'sub_hms', sub {
   $date = $date->sub_hms(undef, 1, 1);
 
   # $date->string; # 1988-01-31T23:58:59Z
+
   # $date->epoch; # 570671939
 
 =cut
@@ -1776,6 +1843,7 @@ $test->for('example', 2, 'sub_hms', sub {
   $date = $date->sub_hms(1, 1);
 
   # $date->string; # 1988-01-31T22:59:00Z
+
   # $date->epoch; # 570668340
 
 =cut
@@ -1809,6 +1877,7 @@ The sub_mdy method decrements the C<month>, C<day>, and C<year> attributes.
   $date = $date->sub_mdy(1, 1, 1);
 
   # $date->string; # 1986-12-31T07:42:06Z
+
   # $date->epoch; # 536398926
 
 =cut
@@ -1828,6 +1897,7 @@ $test->for('example', 1, 'sub_mdy', sub {
   $date = $date->sub_mdy(1, 1, undef);
 
   # $date->string; # 1987-12-31T13:30:56Z
+
   # $date->epoch; # 567955856
 
 =cut
@@ -1847,6 +1917,7 @@ $test->for('example', 2, 'sub_mdy', sub {
   $date = $date->sub_mdy(1, 1);
 
   # $date->string; # 1987-12-31T13:30:56Z
+
   # $date->epoch; # 567955856
 
 =cut
@@ -1880,6 +1951,7 @@ The sub_minutes method decrements the C<minute> attribute.
   $date = $date->sub_minutes(1);
 
   # $date->string; # 1988-01-31T23:59:00Z
+
   # $date->epoch; # 570671940
 
 =cut
@@ -1899,6 +1971,7 @@ $test->for('example', 1, 'sub_minutes', sub {
   $date = $date->sub_minutes(61);
 
   # $date->string; # 1988-01-31T22:59:00Z
+
   # $date->epoch; # 570668340
 
 =cut
@@ -1918,6 +1991,7 @@ $test->for('example', 2, 'sub_minutes', sub {
   $date = $date->sub_minutes(-1);
 
   # $date->string; # 1988-02-01T00:01:00Z
+
   # $date->epoch; # 570672060
 
 =cut
@@ -1951,6 +2025,7 @@ The sub_months method decrements the C<month> attribute.
   $date = $date->sub_months(1);
 
   # $date->string; # 1988-01-01T13:30:56Z
+
   # $date->epoch; # 568042256
 
 =cut
@@ -1970,6 +2045,7 @@ $test->for('example', 1, 'sub_months', sub {
   $date = $date->sub_months(13);
 
   # $date->string; # 1987-01-01T07:42:08Z
+
   # $date->epoch; # 536485328
 
 =cut
@@ -1989,6 +2065,7 @@ $test->for('example', 2, 'sub_months', sub {
   $date = $date->sub_months(-1);
 
   # $date->string; # 1988-03-02T10:29:04Z
+
   # $date->epoch; # 573301744
 
 =cut
@@ -2022,6 +2099,7 @@ The sub_seconds method decrements the C<second> attribute.
   $date = $date->sub_seconds(1);
 
   # $date->string; # 1988-01-31T23:59:59Z
+
   # $date->epoch; # 570671999
 
 =cut
@@ -2041,6 +2119,7 @@ $test->for('example', 1, 'sub_seconds', sub {
   $date = $date->sub_seconds(61);
 
   # $date->string; # 1988-01-31T23:58:59Z
+
   # $date->epoch; # 570671939
 
 =cut
@@ -2060,6 +2139,7 @@ $test->for('example', 2, 'sub_seconds', sub {
   $date = $date->sub_seconds(-1);
 
   # $date->string; # 1988-02-01T00:00:01Z
+
   # $date->epoch; # 570672001
 
 =cut
@@ -2093,6 +2173,7 @@ The sub_years method decrements the C<years> attribute.
   $date = $date->sub_years(1);
 
   # $date->string; # 1987-01-31T18:11:10Z
+
   # $date->epoch; # 539115070
 
 =cut
@@ -2112,6 +2193,7 @@ $test->for('example', 1, 'sub_years', sub {
   $date = $date->sub_years(25);
 
   # $date->string; # 1963-01-31T22:39:10Z
+
   # $date->epoch; # -218251250
 
 =cut
@@ -2131,6 +2213,7 @@ $test->for('example', 2, 'sub_years', sub {
   $date = $date->sub_years(-1);
 
   # $date->string; # 1989-01-31T05:48:50Z
+
   # $date->epoch; # 602228930
 
 =cut
