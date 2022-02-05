@@ -1,3 +1,8 @@
+## Release [0.04](https://github.com/cpanery/venus/releases/tag/0.04)
+
+- [feature] Implement Venus::Role::Matchable ([#80](https://github.com/cpanery/venus/issues/80))
+- [update] Address CPAN Testers reports ([#82](https://github.com/cpanery/venus/issues/82))
+
 ## Release [0.03](https://github.com/cpanery/venus/releases/tag/0.03)
 
 - [feature] Implement Venus::Match ([#7](https://github.com/cpanery/venus/issues/7))

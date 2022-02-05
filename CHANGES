@@ -1,3 +1,8 @@
+0.04 2022-02-04
+
+- [feature] (#80) Implement Venus::Role::Matchable
+- [update] (#82) Address CPAN Testers reports
+
 0.03 2022-02-01
 
 - [feature] (#7) Implement Venus::Match
