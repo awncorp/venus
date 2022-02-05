@@ -45,6 +45,8 @@ L<Venus::Role::Doable>
 
 L<Venus::Role::Dumpable>
 
+L<Venus::Role::Matchable>
+
 L<Venus::Role::Printable>
 
 L<Venus::Role::Throwable>
