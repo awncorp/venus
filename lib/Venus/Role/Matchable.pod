@@ -1,0 +1,120 @@
+
+=head1 NAME
+
+Venus::Role::Matchable - Matchable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Matchable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Matchable';
+
+  has 'active';
+
+  sub validate {
+    my ($self) = @_;
+
+    return $self->match->when('active')->then(true)->none(false);
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # $example->validate->result;
+
+  # 0
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides a mechanism for
+assembling complex pattern matching operations.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 match
+
+  match(Str | CodeRef $method, Any @args) (Match)
+
+The match method returns a L<Venus::Match> object having the match value set to
+the invocant or the result of a dispatch. This method supports dispatching,
+i.e. providing a method name and arguments whose return value will be acted on
+by this method.
+
+I<Since C<0.04>>
+
+=over 4
+
+=item match example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $match = $example->match;
+
+  # bless({..., value => bless(..., 'Example')}, 'Venus::Match')
+
+=back
+
+=over 4
+
+=item match example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $match = $example->match('active');
+
+  # bless({..., value => undef}, 'Venus::Match')
+
+=back
+
+=over 4
+
+=item match example 3
+
+  package main;
+
+  my $example = Example->new(active => 1);
+
+  my $match = $example->match('active');
+
+  # bless({..., value => 1}, 'Venus::Match')
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Cpanery, C<cpanery@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2021, Cpanery
+
+Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+
+=cut

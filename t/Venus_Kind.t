@@ -83,6 +83,7 @@ Venus::Role::Catchable
 Venus::Role::Digestable
 Venus::Role::Doable
 Venus::Role::Dumpable
+Venus::Role::Matchable
 Venus::Role::Printable
 Venus::Role::Throwable
 
