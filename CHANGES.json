@@ -1,5 +1,27 @@
 [
   {
+    "date": "2022-02-04",
+    "version": "0.04",
+    "changes": [
+      {
+        "type": "feature",
+        "name": "Implement Venus::Role::Matchable",
+        "github": {
+          "issue": 80,
+          "pull_request": 85
+        }
+      },
+      {
+        "type": "update",
+        "name": "Address CPAN Testers reports",
+        "github": {
+          "issue": 82,
+          "pull_request": 83
+        }
+      }
+    ]
+  },
+  {
     "date": "2022-02-01",
     "version": "0.03",
     "changes": [
