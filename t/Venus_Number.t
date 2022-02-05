@@ -201,7 +201,7 @@ The atan2 method returns the arctangent of Y/X in the range -PI to PI.
 $test->for('example', 1, 'atan2', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '0.785398163397448';
+  like $result, qr/0.78539/;
 
   $result
 });
@@ -237,7 +237,7 @@ The cos method computes the cosine of the number (expressed in radians).
 $test->for('example', 1, 'cos', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '0.843853958732492';
+  like $result, qr/0.84385/;
 
   $result
 });
@@ -386,7 +386,7 @@ $test->for('example', 1, 'exp', sub {
 $test->for('example', 2, 'exp', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '2.71828182845905';
+  like $result, qr/2.71828/;
 
   $result
 });
@@ -408,7 +408,7 @@ $test->for('example', 2, 'exp', sub {
 $test->for('example', 3, 'exp', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '4.48168907033806';
+  like $result, qr/4.48168/;
 
   $result
 });
@@ -575,7 +575,7 @@ The log method returns the natural logarithm (base e) of the number.
 $test->for('example', 1, 'log', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq '9.42100640177928';
+  like $result, qr/9.42100/;
 
   $result
 });
