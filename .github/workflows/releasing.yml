@@ -13,14 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.user ${{ secrets.GithubToken }}
     - name: Advertise Perl Version
       run: perl -V
     - name: Install Perl::Critic
@@ -82,14 +74,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Git User
-      run: git config --global user.name "Cpanery"
-    - name: Setup Git Email
-      run: git config --global user.email "cpanery@cpan.org"
-    - name: Setup GitHub User
-      run: git config --global github.user ${{ secrets.GithubUser }}
-    - name: Setup GitHub Token
-      run: git config --global github.token ${{ secrets.GithubToken }}
     - uses: ncipollo/release-action@v1
       with:
         bodyFile: "CHANGES.md"
