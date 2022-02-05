@@ -1,4 +1,4 @@
-## Venus - OO Library
+## Venus - Object-Oriented Standard Library for Perl 5
 
 Venus is an object-orientation framework and extendible standard library for
 Perl 5, built on top of [Moo](https://metacpan.org/pod/Moo) with classes which
