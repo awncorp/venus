@@ -1,5 +1,27 @@
 [
   {
+    "date": "2022-02-12",
+    "version": "0.05",
+    "changes": [
+      {
+        "type": "feature",
+        "name": "Implement Venus::Process",
+        "github": {
+          "issue": 79,
+          "pull_request": 89
+        }
+      },
+      {
+        "type": "defect",
+        "name": "Fix Venus::Path#mkdirs empty rootdir issue",
+        "github": {
+          "issue": 90,
+          "pull_request": 91
+        }
+      }
+    ]
+  },
+  {
     "date": "2022-02-04",
     "version": "0.04",
     "changes": [
