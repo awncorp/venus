@@ -1234,7 +1234,7 @@ Cpanery, C<cpanery@cpan.org>
 
 # END
 
-$test->render('lib/Venus/Match.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Process.pod') if $ENV{RENDER};
 
 SKIP:
 ok 1 and done_testing;
