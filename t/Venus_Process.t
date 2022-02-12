@@ -23,6 +23,7 @@ our $TEST_VENUS_PROCESS_EXIT = 0;
 our $TEST_VENUS_PROCESS_EXITCODE = 0;
 our $TEST_VENUS_PROCESS_FORK = undef;
 our $TEST_VENUS_PROCESS_KILL = 0;
+our $TEST_VENUS_PROCESS_OPEN = 1;
 our $TEST_VENUS_PROCESS_PID = 12345;
 our $TEST_VENUS_PROCESS_SETSID = 1;
 our $TEST_VENUS_PROCESS_WAITPID = undef;
@@ -74,6 +75,15 @@ our $TEST_VENUS_PROCESS_WAITPID = undef;
   no warnings 'redefine';
   *{"Venus::Process::_kill"} = sub {
     $TEST_VENUS_PROCESS_KILL;
+  };
+}
+
+# _open
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_open"} = sub {
+    $TEST_VENUS_PROCESS_OPEN
   };
 }
 
