@@ -10,7 +10,13 @@ use lib 't/lib';
 use Test::More;
 use Test::Venus;
 
+use Config;
 use Venus::Process;
+
+if ($Config{d_pseudofork}) {
+  diag 'Fork emulation not supported';
+  goto SKIP;
+}
 
 our $TEST_VENUS_PROCESS_CHDIR = 1;
 our $TEST_VENUS_PROCESS_EXIT = 0;
@@ -1230,4 +1236,5 @@ Cpanery, C<cpanery@cpan.org>
 
 $test->render('lib/Venus/Match.pod') if $ENV{RENDER};
 
+SKIP:
 ok 1 and done_testing;
