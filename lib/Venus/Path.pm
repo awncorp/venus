@@ -251,7 +251,10 @@ sub mkdirs {
 
   my @paths;
 
-  for my $path (reverse($self->parents), ($self->is_file ? () : $self)) {
+  for my $path (
+    grep !!$_, reverse($self->parents), ($self->is_file ? () : $self)
+  )
+  {
     if ($path->exists) {
       next;
     }
