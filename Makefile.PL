@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Moo" => "2.005004"
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }

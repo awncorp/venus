@@ -226,7 +226,7 @@ within.
 =metadata chdir
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 chdir
@@ -299,7 +299,7 @@ terminated).
 =metadata check
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 check
@@ -410,7 +410,7 @@ L</setsid>, and attempts to change the working directory to the root directory.
 =metadata daemon
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 daemon
@@ -447,7 +447,7 @@ be undone by calling the L</engage> method.
 =metadata disengage
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 disengage
@@ -481,7 +481,7 @@ This method effectively does the opposite of the L</disengage> method.
 =metadata engage
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 engage
@@ -512,7 +512,7 @@ The exit method exits the program immediately.
 =metadata exit
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 exit
@@ -570,7 +570,7 @@ executed in the child process.
 =metadata fork
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 fork
@@ -682,7 +682,7 @@ each child process.
 =metadata forks
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 forks
@@ -796,7 +796,7 @@ necessarily mean all processes were successfully signalled.
 =metadata kill
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 kill
@@ -836,7 +836,7 @@ identifier of the current process.
 =metadata setsid
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 setsid
@@ -869,7 +869,7 @@ restored to its default.
 =metadata stderr
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 stderr
@@ -903,7 +903,7 @@ restored to its default.
 =metadata stdin
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 stdin
@@ -937,7 +937,7 @@ restored to its default.
 =metadata stdout
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 stdout
@@ -974,7 +974,7 @@ method.
 =metadata trap
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 trap
@@ -1011,7 +1011,7 @@ terminated).
 =metadata wait
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 wait
@@ -1124,7 +1124,7 @@ the parent process might exit before the child process is done working.
 =metadata work
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 work
@@ -1163,7 +1163,7 @@ any user-defined signal traps in the current process.
 =metadata untrap
 
 {
-  since => '0.05',
+  since => '0.06',
 }
 
 =example-1 untrap
