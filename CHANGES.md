@@ -1,4 +1,4 @@
-## Release [0.05](https://github.com/cpanery/venus/releases/tag/0.05)
+## Release [0.06](https://github.com/cpanery/venus/releases/tag/0.06)
 
 - [feature] Implement Venus::Process ([#79](https://github.com/cpanery/venus/issues/79))
 - [defect] Fix Venus::Path#mkdirs empty rootdir issue ([#90](https://github.com/cpanery/venus/issues/90))
