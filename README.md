@@ -337,6 +337,7 @@ see below:
 - [Venus::Number](https://github.com/cpanery/venus/blob/master/lib/Venus/Number.pod#name)
 - [Venus::Opts](https://github.com/cpanery/venus/blob/master/lib/Venus/Opts.pod#name)
 - [Venus::Path](https://github.com/cpanery/venus/blob/master/lib/Venus/Path.pod#name)
+- [Venus::Process](https://github.com/cpanery/venus/blob/master/lib/Venus/Process.pod#name)
 - [Venus::Regexp](https://github.com/cpanery/venus/blob/master/lib/Venus/Regexp.pod#name)
 - [Venus::Replace](https://github.com/cpanery/venus/blob/master/lib/Venus/Replace.pod#name)
 - [Venus::Role](https://github.com/cpanery/venus/blob/master/lib/Venus/Role.pod#name)
