@@ -18,7 +18,7 @@ require File::Spec;
 require POSIX;
 
 state $GETCWD = Cwd->getcwd;
-state %MAPSIG = %SIG;
+state $MAPSIG = {%SIG};
 
 # HOOKS
 
@@ -323,10 +323,10 @@ sub untrap {
   my ($self, $name) = @_;
 
   if ($name) {
-    $SIG{uc($name)} = $MAPSIG{uc($name)};
+    $SIG{uc($name)} = $$MAPSIG{uc($name)};
   }
   else {
-    %SIG = %MAPSIG;
+    %SIG = %$MAPSIG;
   }
 
   return $self;

@@ -70,7 +70,7 @@ This package provides the following methods:
 The chdir method changes the working directory the current process is opreting
 within.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -118,7 +118,7 @@ The check method does a non-blocking L</waitpid> operation and returns the wait
 status. In list context, returns the specified process' exit code (if
 terminated).
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -201,7 +201,7 @@ The daemon method detaches the process from controlling terminal and runs it in
 the background as system daemon. This method internally calls L</disengage> and
 L</setsid>, and attempts to change the working directory to the root directory.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -228,7 +228,7 @@ working directory to the root directory and redirecting its standard file
 descriptors from and to /dev/null or the OS equivalent. These state changes can
 be undone by calling the L</engage> method.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -253,7 +253,7 @@ working directory to the directory used to launch the process, and by
 redirecting/returning its standard file descriptors from and to their defaults.
 This method effectively does the opposite of the L</disengage> method.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -275,7 +275,7 @@ I<Since C<0.05>>
 
 The exit method exits the program immediately.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -315,7 +315,7 @@ In list context, this method returns both the process and I<PID> (or process
 ID) of the child process. If a callback or argument is provided it will be
 executed in the child process.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -401,7 +401,7 @@ and an arrayref of I<PID> values (or process IDs) for each of the child
 processes created. If a callback or argument is provided it will be executed in
 each child process.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -488,7 +488,7 @@ The kill method calls the system L</kill> function which sends a signal to a
 list of processes and returns truthy or falsy. B<Note:> A truthy result doesn't
 necessarily mean all processes were successfully signalled.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -516,7 +516,7 @@ I<Since C<0.05>>
 The setsid method calls the L<POSIX/setsid> function and sets the process group
 identifier of the current process.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -540,7 +540,7 @@ The stderr method redirects C<STDERR> to the path provided, typically
 C</dev/null> or some equivalent. If called with no arguments C<STDERR> will be
 restored to its default.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -564,7 +564,7 @@ The stdin method redirects C<STDIN> to the path provided, typically
 C</dev/null> or some equivalent. If called with no arguments C<STDIN> will be
 restored to its default.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -588,7 +588,7 @@ The stdout method redirects C<STDOUT> to the path provided, typically
 C</dev/null> or some equivalent. If called with no arguments C<STDOUT> will be
 restored to its default.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -615,7 +615,7 @@ Signal traps are inherited by child processes (or forks) but can be overwritten
 using this method, or reverted to the default behavior by using the L</untrap>
 method.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -641,7 +641,7 @@ The untrap method restores the process signal trap specified to its default
 behavior. If called with no arguments, restores all signal traps overwriting
 any user-defined signal traps in the current process.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -689,7 +689,7 @@ The wait method does a blocking L</waitpid> operation and returns the wait
 status. In list context, returns the specified process' exit code (if
 terminated).
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
@@ -774,7 +774,7 @@ the child process. It is recommended to install an L</alarm> in the child
 process (i.e. callback) to avoid creating zombie processed in situations where
 the parent process might exit before the child process is done working.
 
-I<Since C<0.05>>
+I<Since C<0.06>>
 
 =over 4
 
