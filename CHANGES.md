@@ -1,3 +1,8 @@
+## Release [0.05](https://github.com/cpanery/venus/releases/tag/0.05)
+
+- [feature] Implement Venus::Process ([#79](https://github.com/cpanery/venus/issues/79))
+- [defect] Fix Venus::Path#mkdirs empty rootdir issue ([#90](https://github.com/cpanery/venus/issues/90))
+
 ## Release [0.04](https://github.com/cpanery/venus/releases/tag/0.04)
 
 - [feature] Implement Venus::Role::Matchable ([#80](https://github.com/cpanery/venus/issues/80))
