@@ -39,6 +39,9 @@ $test->for('abstract');
 =includes
 
 method: coerce
+method: coerce_args
+method: coerce_into
+method: coerce_onto
 method: coercion
 
 =cut
@@ -162,7 +165,7 @@ package names.
 =metadata coerce
 
 {
-  since => '0.01',
+  since => '0.02',
 }
 
 =example-1 coerce
@@ -197,6 +200,141 @@ $test->for('example', 1, 'coerce', sub {
   $result
 });
 
+=method coerce_args
+
+The coerce_args method replaces values in the data provided with objects
+corresponding to the specification provided. The specification should contains
+key/value pairs where the keys map to class attributes (or input parameters)
+and the values are L<Venus::Space> compatible package names.
+
+=signature coerce_args
+
+  coerce_args(HashRef $data, HashRef $spec) (HashRef)
+
+=metadata coerce_args
+
+{
+  since => '0.07',
+}
+
+=example-1 coerce_args
+
+  package main;
+
+  my $person = Person->new;
+
+  my $data = $person->coerce_args(
+    {
+      father => { name => 'father' }
+    },
+    {
+      father => 'Person',
+    },
+  );
+
+  # {
+  #   father   => bless({...}, 'Person'),
+  # }
+
+=cut
+
+$test->for('example', 1, 'coerce_args', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is ref($result), 'HASH';
+  ok $result->{father};
+  ok $result->{father}->isa('Person');
+
+  $result
+});
+
+=method coerce_into
+
+The coerce_into method attempts to build and return an object based on the
+class name and value provided, unless the value provided is already an object
+derived from the specified class.
+
+=signature coerce_into
+
+  coerce_into(Str $class, Any $value) (Object)
+
+=metadata coerce_into
+
+{
+  since => '0.07',
+}
+
+=example-1 coerce_into
+
+  package main;
+
+  my $person = Person->new;
+
+  my $friend = $person->coerce_into('Person', {
+    name => 'friend',
+  });
+
+  # bless({...}, 'Person')
+
+=cut
+
+$test->for('example', 1, 'coerce_into', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Person');
+  ok $result->name->isa('Venus::String');
+  is $result->name->value, 'friend';
+
+  $result
+});
+
+=method coerce_onto
+
+The coerce_onto method attempts to build and assign an object based on the
+class name and value provided, as the value corresponding to the name
+specified, in the data provided. If the C<$value> is omitted, the value
+corresponding to the name in the C<$data> will be used.
+
+=signature coerce_onto
+
+  coerce_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+
+=metadata coerce_onto
+
+{
+  since => '0.07',
+}
+
+=example-1 coerce_onto
+
+  package main;
+
+  my $person = Person->new;
+
+  my $data = { friend => { name => 'friend' } };
+
+  my $friend = $person->coerce_onto($data, 'friend', 'Person');
+
+  # bless({...}, 'Person'),
+
+  # $data was updated
+  #
+  # {
+  #   friend => bless({...}, 'Person'),
+  # }
+
+=cut
+
+$test->for('example', 1, 'coerce_onto', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Person');
+  ok $result->name->isa('Venus::String');
+  is $result->name->value, 'friend';
+
+  $result
+});
+
 =method coercion
 
 The coercion method is called automatically during object construction but can
@@ -209,7 +347,7 @@ be called manually as well, and is passed a hashref to coerce and return.
 =metadata coercion
 
 {
-  since => '0.01',
+  since => '0.02',
 }
 
 =example-1 coercion
