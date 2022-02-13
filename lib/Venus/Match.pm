@@ -37,6 +37,16 @@ has 'on_when' => (
 
 # METHODS
 
+sub data {
+  my ($self, $data) = @_;
+
+  while(my($key, $value) = each(%$data)) {
+    $self->just($key)->then($value);
+  }
+
+  return $self;
+}
+
 sub expr {
   my ($self, $topic) = @_;
 
