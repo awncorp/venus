@@ -258,7 +258,7 @@ an exact string match of the C<$topic> provided.
 
 =signature just
 
-  just(Str $topic) (Self)
+  just(Str $topic) (Match)
 
 =metadata just
 
@@ -433,7 +433,7 @@ no other conditions have been matched.
 
 =signature none
 
-  none(CodeRef $code) (Self)
+  none(CodeRef $code) (Match)
 
 =metadata none
 
@@ -504,7 +504,7 @@ match value only if the code provided returns truthy.
 
 =signature only
 
-  only(CodeRef $code) (Self)
+  only(CodeRef $code) (Match)
 
 =metadata only
 
@@ -671,7 +671,7 @@ condition returns truthy.
 
 =signature then
 
-  then(CodeRef $code) (Self)
+  then(CodeRef $code) (Match)
 
 =metadata then
 
@@ -746,7 +746,7 @@ condition.
 
 =signature when
 
-  when(Str | CodeRef $code, Any @args) (Self)
+  when(Str | CodeRef $code, Any @args) (Match)
 
 =metadata when
 

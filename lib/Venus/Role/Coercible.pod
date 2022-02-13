@@ -94,7 +94,7 @@ L</coercion> method, and returns key/value pairs where the keys map to class
 attributes (or input parameters) and the values are L<Venus::Space> compatible
 package names.
 
-I<Since C<0.01>>
+I<Since C<0.02>>
 
 =over 4
 
@@ -225,7 +225,7 @@ I<Since C<0.07>>
 The coercion method is called automatically during object construction but can
 be called manually as well, and is passed a hashref to coerce and return.
 
-I<Since C<0.01>>
+I<Since C<0.02>>
 
 =over 4
 

@@ -669,7 +669,9 @@ $test->for('feature', 'builtin-autoboxing');
 
   my $string = Venus::String->new('hello, world');
 
-  $string->box->split(', ')->join(' ')->titlecase->unbox->get; # Hello World
+  $string->box->split(', ')->join(' ')->titlecase->unbox->get;
+
+  # Hello World
 
 =cut
 
