@@ -180,10 +180,11 @@ $test->for('includes');
   my $process = $parent->fork;
 
   if ($process) {
-    # do something in forked process ...
+    # do something in child process ...
     $process->exit;
   }
   else {
+    # do something in parent process ...
     $parent->wait(-1);
   }
 
@@ -226,7 +227,7 @@ $test->for('inherits');
 
 =method chdir
 
-The chdir method changes the working directory the current process is opreting
+The chdir method changes the working directory the current process is operating
 within.
 
 =signature chdir
@@ -243,9 +244,9 @@ within.
 
   # given: synopsis;
 
-  my $chdir = $parent->chdir;
+  $parent = $parent->chdir;
 
-  # 1
+  # bless({...}, 'Venus::Process')
 
 =cut
 
@@ -260,9 +261,9 @@ $test->for('example', 1, 'chdir', sub {
 
   # given: synopsis;
 
-  my $chdir = $parent->chdir('/tmp');
+  $parent = $parent->chdir('/tmp');
 
-  # 1
+  # bless({...}, 'Venus::Process')
 
 =cut
 
@@ -277,7 +278,7 @@ $test->for('example', 2, 'chdir', sub {
 
   # given: synopsis;
 
-  my $chdir = $parent->chdir('/xyz');
+  $parent = $parent->chdir('/xyz');
 
   # Exception!
 
@@ -298,8 +299,8 @@ $test->for('example', 3, 'chdir', sub {
 
 =method check
 
-The check method does a non-blocking L</waitpid> operation and returns the wait
-status. In list context, returns the specified process' exit code (if
+The check method does a non-blocking L<perlfunc/waitpid> operation and returns
+the wait status. In list context, returns the specified process' exit code (if
 terminated).
 
 =signature check
@@ -323,7 +324,7 @@ terminated).
   my ($process, $pid) = $parent->fork;
 
   if ($process) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
@@ -354,7 +355,7 @@ $test->for('example', 1, 'check', sub {
   my ($process, $pid) = $parent->fork;
 
   if ($process) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
@@ -382,12 +383,10 @@ $test->for('example', 2, 'check', sub {
 
   my $parent = Venus::Process->new;
 
-  my ($process, $pid) = $parent->fork(sub{
-    $_->exit(1);
-  });
+  my ($process, $pid) = $parent->fork(sub{ $_->exit(1) });
 
   if ($process) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
@@ -411,7 +410,7 @@ $test->for('example', 3, 'check', sub {
 
 The daemon method detaches the process from controlling terminal and runs it in
 the background as system daemon. This method internally calls L</disengage> and
-L</setsid>, and attempts to change the working directory to the root directory.
+L</setsid> and attempts to change the working directory to the root directory.
 
 =signature daemon
 
@@ -429,7 +428,7 @@ L</setsid>, and attempts to change the working directory to the root directory.
 
   my $daemon = $parent->daemon; # exits parent immediately
 
-  # do something in forked process ...
+  # in forked process ...
 
   # $daemon->exit;
 
@@ -447,8 +446,8 @@ $test->for('example', 1, 'daemon', sub {
 
 The disengage method limits the interactivity of the process by changing the
 working directory to the root directory and redirecting its standard file
-descriptors from and to /dev/null or the OS equivalent. These state changes can
-be undone by calling the L</engage> method.
+descriptors from and to C</dev/null>, or the OS' equivalent. These state
+changes can be undone by calling the L</engage> method.
 
 =signature disengage
 
@@ -464,7 +463,7 @@ be undone by calling the L</engage> method.
 
   # given: synopsis;
 
-  $process = $parent->disengage;
+  $parent = $parent->disengage;
 
   # bless({...}, 'Venus::Process')
 
@@ -498,7 +497,7 @@ This method effectively does the opposite of the L</disengage> method.
 
   # given: synopsis;
 
-  $process = $parent->engage;
+  $parent = $parent->engage;
 
   # bless({...}, 'Venus::Process')
 
@@ -565,13 +564,13 @@ $test->for('example', 2, 'exit', sub {
 
 =method fork
 
-The fork method calls the system L</fork> function and create a new process
-running the same program at the same point (or call site). This method return a
-newL<Venus::Process> object representing the child process within the child
-process (or fork), and returns C<undef> to the parent (or originating) process.
-In list context, this method returns both the process and I<PID> (or process
-ID) of the child process. If a callback or argument is provided it will be
-executed in the child process.
+The fork method calls the system L<perlfunc/fork> function and creates a new
+process running the same program at the same point (or call site). This method
+returns a new L<Venus::Process> object representing the child process (from
+within the execution of the child process (or fork)), and returns C<undef> to
+the parent (or originating) process. In list context, this method returns both
+the process and I<PID> (or process ID) of the child process. If a callback or
+argument is provided it will be executed in the child process.
 
 =signature fork
 
@@ -590,13 +589,15 @@ executed in the child process.
   $process = $parent->fork;
 
   # if ($process) {
-  #   # do something in forked process ...
+  #   # in forked process ...
   #   $process->exit;
   # }
   # else {
-  #   # do something in the parent process ...
+  #   # in parent process ...
   #   $parent->wait(-1);
   # }
+
+  # in child process
 
   # bless({...}, 'Venus::Process')
 
@@ -620,15 +621,17 @@ $test->for('example', 1, 'fork', sub {
   ($process, $pid) = $parent->fork;
 
   # if ($process) {
-  #   # do something in forked process ...
+  #   # in forked process ...
   #   $process->exit;
   # }
   # else {
-  #   # do something in the parent process ...
+  #   # in parent process ...
   #   $parent->wait($pid);
   # }
 
-  # bless({...}, 'Venus::Process')
+  # in parent process
+
+  # (undef, $pid)
 
 =cut
 
@@ -652,15 +655,17 @@ $test->for('example', 2, 'fork', sub {
   });
 
   # if ($process) {
-  #   # do something in forked process ...
+  #   # in forked process ...
   #   $process->exit;
   # }
   # else {
-  #   # do something in the parent process ...
+  #   # in parent process ...
   #   $parent->wait($pid);
   # }
 
-  # bless({...}, 'Venus::Process')
+  # in parent process
+
+  # (undef, $pid)
 
 =cut
 
@@ -676,14 +681,14 @@ $test->for('example', 3, 'fork', sub {
 
 =method forks
 
-The forks method creates multiple forks by calling the L</fork> method "n"
-times based on the count specified. As with the singular L</fork> method, this
-method return a new L<Venus::Process> object representing the child process
-within the child process (or fork), and returns C<undef> to the parent (or
-originating) process. In list context, this method returns both the process
-and an arrayref of I<PID> values (or process IDs) for each of the child
-processes created. If a callback or argument is provided it will be executed in
-each child process.
+The forks method creates multiple forks by calling the L</fork> method C<n>
+times, based on the count specified. As with the L</fork> method, this method
+returns a new L<Venus::Process> object representing the child process (from
+within the execution of the child process (or fork)), and returns C<undef> to
+the parent (or originating) process. In list context, this method returns both
+the process and an arrayref of I<PID> values (or process IDs) for each of the
+child processes created. If a callback or argument is provided it will be
+executed in each child process.
 
 =signature forks
 
@@ -706,7 +711,7 @@ each child process.
   #   $process->exit;
   # }
   # else {
-  #   # do something in the parent process ...
+  #   # do something in parent process ...
   #   $parent->wait(-1);
   # }
 
@@ -736,11 +741,11 @@ $test->for('example', 1, 'forks', sub {
   #   $process->exit;
   # }
   # else {
-  #   # do something in the parent process ...
+  #   # do something in parent process ...
   #   $parent->wait($_) for @$pids;
   # }
 
-  # in the parent process
+  # in parent process
 
   # (undef, $pids)
 
@@ -774,11 +779,11 @@ $test->for('example', 2, 'forks', sub {
   #   $process->exit;
   # }
   # else {
-  #   # do something in the parent process ...
+  #   # do something in parent process ...
   #   $parent->wait($_) for @$pids;
   # }
 
-  # in the child process
+  # in child process
 
   # bless({...}, 'Venus::Process')
 
@@ -795,9 +800,9 @@ $test->for('example', 3, 'forks', sub {
 
 =method kill
 
-The kill method calls the system L</kill> function which sends a signal to a
-list of processes and returns truthy or falsy. B<Note:> A truthy result doesn't
-necessarily mean all processes were successfully signalled.
+The kill method calls the system L<perlfunc/kill> function which sends a signal
+to a list of processes and returns truthy or falsy. B<Note:> A truthy result
+doesn't necessarily mean all processes were successfully signalled.
 
 =signature kill
 
@@ -814,11 +819,11 @@ necessarily mean all processes were successfully signalled.
   # given: synopsis;
 
   if ($process = $parent->fork) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
-  my $kill = $parent->kill('term', $process->value);
+  my $kill = $parent->kill('term', int$process);
 
   # 1
 
@@ -886,7 +891,7 @@ restored to its default.
 
   # given: synopsis;
 
-  $process = $parent->stderr;
+  $parent = $parent->stderr;
 
   # bless({...}, 'Venus::Process')
 
@@ -920,7 +925,7 @@ restored to its default.
 
   # given: synopsis;
 
-  $process = $parent->stdin;
+  $parent = $parent->stdin;
 
   # bless({...}, 'Venus::Process')
 
@@ -954,7 +959,7 @@ restored to its default.
 
   # given: synopsis;
 
-  $process = $parent->stdout;
+  $parent = $parent->stdout;
 
   # bless({...}, 'Venus::Process')
 
@@ -1010,8 +1015,8 @@ $test->for('example', 1, 'trap', sub {
 
 =method wait
 
-The wait method does a blocking L</waitpid> operation and returns the wait
-status. In list context, returns the specified process' exit code (if
+The wait method does a blocking L<perlfunc/waitpid> operation and returns the
+wait status. In list context, returns the specified process' exit code (if
 terminated).
 
 =signature wait
@@ -1035,11 +1040,11 @@ terminated).
   my ($process, $pid) = $parent->fork;
 
   if ($process) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
-  my $check = $parent->wait($pid);
+  my $wait = $parent->wait($pid);
 
   # 0
 
@@ -1066,11 +1071,11 @@ $test->for('example', 1, 'wait', sub {
   my ($process, $pid) = $parent->fork;
 
   if ($process) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
-  my ($check, $status) = $parent->wait('00000');
+  my ($wait, $status) = $parent->wait('00000');
 
   # (-1, -1)
 
@@ -1094,16 +1099,14 @@ $test->for('example', 2, 'wait', sub {
 
   my $parent = Venus::Process->new;
 
-  my ($process, $pid) = $parent->fork(sub{
-    $_->exit(1);
-  });
+  my ($process, $pid) = $parent->fork(sub{ $_->exit(1) });
 
   if ($process) {
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   }
 
-  my ($check, $status) = $parent->wait($pid);
+  my ($wait, $status) = $parent->wait($pid);
 
   # ($pid, 1)
 
@@ -1123,9 +1126,9 @@ $test->for('example', 3, 'wait', sub {
 
 The work method forks the current process, runs the callback provided in the
 child process, and immediately exits after. This method returns the I<PID> of
-the child process. It is recommended to install an L</alarm> in the child
-process (i.e. callback) to avoid creating zombie processed in situations where
-the parent process might exit before the child process is done working.
+the child process. It is recommended to install an L<perlfunc/alarm> in the
+child process (i.e. callback) to avoid creating zombie processes in situations
+where the parent process might exit before the child process is done working.
 
 =signature work
 
@@ -1143,7 +1146,7 @@ the parent process might exit before the child process is done working.
 
   my $pid = $parent->work(sub{
     my ($process) = @_;
-    # do something in forked process ...
+    # in forked process ...
     $process->exit;
   });
 
@@ -1163,7 +1166,7 @@ $test->for('example', 1, 'work', sub {
 =method untrap
 
 The untrap method restores the process signal trap specified to its default
-behavior. If called with no arguments, restores all signal traps overwriting
+behavior. If called with no arguments, it restores all signal traps overwriting
 any user-defined signal traps in the current process.
 
 =signature untrap
@@ -1180,9 +1183,7 @@ any user-defined signal traps in the current process.
 
   # given: synopsis;
 
-  $parent->trap(chld => 'ignore');
-
-  $parent->trap(term => sub{
+  $parent->trap(chld => 'ignore')->trap(term => sub{
     die 'Something failed!';
   });
 
@@ -1206,9 +1207,7 @@ $test->for('example', 1, 'untrap', sub {
 
   # given: synopsis;
 
-  $parent->trap(chld => 'ignore');
-
-  $parent->trap(term => sub{
+  $parent->trap(chld => 'ignore')->trap(term => sub{
     die 'Something failed!';
   });
 

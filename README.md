@@ -42,7 +42,7 @@ $ curl -ssL https://cpanmin.us | perl - -qn git://github.com/cpanery/venus.git
 
 ## Features
 
-- One Dependency
+- [One Dependency](https://p3rl.org/Moo)
 - [Standard Library](#feature-standard-library)
 - [Value Classes](#feature-value-classes)
 - [Builtin Autoboxing](#feature-builtin-autoboxing)
@@ -146,7 +146,9 @@ use Venus::String;
 
 my $string = Venus::String->new('hello, world');
 
-$string->box->split(', ')->join(' ')->titlecase->unbox->get; # Hello World
+$string->box->split(', ')->join(' ')->titlecase->unbox->get;
+
+# Hello World
 ```
 
 ### Feature: Utility Classes
