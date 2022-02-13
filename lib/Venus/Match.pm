@@ -37,6 +37,35 @@ has 'on_when' => (
 
 # METHODS
 
+sub expr {
+  my ($self, $topic) = @_;
+
+  $self->when(sub{
+    my $value = $self->value;
+
+    if (!defined $value) {
+      return 0;
+    }
+    if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
+      return 0;
+    }
+    if (!Scalar::Util::blessed($value) && ref($value)) {
+      return 0;
+    }
+    if (ref($topic) eq 'Regexp' && "$value" =~ qr/$topic/) {
+      return 1;
+    }
+    elsif ("$value" eq "$topic") {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  });
+
+  return $self;
+}
+
 sub just {
   my ($self, $topic) = @_;
 

@@ -112,6 +112,70 @@ on_when: rw, opt, ArrayRef[CodeRef], C<[]>
 
 $test->for('attributes');
 
+=method expr
+
+The expr method registers a L</when> condition that check if the match value is
+an exact string match of the C<$topic> if the topic is a string, or that it
+matches against the topic if the topic is a regular expression.
+
+=signature expr
+
+  expr(Str | RegexpRef $expr) (Match)
+
+=metadata expr
+
+{
+  since => '0.07',
+}
+
+=example-1 expr
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('1901-01-01');
+
+  $match->expr('1901-01-01')->then(sub{[split /-/]});
+
+  my $result = $match->result;
+
+  # ["1901", "01", "01"]
+
+=cut
+
+$test->for('example', 1, 'expr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["1901", "01", "01"];
+
+  $result
+});
+
+=example-2 expr
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('1901-01-01');
+
+  $match->expr(qr/^1901-/)->then(sub{[split /-/]});
+
+  my $result = $match->result;
+
+  # ["1901", "01", "01"]
+
+=cut
+
+$test->for('example', 2, 'expr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["1901", "01", "01"];
+
+  $result
+});
+
 =method just
 
 The just method registers a L</when> condition that check if the match value is
