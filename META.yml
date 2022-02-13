@@ -21,8 +21,8 @@ resources:
   bugtracker: https://github.com/cpanery/venus/issues
   homepage: https://metacpan.org/dist/Venus
   repository: git://github.com/cpanery/venus.git
-version: '0.06'
+version: '0.07'
 x_authority: cpan:CPANERY
-x_generated_by_perl: v5.32.0
+x_generated_by_perl: v5.35.7
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Apache-2.0
