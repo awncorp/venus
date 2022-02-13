@@ -38,6 +38,8 @@ $test->for('abstract');
 
 =includes
 
+method: data
+method: expr
 method: just
 method: none
 method: only
@@ -111,6 +113,79 @@ on_when: rw, opt, ArrayRef[CodeRef], C<[]>
 =cut
 
 $test->for('attributes');
+
+=method data
+
+The data method takes a hashref (i.e. lookup table) and match conditions and
+actions based on the keys and values found.
+
+=signature data
+
+  data(HashRef $data) (Match)
+
+=metadata data
+
+{
+  since => '0.07',
+}
+
+=example-1 data
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('a');
+
+  $match->data({
+    'a' => 'b',
+    'c' => 'd',
+    'e' => 'f',
+    'g' => 'h',
+  });
+
+  my $result = $match->none('z')->result;
+
+  # "b"
+
+=cut
+
+$test->for('example', 1, 'data', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'b';
+
+  $result
+});
+
+=example-2 data
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('x');
+
+  $match->data({
+    'a' => 'b',
+    'c' => 'd',
+    'e' => 'f',
+    'g' => 'h',
+  });
+
+  my $result = $match->none('z')->result;
+
+  # "z"
+
+=cut
+
+$test->for('example', 2, 'data', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'z';
+
+  $result
+});
 
 =method expr
 
