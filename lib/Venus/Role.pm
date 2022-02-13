@@ -35,7 +35,7 @@ my $wrappers = {
 sub generate {
   my ($info, $orig) = @_;
 
-  return sub { local @_ = options($info, @_); goto $orig };
+  return sub { @_ = options($info, @_); goto $orig };
 }
 
 sub options {
@@ -210,7 +210,7 @@ $wrappers->{use_builder} = sub {
     my $point = $self->can($sub);
     die "$name cannot 'use' method '$sub' via @{[$info->[1]]}" if !$point;
 
-    local @_ = ($self, @args);
+    @_ = ($self, @args);
 
     goto $point;
   };
