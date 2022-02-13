@@ -383,7 +383,7 @@ I<Since C<0.01>>
 
   # given: synopsis;
 
-  my $find = $path->find('[:\/\\\.]+m.*');
+  my $find = $path->find('[:\/\\\.]+m.*$');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
