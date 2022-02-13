@@ -1,3 +1,11 @@
+0.07 2022-02-13
+
+- [update] (#96) Update documentation
+- [feature] (#97) Implement Venus::Match#data
+- [feature] (#98) Implement Venus::Match#expr
+- [feature] (#99) Extend Venus::Role::Coercion with new abilities
+- [defect] (#100) Fix Venus::Class attribute declaration issue
+
 0.06 2022-02-12
 
 - [feature] (#79) Implement Venus::Process

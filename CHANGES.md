@@ -1,3 +1,11 @@
+## Release [0.07](https://github.com/cpanery/venus/releases/tag/0.07)
+
+- [update] Update documentation ([#96](https://github.com/cpanery/venus/issues/96))
+- [feature] Implement Venus::Match#data ([#97](https://github.com/cpanery/venus/issues/97))
+- [feature] Implement Venus::Match#expr ([#98](https://github.com/cpanery/venus/issues/98))
+- [feature] Extend Venus::Role::Coercion with new abilities ([#99](https://github.com/cpanery/venus/issues/99))
+- [defect] Fix Venus::Class attribute declaration issue ([#100](https://github.com/cpanery/venus/issues/100))
+
 ## Release [0.06](https://github.com/cpanery/venus/releases/tag/0.06)
 
 - [feature] Implement Venus::Process ([#79](https://github.com/cpanery/venus/issues/79))
