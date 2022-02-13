@@ -25,6 +25,51 @@ sub coerce {
   return ();
 }
 
+sub coerce_args {
+  my ($self, $data, $spec) = @_;
+
+  for my $name (grep exists($data->{$_}), sort keys %$spec) {
+    $data->{$name} = $self->coerce_onto(
+      $data, $name, $spec->{$name}, $data->{$name},
+    );
+  }
+
+  return $data;
+}
+
+sub coerce_into {
+  my ($self, $class, $value) = @_;
+
+  require Scalar::Util;
+  require Venus::Space;
+
+  $class = Venus::Space->new($class)->load;
+
+  if (Scalar::Util::blessed($value) && $value->isa($class)) {
+    return $value;
+  }
+  else {
+    return $class->new($value);
+  }
+}
+
+sub coerce_onto {
+  my ($self, $data, $name, $class, $value) = @_;
+
+  require Venus::Space;
+
+  $class = Venus::Space->new($class)->load;
+
+  $value = $data->{$name} if $#_ < 4;
+
+  if (my $method = $self->can("coerce_${name}")) {
+    return $data->{$name} = $self->$method(\&coerce_into, $class, $value);
+  }
+  else {
+    return $data->{$name} = $self->coerce_into($class, $value);
+  }
+}
+
 sub coercion {
   my ($self, $data) = @_;
 
@@ -32,40 +77,11 @@ sub coercion {
 
   return $data if !@args;
 
-  my $rules = (@args > 1) ? {@args} : (ref($args[0]) eq 'HASH') ? $args[0] : {};
+  my $spec = (@args > 1) ? {@args} : (ref($args[0]) eq 'HASH') ? $args[0] : {};
 
-  return $data if !%$rules;
+  return $data if !%$spec;
 
-  require Scalar::Util;
-  require Venus::Space;
-
-  my $routine = sub {
-    my ($self, $class, $value) = @_;
-
-    if (Scalar::Util::blessed($value) && $value->isa($class)) {
-      return $value;
-    }
-    else {
-      return $class->new($value);
-    }
-  };
-
-  my $space = "Venus::Space";
-
-  for my $name (grep exists($data->{$_}), sort keys %$rules) {
-    if (my $method = $self->can("coerce_${name}")) {
-      $data->{$name} = $self->$method(
-        $routine, $space->new($rules->{$name})->load, $data->{$name}
-      );
-    }
-    else {
-      $data->{$name} = $self->$routine(
-        $space->new($rules->{$name})->load, $data->{$name}
-      );
-    }
-  }
-
-  return $data;
+  return $self->coerce_args($data, $spec);
 }
 
 1;
