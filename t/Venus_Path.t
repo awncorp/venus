@@ -613,7 +613,7 @@ $test->for('example', 1, 'find', sub {
 
   # given: synopsis;
 
-  my $find = $path->find('[:\/\\\.]+m.*');
+  my $find = $path->find('[:\/\\\.]+m.*$');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
