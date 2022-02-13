@@ -1,5 +1,51 @@
 [
   {
+    "date": "2022-02-13",
+    "version": "0.07",
+    "changes": [
+      {
+        "type": "update",
+        "name": "Update documentation",
+        "github": {
+          "issue": 96,
+          "pull_request": 105
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Match#data",
+        "github": {
+          "issue": 97,
+          "pull_request": 104
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Match#expr",
+        "github": {
+          "issue": 98,
+          "pull_request": 103
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Extend Venus::Role::Coercion with new abilities",
+        "github": {
+          "issue": 99,
+          "pull_request": 102
+        }
+      },
+      {
+        "type": "defect",
+        "name": "Fix Venus::Class attribute declaration issue",
+        "github": {
+          "issue": 100,
+          "pull_request": 101
+        }
+      }
+    ]
+  },
+  {
     "date": "2022-02-12",
     "version": "0.06",
     "changes": [
