@@ -613,7 +613,7 @@ $test->for('example', 1, 'find', sub {
 
   # given: synopsis;
 
-  my $find = $path->find('[:\/\\\.]+m.*$');
+  my $find = $path->find('[:\/\\\.]+m[^:\/\\\.]*$');
 
   # [
   #   bless({ value => "t/data/planets/makemake" }, "Venus::Path"),
@@ -1138,9 +1138,9 @@ $test->for('example', 1, 'mkcall', sub {
 
   use Venus::Path;
 
-  my $path = Venus::Path->new('t/data/sun');
+  my $path = Venus::Path->new($^X);
 
-  my ($call_output, $exit_code) = $path->mkcall('--heat-death');
+  my ($call_output, $exit_code) = $path->mkcall('t/data/sun', '--heat-death');
 
   # ("", 256)
 

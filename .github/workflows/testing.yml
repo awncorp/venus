@@ -37,11 +37,16 @@ jobs:
         locale:
         - C
         - C.UTF-8
-        - en_US.UTF-8 # English
-        - en_GB.UTF-8 # English (UK)
-        - es_ES.UTF-8 # Spanish
+        - be_BY.UTF-8 # Belarusian
         - de_DE.UTF-8 # German
+        - el_GR.UTF-8 # Greek
+        - en_GB.UTF-8 # English (UK)
+        - en_US.UTF-8 # English
+        - es_ES.UTF-8 # Spanish
+        - ja_JP.UTF-8 # Japanese
+        - pt_BR.UTF-8 # Brazillian
         - ru_RU.UTF-8 # Russian
+        - zh_CN.UTF-8 # Chinese
 
     steps:
     - uses: actions/checkout@v2
