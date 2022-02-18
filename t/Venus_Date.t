@@ -890,7 +890,7 @@ if ($^O =~ /Win32/i) {
 $test->for('example', 1, 'format', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, [^\s]+ [\s0]1, 1988$/;
+  like $result, qr/^.+, .+ [\s0]1, 1988$/a;
 
   $result
 });
@@ -913,7 +913,7 @@ if ($^O =~ /Win32/i) {
 $test->for('example', 2, 'format', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+ [\s0]1 [^\s]+$/;
+  like $result, qr/^.+[\s0]1.+$/a;
 
   $result
 });
@@ -1199,7 +1199,7 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 $test->for('example', 1, 'rfc822', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 [-+]\d{4}$/;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 [-+]\d{4}$/a;
 
   $result
 });
@@ -1235,7 +1235,7 @@ if ($^O =~ /Win32/i) {
 $test->for('example', 1, 'rfc1123', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 GMT$/;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 GMT$/a;
 
   $result
 });
@@ -1300,7 +1300,7 @@ The rfc7231 method returns the date and time formatted as an RFC7231 string.
 $test->for('example', 1, 'rfc7231', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^[^\s]+, 01 [^\s]+ 1988 00:00:00 UTC$/;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 UTC$/a;
 
   $result
 });
