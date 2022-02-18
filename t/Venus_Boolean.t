@@ -273,15 +273,15 @@ $test->for('example', 1, '(!)', sub {
   $result
 });
 
-=operator (<)
+=operator (E<lt>)
 
-This package overloads the C<<> operator.
+This package overloads the C<E<lt>> operator.
 
 =cut
 
-$test->for('operator', '(<)');
+$test->for('operator', '(E<lt>)');
 
-=example-1 (<)
+=example-1 (E<lt>)
 
   # given: synopsis;
 
@@ -291,7 +291,7 @@ $test->for('operator', '(<)');
 
 =cut
 
-$test->for('example', 1, '(<)', sub {
+$test->for('example', 1, '(E<lt>)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
@@ -299,15 +299,15 @@ $test->for('example', 1, '(<)', sub {
   $result
 });
 
-=operator (<=)
+=operator (E<lt>=)
 
-This package overloads the C<<=> operator.
+This package overloads the C<E<lt>=> operator.
 
 =cut
 
-$test->for('operator', '(<=)');
+$test->for('operator', '(E<lt>=)');
 
-=example-1 (<=)
+=example-1 (E<lt>=)
 
   # given: synopsis;
 
@@ -317,7 +317,7 @@ $test->for('operator', '(<=)');
 
 =cut
 
-$test->for('example', 1, '(<=)', sub {
+$test->for('example', 1, '(E<lt>=)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
@@ -325,15 +325,15 @@ $test->for('example', 1, '(<=)', sub {
   $result
 });
 
-=operator (>)
+=operator (E<gt>)
 
-This package overloads the C<>> operator.
+This package overloads the C<E<gt>> operator.
 
 =cut
 
-$test->for('operator', '(>)');
+$test->for('operator', '(E<gt>)');
 
-=example-1 (>)
+=example-1 (E<gt>)
 
   # given: synopsis;
 
@@ -343,7 +343,7 @@ $test->for('operator', '(>)');
 
 =cut
 
-$test->for('example', 1, '(>)', sub {
+$test->for('example', 1, '(E<gt>)', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
   ok $result == 0;
@@ -351,15 +351,15 @@ $test->for('example', 1, '(>)', sub {
   !$result
 });
 
-=operator (>=)
+=operator (E<gt>=)
 
-This package overloads the C<>=> operator.
+This package overloads the C<E<gt>=> operator.
 
 =cut
 
-$test->for('operator', '(>=)');
+$test->for('operator', '(E<gt>=)');
 
-=example-1 (>=)
+=example-1 (E<gt>=)
 
   # given: synopsis;
 
@@ -369,7 +369,7 @@ $test->for('operator', '(>=)');
 
 =cut
 
-$test->for('example', 1, '(>=)', sub {
+$test->for('example', 1, '(E<gt>=)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
