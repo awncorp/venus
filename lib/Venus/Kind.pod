@@ -81,6 +81,59 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 safe
+
+  safe(Str | CodeRef $code, Any @args) (Any)
+
+The safe method dispatches the method call or executes the callback and returns
+the result, supressing warnings and exceptions. If an exception is thrown this
+method will return C<undef>. This method supports dispatching, i.e. providing a
+method name and arguments whose return value will be acted on by this method.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item safe example 1
+
+  # given: synopsis;
+
+  my $safe = $example->safe('class');
+
+  # "Example"
+
+=back
+
+=over 4
+
+=item safe example 2
+
+  # given: synopsis;
+
+  my $safe = $example->safe(sub {
+    ${_}->class / 2
+  });
+
+  # '0'
+
+=back
+
+=over 4
+
+=item safe example 3
+
+  # given: synopsis;
+
+  my $safe = $example->safe(sub {
+    die;
+  });
+
+  # undef
+
+=back
+
+=cut
+
 =head2 space
 
   space() (Space)
@@ -98,6 +151,101 @@ I<Since C<0.01>>
   my $space = $example->space;
 
   # bless({ value => "Example" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 trap
+
+  trap(Str | CodeRef $code, Any @args) (Tuple[ArrayRef, ArrayRef, ArrayRef])
+
+The trap method dispatches the method call or executes the callback and returns
+a tuple (i.e. a 3-element arrayref) with the results, warnings, and exceptions
+from the code execution. If an exception is thrown, the results (i.e. the
+1st-element) will be an empty arrayref. This method supports dispatching, i.e.
+providing a method name and arguments whose return value will be acted on by
+this method.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item trap example 1
+
+  # given: synopsis;
+
+  my $result = $example->trap('class');
+
+  # ["Example"]
+
+=back
+
+=over 4
+
+=item trap example 2
+
+  # given: synopsis;
+
+  my ($results, $warnings, $errors) = $example->trap('class');
+
+  # (["Example"], [], [])
+
+=back
+
+=over 4
+
+=item trap example 3
+
+  # given: synopsis;
+
+  my $trap = $example->trap(sub {
+    ${_}->class / 2
+  });
+
+  # ["0"]
+
+=back
+
+=over 4
+
+=item trap example 4
+
+  # given: synopsis;
+
+  my ($results, $warnings, $errors) = $example->trap(sub {
+    ${_}->class / 2
+  });
+
+  # (["0"], ["Argument ... isn't numeric in division ..."], [])
+
+=back
+
+=over 4
+
+=item trap example 5
+
+  # given: synopsis;
+
+  my $trap = $example->trap(sub {
+    die;
+  });
+
+  # []
+
+=back
+
+=over 4
+
+=item trap example 6
+
+  # given: synopsis;
+
+  my ($results, $warnings, $errors) = $example->trap(sub {
+    die;
+  });
+
+  # ([], [], ["Died..."])
 
 =back
 

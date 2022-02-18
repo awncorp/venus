@@ -39,7 +39,9 @@ $test->for('abstract');
 =includes
 
 method: class
+method: safe
 method: space
+method: trap
 method: type
 
 =cut
@@ -123,6 +125,82 @@ $test->for('example', 1, 'class', sub {
   $result
 });
 
+=method safe
+
+The safe method dispatches the method call or executes the callback and returns
+the result, supressing warnings and exceptions. If an exception is thrown this
+method will return C<undef>. This method supports dispatching, i.e. providing a
+method name and arguments whose return value will be acted on by this method.
+
+=signature safe
+
+  safe(Str | CodeRef $code, Any @args) (Any)
+
+=metadata safe
+
+{
+  since => '0.08',
+}
+
+=example-1 safe
+
+  # given: synopsis;
+
+  my $safe = $example->safe('class');
+
+  # "Example"
+
+=cut
+
+$test->for('example', 1, 'safe', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "Example";
+
+  $result
+});
+
+=example-2 safe
+
+  # given: synopsis;
+
+  my $safe = $example->safe(sub {
+    ${_}->class / 2
+  });
+
+  # '0'
+
+=cut
+
+$test->for('example', 2, 'safe', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-3 safe
+
+  # given: synopsis;
+
+  my $safe = $example->safe(sub {
+    die;
+  });
+
+  # undef
+
+=cut
+
+$test->for('example', 3, 'safe', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok not defined $result;
+
+  !$result
+});
+
 =method space
 
 The space method returns a L<Venus::Space> object for the given object.
@@ -153,6 +231,147 @@ $test->for('example', 1, 'space', sub {
   ok $result->isa('Venus::Space');
 
   $result
+});
+
+=method trap
+
+The trap method dispatches the method call or executes the callback and returns
+a tuple (i.e. a 3-element arrayref) with the results, warnings, and exceptions
+from the code execution. If an exception is thrown, the results (i.e. the
+1st-element) will be an empty arrayref. This method supports dispatching, i.e.
+providing a method name and arguments whose return value will be acted on by
+this method.
+
+=signature trap
+
+  trap(Str | CodeRef $code, Any @args) (Tuple[ArrayRef, ArrayRef, ArrayRef])
+
+=metadata trap
+
+{
+  since => '0.08',
+}
+
+=example-1 trap
+
+  # given: synopsis;
+
+  my $result = $example->trap('class');
+
+  # ["Example"]
+
+=cut
+
+$test->for('example', 1, 'trap', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["Example"];
+
+  $result
+});
+
+=example-2 trap
+
+  # given: synopsis;
+
+  my ($results, $warnings, $errors) = $example->trap('class');
+
+  # (["Example"], [], [])
+
+=cut
+
+$test->for('example', 2, 'trap', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  is_deeply \@result, [["Example"],[],[]];
+
+  @result
+});
+
+=example-3 trap
+
+  # given: synopsis;
+
+  my $trap = $example->trap(sub {
+    ${_}->class / 2
+  });
+
+  # ["0"]
+
+=cut
+
+$test->for('example', 3, 'trap', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['0'];
+
+  $result
+});
+
+=example-4 trap
+
+  # given: synopsis;
+
+  my ($results, $warnings, $errors) = $example->trap(sub {
+    ${_}->class / 2
+  });
+
+  # (["0"], ["Argument ... isn't numeric in division ..."], [])
+
+=cut
+
+$test->for('example', 4, 'trap', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  is @result, 3;
+  is $result[0][0], 0;
+  like $result[1][0], qr/argument.*isn't numeric in division.*/i;
+  ok !@{$result[2]};
+
+  @result
+});
+
+=example-5 trap
+
+  # given: synopsis;
+
+  my $trap = $example->trap(sub {
+    die;
+  });
+
+  # []
+
+=cut
+
+$test->for('example', 5, 'trap', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-6 trap
+
+  # given: synopsis;
+
+  my ($results, $warnings, $errors) = $example->trap(sub {
+    die;
+  });
+
+  # ([], [], ["Died..."])
+
+=cut
+
+$test->for('example', 6, 'trap', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  is @result, 3;
+  ok !@{$result[0]};
+  ok !@{$result[1]};
+  like $result[2][0], qr/died/i;
+
+  @result
 });
 
 =method type
