@@ -211,7 +211,7 @@ sub open {
 sub mkcall {
   my ($self, $args) = @_;
 
-  my $path = $self->get;
+  my $path = File::Spec->catfile(File::Spec->splitdir($self->get));
 
   my $result;
 
