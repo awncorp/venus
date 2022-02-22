@@ -93,8 +93,17 @@ sub deduce_defined {
 
   return $self->deduce_references if ref($data);
   return $self->deduce_boolean if scalar_is_boolean($data);
+  return $self->deduce_floatlike if scalar_is_float($data);
   return $self->deduce_numberlike if scalar_is_numeric($data);
   return $self->deduce_stringlike;
+}
+
+sub deduce_floatlike {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return $self->object_float;
 }
 
 sub deduce_numberlike {
@@ -102,7 +111,6 @@ sub deduce_numberlike {
 
   my $data = $self->get;
 
-  return $self->object_float if $data =~ /\./;
   return $self->object_number;
 }
 
@@ -263,6 +271,14 @@ sub scalar_is_boolean {
     ("$value" == "1" && ($value + 0) == 1) ||
     ("$value" == "0" && ($value + 0) == 0)
   );
+}
+
+sub scalar_is_float {
+  my ($value) = @_;
+
+  return Scalar::Util::looks_like_number($value) && length(do{
+    $value =~ /^[+-]?([0-9]*)?\.[0-9]+$/;
+  });
 }
 
 sub scalar_is_numeric {
