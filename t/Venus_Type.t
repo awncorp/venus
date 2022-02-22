@@ -245,6 +245,28 @@ $test->for('example', 3, 'deduce', sub {
   $result
 });
 
+=example-4 deduce
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => '1.23');
+
+  my $deduce = $type->deduce;
+
+  # bless({ value => "1.23" }, "Venus::Float")
+
+=cut
+
+$test->for('example', 4, 'deduce', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Float');
+
+  $result
+});
+
 =method deduce_deep
 
 The deduce_deep function returns any arguments as data type objects, including
@@ -403,6 +425,29 @@ $test->for('example', 3, 'detract', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq qr/\w+/;
+
+  $result
+});
+
+=example-4 detract
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Float;
+
+  my $type = Venus::Type->new(Venus::Float->new('1.23'));
+
+  my $detract = $type->detract;
+
+  # "1.23"
+
+=cut
+
+$test->for('example', 4, 'detract', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq '1.23';
 
   $result
 });
