@@ -156,6 +156,29 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 comparer
+
+  comparer() (Str)
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item comparer example 1
+
+  # given: synopsis;
+
+  my $comparer = $string->comparer;
+
+  # "stringified"
+
+=back
+
+=cut
+
 =head2 concat
 
   concat(Str @parts) (Str)
@@ -488,6 +511,46 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For
+string objects this method returns the underlying value, if that value looks
+like a number, or C<0>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $string->numified;
+
+  # 0
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new(1_000_000);
+
+  my $numified = $string->numified;
+
+  # 1000000
+
+=back
+
+=cut
+
 =head2 render
 
   render(HashRef $tokens) (Str)
@@ -729,6 +792,57 @@ I<Since C<0.01>>
   my $split = $string->split(qr/\,\s*/);
 
   # ["name", "age", "dob", "email"]
+
+=back
+
+=cut
+
+=head2 stringified
+
+  stringified() (Str)
+
+The stringified method returns the object, stringified (i.e. a dump of the
+object's value).
+
+I<Since C<0.08>>
+
+=over 4
+
+=item stringified example 1
+
+  # given: synopsis;
+
+  my $stringified = $string->stringified;
+
+  # "hello world"
+
+=back
+
+=over 4
+
+=item stringified example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new("hello\nworld");
+
+  my $stringified = $string->stringified;
+
+  # "hello\\nworld"
+
+=back
+
+=over 4
+
+=item stringified example 3
+
+  # given: synopsis;
+
+  my $stringified = $self->stringified;
+
+  # ...
 
 =back
 

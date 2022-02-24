@@ -39,12 +39,14 @@ $test->for('abstract');
 =includes
 
 method: call
+method: comparer
 method: compose
 method: conjoin
 method: curry
 method: default
 method: disjoin
 method: next
+method: numified
 method: rcurry
 
 =cut
@@ -168,6 +170,39 @@ $test->for('example', 3, 'call', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 3;
+
+  $result
+});
+
+=method comparer
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+=signature comparer
+
+  comparer() (Str)
+
+=metadata comparer
+
+{
+  since => '0.08',
+}
+
+=example-1 comparer
+
+  # given: synopsis;
+
+  my $comparer = $code->comparer;
+
+  # "stringified"
+
+=cut
+
+$test->for('example', 1, 'comparer', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'stringified';
 
   $result
 });
@@ -415,6 +450,63 @@ $test->for('example', 1, 'next', sub {
   ok $result == 144;
 
   $result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object. For code
+objects this method always returns C<0>.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $code->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub {
+    return;
+  });
+
+  my $numified = $code->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
 });
 
 =method rcurry

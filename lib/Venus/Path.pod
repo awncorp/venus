@@ -595,9 +595,9 @@ I<Since C<0.01>>
 
   use Venus::Path;
 
-  my $path = Venus::Path->new('t/data/sun');
+  my $path = Venus::Path->new($^X);
 
-  my ($call_output, $exit_code) = $path->mkcall('--heat-death');
+  my ($call_output, $exit_code) = $path->mkcall('t/data/sun', '--heat-death');
 
   # ("", 256)
 

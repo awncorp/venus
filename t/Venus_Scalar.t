@@ -39,6 +39,7 @@ $test->for('abstract');
 =includes
 
 method: default
+method: numified
 
 =cut
 
@@ -109,6 +110,61 @@ $test->for('example', 1, 'default', sub {
   ok ref($result) eq 'SCALAR';
 
   $result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object. For
+scalar objects this method always returns C<0>.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $scalar->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new(\{true => 1});
+
+  my $numified = $scalar->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
 });
 
 =operator (${})

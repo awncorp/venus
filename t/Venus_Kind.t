@@ -38,9 +38,14 @@ $test->for('abstract');
 
 =includes
 
+method: checksum
 method: class
+method: comparer
+method: length
+method: numified
 method: safe
 method: space
+method: stringified
 method: trap
 method: type
 
@@ -82,6 +87,7 @@ $test->for('description');
 
 Venus::Role::Boxable
 Venus::Role::Catchable
+Venus::Role::Comparable
 Venus::Role::Digestable
 Venus::Role::Doable
 Venus::Role::Dumpable
@@ -92,6 +98,67 @@ Venus::Role::Throwable
 =cut
 
 $test->for('integrates');
+
+=method checksum
+
+The checksum method returns an md5 hash string representing the stringified
+object value (or the object itself).
+
+=signature checksum
+
+  checksum() (Str)
+
+=metadata checksum
+
+{
+  since => '0.08',
+}
+
+=example-1 checksum
+
+  # given: synopsis;
+
+  my $checksum = $example->checksum;
+
+  # "859a86eed4b2d97eb7b830b02f06de32"
+
+=cut
+
+$test->for('example', 1, 'checksum', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "859a86eed4b2d97eb7b830b02f06de32";
+
+  $result
+});
+
+=example-2 checksum
+
+  package Checksum::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Checksum::Example->new(value => 'example');
+
+  my $checksum = $example->checksum;
+
+  # "1a79a4d60de6718e8e5b326e338ae533"
+
+=cut
+
+$test->for('example', 2, 'checksum', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "1a79a4d60de6718e8e5b326e338ae533";
+
+  $result
+});
 
 =method class
 
@@ -121,6 +188,161 @@ $test->for('example', 1, 'class', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "Example";
+
+  $result
+});
+
+=method comparer
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+=signature comparer
+
+  comparer() (Str)
+
+=metadata comparer
+
+{
+  since => '0.08',
+}
+
+=example-1 comparer
+
+  # given: synopsis;
+
+  my $comparer = $example->comparer;
+
+  # "numeric"
+
+=cut
+
+$test->for('example', 1, 'comparer', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'numified';
+
+  $result
+});
+
+=method length
+
+The length method returns the length (or character count) of the stringified
+object.
+
+=signature length
+
+  length() (Int)
+
+=metadata length
+
+{
+  since => '0.08',
+}
+
+=example-1 length
+
+  # given: synopsis;
+
+  my $length = $example->length;
+
+  # 22
+
+=cut
+
+$test->for('example', 1, 'length', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 22;
+
+  $result
+});
+
+=example-2 length
+
+  package Length::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Length::Example->new(value => 'example');
+
+  my $length = $example->length;
+
+  # 7
+
+=cut
+
+$test->for('example', 2, 'length', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 7;
+
+  $result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object which is
+typically the length (or character count) of the stringified object.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $example->numified;
+
+  # 22
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 22;
+
+  $result
+});
+
+=example-2 numified
+
+  package Numified::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Numified::Example->new(value => 'example');
+
+  my $length = $example->length;
+
+  # 7
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 7;
 
   $result
 });
@@ -229,6 +451,68 @@ $test->for('example', 1, 'space', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
+
+  $result
+});
+
+=method stringified
+
+The stringified method returns the object, stringified (i.e. a dump of the
+object's value).
+
+=signature stringified
+
+  stringified() (Str)
+
+=metadata stringified
+
+{
+  since => '0.08',
+}
+
+=example-1 stringified
+
+  # given: synopsis;
+
+  my $stringified = $example->stringified;
+
+  # bless({}, 'Example')
+
+
+=cut
+
+$test->for('example', 1, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "bless( {}, 'Example' )";
+
+  $result
+});
+
+=example-2 stringified
+
+  package Stringified::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Stringified::Example->new(value => 'example');
+
+  my $stringified = $example->stringified;
+
+  # "example"
+
+=cut
+
+$test->for('example', 2, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'example';
 
   $result
 });

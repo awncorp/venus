@@ -9,6 +9,7 @@ use Moo;
 
 with 'Venus::Role::Boxable';
 with 'Venus::Role::Catchable';
+with 'Venus::Role::Comparable';
 with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';
 with 'Venus::Role::Dumpable';
@@ -22,6 +23,30 @@ sub class {
   my ($self) = @_;
 
   return ref($self) || $self;
+}
+
+sub checksum {
+  my ($self) = @_;
+
+  return $self->digest('md5', 'stringified');
+}
+
+sub comparer {
+  my ($self) = @_;
+
+  return 'numified';
+}
+
+sub length {
+  my ($self) = @_;
+
+  return CORE::length($self->stringified);
+}
+
+sub numified {
+  my ($self) = @_;
+
+  return $self->length;
 }
 
 sub safe {
@@ -38,6 +63,12 @@ sub space {
   require Venus::Space;
 
   return Venus::Space->new($self->class);
+}
+
+sub stringified {
+  my ($self) = @_;
+
+  return $self->dump($self->can('value') ? 'value' : ());
 }
 
 sub trap {

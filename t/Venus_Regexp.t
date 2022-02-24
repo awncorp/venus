@@ -38,9 +38,12 @@ $test->for('abstract');
 
 =includes
 
+method: comparer
 method: default
+method: numified
 method: replace
 method: search
+method: stringified
 
 =cut
 
@@ -53,7 +56,7 @@ $test->for('includes');
   use Venus::Regexp;
 
   my $regexp = Venus::Regexp->new(
-    qr/(?<greet>\w+) (?<username>\w+)/,
+    qr/(?<greet>\w+) (?<username>\w+)/u,
   );
 
   # $regexp->search;
@@ -83,6 +86,39 @@ Venus::Kind::Value
 
 $test->for('inherits');
 
+=method comparer
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+=signature comparer
+
+  comparer() (Str)
+
+=metadata comparer
+
+{
+  since => '0.08',
+}
+
+=example-1 comparer
+
+  # given: synopsis;
+
+  my $comparer = $regexp->comparer;
+
+  # "stringified"
+
+=cut
+
+$test->for('example', 1, 'comparer', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'stringified';
+
+  $result
+});
+
 =method default
 
 The default method returns the default value, i.e. C<qr//>.
@@ -111,6 +147,64 @@ $test->for('example', 1, 'default', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq qr//;
+
+  $result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object. For
+regexp objects the method returns the length (or character count) of the
+stringified object.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $regexp->numified;
+
+  # 36
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 35;
+
+  $result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/.*/u,
+  );
+
+  my $numified = $regexp->numified;
+
+  # 7
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 7;
 
   $result
 });
@@ -194,6 +288,64 @@ $test->for('example', 1, 'search', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Search');
+
+  $result
+});
+
+=method stringified
+
+The stringified method returns the object, stringified (i.e. a dump of the
+object's value).
+
+=signature stringified
+
+  stringified() (Str)
+
+=metadata stringified
+
+{
+  since => '0.08',
+}
+
+=example-1 stringified
+
+  # given: synopsis;
+
+  my $stringified = $regexp->stringified;
+
+  # qr/(?<greet>\w+) (?<username>\w+)/u
+
+
+=cut
+
+$test->for('example', 1, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'qr/(?<greet>\w+) (?<username>\w+)/u';
+
+  $result
+});
+
+=example-2 stringified
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/.*/,
+  );
+
+  my $stringified = $regexp->stringified;
+
+  # qr/.*/u
+
+=cut
+
+$test->for('example', 2, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'qr/.*/u';
 
   $result
 });

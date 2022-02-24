@@ -17,6 +17,12 @@ use overload (
 
 # METHODS
 
+sub comparer {
+  my ($self) = @_;
+
+  return 'stringified';
+}
+
 sub default {
   return qr//;
 }

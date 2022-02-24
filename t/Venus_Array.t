@@ -57,6 +57,7 @@ method: last
 method: list
 method: map
 method: none
+method: numified
 method: one
 method: pairs
 method: path
@@ -68,6 +69,7 @@ method: reverse
 method: rotate
 method: rsort
 method: shift
+method: size
 method: slice
 method: sort
 method: unique
@@ -1055,6 +1057,62 @@ $test->for('example', 2, 'none', sub {
   $result
 });
 
+=method numified
+
+The numified method returns the numerical representation of the object. For
+array objects this method returns the count (i.e. the number of elements in the
+array).
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $array->numified;
+
+  # 9
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 9;
+
+  $result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..3]);
+
+  my $numified = $array->numified;
+
+  # 3
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 3;
+
+  $result
+});
+
 =method one
 
 The one method returns true if only one of the elements in the array meet the
@@ -1560,6 +1618,39 @@ $test->for('example', 1, 'shift', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method size
+
+The size method returns the number of elements within the array, and is an
+alias for the L</count> method.
+
+=signature size
+
+  size() (Int)
+
+=metadata size
+
+{
+  since => '0.08',
+}
+
+=example-1 size
+
+  # given: synopsis;
+
+  my $size = $array->size;
+
+  # 9
+
+=cut
+
+$test->for('example', 1, 'size', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 9;
 
   $result
 });
