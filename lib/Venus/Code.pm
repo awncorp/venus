@@ -23,6 +23,12 @@ sub call {
   return $data->(@args);
 }
 
+sub comparer {
+  my ($self) = @_;
+
+  return 'stringified';
+}
+
 sub compose {
   my ($self, $code, @args) = @_;
 
@@ -65,6 +71,12 @@ sub next {
   my $data = $self->get;
 
   return $data->(@args);
+}
+
+sub numified {
+  my ($self) = @_;
+
+  return 0;
 }
 
 sub rcurry {

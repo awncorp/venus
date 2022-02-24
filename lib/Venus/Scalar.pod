@@ -65,6 +65,45 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For
+scalar objects this method always returns C<0>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $scalar->numified;
+
+  # 0
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new(\{true => 1});
+
+  my $numified = $scalar->numified;
+
+  # 0
+
+=back
+
+=cut
+
 =head1 OPERATORS
 
 This package overloads the following operators:

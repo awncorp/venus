@@ -65,6 +65,73 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 length
+
+  length() (Int)
+
+The length method always returns C<0> for undef objects.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item length example 1
+
+  # given: synopsis;
+
+  my $length = $undef->length;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For
+undef objects this method returns C<0>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $undef->numified;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 stringified
+
+  stringified() (Str)
+
+The stringified method always method returns C<''>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item stringified example 1
+
+  # given: synopsis;
+
+  my $stringified = $undef->stringified;
+
+  # ""
+
+=back
+
+=cut
+
 =head1 AUTHORS
 
 Cpanery, C<cpanery@cpan.org>

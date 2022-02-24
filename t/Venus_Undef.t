@@ -39,6 +39,9 @@ $test->for('abstract');
 =includes
 
 method: default
+method: length
+method: numified
+method: stringified
 
 =cut
 
@@ -107,6 +110,103 @@ $test->for('example', 1, 'default', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
   ok !defined $result;
+
+  !$result
+});
+
+=method length
+
+The length method always returns C<0> for undef objects.
+
+=signature length
+
+  length() (Int)
+
+=metadata length
+
+{
+  since => '0.08',
+}
+
+=example-1 length
+
+  # given: synopsis;
+
+  my $length = $undef->length;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'length', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object. For
+undef objects this method returns C<0>.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $undef->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=method stringified
+
+The stringified method always method returns C<''>.
+
+=signature stringified
+
+  stringified() (Str)
+
+=metadata stringified
+
+{
+  since => '0.08',
+}
+
+=example-1 stringified
+
+  # given: synopsis;
+
+  my $stringified = $undef->stringified;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, 'stringified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, "";
 
   !$result
 });

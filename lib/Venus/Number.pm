@@ -125,6 +125,14 @@ sub neg {
   return $data =~ /^-(.*)/ ? $1 : -$data;
 }
 
+sub numified {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return 0 + $data;
+}
+
 sub pow {
   my ($self, $arg) = @_;
 

@@ -111,6 +111,45 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 length
+
+  length() (Int)
+
+The length method returns the length (or character count) of the stringified
+object.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item length example 1
+
+  # given: synopsis;
+
+  my $length = $boolean->length;
+
+  # 1
+
+=back
+
+=over 4
+
+=item length example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new(0);
+
+  my $length = $boolean->length;
+
+  # 1
+
+=back
+
+=cut
+
 =head2 negate
 
   negate() (Bool)
@@ -127,6 +166,61 @@ I<Since C<0.01>>
   # given: synopsis;
 
   my $negate = $boolean->negate;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For
+boolean objects this method always returns C<1>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $boolean->numified;
+
+  # 1
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new(0);
+
+  my $numified = $boolean->numified;
+
+  # 0
+
+=back
+
+=over 4
+
+=item numified example 3
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new(1);
+
+  my $numified = $boolean->numified;
 
   # 1
 

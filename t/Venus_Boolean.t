@@ -41,7 +41,9 @@ $test->for('abstract');
 method: default
 method: is_false
 method: is_true
+method: length
 method: negate
+method: numified
 method: type
 
 =cut
@@ -181,6 +183,61 @@ $test->for('example', 1, 'is_true', sub {
   !$result
 });
 
+=method length
+
+The length method returns the length (or character count) of the stringified
+object.
+
+=signature length
+
+  length() (Int)
+
+=metadata length
+
+{
+  since => '0.08',
+}
+
+=example-1 length
+
+  # given: synopsis;
+
+  my $length = $boolean->length;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'length', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 length
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new(0);
+
+  my $length = $boolean->length;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'length', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
 =method negate
 
 The negate method returns C<true> if the boolean is falsy, otherwise returns
@@ -210,6 +267,83 @@ $test->for('example', 1, 'negate', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object. For
+boolean objects this method always returns C<1>.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $boolean->numified;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new(0);
+
+  my $numified = $boolean->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-3 numified
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new(1);
+
+  my $numified = $boolean->numified;
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
   $result
 });

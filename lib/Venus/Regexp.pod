@@ -18,7 +18,7 @@ Regexp Class for Perl 5
   use Venus::Regexp;
 
   my $regexp = Venus::Regexp->new(
-    qr/(?<greet>\w+) (?<username>\w+)/,
+    qr/(?<greet>\w+) (?<username>\w+)/u,
   );
 
   # $regexp->search;
@@ -45,6 +45,29 @@ This package provides the following methods:
 
 =cut
 
+=head2 comparer
+
+  comparer() (Str)
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item comparer example 1
+
+  # given: synopsis;
+
+  my $comparer = $regexp->comparer;
+
+  # "stringified"
+
+=back
+
+=cut
+
 =head2 default
 
   default() (Regexp)
@@ -62,6 +85,48 @@ I<Since C<0.01>>
   my $default = $regexp->default;
 
   # qr/(?^u:)/
+
+=back
+
+=cut
+
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For
+regexp objects the method returns the length (or character count) of the
+stringified object.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $regexp->numified;
+
+  # 36
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/.*/u,
+  );
+
+  my $numified = $regexp->numified;
+
+  # 7
 
 =back
 
@@ -125,6 +190,50 @@ I<Since C<0.01>>
   my $search = $regexp->search('hey, cpanery');
 
   # bless({ ... }, 'Venus::Search')
+
+=back
+
+=cut
+
+=head2 stringified
+
+  stringified() (Str)
+
+The stringified method returns the object, stringified (i.e. a dump of the
+object's value).
+
+I<Since C<0.08>>
+
+=over 4
+
+=item stringified example 1
+
+  # given: synopsis;
+
+  my $stringified = $regexp->stringified;
+
+  # qr/(?<greet>\w+) (?<username>\w+)/u
+
+
+
+
+=back
+
+=over 4
+
+=item stringified example 2
+
+  package main;
+
+  use Venus::Regexp;
+
+  my $regexp = Venus::Regexp->new(
+    qr/.*/,
+  );
+
+  my $stringified = $regexp->stringified;
+
+  # qr/.*/u
 
 =back
 

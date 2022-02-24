@@ -645,6 +645,62 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For hash
+objects this method returns the count (i.e. the number of elements in the
+hash).
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $hash->numified;
+
+  # 4
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1,2});
+
+  my $numified = $hash->numified;
+
+  # 1
+
+=back
+
+=over 4
+
+=item numified example 3
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1,2,3,4});
+
+  my $numified = $hash->numified;
+
+  # 2
+
+=back
+
+=cut
+
 =head2 one
 
   one(CodeRef $code) (Bool)
@@ -852,6 +908,29 @@ I<Since C<0.01>>
   my $reverse = $hash->reverse;
 
   # { 2 => 1, 4 => 3, 6 => 5, 8 => 7 }
+
+=back
+
+=cut
+
+=head2 size
+
+  size() (Int)
+
+The size method returns the total number of keys defined, and is an alias for
+the L</count> method.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item size example 1
+
+  # given: synopsis;
+
+  my $size = $hash->size;
+
+  # 4
 
 =back
 
