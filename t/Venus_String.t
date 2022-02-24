@@ -42,6 +42,7 @@ method: append
 method: camelcase
 method: chomp
 method: chop
+method: comparer
 method: concat
 method: contains
 method: default
@@ -52,13 +53,15 @@ method: lcfirst
 method: length
 method: lines
 method: lowercase
+method: numified
 method: render
-method: search
 method: replace
 method: reverse
 method: rindex
+method: search
 method: snakecase
 method: split
+method: stringified
 method: strip
 method: titlecase
 method: trim
@@ -293,6 +296,39 @@ $test->for('example', 1, 'chop', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "this is just a test";
+
+  $result
+});
+
+=method comparer
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+=signature comparer
+
+  comparer() (Str)
+
+=metadata comparer
+
+{
+  since => '0.08',
+}
+
+=example-1 comparer
+
+  # given: synopsis;
+
+  my $comparer = $string->comparer;
+
+  # "stringified"
+
+=cut
+
+$test->for('example', 1, 'comparer', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "stringified";
 
   $result
 });
@@ -884,6 +920,62 @@ $test->for('example', 2, 'repeat', sub {
   $result
 });
 
+=method numified
+
+The numified method returns the numerical representation of the object. For
+string objects this method returns the underlying value, if that value looks
+like a number, or C<0>.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $string->numified;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new(1_000_000);
+
+  my $numified = $string->numified;
+
+  # 1000000
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1000000;
+
+  $result
+});
+
 =method render
 
 The render method treats the string as a template and performs a simple token
@@ -1220,6 +1312,78 @@ $test->for('example', 3, 'split', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ["name", "age", "dob", "email"];
+
+  $result
+});
+
+=method stringified
+
+The stringified method returns the object, stringified (i.e. a dump of the
+object's value).
+
+=signature stringified
+
+  stringified() (Str)
+
+=metadata stringified
+
+{
+  since => '0.08',
+}
+
+=example-1 stringified
+
+  # given: synopsis;
+
+  my $stringified = $string->stringified;
+
+  # "hello world"
+
+=cut
+
+$test->for('example', 1, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "hello world";
+
+  $result
+});
+
+=example-2 stringified
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new("hello\nworld");
+
+  my $stringified = $string->stringified;
+
+  # "hello\\nworld"
+
+=cut
+
+$test->for('example', 2, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'hello\\nworld';
+
+  $result
+});
+
+=example-3 stringified
+
+  # given: synopsis;
+
+  my $stringified = $self->stringified;
+
+  # ...
+
+=cut
+
+$test->for('example', 3, 'stringified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
 
   $result
 });

@@ -478,6 +478,61 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object. For
+number objects this method returns the object's underlying value.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $number->numified;
+
+  # 1000
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(2_000);
+
+  my $numified = $number->numified;
+
+  # 2000
+
+=back
+
+=over 4
+
+=item numified example 3
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(10_000);
+
+  my $numified = $number->numified;
+
+  # 10000
+
+=back
+
+=cut
+
 =head2 pow
 
   pow() (Num)

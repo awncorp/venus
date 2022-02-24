@@ -285,6 +285,12 @@ sub none {
   return $found ? 0 : 1;
 }
 
+sub numified {
+  my ($self) = @_;
+
+  return $self->count;
+}
+
 sub one {
   my ($self, $code) = @_;
 
@@ -404,6 +410,12 @@ sub shift {
   my $data = $self->get;
 
   return CORE::shift(@$data);
+}
+
+sub size {
+  my ($self) = @_;
+
+  return $self->count;
 }
 
 sub slice {

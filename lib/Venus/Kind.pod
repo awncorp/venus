@@ -39,6 +39,8 @@ L<Venus::Role::Boxable>
 
 L<Venus::Role::Catchable>
 
+L<Venus::Role::Comparable>
+
 L<Venus::Role::Digestable>
 
 L<Venus::Role::Doable>
@@ -59,6 +61,51 @@ This package provides the following methods:
 
 =cut
 
+=head2 checksum
+
+  checksum() (Str)
+
+The checksum method returns an md5 hash string representing the stringified
+object value (or the object itself).
+
+I<Since C<0.08>>
+
+=over 4
+
+=item checksum example 1
+
+  # given: synopsis;
+
+  my $checksum = $example->checksum;
+
+  # "859a86eed4b2d97eb7b830b02f06de32"
+
+=back
+
+=over 4
+
+=item checksum example 2
+
+  package Checksum::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Checksum::Example->new(value => 'example');
+
+  my $checksum = $example->checksum;
+
+  # "1a79a4d60de6718e8e5b326e338ae533"
+
+=back
+
+=cut
+
 =head2 class
 
   class() (Str)
@@ -76,6 +123,119 @@ I<Since C<0.01>>
   my $class = $example->class;
 
   # "Example"
+
+=back
+
+=cut
+
+=head2 comparer
+
+  comparer() (Str)
+
+The comparer method returns the name of the method which will produce a value
+to be used in comparison operations.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item comparer example 1
+
+  # given: synopsis;
+
+  my $comparer = $example->comparer;
+
+  # "numeric"
+
+=back
+
+=cut
+
+=head2 length
+
+  length() (Int)
+
+The length method returns the length (or character count) of the stringified
+object.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item length example 1
+
+  # given: synopsis;
+
+  my $length = $example->length;
+
+  # 22
+
+=back
+
+=over 4
+
+=item length example 2
+
+  package Length::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Length::Example->new(value => 'example');
+
+  my $length = $example->length;
+
+  # 7
+
+=back
+
+=cut
+
+=head2 numified
+
+  numified() (Int)
+
+The numified method returns the numerical representation of the object which is
+typically the length (or character count) of the stringified object.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item numified example 1
+
+  # given: synopsis;
+
+  my $numified = $example->numified;
+
+  # 22
+
+=back
+
+=over 4
+
+=item numified example 2
+
+  package Numified::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Numified::Example->new(value => 'example');
+
+  my $length = $example->length;
+
+  # 7
 
 =back
 
@@ -151,6 +311,54 @@ I<Since C<0.01>>
   my $space = $example->space;
 
   # bless({ value => "Example" }, "Venus::Space")
+
+=back
+
+=cut
+
+=head2 stringified
+
+  stringified() (Str)
+
+The stringified method returns the object, stringified (i.e. a dump of the
+object's value).
+
+I<Since C<0.08>>
+
+=over 4
+
+=item stringified example 1
+
+  # given: synopsis;
+
+  my $stringified = $example->stringified;
+
+  # bless({}, 'Example')
+
+
+
+
+=back
+
+=over 4
+
+=item stringified example 2
+
+  package Stringified::Example;
+
+  use Venus::Class;
+
+  extends 'Venus::Kind';
+
+  has 'value';
+
+  package main;
+
+  my $example = Stringified::Example->new(value => 'example');
+
+  my $stringified = $example->stringified;
+
+  # "example"
 
 =back
 

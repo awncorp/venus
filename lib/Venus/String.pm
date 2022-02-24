@@ -65,6 +65,12 @@ sub chop {
   return $data;
 }
 
+sub comparer {
+  my ($self) = @_;
+
+  return 'stringified';
+}
+
 sub concat {
   my ($self, @args) = @_;
 
@@ -148,6 +154,14 @@ sub lowercase {
   return CORE::lc($data);
 }
 
+sub numified {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return $data =~ /^[\d\.]+$/ ? (0 + $data) : 0;
+}
+
 sub prepend {
   my ($self, @args) = @_;
 
@@ -186,14 +200,6 @@ sub render {
   return $data;
 }
 
-sub search {
-  my ($self, $regexp) = @_;
-
-  require Venus::Regexp;
-
-  return Venus::Regexp->new($regexp)->search($self->get);
-}
-
 sub replace {
   my ($self, $regexp, $replace, $flags) = @_;
 
@@ -217,6 +223,14 @@ sub rindex {
 
   return CORE::rindex($data, $substr) if not(CORE::defined($start));
   return CORE::rindex($data, $substr, $start);
+}
+
+sub search {
+  my ($self, $regexp) = @_;
+
+  require Venus::Regexp;
+
+  return Venus::Regexp->new($regexp)->search($self->get);
 }
 
 sub snakecase {

@@ -54,6 +54,7 @@ method: list
 method: map
 method: merge
 method: none
+method: numified
 method: one
 method: pairs
 method: path
@@ -61,6 +62,7 @@ method: random
 method: reset
 method: reverse
 method: slice
+method: size
 
 =cut
 
@@ -949,6 +951,84 @@ $test->for('example', 2, 'none', sub {
   $result
 });
 
+=method numified
+
+The numified method returns the numerical representation of the object. For hash
+objects this method returns the count (i.e. the number of elements in the
+hash).
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $hash->numified;
+
+  # 4
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 4;
+
+  $result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1,2});
+
+  my $numified = $hash->numified;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-3 numified
+
+  package main;
+
+  use Venus::Hash;
+
+  my $hash = Venus::Hash->new({1,2,3,4});
+
+  my $numified = $hash->numified;
+
+  # 2
+
+=cut
+
+$test->for('example', 3, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 2;
+
+  $result
+});
+
 =method one
 
 The one method returns true if only one of the elements in the array meet the
@@ -1275,6 +1355,39 @@ $test->for('example', 1, 'slice', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [2, 4];
+
+  $result
+});
+
+=method size
+
+The size method returns the total number of keys defined, and is an alias for
+the L</count> method.
+
+=signature size
+
+  size() (Int)
+
+=metadata size
+
+{
+  since => '0.08',
+}
+
+=example-1 size
+
+  # given: synopsis;
+
+  my $size = $hash->size;
+
+  # 4
+
+=cut
+
+$test->for('example', 1, 'size', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 4;
 
   $result
 });

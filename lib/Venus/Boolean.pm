@@ -93,6 +93,12 @@ sub negate {
   return $self->get ? $false : $true;
 }
 
+sub numified {
+  my ($self) = @_;
+
+  return 0 + $self->value;
+}
+
 sub type {
   my ($self) = @_;
 

@@ -27,4 +27,22 @@ sub default {
   return undef;
 }
 
+sub length {
+  my ($self) = @_;
+
+  return 0;
+}
+
+sub numified {
+  my ($self) = @_;
+
+  return 0;
+}
+
+sub stringified {
+  my ($self) = @_;
+
+  return '';
+}
+
 1;

@@ -50,6 +50,7 @@ method: int
 method: log
 method: mod
 method: neg
+method: numified
 method: pow
 method: range
 method: sin
@@ -693,6 +694,83 @@ $test->for('example', 1, 'neg', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == -12345;
+
+  $result
+});
+
+=method numified
+
+The numified method returns the numerical representation of the object. For
+number objects this method returns the object's underlying value.
+
+=signature numified
+
+  numified() (Int)
+
+=metadata numified
+
+{
+  since => '0.08',
+}
+
+=example-1 numified
+
+  # given: synopsis;
+
+  my $numified = $number->numified;
+
+  # 1000
+
+=cut
+
+$test->for('example', 1, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1000;
+
+  $result
+});
+
+=example-2 numified
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(2_000);
+
+  my $numified = $number->numified;
+
+  # 2000
+
+=cut
+
+$test->for('example', 2, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 2000;
+
+  $result
+});
+
+=example-3 numified
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(10_000);
+
+  my $numified = $number->numified;
+
+  # 10000
+
+=cut
+
+$test->for('example', 3, 'numified', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 10_000;
 
   $result
 });
