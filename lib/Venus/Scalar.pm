@@ -20,10 +20,4 @@ sub default {
   return \'';
 }
 
-sub numified {
-  my ($self) = @_;
-
-  return 0;
-}
-
 1;

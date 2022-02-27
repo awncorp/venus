@@ -32,21 +32,23 @@ sub checksum {
 }
 
 sub comparer {
-  my ($self) = @_;
+  my ($self, $operation) = @_;
 
-  return 'numified';
-}
-
-sub length {
-  my ($self) = @_;
-
-  return CORE::length($self->stringified);
+  if (lc($operation) eq 'eq') {
+    return 'checksum';
+  }
+  if (lc($operation) eq 'gt') {
+    return 'numified';
+  }
+  if (lc($operation) eq 'lt') {
+    return 'numified';
+  }
 }
 
 sub numified {
   my ($self) = @_;
 
-  return $self->length;
+  return CORE::length($self->stringified);
 }
 
 sub safe {

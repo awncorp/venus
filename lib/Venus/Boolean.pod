@@ -65,6 +65,936 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 eq
+
+  eq(Any $arg) (Bool)
+
+The eq method performs an I<"equals"> operation using the argument provided.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item eq example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item eq example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item eq example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item eq example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item eq example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item eq example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item eq example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item eq example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item eq example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item eq example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->eq($rvalue);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 ge
+
+  ge(Any $arg) (Bool)
+
+The ge method performs a I<"greater-than-or-equal-to"> operation using the
+argument provided.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item ge example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ge example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ge example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ge example 4
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ge example 5
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ge example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ge example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ge example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ge example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->ge($rvalue);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 gele
+
+  gele(Any $arg1, Any $arg2) (Bool)
+
+The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
+argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item gele example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gele example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gele example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gele example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gele example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gele example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gele example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gele example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gele example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item gele example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->gele($rvalue);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 gt
+
+  gt(Any $arg) (Bool)
+
+The gt method performs a I<"greater-than"> operation using the argument provided.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item gt example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gt example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->gt($rvalue);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 gtlt
+
+  gtlt(Any $arg1, Any $arg2) (Bool)
+
+The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
+I<"lesser-than"> operation on the 2nd argument.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item gtlt example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item gtlt example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->gtlt($rvalue);
+
+  # 0
+
+=back
+
+=cut
+
 =head2 is_false
 
   is_false() (Bool)
@@ -111,22 +1041,28 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 length
+=head2 le
 
-  length() (Int)
+  le(Any $arg) (Bool)
 
-The length method returns the length (or character count) of the stringified
-object.
+The le method performs a I<"lesser-than-or-equal-to"> operation using the
+argument provided.
 
 I<Since C<0.08>>
 
 =over 4
 
-=item length example 1
+=item le example 1
 
-  # given: synopsis;
+  package main;
 
-  my $length = $boolean->length;
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->le($rvalue);
 
   # 1
 
@@ -134,17 +1070,540 @@ I<Since C<0.08>>
 
 =over 4
 
-=item length example 2
+=item le example 2
 
   package main;
 
   use Venus::Boolean;
 
-  my $boolean = Venus::Boolean->new(0);
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
 
-  my $length = $boolean->length;
+  my $result = $lvalue->le($rvalue);
 
   # 1
+
+=back
+
+=over 4
+
+=item le example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item le example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->le($rvalue);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg) (Bool)
+
+The lt method performs a I<"lesser-than"> operation using the argument provided.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item lt example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item lt example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item lt example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item lt example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item lt example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item lt example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item lt example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item lt example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item lt example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item lt example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->lt($rvalue);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 ne
+
+  ne(Any $arg) (Bool)
+
+The ne method performs a I<"not-equal-to"> operation using the argument provided.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item ne example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ne example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ne example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ne example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item ne example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item ne example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->ne($rvalue);
+
+  # 0
 
 =back
 
@@ -177,8 +1636,7 @@ I<Since C<0.01>>
 
   numified() (Int)
 
-The numified method returns the numerical representation of the object. For
-boolean objects this method always returns C<1>.
+The numified method returns the numerical representation of the object.
 
 I<Since C<0.08>>
 
@@ -223,6 +1681,196 @@ I<Since C<0.08>>
   my $numified = $boolean->numified;
 
   # 1
+
+=back
+
+=cut
+
+=head2 tv
+
+  tv(Any $arg) (Bool)
+
+The tv method performs a I<"type-and-value-equal-to"> operation using argument
+provided.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item tv example 1
+
+  package main;
+
+  use Venus::Array;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Array->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Boolean->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 1
+
+=back
+
+=over 4
+
+=item tv example 3
+
+  package main;
+
+  use Venus::Code;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Code->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 4
+
+  package main;
+
+  use Venus::Float;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Float->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 5
+
+  package main;
+
+  use Venus::Hash;
+  use Venus::Boolean;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Hash->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 6
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Number;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Number->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 7
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Regexp;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Regexp->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 8
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Scalar;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Scalar->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 9
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::String;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::String->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
+
+=back
+
+=over 4
+
+=item tv example 10
+
+  package main;
+
+  use Venus::Boolean;
+  use Venus::Undef;
+
+  my $lvalue = Venus::Boolean->new;
+  my $rvalue = Venus::Undef->new;
+
+  my $result = $lvalue->tv($rvalue);
+
+  # 0
 
 =back
 

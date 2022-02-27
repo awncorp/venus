@@ -115,7 +115,7 @@ L</comparer> method) of the invocant.
 
   my $example = Example->new;
 
-  my $result = $example->eq(2);
+  my $result = $example->eq($example);
 
   # 1
 
@@ -137,16 +137,16 @@ $test->for('example', 1, 'eq', sub {
 
   my $result = $example->eq([1,2]);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 eq
@@ -157,16 +157,16 @@ $test->for('example', 2, 'eq', sub {
 
   my $result = $example->eq({1..4});
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 3, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =method ge
@@ -212,7 +212,7 @@ $test->for('example', 1, 'ge', sub {
 
   my $example = Example->new;
 
-  my $result = $example->ge([]);
+  my $result = $example->ge($example);
 
   # 1
 
@@ -290,18 +290,18 @@ $test->for('example', 1, 'gele', sub {
 
   my $example = Example->new;
 
-  my $result = $example->gele(2, [1,2,3]);
+  my $result = $example->gele(2, []);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 gele
@@ -349,16 +349,16 @@ L</comparer> method) of the invocant.
 
   my $result = $example->gt({1..2});
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'gt', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 gt
@@ -367,7 +367,7 @@ $test->for('example', 1, 'gt', sub {
 
   my $example = Example->new;
 
-  my $result = $example->gt([9]);
+  my $result = $example->gt(1.9998);
 
   # 1
 
@@ -389,16 +389,16 @@ $test->for('example', 2, 'gt', sub {
 
   my $result = $example->gt(\1_000_000);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 3, 'gt', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =method gtlt
@@ -464,7 +464,7 @@ $test->for('example', 2, 'gtlt', sub {
 
   my $example = Example->new;
 
-  my $result = $example->gtlt([9], [0,1,2]);
+  my $result = $example->gtlt('.', ['.']);
 
   # 1
 
@@ -657,16 +657,16 @@ L</comparer> method) of the invocant.
 
   my $result = $example->ne([1,2]);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 1, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-2 ne
