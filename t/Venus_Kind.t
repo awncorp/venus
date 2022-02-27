@@ -40,8 +40,6 @@ $test->for('abstract');
 
 method: checksum
 method: class
-method: comparer
-method: length
 method: numified
 method: safe
 method: space
@@ -192,100 +190,6 @@ $test->for('example', 1, 'class', sub {
   $result
 });
 
-=method comparer
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-=signature comparer
-
-  comparer() (Str)
-
-=metadata comparer
-
-{
-  since => '0.08',
-}
-
-=example-1 comparer
-
-  # given: synopsis;
-
-  my $comparer = $example->comparer;
-
-  # "numeric"
-
-=cut
-
-$test->for('example', 1, 'comparer', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 'numified';
-
-  $result
-});
-
-=method length
-
-The length method returns the length (or character count) of the stringified
-object.
-
-=signature length
-
-  length() (Int)
-
-=metadata length
-
-{
-  since => '0.08',
-}
-
-=example-1 length
-
-  # given: synopsis;
-
-  my $length = $example->length;
-
-  # 22
-
-=cut
-
-$test->for('example', 1, 'length', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 22;
-
-  $result
-});
-
-=example-2 length
-
-  package Length::Example;
-
-  use Venus::Class;
-
-  extends 'Venus::Kind';
-
-  has 'value';
-
-  package main;
-
-  my $example = Length::Example->new(value => 'example');
-
-  my $length = $example->length;
-
-  # 7
-
-=cut
-
-$test->for('example', 2, 'length', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 7;
-
-  $result
-});
-
 =method numified
 
 The numified method returns the numerical representation of the object which is
@@ -333,7 +237,7 @@ $test->for('example', 1, 'numified', sub {
 
   my $example = Numified::Example->new(value => 'example');
 
-  my $length = $example->length;
+  my $numified = $example->numified;
 
   # 7
 

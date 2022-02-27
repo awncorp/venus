@@ -71,6 +71,12 @@ sub build_self {
 
 # METHODS
 
+sub comparer {
+  my ($self) = @_;
+
+  return 'numified';
+}
+
 sub default {
   return $false;
 }

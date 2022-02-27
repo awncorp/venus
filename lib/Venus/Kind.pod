@@ -128,74 +128,6 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 comparer
-
-  comparer() (Str)
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item comparer example 1
-
-  # given: synopsis;
-
-  my $comparer = $example->comparer;
-
-  # "numeric"
-
-=back
-
-=cut
-
-=head2 length
-
-  length() (Int)
-
-The length method returns the length (or character count) of the stringified
-object.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item length example 1
-
-  # given: synopsis;
-
-  my $length = $example->length;
-
-  # 22
-
-=back
-
-=over 4
-
-=item length example 2
-
-  package Length::Example;
-
-  use Venus::Class;
-
-  extends 'Venus::Kind';
-
-  has 'value';
-
-  package main;
-
-  my $example = Length::Example->new(value => 'example');
-
-  my $length = $example->length;
-
-  # 7
-
-=back
-
-=cut
-
 =head2 numified
 
   numified() (Int)
@@ -233,7 +165,7 @@ I<Since C<0.08>>
 
   my $example = Numified::Example->new(value => 'example');
 
-  my $length = $example->length;
+  my $numified = $example->numified;
 
   # 7
 

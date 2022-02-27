@@ -158,6 +158,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item deduce example 4
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => '1.23');
+
+  my $deduce = $type->deduce;
+
+  # bless({ value => "1.23" }, "Venus::Float")
+
+=back
+
 =cut
 
 =head2 deduce_deep
@@ -271,6 +287,23 @@ I<Since C<0.01>>
   my $detract = $type->detract;
 
   # qr/\w+/
+
+=back
+
+=over 4
+
+=item detract example 4
+
+  package main;
+
+  use Venus::Type;
+  use Venus::Float;
+
+  my $type = Venus::Type->new(Venus::Float->new('1.23'));
+
+  my $detract = $type->detract;
+
+  # "1.23"
 
 =back
 

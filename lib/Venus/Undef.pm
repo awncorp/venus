@@ -23,14 +23,14 @@ sub build_self {
 
 # METHODS
 
-sub default {
-  return undef;
-}
-
-sub length {
+sub comparer {
   my ($self) = @_;
 
-  return 0;
+  return 'numified';
+}
+
+sub default {
+  return undef;
 }
 
 sub numified {
