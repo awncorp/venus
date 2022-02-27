@@ -45,29 +45,6 @@ This package provides the following methods:
 
 =cut
 
-=head2 comparer
-
-  comparer() (Str)
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item comparer example 1
-
-  # given: synopsis;
-
-  my $comparer = $regexp->comparer;
-
-  # "stringified"
-
-=back
-
-=cut
-
 =head2 default
 
   default() (Regexp)

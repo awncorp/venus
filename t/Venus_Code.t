@@ -39,7 +39,6 @@ $test->for('abstract');
 =includes
 
 method: call
-method: comparer
 method: compose
 method: conjoin
 method: curry
@@ -54,7 +53,6 @@ method: le
 method: lt
 method: ne
 method: next
-method: numified
 method: rcurry
 method: tv
 
@@ -179,39 +177,6 @@ $test->for('example', 3, 'call', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 3;
-
-  $result
-});
-
-=method comparer
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-=signature comparer
-
-  comparer() (Str)
-
-=metadata comparer
-
-{
-  since => '0.08',
-}
-
-=example-1 comparer
-
-  # given: synopsis;
-
-  my $comparer = $code->comparer;
-
-  # "stringified"
-
-=cut
-
-$test->for('example', 1, 'comparer', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 'stringified';
 
   $result
 });
@@ -751,16 +716,16 @@ $test->for('example', 3, 'ge', sub {
 
   my $result = $lvalue->ge($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 4, 'ge', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-5 ge
@@ -1210,16 +1175,16 @@ $test->for('example', 3, 'gt', sub {
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 4, 'gt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-5 gt
@@ -1670,16 +1635,16 @@ $test->for('example', 3, 'le', sub {
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 4, 'le', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-5 le
@@ -1899,16 +1864,16 @@ $test->for('example', 3, 'lt', sub {
 
   my $result = $lvalue->lt($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 4, 'lt', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-5 lt
@@ -2295,63 +2260,6 @@ $test->for('example', 1, 'next', sub {
   ok $result == 144;
 
   $result
-});
-
-=method numified
-
-The numified method returns the numerical representation of the object. For code
-objects this method always returns C<0>.
-
-=signature numified
-
-  numified() (Int)
-
-=metadata numified
-
-{
-  since => '0.08',
-}
-
-=example-1 numified
-
-  # given: synopsis;
-
-  my $numified = $code->numified;
-
-  # 0
-
-=cut
-
-$test->for('example', 1, 'numified', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
-
-  !$result
-});
-
-=example-2 numified
-
-  package main;
-
-  use Venus::Code;
-
-  my $code = Venus::Code->new(sub {
-    return;
-  });
-
-  my $numified = $code->numified;
-
-  # 0
-
-=cut
-
-$test->for('example', 2, 'numified', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
-
-  !$result
 });
 
 =method rcurry

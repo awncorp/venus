@@ -56,20 +56,19 @@ method: gtlt
 method: iterator
 method: keys
 method: le
+method: length
 method: list
 method: lt
 method: map
 method: merge
 method: ne
 method: none
-method: numified
 method: one
 method: pairs
 method: path
 method: random
 method: reset
 method: reverse
-method: size
 method: slice
 method: tv
 
@@ -448,16 +447,16 @@ The eq method performs an I<"equals"> operation using the argument provided.
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 eq
@@ -472,16 +471,16 @@ $test->for('example', 1, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 eq
@@ -496,16 +495,16 @@ $test->for('example', 2, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 3, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-4 eq
@@ -543,16 +542,16 @@ $test->for('example', 4, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 5, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-6 eq
@@ -591,16 +590,16 @@ $test->for('example', 6, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 eq
@@ -615,16 +614,16 @@ $test->for('example', 7, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 8, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-9 eq
@@ -639,16 +638,16 @@ $test->for('example', 8, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 9, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =method exists
@@ -836,16 +835,16 @@ argument provided.
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 ge
@@ -860,16 +859,16 @@ $test->for('example', 1, 'ge', sub {
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 ge
@@ -979,16 +978,16 @@ $test->for('example', 6, 'ge', sub {
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 ge
@@ -1066,16 +1065,16 @@ argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 gele
@@ -1090,16 +1089,16 @@ $test->for('example', 1, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 gele
@@ -1114,16 +1113,16 @@ $test->for('example', 2, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 3, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-4 gele
@@ -1137,16 +1136,16 @@ $test->for('example', 3, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 4, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-5 gele
@@ -1161,16 +1160,16 @@ $test->for('example', 4, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 5, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-6 gele
@@ -1209,16 +1208,16 @@ $test->for('example', 6, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 gele
@@ -1233,16 +1232,16 @@ $test->for('example', 7, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 8, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-9 gele
@@ -1257,16 +1256,16 @@ $test->for('example', 8, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 9, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =method grep
@@ -1402,16 +1401,16 @@ $test->for('example', 2, 'gt', sub {
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 3, 'gt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-4 gt
@@ -1449,16 +1448,16 @@ $test->for('example', 4, 'gt', sub {
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 5, 'gt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-6 gt
@@ -1521,16 +1520,16 @@ $test->for('example', 7, 'gt', sub {
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 8, 'gt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-9 gt
@@ -1545,16 +1544,16 @@ $test->for('example', 8, 'gt', sub {
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 9, 'gt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =method gtlt
@@ -1914,16 +1913,16 @@ argument provided.
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'le', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 le
@@ -1962,16 +1961,16 @@ $test->for('example', 2, 'le', sub {
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 3, 'le', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-4 le
@@ -2009,16 +2008,16 @@ $test->for('example', 4, 'le', sub {
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 5, 'le', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-6 le
@@ -2057,16 +2056,16 @@ $test->for('example', 6, 'le', sub {
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'le', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 le
@@ -2081,16 +2080,16 @@ $test->for('example', 7, 'le', sub {
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 8, 'le', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-9 le
@@ -2105,14 +2104,47 @@ $test->for('example', 8, 'le', sub {
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 9, 'le', sub {
   my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=method length
+
+The length method returns the total number of keys defined, and is an alias for
+the L</count> method.
+
+=signature length
+
+  length() (Int)
+
+=metadata length
+
+{
+  since => '0.08',
+}
+
+=example-1 length
+
+  # given: synopsis;
+
+  my $length = $hash->length;
+
+  # 4
+
+=cut
+
+$test->for('example', 1, 'length', sub {
+  my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is $result, 1;
+  is $result, 4;
 
   $result
 });
@@ -2218,16 +2250,16 @@ $test->for('example', 1, 'lt', sub {
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 2, 'lt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-3 lt
@@ -2536,16 +2568,16 @@ The ne method performs a I<"not-equal-to"> operation using the argument provided
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 1, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-2 ne
@@ -2560,16 +2592,16 @@ $test->for('example', 1, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 2, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-3 ne
@@ -2584,16 +2616,16 @@ $test->for('example', 2, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 3, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-4 ne
@@ -2631,16 +2663,16 @@ $test->for('example', 4, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 5, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-6 ne
@@ -2679,16 +2711,16 @@ $test->for('example', 6, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 7, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-8 ne
@@ -2703,16 +2735,16 @@ $test->for('example', 7, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 8, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-9 ne
@@ -2727,16 +2759,16 @@ $test->for('example', 8, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 9, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =method none
@@ -2792,84 +2824,6 @@ $test->for('example', 2, 'none', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
-
-  $result
-});
-
-=method numified
-
-The numified method returns the numerical representation of the object. For hash
-objects this method returns the count (i.e. the number of elements in the
-hash).
-
-=signature numified
-
-  numified() (Int)
-
-=metadata numified
-
-{
-  since => '0.08',
-}
-
-=example-1 numified
-
-  # given: synopsis;
-
-  my $numified = $hash->numified;
-
-  # 4
-
-=cut
-
-$test->for('example', 1, 'numified', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 4;
-
-  $result
-});
-
-=example-2 numified
-
-  package main;
-
-  use Venus::Hash;
-
-  my $hash = Venus::Hash->new({1,2});
-
-  my $numified = $hash->numified;
-
-  # 1
-
-=cut
-
-$test->for('example', 2, 'numified', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
-
-  $result
-});
-
-=example-3 numified
-
-  package main;
-
-  use Venus::Hash;
-
-  my $hash = Venus::Hash->new({1,2,3,4});
-
-  my $numified = $hash->numified;
-
-  # 2
-
-=cut
-
-$test->for('example', 3, 'numified', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 2;
 
   $result
 });
@@ -3200,39 +3154,6 @@ $test->for('example', 1, 'slice', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [2, 4];
-
-  $result
-});
-
-=method size
-
-The size method returns the total number of keys defined, and is an alias for
-the L</count> method.
-
-=signature size
-
-  size() (Int)
-
-=metadata size
-
-{
-  since => '0.08',
-}
-
-=example-1 size
-
-  # given: synopsis;
-
-  my $size = $hash->size;
-
-  # 4
-
-=cut
-
-$test->for('example', 1, 'size', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 4;
 
   $result
 });

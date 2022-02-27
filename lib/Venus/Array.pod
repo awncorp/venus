@@ -309,7 +309,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -327,7 +327,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -345,7 +345,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -363,7 +363,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -399,7 +399,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -417,7 +417,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -435,7 +435,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -587,7 +587,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -623,7 +623,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -677,7 +677,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -741,7 +741,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -759,7 +759,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -777,7 +777,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -795,7 +795,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -813,7 +813,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -849,7 +849,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -867,7 +867,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -885,7 +885,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -991,7 +991,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1027,7 +1027,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1081,7 +1081,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1099,7 +1099,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1489,7 +1489,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1507,7 +1507,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1525,7 +1525,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1561,7 +1561,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1579,7 +1579,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1597,7 +1597,30 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
+
+=back
+
+=cut
+
+=head2 length
+
+  length() (Int)
+
+The length method returns the number of elements within the array, and is an
+alias for the L</count> method.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item length example 1
+
+  # given: synopsis;
+
+  my $length = $array->length;
+
+  # 9
 
 =back
 
@@ -1677,7 +1700,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1902,7 +1925,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1920,7 +1943,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1938,7 +1961,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1956,7 +1979,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1992,7 +2015,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -2010,7 +2033,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -2028,7 +2051,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -2070,46 +2093,6 @@ I<Since C<0.01>>
   });
 
   # 1
-
-=back
-
-=cut
-
-=head2 numified
-
-  numified() (Int)
-
-The numified method returns the numerical representation of the object. For
-array objects this method returns the count (i.e. the number of elements in the
-array).
-
-I<Since C<0.08>>
-
-=over 4
-
-=item numified example 1
-
-  # given: synopsis;
-
-  my $numified = $array->numified;
-
-  # 9
-
-=back
-
-=over 4
-
-=item numified example 2
-
-  package main;
-
-  use Venus::Array;
-
-  my $array = Venus::Array->new([1..3]);
-
-  my $numified = $array->numified;
-
-  # 3
 
 =back
 
@@ -2468,29 +2451,6 @@ I<Since C<0.01>>
   my $shift = $array->shift;
 
   # 1
-
-=back
-
-=cut
-
-=head2 size
-
-  size() (Int)
-
-The size method returns the number of elements within the array, and is an
-alias for the L</count> method.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item size example 1
-
-  # given: synopsis;
-
-  my $size = $array->size;
-
-  # 9
 
 =back
 

@@ -105,29 +105,6 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 comparer
-
-  comparer() (Str)
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item comparer example 1
-
-  # given: synopsis;
-
-  my $comparer = $code->comparer;
-
-  # "stringified"
-
-=back
-
-=cut
-
 =head2 compose
 
   compose(CodeRef $code, Any @data) (CodeRef)
@@ -525,7 +502,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -868,7 +845,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1212,7 +1189,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->le($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1383,7 +1360,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1672,47 +1649,6 @@ I<Since C<0.01>>
   my $next = $code->next(72);
 
   # 144
-
-=back
-
-=cut
-
-=head2 numified
-
-  numified() (Int)
-
-The numified method returns the numerical representation of the object. For code
-objects this method always returns C<0>.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item numified example 1
-
-  # given: synopsis;
-
-  my $numified = $code->numified;
-
-  # 0
-
-=back
-
-=over 4
-
-=item numified example 2
-
-  package main;
-
-  use Venus::Code;
-
-  my $code = Venus::Code->new(sub {
-    return;
-  });
-
-  my $numified = $code->numified;
-
-  # 0
 
 =back
 

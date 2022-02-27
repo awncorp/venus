@@ -65,7 +65,7 @@ I<Since C<0.08>>
 
   my $example = Example->new;
 
-  my $result = $example->eq(2);
+  my $result = $example->eq($example);
 
   # 1
 
@@ -81,7 +81,7 @@ I<Since C<0.08>>
 
   my $result = $example->eq([1,2]);
 
-  # 1
+  # 0
 
 =back
 
@@ -95,7 +95,7 @@ I<Since C<0.08>>
 
   my $result = $example->eq({1..4});
 
-  # 1
+  # 0
 
 =back
 
@@ -134,7 +134,7 @@ I<Since C<0.08>>
 
   my $example = Example->new;
 
-  my $result = $example->ge([]);
+  my $result = $example->ge($example);
 
   # 1
 
@@ -190,9 +190,9 @@ I<Since C<0.08>>
 
   my $example = Example->new;
 
-  my $result = $example->gele(2, [1,2,3]);
+  my $result = $example->gele(2, []);
 
-  # 1
+  # 0
 
 =back
 
@@ -233,7 +233,7 @@ I<Since C<0.08>>
 
   my $result = $example->gt({1..2});
 
-  # 1
+  # 0
 
 =back
 
@@ -245,7 +245,7 @@ I<Since C<0.08>>
 
   my $example = Example->new;
 
-  my $result = $example->gt([9]);
+  my $result = $example->gt(1.9998);
 
   # 1
 
@@ -261,7 +261,7 @@ I<Since C<0.08>>
 
   my $result = $example->gt(\1_000_000);
 
-  # 1
+  # 0
 
 =back
 
@@ -314,7 +314,7 @@ I<Since C<0.08>>
 
   my $example = Example->new;
 
-  my $result = $example->gtlt([9], [0,1,2]);
+  my $result = $example->gtlt('.', ['.']);
 
   # 1
 
@@ -453,7 +453,7 @@ I<Since C<0.08>>
 
   my $result = $example->ne([1,2]);
 
-  # 0
+  # 1
 
 =back
 

@@ -42,7 +42,6 @@ method: append
 method: camelcase
 method: chomp
 method: chop
-method: comparer
 method: concat
 method: contains
 method: default
@@ -305,39 +304,6 @@ $test->for('example', 1, 'chop', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "this is just a test";
-
-  $result
-});
-
-=method comparer
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-=signature comparer
-
-  comparer() (Str)
-
-=metadata comparer
-
-{
-  since => '0.08',
-}
-
-=example-1 comparer
-
-  # given: synopsis;
-
-  my $comparer = $string->comparer;
-
-  # "stringified"
-
-=cut
-
-$test->for('example', 1, 'comparer', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, "stringified";
 
   $result
 });
@@ -2787,16 +2753,16 @@ like a number, or C<0>.
 
   my $numified = $string->numified;
 
-  # 0
+  # 11
 
 =cut
 
 $test->for('example', 1, 'numified', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 11;
 
-  !$result
+  $result
 });
 
 =example-2 numified

@@ -49,6 +49,12 @@ sub atan2 {
   return CORE::atan2($data, $arg + 0);
 }
 
+sub comparer {
+  my ($self) = @_;
+
+  return 'numified';
+}
+
 sub cos {
   my ($self) = @_;
 

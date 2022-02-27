@@ -68,7 +68,11 @@ sub chop {
 sub comparer {
   my ($self) = @_;
 
-  return 'stringified';
+  my $data = $self->get;
+
+  require Scalar::Util;
+
+  return Scalar::Util::looks_like_number($data) ? 'numified' : 'stringified';
 }
 
 sub concat {
@@ -159,7 +163,7 @@ sub numified {
 
   my $data = $self->get;
 
-  return $data =~ /^[\d\.]+$/ ? (0 + $data) : 0;
+  return $self->comparer eq 'numified' ? (0 + $data) : $self->SUPER::numified();
 }
 
 sub prepend {

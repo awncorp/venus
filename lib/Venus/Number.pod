@@ -235,7 +235,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -253,7 +253,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -289,7 +289,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -342,7 +342,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -466,7 +466,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -484,7 +484,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -520,7 +520,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -573,7 +573,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -638,7 +638,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -656,7 +656,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -692,7 +692,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -745,7 +745,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1445,7 +1445,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1463,7 +1463,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1499,7 +1499,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1552,7 +1552,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1675,7 +1675,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1693,7 +1693,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1729,7 +1729,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1782,7 +1782,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -2198,316 +2198,6 @@ I<Since C<0.08>>
 =back
 
 =cut
-
-=head1 OPERATORS
-
-This package overloads the following operators:
-
-=cut
-
-=over 4
-
-=item operation: C<(!)>
-
-This package overloads the C<!> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number = !$number;
-
-  # ""
-
-=back
-
-=over 4
-
-=item operation: C<(!=)>
-
-This package overloads the C<!=> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number != 100;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(%)>
-
-This package overloads the C<%> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number % 2_000;
-
-  # 1_000
-
-=back
-
-=over 4
-
-=item operation: C<(*)>
-
-This package overloads the C<*> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number * 2;
-
-  # 2_000
-
-=back
-
-=over 4
-
-=item operation: C<(+)>
-
-This package overloads the C<+> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number + 100;
-
-  # 1100
-
-=back
-
-=over 4
-
-=item operation: C<(-)>
-
-This package overloads the C<-> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number - 100;
-
-  # 900
-
-=back
-
-=over 4
-
-=item operation: C<(.)>
-
-This package overloads the C<.> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number . 0;
-
-  # 10_000
-
-=back
-
-=over 4
-
-=item operation: C<(/)>
-
-This package overloads the C</> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number / 10;
-
-  # 100
-
-=back
-
-=over 4
-
-=item operation: C<(0+)>
-
-This package overloads the C<0+> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number + 0;
-
-  # 1_000
-
-=back
-
-=over 4
-
-=item operation: C<(E<lt>)>
-
-This package overloads the C<E<lt>> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number < 1001;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(E<lt>=)>
-
-This package overloads the C<E<lt>=> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number <= 1000;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(==)>
-
-This package overloads the C<==> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number == 1000;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(E<gt>)>
-
-This package overloads the C<E<gt>> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number > 999;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(E<gt>=)>
-
-This package overloads the C<E<gt>=> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number >= 1000;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(bool)>
-
-This package overloads the C<bool> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = !!$number;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(eq)>
-
-This package overloads the C<eq> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number eq "1000";
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(ne)>
-
-This package overloads the C<ne> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number ne "1_000";
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(qr)>
-
-This package overloads the C<qr> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = '1000' =~ qr/$number/;
-
-  # 1
-
-=back
-
-=over 4
-
-=item operation: C<(x)>
-
-This package overloads the C<x> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = $number x 2;
-
-  # 10001000
-
-=back
 
 =head1 AUTHORS
 

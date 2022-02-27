@@ -156,29 +156,6 @@ I<Since C<0.01>>
 
 =cut
 
-=head2 comparer
-
-  comparer() (Str)
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-I<Since C<0.08>>
-
-=over 4
-
-=item comparer example 1
-
-  # given: synopsis;
-
-  my $comparer = $string->comparer;
-
-  # "stringified"
-
-=back
-
-=cut
-
 =head2 concat
 
   concat(Str @parts) (Str)
@@ -1901,7 +1878,7 @@ I<Since C<0.08>>
 
   my $numified = $string->numified;
 
-  # 0
+  # 11
 
 =back
 

@@ -368,16 +368,16 @@ The eq method performs an I<"equals"> operation using the argument provided.
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 eq
@@ -392,16 +392,16 @@ $test->for('example', 1, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 eq
@@ -440,16 +440,16 @@ $test->for('example', 3, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 4, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-5 eq
@@ -511,16 +511,16 @@ $test->for('example', 6, 'eq', sub {
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'eq', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 eq
@@ -679,16 +679,16 @@ argument provided.
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 ge
@@ -703,16 +703,16 @@ $test->for('example', 1, 'ge', sub {
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 ge
@@ -751,16 +751,16 @@ $test->for('example', 3, 'ge', sub {
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 4, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-5 ge
@@ -822,16 +822,16 @@ $test->for('example', 6, 'ge', sub {
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'ge', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 ge
@@ -909,16 +909,16 @@ argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 1, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-2 gele
@@ -933,16 +933,16 @@ $test->for('example', 1, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 2, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-3 gele
@@ -981,16 +981,16 @@ $test->for('example', 3, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 4, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-5 gele
@@ -1052,16 +1052,16 @@ $test->for('example', 6, 'gele', sub {
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =cut
 
 $test->for('example', 7, 'gele', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 1;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =example-8 gele
@@ -1994,16 +1994,16 @@ The lt method performs a I<"lesser-than"> operation using the argument provided.
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 1, 'lt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-2 lt
@@ -2018,16 +2018,16 @@ $test->for('example', 1, 'lt', sub {
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 2, 'lt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-3 lt
@@ -2066,16 +2066,16 @@ $test->for('example', 3, 'lt', sub {
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 4, 'lt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-5 lt
@@ -2137,16 +2137,16 @@ $test->for('example', 6, 'lt', sub {
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 7, 'lt', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-8 lt
@@ -2304,16 +2304,16 @@ The ne method performs a I<"not-equal-to"> operation using the argument provided
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 1, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-2 ne
@@ -2328,16 +2328,16 @@ $test->for('example', 1, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 2, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-3 ne
@@ -2376,16 +2376,16 @@ $test->for('example', 3, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 4, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-5 ne
@@ -2447,16 +2447,16 @@ $test->for('example', 6, 'ne', sub {
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =cut
 
 $test->for('example', 7, 'ne', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+  ok my $result = $tryable->result;
+  is $result, 1;
 
-  !$result
+  $result
 });
 
 =example-8 ne
@@ -3016,500 +3016,6 @@ $test->for('example', 9, 'tv', sub {
   is $result, 0;
 
   !$result
-});
-
-=operator (!)
-
-This package overloads the C<!> operator.
-
-=cut
-
-$test->for('operator', '(!)');
-
-=example-1 (!)
-
-  # given: synopsis;
-
-  my $result = $number = !$number;
-
-  # ""
-
-=cut
-
-$test->for('example', 1, '(!)', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  ok $result eq '';
-
-  !$result
-});
-
-=operator (!=)
-
-This package overloads the C<!=> operator.
-
-=cut
-
-$test->for('operator', '(!=)');
-
-=example-1 (!=)
-
-  # given: synopsis;
-
-  my $result = $number != 100;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(!=)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (%)
-
-This package overloads the C<%> operator.
-
-=cut
-
-$test->for('operator', '(%)');
-
-=example-1 (%)
-
-  # given: synopsis;
-
-  my $result = $number % 2_000;
-
-  # 1_000
-
-=cut
-
-$test->for('example', 1, '(%)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1_000;
-
-  $result
-});
-
-=operator (*)
-
-This package overloads the C<*> operator.
-
-=cut
-
-$test->for('operator', '(*)');
-
-=example-1 (*)
-
-  # given: synopsis;
-
-  my $result = $number * 2;
-
-  # 2_000
-
-=cut
-
-$test->for('example', 1, '(*)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 2_000;
-
-  $result
-});
-
-=operator (+)
-
-This package overloads the C<+> operator.
-
-=cut
-
-$test->for('operator', '(+)');
-
-=example-1 (+)
-
-  # given: synopsis;
-
-  my $result = $number + 100;
-
-  # 1100
-
-=cut
-
-$test->for('example', 1, '(+)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1100;
-
-  $result
-});
-
-=operator (-)
-
-This package overloads the C<-> operator.
-
-=cut
-
-$test->for('operator', '(-)');
-
-=example-1 (-)
-
-  # given: synopsis;
-
-  my $result = $number - 100;
-
-  # 900
-
-=cut
-
-$test->for('example', 1, '(-)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 900;
-
-  $result
-});
-
-=operator (.)
-
-This package overloads the C<.> operator.
-
-=cut
-
-$test->for('operator', '(.)');
-
-=example-1 (.)
-
-  # given: synopsis;
-
-  my $result = $number . 0;
-
-  # 10_000
-
-=cut
-
-$test->for('example', 1, '(.)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 10_000;
-
-  $result
-});
-
-=operator (/)
-
-This package overloads the C</> operator.
-
-=cut
-
-$test->for('operator', '(/)');
-
-=example-1 (/)
-
-  # given: synopsis;
-
-  my $result = $number / 10;
-
-  # 100
-
-=cut
-
-$test->for('example', 1, '(/)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 100;
-
-  $result
-});
-
-=operator (0+)
-
-This package overloads the C<0+> operator.
-
-=cut
-
-$test->for('operator', '(0+)');
-
-=example-1 (0+)
-
-  # given: synopsis;
-
-  my $result = $number + 0;
-
-  # 1_000
-
-=cut
-
-$test->for('example', 1, '(0+)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1_000;
-
-  $result
-});
-
-=operator (E<lt>)
-
-This package overloads the C<E<lt>> operator.
-
-=cut
-
-$test->for('operator', '(E<lt>)');
-
-=example-1 (E<lt>)
-
-  # given: synopsis;
-
-  my $result = $number < 1001;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(E<lt>)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (E<lt>=)
-
-This package overloads the C<E<lt>=> operator.
-
-=cut
-
-$test->for('operator', '(E<lt>=)');
-
-=example-1 (E<lt>=)
-
-  # given: synopsis;
-
-  my $result = $number <= 1000;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(E<lt>=)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (==)
-
-This package overloads the C<==> operator.
-
-=cut
-
-$test->for('operator', '(==)');
-
-=example-1 (==)
-
-  # given: synopsis;
-
-  my $result = $number == 1000;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(==)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (E<gt>)
-
-This package overloads the C<E<gt>> operator.
-
-=cut
-
-$test->for('operator', '(E<gt>)');
-
-=example-1 (E<gt>)
-
-  # given: synopsis;
-
-  my $result = $number > 999;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(E<gt>)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (E<gt>=)
-
-This package overloads the C<E<gt>=> operator.
-
-=cut
-
-$test->for('operator', '(E<gt>=)');
-
-=example-1 (E<gt>=)
-
-  # given: synopsis;
-
-  my $result = $number >= 1000;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(E<gt>=)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (bool)
-
-This package overloads the C<bool> operator.
-
-=cut
-
-$test->for('operator', '(bool)');
-
-=example-1 (bool)
-
-  # given: synopsis;
-
-  my $result = !!$number;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(bool)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (eq)
-
-This package overloads the C<eq> operator.
-
-=cut
-
-$test->for('operator', '(eq)');
-
-=example-1 (eq)
-
-  # given: synopsis;
-
-  my $result = $number eq "1000";
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(eq)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (ne)
-
-This package overloads the C<ne> operator.
-
-=cut
-
-$test->for('operator', '(ne)');
-
-=example-1 (ne)
-
-  # given: synopsis;
-
-  my $result = $number ne "1_000";
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(ne)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (qr)
-
-This package overloads the C<qr> operator.
-
-=cut
-
-$test->for('operator', '(qr)');
-
-=example-1 (qr)
-
-  # given: synopsis;
-
-  my $result = '1000' =~ qr/$number/;
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(qr)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1;
-
-  $result
-});
-
-=operator (x)
-
-This package overloads the C<x> operator.
-
-=cut
-
-$test->for('operator', '(x)');
-
-=example-1 (x)
-
-  # given: synopsis;
-
-  my $result = $number x 2;
-
-  # 10001000
-
-=cut
-
-$test->for('example', 1, '(x)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result == 1_000_1_000;
-
-  $result
 });
 
 =license

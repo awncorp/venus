@@ -218,6 +218,12 @@ sub keys {
   return [CORE::sort(CORE::keys(%$data))];
 }
 
+sub length {
+  my ($self) = @_;
+
+  return $self->count;
+}
+
 sub list {
   my ($self) = @_;
 
@@ -303,12 +309,6 @@ sub none {
   return $found ? 0 : 1;
 }
 
-sub numified {
-  my ($self) = @_;
-
-  return $self->count;
-}
-
 sub one {
   my ($self, $code) = @_;
 
@@ -379,12 +379,6 @@ sub reverse {
   }
 
   return {CORE::reverse(%$result)};
-}
-
-sub size {
-  my ($self) = @_;
-
-  return $self->count;
 }
 
 sub slice {

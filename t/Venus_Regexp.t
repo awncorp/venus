@@ -38,7 +38,6 @@ $test->for('abstract');
 
 =includes
 
-method: comparer
 method: default
 method: eq
 method: ge
@@ -94,39 +93,6 @@ Venus::Kind::Value
 =cut
 
 $test->for('inherits');
-
-=method comparer
-
-The comparer method returns the name of the method which will produce a value
-to be used in comparison operations.
-
-=signature comparer
-
-  comparer() (Str)
-
-=metadata comparer
-
-{
-  since => '0.08',
-}
-
-=example-1 comparer
-
-  # given: synopsis;
-
-  my $comparer = $regexp->comparer;
-
-  # "stringified"
-
-=cut
-
-$test->for('example', 1, 'comparer', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, 'stringified';
-
-  $result
-});
 
 =method default
 

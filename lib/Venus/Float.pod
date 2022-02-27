@@ -87,7 +87,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -105,7 +105,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -140,7 +140,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -194,7 +194,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->eq($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -259,7 +259,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -277,7 +277,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -312,7 +312,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -366,7 +366,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ge($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -431,7 +431,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -449,7 +449,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -484,7 +484,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -538,7 +538,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->gele($rvalue);
 
-  # 1
+  # 0
 
 =back
 
@@ -1117,7 +1117,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1135,7 +1135,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1170,7 +1170,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1224,7 +1224,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->lt($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1288,7 +1288,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1306,7 +1306,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1341,7 +1341,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
@@ -1395,7 +1395,7 @@ I<Since C<0.08>>
 
   my $result = $lvalue->ne($rvalue);
 
-  # 0
+  # 1
 
 =back
 
