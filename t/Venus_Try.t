@@ -264,6 +264,29 @@ $test->for('example', 2, 'callback', sub {
   $result
 });
 
+=example-3 callback
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  my $callback = $try->callback('missing_method');
+
+  # Exception! Venus::Try::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 3, 'callback', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Try::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method catch
 
 The catch method takes a package or ref name, and when triggered checks whether
@@ -853,6 +876,31 @@ $test->for('example', 2, 'result', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [1..5];
+
+  $result
+});
+
+=example-3 result
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {die});
+
+  my $result = $try->result;
+
+  # Exception! Venus::Error
+
+=cut
+
+$test->for('example', 3, 'result', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok !$result->isa('Venus::Try::Error');
+  ok $result->isa('Venus::Error');
 
   $result
 });

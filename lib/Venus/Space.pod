@@ -463,6 +463,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item call example 3
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $result = $space->call('missing');
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 chain
@@ -637,6 +653,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item cop example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  my $code = $space->cop('missing', $space->blessed);
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 data
@@ -714,6 +746,22 @@ I<Since C<0.01>>
   my $eval = $space->eval('our $VERSION = 0.01');
 
   # 0.01
+
+=back
+
+=over 4
+
+=item eval example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $eval = $space->eval('die');
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
 
 =back
 
@@ -989,6 +1037,22 @@ I<Since C<0.01>>
   my $load = $space->load;
 
   # "CPAN"
+
+=back
+
+=over 4
+
+=item load example 2
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('no/thing');
+
+  my $load = $space->load;
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
 
 =back
 

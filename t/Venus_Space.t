@@ -704,6 +704,29 @@ $test->for('example', 2, 'call', sub {
   $result
 });
 
+=example-3 call
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $result = $space->call('missing');
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 3, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Space::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method chain
 
 The chain method chains one or more method calls and returns the result.
@@ -949,6 +972,29 @@ $test->for('example', 1, 'cop', sub {
   $result
 });
 
+=example-2 cop
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/bar');
+
+  my $code = $space->cop('missing', $space->blessed);
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'cop', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Space::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method data
 
 The data method attempts to read and return any content stored in the C<DATA>
@@ -1056,6 +1102,29 @@ $test->for('example', 1, 'eval', sub {
   ok my $result = $tryable->result;
   is $result, 0.01;
   is "Foo"->VERSION, 0.01;
+
+  $result
+});
+
+=example-2 eval
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $eval = $space->eval('die');
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'eval', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Space::Error');
+  ok $error->isa('Venus::Error');
 
   $result
 });
@@ -1430,6 +1499,29 @@ $test->for('example', 1, 'load', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq 'CPAN';
+
+  $result
+});
+
+=example-2 load
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('no/thing');
+
+  my $load = $space->load;
+
+  # Exception! Venus::Space::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'load', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Space::Error');
+  ok $error->isa('Venus::Error');
 
   $result
 });

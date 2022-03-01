@@ -38,6 +38,10 @@ sub _fork {
   CORE::fork();
 }
 
+sub _forkable {
+  $Config::Config{d_pseudofork} ? 0 : 1;
+}
+
 sub _kill {
   CORE::kill(@_);
 }
@@ -136,7 +140,7 @@ sub explain {
 sub fork {
   my ($self, $code, @args) = @_;
 
-  if ($Config::Config{d_pseudofork}) {
+  if (not(_forkable())) {
     my $throw;
     my $error = "Can't fork process @{[_pid()]}: Fork emulation not supported";
     $throw = $self->throw;
