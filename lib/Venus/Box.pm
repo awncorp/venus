@@ -52,7 +52,9 @@ sub build_proxy {
 
   if (not(Scalar::Util::blessed($value))) {
     require Venus::Error;
-    Venus::Error->throw("$package can only operate on objects, not $value");
+    return Venus::Error->throw(
+      "$package can only operate on objects, not $value"
+    );
   }
   if (not($value->can($method) || $value->can('AUTOLOAD'))) {
     return undef;

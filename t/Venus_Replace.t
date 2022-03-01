@@ -232,6 +232,33 @@ $test->for('example', 1, 'evaluate', sub {
   $result
 });
 
+=example-2 evaluate
+
+  package main;
+
+  use Venus::Replace;
+
+  my $replace = Venus::Replace->new(
+    string => 'hello world',
+    regexp => 'world)(',
+    substr => 'universe',
+  );
+
+  my $evaluate = $replace->evaluate;
+
+  # Exception! Venus::Replace::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'evaluate', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Replace::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method explain
 
 The explain method returns the subject of the regular expression operation and

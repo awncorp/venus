@@ -210,6 +210,27 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item error example 6
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error::NoThing',
+    parent => 'No::Thing',
+  );
+
+  my $error = $throw->error({
+    message => 'Example error (no thing)!',
+  });
+
+  # Exception! Venus::Throw::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head1 AUTHORS
