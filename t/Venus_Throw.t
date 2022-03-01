@@ -268,6 +268,34 @@ $test->for('example', 5, 'error', sub {
   $result
 });
 
+=example-6 error
+
+  package main;
+
+  use Venus::Throw;
+
+  my $throw = Venus::Throw->new(
+    package => 'Example::Error::NoThing',
+    parent => 'No::Thing',
+  );
+
+  my $error = $throw->error({
+    message => 'Example error (no thing)!',
+  });
+
+  # Exception! Venus::Throw::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 6, 'error', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Throw::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =license
 
 Copyright (C) 2021, Cpanery

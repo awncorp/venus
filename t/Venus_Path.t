@@ -1095,6 +1095,29 @@ $test->for('example', 3, 'open', sub {
   $result
 });
 
+=example-4 open
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $fh = $path->open('>');
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 4, 'open', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method mkcall
 
 The mkcall method returns the result of executing the path as an executable. In
@@ -1140,7 +1163,7 @@ $test->for('example', 1, 'mkcall', sub {
 
   my $path = Venus::Path->new($^X);
 
-  my ($call_output, $exit_code) = $path->mkcall('t/data/sun', '--heat-death');
+  my ($call_output, $exit_code) = $path->mkcall('t/data/sun --heat-death');
 
   # ("", 256)
 
@@ -1153,6 +1176,34 @@ $test->for('example', 2, 'mkcall', sub {
 
   !$result[0]
 });
+
+=example-3 mkcall
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('.help');
+
+  my $output = $path->mkcall;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+SKIP: {
+if ($^O =~ /Win32/i) {
+  skip '=example-3 mkcall';
+}
+$test->for('example', 3, 'mkcall', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->safe('result');
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+}
 
 =method mkdir
 
@@ -1190,6 +1241,29 @@ $test->for('example', 1, 'mkdir', sub {
   ok $result->exists;
 
   rmdir 't/data/systems';
+  $result
+});
+
+=example-2 mkdir
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  $path = $path->mkdir;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'mkdir', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
+
   $result
 });
 
@@ -1304,6 +1378,29 @@ $test->for('example', 1, 'mkfile', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->exists;
+
+  $result
+});
+
+=example-2 mkfile
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  $path = $path->mkfile;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'mkfile', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
 
   $result
 });
@@ -1481,6 +1578,29 @@ $test->for('example', 1, 'read', sub {
   $result
 });
 
+=example-2 read
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $content = $path->read;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'read', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method relative
 
 The relative method returns a path object representing a relative path
@@ -1575,6 +1695,29 @@ $test->for('example', 1, 'rmdir', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
+
+  $result
+});
+
+=example-2 rmdir
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $rmdir = $path->mkdir->rmdir;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'rmdir', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
 
   $result
 });
@@ -1869,6 +2012,29 @@ $test->for('example', 1, 'unlink', sub {
   $result
 });
 
+=example-2 unlink
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $unlink = $path->unlink;
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'unlink', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method write
 
 The write method write the data provided to the file.
@@ -1903,6 +2069,29 @@ $test->for('example', 1, 'write', sub {
   ok $result->read =~ m{asteroid};
 
   unlink $result;
+  $result
+});
+
+=example-2 write
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('/path/to/xyz');
+
+  my $write = $path->write('nothing');
+
+  # Exception! Venus::Path::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'write', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Path::Error');
+  ok $error->isa('Venus::Error');
+
   $result
 });
 

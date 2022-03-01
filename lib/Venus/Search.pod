@@ -154,6 +154,25 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item evaluate example 2
+
+  package main;
+
+  use Venus::Search;
+
+  my $search = Venus::Search->new(
+    string => 'hello world',
+    regexp => 'hello:)',
+  );
+
+  my $evaluate = $search->evaluate;
+
+  # Exception! Venus::Search::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 explain

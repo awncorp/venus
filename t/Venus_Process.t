@@ -22,6 +22,7 @@ our $TEST_VENUS_PROCESS_CHDIR = 1;
 our $TEST_VENUS_PROCESS_EXIT = 0;
 our $TEST_VENUS_PROCESS_EXITCODE = 0;
 our $TEST_VENUS_PROCESS_FORK = undef;
+our $TEST_VENUS_PROCESS_FORKABLE = 1;
 our $TEST_VENUS_PROCESS_KILL = 0;
 our $TEST_VENUS_PROCESS_OPEN = 1;
 our $TEST_VENUS_PROCESS_PID = 12345;
@@ -66,6 +67,15 @@ our $TEST_VENUS_PROCESS_WAITPID = undef;
     else {
       return $TEST_VENUS_PROCESS_PID++;
     }
+  };
+}
+
+# _forkable
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_forkable"} = sub {
+    return $TEST_VENUS_PROCESS_FORKABLE;
   };
 }
 
@@ -280,7 +290,7 @@ $test->for('example', 2, 'chdir', sub {
 
   $parent = $parent->chdir('/xyz');
 
-  # Exception!
+  # Exception! Venus::Process::Error (isa Venus::Error)
 
 =cut
 
@@ -679,6 +689,31 @@ $test->for('example', 3, 'fork', sub {
   @result
 });
 
+=example-4 fork
+
+  # given: synopsis;
+
+  $process = $parent->fork(sub{});
+
+  # simulate fork failure
+
+  # no forking attempted if NOT supported
+
+  # Exception! Venus::Process:Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 4, 'fork', sub {
+  my ($tryable) = @_;
+  require Config;
+  local $TEST_VENUS_PROCESS_FORKABLE = 0;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Process::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method forks
 
 The forks method creates multiple forks by calling the L</fork> method C<n>
@@ -871,6 +906,26 @@ $test->for('example', 1, 'setsid', sub {
   $result
 });
 
+=example-2 setsid
+
+  # given: synopsis;
+
+  my $setsid = $parent->setsid;
+
+  # Exception! Venus::Process::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'setsid', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_SETSID = -1;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Process::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method stderr
 
 The stderr method redirects C<STDERR> to the path provided, typically
@@ -901,6 +956,26 @@ $test->for('example', 1, 'stderr', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Process');
+
+  $result
+});
+
+=example-2 stderr
+
+  # given: synopsis;
+
+  $parent = $parent->stderr('/nowhere');
+
+  # Exception! Venus::Process:Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'stderr', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_OPEN = 0;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Process::Error');
+  ok $error->isa('Venus::Error');
 
   $result
 });
@@ -939,6 +1014,26 @@ $test->for('example', 1, 'stdin', sub {
   $result
 });
 
+=example-2 stdin
+
+  # given: synopsis;
+
+  $parent = $parent->stdin('/nowhere');
+
+  # Exception! Venus::Process::Error (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'stdin', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_OPEN = 0;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Process::Error');
+  ok $error->isa('Venus::Error');
+
+  $result
+});
+
 =method stdout
 
 The stdout method redirects C<STDOUT> to the path provided, typically
@@ -969,6 +1064,26 @@ $test->for('example', 1, 'stdout', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Process');
+
+  $result
+});
+
+=example-2 stdout
+
+  # given: synopsis;
+
+  $parent = $parent->stdout('/nowhere');
+
+  # Exception! Venus::Process::Error (isa Venus::Process)
+
+=cut
+
+$test->for('example', 2, 'stdout', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_OPEN = 0;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Process::Error');
+  ok $error->isa('Venus::Error');
 
   $result
 });

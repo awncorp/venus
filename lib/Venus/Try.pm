@@ -65,10 +65,11 @@ sub callback {
     my $invocant = $self->invocant;
     my $method = $invocant ? $invocant->can($callback) : $self->can($callback);
 
-    require Venus::Error;
-    Venus::Error->new(sprintf(
-      qq(Can't locate object method "%s" on package "%s"),
-      ($callback, $invocant ? ref($invocant) : ref($self))))->throw if !$method;
+    $self->throw->error({
+      message => sprintf(qq(Can't locate object method "%s" on package "%s"),
+        ($callback, $invocant ? ref($invocant) : ref($self)))
+    })
+    if !$method;
 
     $callback = sub {goto $method};
   }
@@ -201,8 +202,13 @@ sub result {
         die $caught;
       }
       else {
-        require Venus::Error;
-        Venus::Error->new($caught)->throw;
+        if (UNIVERSAL::isa($caught, 'Venus::Error')) {
+          $caught->throw;
+        }
+        else {
+          require Venus::Error;
+          Venus::Error->throw($caught);
+        }
       }
     }
   }

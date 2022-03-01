@@ -228,6 +228,22 @@ I<Since C<0.01>>
 
 =back
 
+=over 4
+
+=item callback example 3
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  my $callback = $try->callback('missing_method');
+
+  # Exception! Venus::Try::Error (isa Venus::Error)
+
+=back
+
 =cut
 
 =head2 catch
@@ -680,6 +696,24 @@ I<Since C<0.01>>
   my $result = $try->result(1..5);
 
   # [1..5]
+
+=back
+
+=over 4
+
+=item result example 3
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {die});
+
+  my $result = $try->result;
+
+  # Exception! Venus::Error
 
 =back
 
