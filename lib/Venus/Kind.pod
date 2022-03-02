@@ -51,6 +51,8 @@ L<Venus::Role::Matchable>
 
 L<Venus::Role::Printable>
 
+L<Venus::Role::Testable>
+
 L<Venus::Role::Throwable>
 
 =cut

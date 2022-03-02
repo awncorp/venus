@@ -91,6 +91,7 @@ Venus::Role::Doable
 Venus::Role::Dumpable
 Venus::Role::Matchable
 Venus::Role::Printable
+Venus::Role::Testable
 Venus::Role::Throwable
 
 =cut
