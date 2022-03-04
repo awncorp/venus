@@ -40,6 +40,7 @@ $test->for('abstract');
 
 method: all
 method: any
+method: cast
 method: count
 method: default
 method: delete
@@ -239,6 +240,261 @@ $test->for('example', 2, 'any', sub {
   ok $result == 1;
 
   $result
+});
+
+=method cast
+
+The cast method converts L<"value"|Venus::Kind::Value> objects between
+different I<"value"> object types, based on the name of the type provided. This
+method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
+
+=signature cast
+
+  cast(Str $kind) (Object | Undef)
+
+=metadata cast
+
+{
+  since => '0.08',
+}
+
+=example-1 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('array');
+
+  # bless({ value => [] }, "Venus::Array")
+
+=cut
+
+$test->for('example', 1, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Array');
+  is_deeply $result->get, [];
+
+  $result
+});
+
+=example-2 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('boolean');
+
+  # bless({ value => 1 }, "Venus::Boolean")
+
+=cut
+
+$test->for('example', 2, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Boolean');
+  is $result->get, 1;
+
+  $result
+});
+
+=example-3 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('code');
+
+  # bless({ value => sub { ... } }, "Venus::Code")
+
+=cut
+
+$test->for('example', 3, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Code');
+  is_deeply $result->get->(), [];
+
+  $result
+});
+
+=example-4 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('float');
+
+  # bless({ value => "1.0" }, "Venus::Float")
+
+=cut
+
+$test->for('example', 4, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Float');
+  is $result->get, '1.0';
+
+  $result
+});
+
+=example-5 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('hash');
+
+  # bless({ value => {} }, "Venus::Hash")
+
+=cut
+
+$test->for('example', 5, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Hash');
+  is_deeply $result->get, {};
+
+  $result
+});
+
+=example-6 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('number');
+
+  # bless({ value => 2 }, "Venus::Number")
+
+=cut
+
+$test->for('example', 6, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Number');
+  is $result->get, 2;
+
+  $result
+});
+
+=example-7 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('regexp');
+
+  # bless({ value => qr/(?^u:\[\])/ }, "Venus::Regexp")
+
+=cut
+
+$test->for('example', 7, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Regexp');
+  is $result->get, qr/\[\]/;
+
+  $result
+});
+
+=example-8 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('scalar');
+
+  # bless({ value => \[] }, "Venus::Scalar")
+
+=cut
+
+$test->for('example', 8, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Scalar');
+  is_deeply $result->get, \[];
+
+  $result
+});
+
+=example-9 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('string');
+
+  # bless({ value => "[]" }, "Venus::String")
+
+=cut
+
+$test->for('example', 9, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::String');
+  is $result->get, '[]';
+
+  $result
+});
+
+=example-10 cast
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new;
+
+  my $cast = $array->cast('undef');
+
+  # bless({ value => undef }, "Venus::Undef")
+
+=cut
+
+$test->for('example', 10, 'cast', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Undef');
+
+  !$result
 });
 
 =method count

@@ -43,6 +43,178 @@ This package provides the following methods:
 
 =cut
 
+=head2 cast
+
+  cast(Str $kind) (Object | Undef)
+
+The cast method converts L<"value"|Venus::Kind::Value> objects between
+different I<"value"> object types, based on the name of the type provided. This
+method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item cast example 1
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('array');
+
+  # bless({ value => [0] }, "Venus::Array")
+
+=back
+
+=over 4
+
+=item cast example 2
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('boolean');
+
+  # bless({ value => 0 }, "Venus::Boolean")
+
+=back
+
+=over 4
+
+=item cast example 3
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('code');
+
+  # bless({ value => sub { ... } }, "Venus::Code")
+
+=back
+
+=over 4
+
+=item cast example 4
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('float');
+
+  # bless({ value => "0.0" }, "Venus::Float")
+
+=back
+
+=over 4
+
+=item cast example 5
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('hash');
+
+  # bless({ value => { "0" => 0 } }, "Venus::Hash")
+
+=back
+
+=over 4
+
+=item cast example 6
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('number');
+
+  # bless({ value => 0 }, "Venus::Number")
+
+=back
+
+=over 4
+
+=item cast example 7
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('regexp');
+
+  # bless({ value => qr/(?^u:0)/ }, "Venus::Regexp")
+
+=back
+
+=over 4
+
+=item cast example 8
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('scalar');
+
+  # bless({ value => \0 }, "Venus::Scalar")
+
+=back
+
+=over 4
+
+=item cast example 9
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('string');
+
+  # bless({ value => 0 }, "Venus::String")
+
+=back
+
+=over 4
+
+=item cast example 10
+
+  package main;
+
+  use Venus::Boolean;
+
+  my $boolean = Venus::Boolean->new;
+
+  my $cast = $boolean->cast('undef');
+
+  # bless({ value => undef }, "Venus::Undef")
+
+=back
+
+=cut
+
 =head2 default
 
   default() (Bool)
@@ -1686,6 +1858,29 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 string
+
+  string() (Str)
+
+The string method returns the word C<'true'> if the boolean is truthy,
+otherwise returns C<'false'>. This method was formerly named I<"type">.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item string example 1
+
+  # given: synopsis;
+
+  my $string = $boolean->string;
+
+  # "false"
+
+=back
+
+=cut
+
 =head2 tv
 
   tv(Any $arg) (Bool)
@@ -1871,29 +2066,6 @@ I<Since C<0.08>>
   my $result = $lvalue->tv($rvalue);
 
   # 0
-
-=back
-
-=cut
-
-=head2 type
-
-  type() (Str)
-
-The type method returns the word C<'true'> if the boolean is truthy, otherwise
-returns C<'false'>.
-
-I<Since C<0.01>>
-
-=over 4
-
-=item type example 1
-
-  # given: synopsis;
-
-  my $type = $boolean->type;
-
-  # "false"
 
 =back
 
