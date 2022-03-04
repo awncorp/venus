@@ -105,7 +105,7 @@ sub numified {
   return 0 + $self->value;
 }
 
-sub type {
+sub string {
   my ($self) = @_;
 
   return $self->get ? $true_type : $false_type;

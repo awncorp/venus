@@ -17,6 +17,16 @@ with 'Venus::Role::Valuable';
 
 # METHODS
 
+sub cast {
+  my ($self, @args) = @_;
+
+  require Venus::Type;
+
+  my $value = $self->can('value') ? $self->value : $self;
+
+  return Venus::Type->new(value => $value)->cast(@args);
+}
+
 sub defined {
   my ($self) = @_;
 

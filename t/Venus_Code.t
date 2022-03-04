@@ -39,6 +39,7 @@ $test->for('abstract');
 =includes
 
 method: call
+method: cast
 method: compose
 method: conjoin
 method: curry
@@ -179,6 +180,264 @@ $test->for('example', 3, 'call', sub {
   ok $result == 3;
 
   $result
+});
+
+=method cast
+
+The cast method converts L<"value"|Venus::Kind::Value> objects between
+different I<"value"> object types, based on the name of the type provided. This
+method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
+
+=signature cast
+
+  cast(Str $kind) (Object | Undef)
+
+=metadata cast
+
+{
+  since => '0.08',
+}
+
+=example-1 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub{[@_]});
+
+  my $cast = $code->cast('array');
+
+  # bless({ value => [sub { ... }] }, "Venus::Array")
+
+=cut
+
+$test->for('example', 1, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Array');
+  ok ref($result->get->[0]), 'CODE';
+  is_deeply $result->get->[0]->(0), [0];
+
+  $result
+});
+
+=example-2 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('boolean');
+
+  # bless({ value => 1 }, "Venus::Boolean")
+
+=cut
+
+$test->for('example', 2, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Boolean');
+  is $result->get, 1;
+
+  $result
+});
+
+=example-3 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub{[@_]});
+
+  my $cast = $code->cast('code');
+
+  # bless({ value => sub { ... } }, "Venus::Code")
+
+=cut
+
+$test->for('example', 3, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Code');
+  is_deeply $result->get->(), [];
+
+  $result
+});
+
+=example-4 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('float');
+
+  # bless({ value => "1.0" }, "Venus::Float")
+
+=cut
+
+$test->for('example', 4, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Float');
+  is $result->get, '1.0';
+
+  $result
+});
+
+=example-5 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new(sub{[@_]});
+
+  my $cast = $code->cast('hash');
+
+  # bless({ value => { "0" => sub { ... } } }, "Venus::Hash")
+
+=cut
+
+$test->for('example', 5, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Hash');
+  ok ref($result->get->{0}), 'CODE';
+  is_deeply(scalar($result->get->{0}->(0)), [0]);
+
+  $result
+});
+
+=example-6 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('number');
+
+  # bless({ value => 112 }, "Venus::Number")
+
+=cut
+
+$test->for('example', 6, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Number');
+  is $result->get, 112;
+
+  $result
+});
+
+=example-7 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('regexp');
+
+  # bless({ value => qr/.../, }, "Venus::Regexp")
+
+=cut
+
+$test->for('example', 7, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Regexp');
+  is ref($result->get), 'Regexp';
+
+  $result
+});
+
+=example-8 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('scalar');
+
+  # bless({ value => \sub {...} }, "Venus::Scalar")
+
+=cut
+
+$test->for('example', 8, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Scalar');
+  is ref($result->get), 'REF';
+  is ref(${$result->get}), 'CODE';
+
+  $result
+});
+
+=example-9 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('string');
+
+  # bless({ value => "sub {...}" }, "Venus::String")
+
+=cut
+
+$test->for('example', 9, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::String');
+  like $result->get, qr/sub.*{.*}/;
+
+  $result
+});
+
+=example-10 cast
+
+  package main;
+
+  use Venus::Code;
+
+  my $code = Venus::Code->new;
+
+  my $cast = $code->cast('undef');
+
+  # bless({ value => undef }, "Venus::Undef")
+
+=cut
+
+$test->for('example', 10, 'cast', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Venus::Kind::Value');
+  ok $result->isa('Venus::Undef');
+
+  !$result
 });
 
 =method compose
