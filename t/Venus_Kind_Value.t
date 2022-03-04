@@ -38,6 +38,7 @@ $test->for('abstract');
 
 =includes
 
+method: cast
 method: defined
 method: explain
 
@@ -97,6 +98,89 @@ Venus::Role::Valuable
 =cut
 
 $test->for('integrates');
+
+=method cast
+
+The cast method converts L<"value"|Venus::Kind::Value> objects between
+different I<"value"> object types, based on the name of the type provided. This
+method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
+
+=signature cast
+
+  cast(Str $kind) (Object | Undef)
+
+=metadata cast
+
+{
+  since => '0.08',
+}
+
+=example-1 cast
+
+  package main;
+
+  my $example = Example->new;
+
+  my $cast = $example->cast;
+
+  # bless({value => undef}, "Venus::Undef")
+
+=cut
+
+$test->for('example', 1, 'cast', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Venus::Undef');
+  is $result->value, undef;
+
+  !$result
+});
+
+=example-2 cast
+
+  package main;
+
+  my $example = Example->new(
+    value => 123.45,
+  );
+
+  my $cast = $example->cast('array');
+
+  # bless({value => [123.45]}, "Venus::Array")
+
+=cut
+
+$test->for('example', 2, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Array');
+  is_deeply $result->value, [123.45];
+
+  $result
+});
+
+=example-3 cast
+
+  package main;
+
+  my $example = Example->new(
+    value => 123.45,
+  );
+
+  my $cast = $example->cast('hash');
+
+  # bless({value => {'123.45' => 123.45}, "Venus::Hash")
+
+=cut
+
+$test->for('example', 3, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Hash');
+  is_deeply $result->value, {'123.45' => 123.45};
+
+  $result
+});
 
 =method defined
 

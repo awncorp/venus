@@ -44,6 +44,9 @@ sub comparer {
   if (lc($operation) eq 'lt') {
     return 'numified';
   }
+  else {
+    return 'stringified';
+  }
 }
 
 sub numified {
@@ -107,7 +110,8 @@ sub type {
 
   require Venus::Type;
 
-  my $value = $method ? $self->$method(@args) : $self;
+  my $value = $method
+    ? $self->$method(@args) : $self->can('value') ? $self->value : $self;
 
   return Venus::Type->new(value => $value);
 }

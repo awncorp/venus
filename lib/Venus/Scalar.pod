@@ -43,6 +43,178 @@ This package provides the following methods:
 
 =cut
 
+=head2 cast
+
+  cast(Str $kind) (Object | Undef)
+
+The cast method converts L<"value"|Venus::Kind::Value> objects between
+different I<"value"> object types, based on the name of the type provided. This
+method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
+
+I<Since C<0.08>>
+
+=over 4
+
+=item cast example 1
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('array');
+
+  # bless({ value => [\""] }, "Venus::Array")
+
+=back
+
+=over 4
+
+=item cast example 2
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('boolean');
+
+  # bless({ value => 1 }, "Venus::Boolean")
+
+=back
+
+=over 4
+
+=item cast example 3
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('code');
+
+  # bless({ value => sub { ... } }, "Venus::Code")
+
+=back
+
+=over 4
+
+=item cast example 4
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('float');
+
+  # bless({ value => "1.0" }, "Venus::Float")
+
+=back
+
+=over 4
+
+=item cast example 5
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('hash');
+
+  # bless({ value => { "0" => \"" } }, "Venus::Hash")
+
+=back
+
+=over 4
+
+=item cast example 6
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('number');
+
+  # bless({ value => 2 }, "Venus::Number")
+
+=back
+
+=over 4
+
+=item cast example 7
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('regexp');
+
+  # bless({ value => qr/(?^u:\\\")/ }, "Venus::Regexp")
+
+=back
+
+=over 4
+
+=item cast example 8
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('scalar');
+
+  # bless({ value => \"" }, "Venus::Scalar")
+
+=back
+
+=over 4
+
+=item cast example 9
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('string');
+
+  # bless({ value => "\\\"" }, "Venus::String")
+
+=back
+
+=over 4
+
+=item cast example 10
+
+  package main;
+
+  use Venus::Scalar;
+
+  my $scalar = Venus::Scalar->new;
+
+  my $cast = $scalar->cast('undef');
+
+  # bless({ value => undef }, "Venus::Undef")
+
+=back
+
+=cut
+
 =head2 default
 
   default() (Ref)
