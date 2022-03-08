@@ -1,5 +1,99 @@
 [
   {
+    "date": "2022-03-08",
+    "version": "0.08",
+    "changes": [
+      {
+        "type": "update",
+        "name": "Document Venus::{Class,Role} configurations",
+        "github": {
+          "issue": 111,
+          "pull_request": 133
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement value casting",
+        "github": {
+          "issue": 114,
+          "pull_request": 132
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Role::Testable",
+        "github": {
+          "issue": 130,
+          "pull_request": 131
+        }
+      },
+      {
+        "type": "update",
+        "name": "Reimplement Venus::Box#unbox as a virtual method",
+        "github": {
+          "issue": 128,
+          "pull_request": 129
+        }
+      },
+      {
+        "type": "update",
+        "name": "Document all exceptions and methods that throw them",
+        "github": {
+          "issue": 123,
+          "pull_request": 127
+        }
+      },
+      {
+        "type": "update",
+        "name": "Refactor Venus::Role::Comparable",
+        "github": {
+          "issue": 125,
+          "pull_request": 126
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Role::Comparable",
+        "github": {
+          "issue": 112,
+          "pull_request": 124
+        }
+      },
+      {
+        "type": "defect",
+        "name": "Fix inability to deduce floats",
+        "github": {
+          "issue": 121,
+          "pull_request": 122
+        }
+      },
+      {
+        "type": "update",
+        "name": "Fix operator overload documentation rendering",
+        "github": {
+          "issue": 117,
+          "pull_request": 120
+        }
+      },
+      {
+        "type": "feature",
+        "name": "Implement Venus::Kind#{safe,trap}",
+        "github": {
+          "issue": 115,
+          "pull_request": 119
+        }
+      },
+      {
+        "type": "update",
+        "name": "Address test failures reported via CPAN testers issues",
+        "github": {
+          "issue": 116,
+          "pull_request": 118
+        }
+      }
+    ]
+  },
+  {
     "date": "2022-02-13",
     "version": "0.07",
     "changes": [

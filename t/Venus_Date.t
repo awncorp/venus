@@ -883,18 +883,14 @@ rules.
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-1 format';
-}
 $test->for('example', 1, 'format', sub {
+  plan skip_all => 'skip Date#format on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   like $result, qr/^.+, .+ [\s0]1, 1988$/a;
 
   $result
 });
-}
 
 =example-2 format
 
@@ -906,18 +902,14 @@ $test->for('example', 1, 'format', sub {
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-2 format';
-}
 $test->for('example', 2, 'format', sub {
+  plan skip_all => 'skip Date#format on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   like $result, qr/^.+[\s0]1.+$/a;
 
   $result
 });
-}
 
 =method hms
 
@@ -1228,18 +1220,14 @@ The rfc1123 method returns the date and time formatted as an RFC1123 string.
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-1 rfc1132';
-}
 $test->for('example', 1, 'rfc1123', sub {
+  plan skip_all => 'skip Date#rfc1123 on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   like $result, qr/^.+, 01 .+ 1988 00:00:00 GMT$/a;
 
   $result
 });
-}
 
 =method rfc3339
 

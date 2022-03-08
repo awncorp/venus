@@ -1191,11 +1191,8 @@ $test->for('example', 2, 'mkcall', sub {
 
 =cut
 
-SKIP: {
-if ($^O =~ /Win32/i) {
-  skip '=example-3 mkcall';
-}
 $test->for('example', 3, 'mkcall', sub {
+  plan skip_all => 'skip Path#mkcall on win32' if $^O =~ /win32/i;
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->safe('result');
   ok $error->isa('Venus::Path::Error');
@@ -1203,7 +1200,6 @@ $test->for('example', 3, 'mkcall', sub {
 
   $result
 });
-}
 
 =method mkdir
 
