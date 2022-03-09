@@ -177,19 +177,14 @@ details.
 
 =cut
 
-SKIP: {
-if (not(do{eval "require registry; 1"})) {
-  diag 'cannot find registry pragma';
-  skip '=example-1 has-isa';
-}
 $test->for('example', 1, 'has-isa', sub {
+  plan skip_all => 'no registry found' if not(do{eval "require registry; 1"});
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->data;
 
   $result
 });
-}
 
 =feature has-req
 

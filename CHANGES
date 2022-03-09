@@ -1,3 +1,17 @@
+0.08 2022-03-08
+
+- [update] (#111) Document Venus::{Class,Role} configurations
+- [feature] (#114) Implement value casting
+- [feature] (#130) Implement Venus::Role::Testable
+- [update] (#128) Reimplement Venus::Box#unbox as a virtual method
+- [update] (#123) Document all exceptions and methods that throw them
+- [update] (#125) Refactor Venus::Role::Comparable
+- [feature] (#112) Implement Venus::Role::Comparable
+- [defect] (#121) Fix inability to deduce floats
+- [update] (#117) Fix operator overload documentation rendering
+- [feature] (#115) Implement Venus::Kind#{safe,trap}
+- [update] (#116) Address test failures reported via CPAN testers issues
+
 0.07 2022-02-13
 
 - [update] (#96) Update documentation
