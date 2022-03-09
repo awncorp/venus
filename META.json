@@ -44,7 +44,7 @@
          "web" : "http://github.com/cpanery/venus"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_authority" : "cpan:CPANERY",
    "x_generated_by_perl" : "v5.35.7",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

@@ -1,3 +1,17 @@
+## Release [0.08](https://github.com/cpanery/venus/releases/tag/0.08)
+
+- [update] Document Venus::{Class,Role} configurations ([#111](https://github.com/cpanery/venus/issues/111))
+- [feature] Implement value casting ([#114](https://github.com/cpanery/venus/issues/114))
+- [feature] Implement Venus::Role::Testable ([#130](https://github.com/cpanery/venus/issues/130))
+- [update] Reimplement Venus::Box#unbox as a virtual method ([#128](https://github.com/cpanery/venus/issues/128))
+- [update] Document all exceptions and methods that throw them ([#123](https://github.com/cpanery/venus/issues/123))
+- [update] Refactor Venus::Role::Comparable ([#125](https://github.com/cpanery/venus/issues/125))
+- [feature] Implement Venus::Role::Comparable ([#112](https://github.com/cpanery/venus/issues/112))
+- [defect] Fix inability to deduce floats ([#121](https://github.com/cpanery/venus/issues/121))
+- [update] Fix operator overload documentation rendering ([#117](https://github.com/cpanery/venus/issues/117))
+- [feature] Implement Venus::Kind#{safe,trap} ([#115](https://github.com/cpanery/venus/issues/115))
+- [update] Address test failures reported via CPAN testers issues ([#116](https://github.com/cpanery/venus/issues/116))
+
 ## Release [0.07](https://github.com/cpanery/venus/releases/tag/0.07)
 
 - [update] Update documentation ([#96](https://github.com/cpanery/venus/issues/96))
