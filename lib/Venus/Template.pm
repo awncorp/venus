@@ -5,31 +5,40 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{$_[0]->render . "$_[1]"},
   'eq' => sub{$_[0]->render eq "$_[1]"},
   'ne' => sub{$_[0]->render ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->render)]}/},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has markers => (
-  is => 'rw',
-  default => sub{[qr/\{\{/, qr/\}\}/]},
-);
+attr 'markers';
+attr 'variables';
 
-has variables => (
-  is => 'rw',
-  default => sub{{}},
-);
+# BUILDERS
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->markers([qr/\{\{/, qr/\}\}/]) if !defined $self->markers;
+  $self->variables({}) if !defined $self->variables;
+
+  return $self;
+}
 
 # METHODS
 

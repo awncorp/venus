@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -56,8 +54,17 @@ method: mdy
 method: parse
 method: reset
 method: restart
+method: restart_day
+method: restart_hour
+method: restart_minute
+method: restart_month
+method: restart_quarter
+method: restart_second
+method: restart_year
+method: rfc1123
 method: rfc3339
 method: rfc7231
+method: rfc822
 method: set
 method: set_hms
 method: set_mdy
@@ -1164,6 +1171,272 @@ $test->for('example', 3, 'restart', sub {
   $result
 });
 
+=method restart_day
+
+The restart_day method truncates the date and time to the C<day>.
+
+=signature restart_day
+
+  restart_day() (Date)
+
+=metadata restart_day
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_day
+
+  # given: synopsis;
+
+  $date = $date->restart_day;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'restart_day', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_day requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method restart_hour
+
+The restart_hour method truncates the date and time to the C<hour>.
+
+=signature restart_hour
+
+  restart_hour() (Date)
+
+=metadata restart_hour
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_hour
+
+  # given: synopsis;
+
+  $date = $date->restart_hour;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'restart_hour', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_hour requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method restart_minute
+
+The restart_minute method truncates the date and time to the C<minute>.
+
+=signature restart_minute
+
+  restart_minute() (Date)
+
+=metadata restart_minute
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_minute
+
+  # given: synopsis;
+
+  $date = $date->restart_minute;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'restart_minute', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_minute requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method restart_month
+
+The restart_month method truncates the date and time to the C<month>.
+
+=signature restart_month
+
+  restart_month() (Date)
+
+=metadata restart_month
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_month
+
+  # given: synopsis;
+
+  $date = $date->restart_month;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'restart_month', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_month requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method restart_quarter
+
+The restart_quarter method truncates the date and time to the C<quarter>.
+
+=signature restart_quarter
+
+  restart_quarter() (Date)
+
+=metadata restart_quarter
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_quarter
+
+  # given: synopsis;
+
+  $date = $date->restart_quarter;
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=cut
+
+$test->for('example', 1, 'restart_quarter', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_quarter requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 567993600;
+
+  $result
+});
+
+=method restart_second
+
+The restart_second method truncates the date and time to the C<second>.
+
+=signature restart_second
+
+  restart_second() (Date)
+
+=metadata restart_second
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_second
+
+  # given: synopsis;
+
+  $date = $date->restart_second;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=cut
+
+$test->for('example', 1, 'restart_second', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_second requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 570672000;
+
+  $result
+});
+
+=method restart_year
+
+The restart_year method truncates the date and time to the C<year>.
+
+=signature restart_year
+
+  restart_year() (Date)
+
+=metadata restart_year
+
+{
+  since => '1.02',
+}
+
+=example-1 restart_year
+
+  # given: synopsis;
+
+  $date = $date->restart_year;
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=cut
+
+$test->for('example', 1, 'restart_year', sub {
+  if ($] < 5.28000) {
+    diag 'Venus::Date#restart_year requires Perl 5.28+' if $ENV{DEBUG};
+    return 1;
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->epoch == 567993600;
+
+  $result
+});
+
 =method rfc822
 
 The rfc822 method returns the date and time formatted as an RFC822 string.
@@ -1191,7 +1464,9 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 $test->for('example', 1, 'rfc822', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  like $result, qr/^.+, 01 .+ 1988 00:00:00 [-+]\d{4}$/a;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 .+$/a;
+  like $result, qr/^.+, 01 .+ 1988 00:00:00 [-+]\d{4}$/a
+    if $ENV{LC_ALL} || $ENV{LC_TIME};
 
   $result
 });
@@ -2500,19 +2775,53 @@ $test->for('example', 1, '(ne)', sub {
   $result
 });
 
-=license
+=operator ("")
 
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+This package overloads the C<""> operator.
 
 =cut
 
-=authors
+$test->for('operator', '("")');
 
-Cpanery, C<cpanery@cpan.org>
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$date";
+
+  # "570672000"
 
 =cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq '570672000';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $date ~~ '570672000';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
+});
 
 # END
 

@@ -54,7 +54,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Explainable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -857,16 +861,40 @@ I<Since C<0.06>>
 
 =cut
 
-=head1 AUTHORS
+=head1 OPERATORS
 
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+This package overloads the following operators:
 
 =cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$parent";
+
+  # $pid
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $parent ~~ /^\d+$/;
+
+  # 1
+
+=back

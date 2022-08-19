@@ -5,9 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base';
 
-extends 'Venus::Number';
+base 'Venus::Number';
 
 # METHODS
 

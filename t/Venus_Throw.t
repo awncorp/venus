@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -90,6 +88,7 @@ $test->for('integrates');
 
 =attributes
 
+name: rw, opt, Str
 message: rw, opt, Str
 package: ro, opt, Str
 parent: ro, opt, Str, C<'Venus::Error'>
@@ -283,6 +282,8 @@ $test->for('example', 5, 'error', sub {
     message => 'Example error (no thing)!',
   });
 
+  # No::Thing does not exist
+
   # Exception! Venus::Throw::Error (isa Venus::Error)
 
 =cut
@@ -296,19 +297,36 @@ $test->for('example', 6, 'error', sub {
   $result
 });
 
-=license
+=example-7 error
 
-Copyright (C) 2021, Cpanery
+  # given: synopsis;
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+  my $error = $throw->error({
+    name => 'on.test.error',
+    context => 'Test.error',
+    message => 'Something failed!',
+  });
+
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  #   "name"  => "on_test_error",
+  # }, "Main::Error")
 
 =cut
 
-=authors
+$test->for('example', 7, 'error', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Main::Error');
+  ok $error->isa('Venus::Error');
+  ok $error->message eq 'Something failed!';
+  ok $error->context eq 'Test.error';
+  ok $error->name eq 'on_test_error';
 
-Cpanery, C<cpanery@cpan.org>
-
-=cut
+  $result
+});
 
 # END
 

@@ -1,0 +1,345 @@
+
+=head1 NAME
+
+Venus::Test - Test Automation
+
+=cut
+
+=head1 ABSTRACT
+
+Test Automation for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Test;
+
+  my $test = test 't/Venus_Test.t';
+
+  # $test->for('name');
+
+=cut
+
+=head1 DESCRIPTION
+
+This package aims to provide a standard for documenting L<Venus> derived
+software projects, a framework writing tests, test automation, and
+documentation generation.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Data>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+=cut
+
+=head1 FUNCTIONS
+
+This package provides the following functions:
+
+=cut
+
+=head2 test
+
+  test(Str $file) (Test)
+
+The test function is exported automatically and returns a L<Venus::Test> object
+for the test file given.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item test example 1
+
+  package main;
+
+  use Venus::Test;
+
+  my $test = test 't/Venus_Test.t';
+
+  # bless( { ..., 'value' => 't/Venus_Test.t' }, 'Venus::Test' )
+
+=back
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 data
+
+  data(Str $name, Any @args) (Str)
+
+The data method attempts to find and return the POD content based on the name
+provided. If the content cannot be found an exception is raised.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis
+
+  my $data = $test->data('name');
+
+  # Venus::Test
+
+=back
+
+=over 4
+
+=item data example 2
+
+  # given: synopsis
+
+  my $data = $test->data('unknown');
+
+  # Exception!
+
+=back
+
+=cut
+
+=head2 for
+
+  for(Str $name | CodeRef $code, Any @args) Any
+
+The for method attempts to find the POD content based on the name provided and
+executes the corresponding predefined test, optionally accepting a callback
+which, if provided, will be passes a L<Venus::Try> object containing the
+POD-driven test. The callback, if provided, must always return a true value.
+B<Note:> All automated tests disable the I<"redefine"> class of warnings to
+prevent warnings when redeclaring packages in examples.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item for example 1
+
+  # given: synopsis
+
+  my $data = $test->for('name');
+
+  # Venus::Test
+
+=back
+
+=over 4
+
+=item for example 2
+
+  # given: synopsis
+
+  my $data = $test->for('synosis');
+
+  # true
+
+=back
+
+=over 4
+
+=item for example 3
+
+  # given: synopsis
+
+  my $data = $test->for('example', 1, 'data', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+    ok length($result) > 1;
+
+    $result
+  });
+
+  # Venus::Test
+
+=back
+
+=cut
+
+=head2 pdml
+
+  pdml(Str $name | CodeRef $code, Any @args) Str
+
+The pdml method attempts to find the POD content based on the name provided and
+return a POD string for use in documentation.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item pdml example 1
+
+  # given: synopsis
+
+  my $pdml = $test->pdml('name');
+
+  # =head1 NAME
+  #
+  # Venus::Test - Test Automation
+  #
+  # =cut
+
+=back
+
+=over 4
+
+=item pdml example 2
+
+  # given: synopsis
+
+  my $pdml = $test->pdml('synopsis');
+
+  # =head1 SYNOPSIS
+  #
+  # package main;
+  #
+  # use Venus::Test;
+  #
+  # my $test = test 't/Venus_Test.t';
+  #
+  # # $test->for('name');
+  #
+  # =cut
+
+=back
+
+=over 4
+
+=item pdml example 3
+
+  # given: synopsis
+
+  my $pdml = $test->pdml('example', 1, 'data');
+
+  # =over 4
+  #
+  # =item data example 1
+  #
+  #   # given: synopsis
+  #
+  #   my $data = $test->data(\'name\');
+  #
+  #   # Venus::Test
+  #
+  # =back
+
+=back
+
+=cut
+
+=head2 render
+
+  render(Str $file) Path
+
+The render method returns a string representation of a valid POD document.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item render example 1
+
+  # given: synopsis
+
+  my $path = $test->render('t/Test_Venus.pod');
+
+  # =over 4
+  #
+  # =item data example 1
+  #
+  #   # given: synopsis
+  #
+  #   my $data = $test->data(\'name\');
+  #
+  #   # Venus::Test
+  #
+  # =back
+
+=back
+
+=cut
+
+=head2 text
+
+  text(Str $name, Any @args) (Str)
+
+The text method attempts to find and return the POD content based on the name
+provided. If the content cannot be found an empty string is returned. If the
+POD block is not recognized, an exception is raised.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item text example 1
+
+  # given: synopsis
+
+  my $text = $test->text('name');
+
+  # Venus::Test
+
+=back
+
+=over 4
+
+=item text example 2
+
+  # given: synopsis
+
+  my $text = $test->text('includes');
+
+  # function: test
+  # method: data
+  # method: for
+  # method: pdml
+  # method: render
+  # method: text
+
+=back
+
+=over 4
+
+=item text example 3
+
+  # given: synopsis
+
+  my $text = $test->text('attributes');
+
+  # ''
+
+=back
+
+=over 4
+
+=item text example 4
+
+  # given: synopsis
+
+  my $text = $test->text('unknown');
+
+  # Exception!
+
+=back
+
+=cut

@@ -824,6 +824,196 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 restart_day
+
+  restart_day() (Date)
+
+The restart_day method truncates the date and time to the C<day>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_day example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_day;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_hour
+
+  restart_hour() (Date)
+
+The restart_hour method truncates the date and time to the C<hour>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_hour example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_hour;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_minute
+
+  restart_minute() (Date)
+
+The restart_minute method truncates the date and time to the C<minute>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_minute example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_minute;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_month
+
+  restart_month() (Date)
+
+The restart_month method truncates the date and time to the C<month>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_month example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_month;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_quarter
+
+  restart_quarter() (Date)
+
+The restart_quarter method truncates the date and time to the C<quarter>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_quarter example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_quarter;
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=back
+
+=cut
+
+=head2 restart_second
+
+  restart_second() (Date)
+
+The restart_second method truncates the date and time to the C<second>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_second example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_second;
+
+  # $date->string; # 1988-02-01T00:00:00Z
+
+  # $date->epoch; # 570672000
+
+=back
+
+=cut
+
+=head2 restart_year
+
+  restart_year() (Date)
+
+The restart_year method truncates the date and time to the C<year>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item restart_year example 1
+
+  # given: synopsis;
+
+  $date = $date->restart_year;
+
+  # $date->string; # 1988-01-01T00:00:00Z
+
+  # $date->epoch; # 567993600
+
+=back
+
+=cut
+
+=head2 rfc1123
+
+  rfc1123() (Str)
+
+The rfc1123 method returns the date and time formatted as an RFC1123 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rfc1123 example 1
+
+  # given: synopsis;
+
+  my $rfc1123 = $date->rfc1123;
+
+  # Mon, 01 Feb 1988 00:00:00 GMT
+
+=back
+
+=cut
+
 =head2 rfc3339
 
   rfc3339() (Str)
@@ -863,6 +1053,28 @@ I<Since C<0.01>>
   my $rfc7231 = $date->rfc7231;
 
   # Mon, 01 Feb 1988 00:00:00 UTC
+
+=back
+
+=cut
+
+=head2 rfc822
+
+  rfc822() (Str)
+
+The rfc822 method returns the date and time formatted as an RFC822 string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item rfc822 example 1
+
+  # given: synopsis;
+
+  my $rfc822 = $date->rfc822;
+
+  # Mon, 01 Feb 1988 00:00:00 +0000
 
 =back
 
@@ -1705,16 +1917,34 @@ B<example 1>
 
 =back
 
-=head1 AUTHORS
+=over 4
 
-Cpanery, C<cpanery@cpan.org>
+=item operation: C<("")>
 
-=cut
+This package overloads the C<""> operator.
 
-=head1 LICENSE
+B<example 1>
 
-Copyright (C) 2021, Cpanery
+  # given: synopsis;
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+  my $result = "$date";
 
-=cut
+  # "570672000"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $date ~~ '570672000';
+
+  # 1
+
+=back

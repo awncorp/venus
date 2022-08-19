@@ -5,9 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Dumpable';
+# AUDITS
+
+sub AUDIT {
+  my ($self, $from) = @_;
+
+  if (!$from->does('Venus::Role::Dumpable')) {
+    die "${self} requires ${from} to consume Venus::Role::Dumpable";
+  }
+
+  return $self;
+}
 
 # METHODS
 
@@ -21,6 +31,12 @@ sub print_pretty {
   my ($self, @args) = @_;
 
   return $self->printer($self->dump_pretty(@args));
+}
+
+sub print_string {
+  my ($self, $method, @args) = @_;
+
+  return $self->printer($method ? scalar($self->$method(@args)) : $self);
 }
 
 sub printer {
@@ -39,6 +55,26 @@ sub say_pretty {
   my ($self, @args) = @_;
 
   return $self->printer($self->dump_pretty(@args), "\n");
+}
+
+sub say_string {
+  my ($self, $method, @args) = @_;
+
+  return $self->printer(($method ? scalar($self->$method(@args)) : $self), "\n");
+}
+
+# EXPORTS
+
+sub EXPORT {
+  [
+    'print',
+    'print_pretty',
+    'print_string',
+    'printer',
+    'say',
+    'say_pretty',
+    'say_string',
+  ]
 }
 
 1;

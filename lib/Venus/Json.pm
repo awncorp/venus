@@ -5,22 +5,25 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
-extends 'Venus::Kind::Utility';
+use Venus::Class 'attr', 'base', 'with';
 
+base 'Venus::Kind::Utility';
+
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
 # ATTRIBUTES
 
-has decoder => (
-  is => 'rw',
-);
-
-has encoder => (
-  is => 'rw',
-);
+attr 'decoder';
+attr 'encoder';
 
 # BUILDERS
 
@@ -35,9 +38,13 @@ sub build_self {
 sub config {
   my ($self, $package) = @_;
 
-  $package ||= $self->package or $self->throw->error({
-    message => 'No suitable JSON package',
-  });
+  $package ||= $self->package or do {
+    my $throw;
+    $throw = $self->throw;
+    $throw->name('on.config');
+    $throw->message('No suitable JSON package');
+    $throw->error;
+  };
 
   $package = $package->new
     ->canonical
@@ -122,7 +129,12 @@ sub package {
     'JSON::PP' => '2.27105',
     'Cpanel::JSON::XS' => '4.09',
   );
-  for my $package (qw(Cpanel::JSON::XS JSON::XS JSON::PP)) {
+  for my $package (
+    grep defined,
+    $ENV{VENUS_JSON_PACKAGE},
+    qw(Cpanel::JSON::XS JSON::XS JSON::PP)
+  )
+  {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
     if (do {local $@; eval "$criteria"; $@}) {
       next;

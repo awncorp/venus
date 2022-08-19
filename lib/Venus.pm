@@ -7,41 +7,39 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '0.08';
+our $VERSION = '1.23';
 
 # AUTHORITY
 
-our $AUTHORITY = 'cpan:CPANERY';
+our $AUTHORITY = 'cpan:AWNCORP';
 
 # IMPORTS
 
 sub import {
-  my ($package, @exports) = @_;
+  my ($self, @args) = @_;
 
   my $target = caller;
 
   no strict 'refs';
 
   my %seen;
-  for my $name (grep !$seen{$_}++, @exports, 'true', 'false') {
-    *{"${target}::${name}"} = $package->can($name) if !$target->can($name);
+  for my $name (grep !$seen{$_}++, @args, 'true', 'false') {
+    *{"${target}::${name}"} = $self->can($name) if !$target->can($name);
   }
 
-  return $package;
+  return $self;
 }
 
 # FUNCTIONS
 
 sub catch (&) {
-  my (@args) = @_;
-
-  my ($callback) = @_;
-
-  require Venus::Try;
+  my ($data) = @_;
 
   my $error;
 
-  my @result = Venus::Try->new($callback)->error(\$error)->result;
+  require Venus::Try;
+
+  my @result = Venus::Try->new($data)->error(\$error)->result;
 
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
 }
@@ -64,11 +62,9 @@ sub false () {
 }
 
 sub raise ($;$) {
-  my ($package, $data) = @_;
+  my ($self, $data) = @_;
 
-  my $parent = 'Venus::Error';
-
-  ($package, $parent) = (@$package) if (ref($package) eq 'ARRAY');
+  ($self, my $parent) = (@$self) if (ref($self) eq 'ARRAY');
 
   $data //= {};
   $data->{context} //= (caller(1))[3];
@@ -77,7 +73,7 @@ sub raise ($;$) {
 
   require Venus::Throw;
 
-  return Venus::Throw->new(package => $package, parent => $parent)->error($data);
+  return Venus::Throw->new(package => $self, parent => $parent)->error($data);
 }
 
 sub true () {

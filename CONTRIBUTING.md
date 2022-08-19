@@ -21,34 +21,12 @@ of this project:
 - Pluggable standard library
 - Robust and accurate documentation
 - Simple package reflection
-- Single non-core dependency (Moo)
-- Small, flexible, powerful
+- No non-core dependencies
+- Small, flexible, powerful, optional
 - Standard library, intuitive behaviors
 - Utility classes for common computing tasks
 - Value classes for primitives
 - Composable standards via traits (roles)
-
-## Prerequisites
-
-The following tools are prerquisites for developing in this project.
-
-**[plx](https://metacpan.org/pod/App::plx)**
-
-```bash
-$ curl -L https://cpanmin.us | perl - -qn App::plx
-```
-
-**[cpm](https://metacpan.org/pod/App::cpm)**
-
-```bash
-$ curl -L https://cpanmin.us | perl - -qn App::cpm
-```
-
-**[reply](https://metacpan.org/pod/Reply)**
-
-```bash
-$ plx cpanfile reply
-```
 
 ## Installation
 
@@ -64,19 +42,19 @@ mkdir venus && cd venus
 **Fetch**
 
 ```bash
-git clone git@github.com:cpanery/venus.git .
+git clone git@github.com:awncorp/venus.git .
 ```
 
 **Build**
 
 ```bash
-plx cpanfile
+cpanm -qn --installdeps .
 ```
 
 **Validate**
 
 ```bash
-plx prove -r t
+prove -r t
 ```
 
 ## Directory Structure
@@ -115,7 +93,7 @@ URL), e.g. `issue-1`.
 Create or find an issue on GitHub:
 
 ```bash
-$ open https://github.com/cpanery/venus/issues/1
+$ open https://github.com/awncorp/venus/issues/1
 ```
 
 Create a local branch based on the issue (ticket) number (found in the URL):
@@ -137,39 +115,13 @@ $ git push origin issue-1
 Running the test suite using `prove`:
 
 ```bash
-$ plx prove -r t
+$ prove -r t
 ```
 
 Testing the code using the `reply` (REPL):
 
 ```bash
-$ plx reply -e 'use Venus'
-```
-
-## Releasing
-
-This project uses [Dist::Zilla](https://github.com/rjbs/Dist-Zilla) to manage
-its build and release processes. The following tools are prerquisites for
-releasing this project.
-
-**[dzil](https://metacpan.org/pod/Dist::Zilla)**
-
-Installing the `dzil` dependencies for distribution building:
-
-```bash
-plx cpanfile dzil
-```
-
-Building the code using `dzil`:
-
-```bash
-$ plx build $version # e.g. 0.01
-```
-
-Releasing the code using `dzil`:
-
-```bash
-$ plx release $version # e.g. 0.01
+$ reply -e 'use Venus'
 ```
 
 ## Support
@@ -177,4 +129,4 @@ $ plx release $version # e.g. 0.01
 **Questions, Suggestions, Issues/Bugs**
 
 Please post any questions, suggestions, issues or bugs to the [issue
-tracker](https://github.com/cpanery/venus/issues) on GitHub.
+tracker](https://github.com/awncorp/venus/issues) on GitHub.

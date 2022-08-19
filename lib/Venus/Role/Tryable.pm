@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -19,6 +19,12 @@ sub try {
   return $try if !$callback;
 
   return $try->call($callback);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['try']
 }
 
 1;

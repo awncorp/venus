@@ -1,58 +1,119 @@
-## Release [0.08](https://github.com/cpanery/venus/releases/tag/0.08)
+# Changelog
 
-- [update] Document Venus::{Class,Role} configurations ([#111](https://github.com/cpanery/venus/issues/111))
-- [feature] Implement value casting ([#114](https://github.com/cpanery/venus/issues/114))
-- [feature] Implement Venus::Role::Testable ([#130](https://github.com/cpanery/venus/issues/130))
-- [update] Reimplement Venus::Box#unbox as a virtual method ([#128](https://github.com/cpanery/venus/issues/128))
-- [update] Document all exceptions and methods that throw them ([#123](https://github.com/cpanery/venus/issues/123))
-- [update] Refactor Venus::Role::Comparable ([#125](https://github.com/cpanery/venus/issues/125))
-- [feature] Implement Venus::Role::Comparable ([#112](https://github.com/cpanery/venus/issues/112))
-- [defect] Fix inability to deduce floats ([#121](https://github.com/cpanery/venus/issues/121))
-- [update] Fix operator overload documentation rendering ([#117](https://github.com/cpanery/venus/issues/117))
-- [feature] Implement Venus::Kind#{safe,trap} ([#115](https://github.com/cpanery/venus/issues/115))
-- [update] Address test failures reported via CPAN testers issues ([#116](https://github.com/cpanery/venus/issues/116))
+## Version: 1.23
 
-## Release [0.07](https://github.com/cpanery/venus/releases/tag/0.07)
+- [change] Replace Venus::Role::Testable#{istrue,isfalse} with {is_true,is_false}
+- [change] Resolve cross-platform float precision test failures
+- [feature] Allow Venus::Class to IMPORT and EXPORT using FROM
+- [feature] Add caller info to Venus::Error stacktrace
+- [feature] Allow Venus::Error#{is,as} to fallback to name
+- [feature] Implement Venus:Random
+- [feature] Implement Venus::Error#of
+- [update] Set "srand" on fork in Venus::Process
+- [update] Include names (for Venus::Error#{as,is}) in all exceptions
+- [update] Update Venus::Box#unbox as alias to __handle__unbox
+- [update] Make all Venus imports strict
 
-- [update] Update documentation ([#96](https://github.com/cpanery/venus/issues/96))
-- [feature] Implement Venus::Match#data ([#97](https://github.com/cpanery/venus/issues/97))
-- [feature] Implement Venus::Match#expr ([#98](https://github.com/cpanery/venus/issues/98))
-- [feature] Extend Venus::Role::Coercion with new abilities ([#99](https://github.com/cpanery/venus/issues/99))
-- [defect] Fix Venus::Class attribute declaration issue ([#100](https://github.com/cpanery/venus/issues/100))
+## Version: 1.10
 
-## Release [0.06](https://github.com/cpanery/venus/releases/tag/0.06)
+- [change] Rename truncate_to_x methods to restart_x
+- [feature] Cascade DESTROY from Core
+- [feature] Implement Venus::Mixin to mix-in routines
+- [feature] Venus::{Json,Yaml} engine override via ENV VAR
+- [feature] Allow Venus::Meta to return configurations
+- [feature] Allow attr override (prevent accessor install)
+- [feature] Implement Venus::Error#{is,as} for better classification
+- [feature] Implement Venus::Match#test
+- [feature] Implement Venus::{Array,Hash}#call
+- [update] Allow Meta to return local-only attrs, bases, roles, and subs
+- [update] Improve Venus::Space algorithms, add additional methods
+- [update] Add missing documentation in Venus::Date, Venus::String
+- [update] Update Venus::Core to better handle non-hashref based objects
+- [update] Update criteria on require of classes and roles
 
-- [feature] Implement Venus::Process ([#79](https://github.com/cpanery/venus/issues/79))
-- [defect] Fix Venus::Path#mkdirs empty rootdir issue ([#90](https://github.com/cpanery/venus/issues/90))
+## Version: 1.01
 
-## Release [0.04](https://github.com/cpanery/venus/releases/tag/0.04)
+- [feature] Test, validate, and generate attributes the same as methods
+- [feature] Export (on-demand) catch, error, and raise from Venus::{Class,Role}
+- [update] Unravel and flattern roles
+- [update] Expose errors on require of classes and roles
 
-- [feature] Implement Venus::Role::Matchable ([#80](https://github.com/cpanery/venus/issues/80))
-- [update] Address CPAN Testers reports ([#82](https://github.com/cpanery/venus/issues/82))
+## Version: 1.00
 
-## Release [0.03](https://github.com/cpanery/venus/releases/tag/0.03)
+- [change] Replace Moo with Mars architecture
+- [feature] Auto-generate VERSION from the main module
+- [update] Fix Venus::Date#rfc822 test example 1 on Windows
+- [update] Fix Venus::String#camelcase, add pascalcase
 
-- [feature] Implement Venus::Match ([#7](https://github.com/cpanery/venus/issues/7))
-- [update] Address CPAN Testers reports ([#69](https://github.com/cpanery/venus/issues/69))
+## Version: 0.09
 
-## Release [0.02](https://github.com/cpanery/venus/releases/tag/0.02)
+- [feature] Include Venus::Test in the library
+- [feature] Add splice to Venus::Space
+- [feature] Add kebabcase to Venus::String
+- [feature] Add truncate_to_x methods to Venus::Date
+- [feature] Add print_string and say_string to Venus::Role::Printable
+- [update] Cleanup documentation
+- [update] Generate CHANGELOG from .changelog
+- [update] Add "Ethic" to READMEs
+- [update] Marker =cut being rendered twice
 
-- [update] Update String#render token syntax ([#58](https://github.com/cpanery/venus/issues/58))
-- [feature] Implement Venus::Template ([#56](https://github.com/cpanery/venus/issues/56))
-- [feature] Implement Venus::Role::Coercible ([#8](https://github.com/cpanery/venus/issues/8))
-- [update] Document all proxyable methods ([#27](https://github.com/cpanery/venus/issues/27))
-- [feature] Implement String#substr ([#42](https://github.com/cpanery/venus/issues/42))
-- [feature] Implement String#append_with,prepend_with ([#47](https://github.com/cpanery/venus/issues/47))
-- [feature] Implement String#repeat ([#43](https://github.com/cpanery/venus/issues/43))
-- [feature] Implement String#prepend ([#41](https://github.com/cpanery/venus/issues/41))
-- [feature] Implement Venus::Role::Digestable ([#3](https://github.com/cpanery/venus/issues/3))
-- [update] Require Perl version 5.18+ ([#29](https://github.com/cpanery/venus/issues/29))
-- [defect] Fix Dumpable method calls in list context ([#23](https://github.com/cpanery/venus/issues/23))
-- [update] Minor refactors to source, documentation, and automation ([#10](https://github.com/cpanery/venus/issues/10))
-- [update] Document overrides in Venus::Boolean ([#14](https://github.com/cpanery/venus/issues/14))
-- [update] Update Venus::Json to use encoder/decoder callbacks ([#17](https://github.com/cpanery/venus/issues/17))
-- [feature] Support any YAML library, deduce booleans ([#2](https://github.com/cpanery/venus/issues/2))
-- [feature] Support any JSON library via encode/decode callbacks ([#1](https://github.com/cpanery/venus/issues/1))
-- [update] Document overrides, i.e. overloaded operators ([#4](https://github.com/cpanery/venus/issues/4))
-- [update] Update CONTRIBUTING.md ([#5](https://github.com/cpanery/venus/issues/5))
-- [update] JSON::PP support requires 4.00 ([#9](https://github.com/cpanery/venus/issues/9))
+## Version: 0.08
+
+- [defect] Fix inability to deduce floats
+- [feature] Implement value casting
+- [feature] Implement Venus::Kind#{safe,trap}
+- [feature] Implement Venus::Role::Comparable
+- [feature] Implement Venus::Role::Testable
+- [update] Address test failures reported via CPAN testers issues
+- [update] Document all exceptions and methods that throw them
+- [update] Document Venus::{Class,Role} configurations
+- [update] Fix operator overload documentation rendering
+- [update] Refactor Venus::Role::Comparable
+- [update] Reimplement Venus::Box#unbox as a virtual method
+
+## Version: 0.07
+
+- [defect] Fix Venus::Class attribute declaration issue
+- [feature] Extend Venus::Role::Coercion with new abilities
+- [feature] Implement Venus::Match#data
+- [feature] Implement Venus::Match#expr
+- [update] Update documentation
+
+## Version: 0.06
+
+- [defect] Fix Venus::Path#mkdirs empty rootdir issue
+- [feature] Implement Venus::Process
+
+## Version: 0.04
+
+- [feature] Implement Venus::Role::Matchable
+- [update] Address CPAN Testers reports
+
+## Version: 0.03
+
+- [feature] Implement Venus::Match
+- [update] Address CPAN Testers reports
+
+## Version: 0.02
+
+- [defect] Fix Dumpable method calls in list context
+- [feature] Implement String#append_with,prepend_with
+- [feature] Implement String#prepend
+- [feature] Implement String#repeat
+- [feature] Implement String#substr
+- [feature] Implement Venus::Role::Coercible
+- [feature] Implement Venus::Role::Digestable
+- [feature] Implement Venus::Template
+- [feature] Support any JSON library via encode/decode callbacks
+- [feature] Support any YAML library, deduce booleans
+- [update] Document all proxyable methods
+- [update] Document overrides, i.e. overloaded operators
+- [update] Document overrides in Venus::Boolean
+- [update] JSON::PP support requires 4.00
+- [update] Minor refactors to source, documentation, and automation
+- [update] Require Perl version 5.18+
+- [update] Update CONTRIBUTING.md
+- [update] Update String#render token syntax
+- [update] Update Venus::Json to use encoder/decoder callbacks
+
+

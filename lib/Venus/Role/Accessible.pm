@@ -5,19 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Buildable';
-with 'Venus::Role::Valuable';
+# AUDITS
 
-# BUILDERS
+sub AUDIT {
+  my ($self, $from) = @_;
 
-sub build_arg {
-  my ($self, $data) = @_;
+  if (!$from->does('Venus::Role::Valuable')) {
+    die "${self} requires ${from} to consume Venus::Role::Valuable";
+  }
 
-  return {
-    value => $data,
-  };
+  return $self;
 }
 
 # METHODS
@@ -32,6 +31,12 @@ sub set {
   my ($self, $value) = @_;
 
   return $self->value($value);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['get', 'set']
 }
 
 1;

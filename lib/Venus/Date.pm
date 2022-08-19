@@ -5,18 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Explainable';
 
 use overload (
+  '""' => 'explain',
   '!=' => sub{("$_[0]" + 0) != ($_[1] + 0)},
   '+' => sub{("$_[0]" + 0) + ($_[1] + 0)},
   '-' => sub{("$_[0]" + 0) - ($_[1] + 0)},
-  '0+' => sub{("$_[0]" + 0)},
+  '0+' => sub{($_[0]->epoch + 0)},
   '<' => sub{("$_[0]" + 0) < ($_[1] + 0)},
   '<=' => sub{("$_[0]" + 0) <= ($_[1] + 0)},
   '==' => sub{("$_[0]" + 0) == ($_[1] + 0)},
@@ -24,33 +25,18 @@ use overload (
   '>=' => sub{("$_[0]" + 0) >= ($_[1] + 0)},
   'eq' => sub{"$_[0]" eq "$_[1]"},
   'ne' => sub{"$_[0]" ne "$_[1]"},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has day => (
-  is => 'rw',
-);
-
-has month => (
-  is => 'rw',
-);
-
-has year => (
-  is => 'rw',
-);
-
-has hour => (
-  is => 'rw',
-);
-
-has minute => (
-  is => 'rw',
-);
-
-has second => (
-  is => 'rw',
-);
+attr 'day';
+attr 'month';
+attr 'year';
+attr 'hour';
+attr 'minute';
+attr 'second';
 
 # BUILDERS
 
@@ -248,6 +234,48 @@ sub restart {
   my $timepiece = $self->timepiece->truncate(to => $here);
 
   return $self->reset($timepiece->epoch);
+}
+
+sub restart_day {
+  my ($self) = @_;
+
+  return $self->restart('day');
+}
+
+sub restart_hour {
+  my ($self) = @_;
+
+  return $self->restart('hour');
+}
+
+sub restart_minute {
+  my ($self) = @_;
+
+  return $self->restart('minute');
+}
+
+sub restart_month {
+  my ($self) = @_;
+
+  return $self->restart('month');
+}
+
+sub restart_quarter {
+  my ($self) = @_;
+
+  return $self->restart('quarter');
+}
+
+sub restart_second {
+  my ($self) = @_;
+
+  return $self->restart('second');
+}
+
+sub restart_year {
+  my ($self) = @_;
+
+  return $self->restart('year');
 }
 
 sub rfc822 {

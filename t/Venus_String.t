@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -39,6 +37,7 @@ $test->for('abstract');
 =includes
 
 method: append
+method: append_with
 method: camelcase
 method: cast
 method: chomp
@@ -53,6 +52,7 @@ method: gt
 method: gtlt
 method: hex
 method: index
+method: kebabcase
 method: lc
 method: lcfirst
 method: le
@@ -62,7 +62,11 @@ method: lowercase
 method: lt
 method: ne
 method: numified
+method: pascalcase
+method: prepend
+method: prepend_with
 method: render
+method: repeat
 method: replace
 method: reverse
 method: rindex
@@ -71,6 +75,7 @@ method: snakecase
 method: split
 method: stringified
 method: strip
+method: substr
 method: titlecase
 method: trim
 method: tv
@@ -202,14 +207,14 @@ The camelcase method converts the string to camelcase.
 
   my $camelcase = $string->camelcase;
 
-  # "HelloWorld"
+  # "helloWorld"
 
 =cut
 
 $test->for('example', 1, 'camelcase', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "HelloWorld";
+  ok $result eq "helloWorld";
 
   $result
 });
@@ -1979,6 +1984,38 @@ $test->for('example', 3, 'index', sub {
   $result
 });
 
+=method kebabcase
+
+The kebabcase method converts the string to kebabcase.
+
+=signature kebabcase
+
+  kebabcase() (Str)
+
+=metadata kebabcase
+
+{
+  since => '0.09',
+}
+
+=example-1 kebabcase
+
+  # given: synopsis;
+
+  my $kebabcase = $string->kebabcase;
+
+  # "hello-world"
+
+=cut
+
+$test->for('example', 1, 'kebabcase', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "hello-world";
+
+  $result
+});
+
 =method lc
 
 The lc method returns a lowercased version of the string.
@@ -2824,6 +2861,38 @@ $test->for('example', 9, 'ne', sub {
   is $result, 0;
 
   !$result
+});
+
+=method pascalcase
+
+The pascalcase method converts the string to pascalcase.
+
+=signature pascalcase
+
+  pascalcase() (Str)
+
+=metadata pascalcase
+
+{
+  since => '0.01',
+}
+
+=example-1 pascalcase
+
+  # given: synopsis;
+
+  my $pascalcase = $string->pascalcase;
+
+  # "HelloWorld"
+
+=cut
+
+$test->for('example', 1, 'pascalcase', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "HelloWorld";
+
+  $result
 });
 
 =method prepend
@@ -4180,20 +4249,6 @@ $test->for('example', 1, '(qr)', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

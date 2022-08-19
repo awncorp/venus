@@ -5,34 +5,21 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Proxyable';
 
 # ATTRIBUTES
 
-has named => (
-  is => 'rw',
-  default => sub {{}},
-);
-
-has parsed => (
-  is => 'rw',
-  default => sub {{}},
-);
-
-has specs => (
-  is => 'rw',
-  default => sub {[]},
-);
-
-has warns => (
-  is => 'rw',
-  default => sub {[]},
-);
+attr 'named';
+attr 'parsed';
+attr 'specs';
+attr 'warns';
 
 # BUILDERS
 
@@ -40,12 +27,17 @@ sub build_arg {
   my ($self, $data) = @_;
 
   return {
-    specs => $data,
+    value => $data,
   };
 }
 
 sub build_self {
   my ($self, $data) = @_;
+
+  $self->named({}) if !$self->named;
+  $self->parsed({}) if !$self->parsed;
+  $self->specs([]) if !$self->specs;
+  $self->warns([]) if !$self->warns;
 
   return $self->parse;
 }

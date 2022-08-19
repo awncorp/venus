@@ -5,9 +5,19 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Tryable';
+# AUDITS
+
+sub AUDIT {
+  my ($self, $from) = @_;
+
+  if (!$from->does('Venus::Role::Tryable')) {
+    die "${self} requires ${from} to consume Venus::Role::Tryable";
+  }
+
+  return $self;
+}
 
 # METHODS
 
@@ -17,6 +27,12 @@ sub catch {
   my @result = $self->try($method, @args)->error(\my $error)->result;
 
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['catch']
 }
 
 1;

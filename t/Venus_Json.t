@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 if (require Venus::Json && not Venus::Json->package) {
   diag 'No suitable JSON library found';
@@ -74,9 +72,10 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON is installed,
+data. B<Note:> This package requires that a suitable JSON library is installed,
 currently either C<JSON::XS> C<3.0+>, C<JSON::PP> C<2.27105+>, or
-C<Cpanel::JSON::XS> C<4.09+>.
+C<Cpanel::JSON::XS> C<4.09+>. You can use the C<VENUS_JSON_PACKAGE> environment
+variable to include or prioritize your preferred JSON library.
 
 =cut
 
@@ -93,7 +92,9 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Accessible
+Venus::Role::Buildable
 Venus::Role::Explainable
+Venus::Role::Valuable
 
 =cut
 
@@ -174,20 +175,6 @@ $test->for('example', 1, 'encode', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

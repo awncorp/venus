@@ -5,15 +5,20 @@ use 5.018;
 use strict;
 use warnings;
 
-use overload (
-  '""' => 'explain',
-  '~~' => 'explain',
-);
+use Venus::Role 'with';
 
-use Moo::Role;
+# AUDIT
 
-# REQUIRES
+sub AUDIT {
+  my ($self, $from) = @_;
 
-requires 'explain';
+  my $name = ref $self || $self;
+
+  if (!$from->can('explain')) {
+    die "${from} requires 'explain' to consume ${name}";
+  }
+
+  return $self;
+}
 
 1;

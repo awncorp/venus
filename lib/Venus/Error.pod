@@ -35,6 +35,14 @@ This package has the following attributes:
 
 =cut
 
+=head2 name
+
+  name(Str)
+
+This attribute is read-write, accepts C<(Str)> values, and is optional.
+
+=cut
+
 =head2 context
 
   context(Str)
@@ -48,6 +56,14 @@ This attribute is read-write, accepts C<(Str)> values, is optional, and defaults
   message(Str)
 
 This attribute is read-write, accepts C<(Str)> values, is optional, and defaults to C<'Exception!'>.
+
+=cut
+
+=head2 verbose
+
+  verbose(Int)
+
+This attribute is read-write, accepts C<(Int)> values, is optional, and defaults to C<1>.
 
 =cut
 
@@ -72,6 +88,151 @@ L<Venus::Role::Stashable>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 as
+
+  as(Str $name) (Error)
+
+The as method returns an error object using the return value(s) of the "as"
+method specified, which should be defined as C<"as_${name}">, which will be
+called automatically by this method. If no C<"as_${name}"> method exists, this
+method will set the L</name> attribute to the value provided.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item as example 1
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $error = System::Error->new->as('auth_error');
+
+  $error->throw;
+
+  # Exception! (isa Venus::Error)
+
+=back
+
+=over 4
+
+=item as example 2
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $error = System::Error->new->as('role_error');
+
+  $error->throw;
+
+  # Exception! (isa Venus::Error)
+
+=back
+
+=over 4
+
+=item as example 3
+
+  package Virtual::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  package main;
+
+  my $error = Virtual::Error->new->as('on_save_error');
+
+  $error->throw;
+
+  # name is "on_save_error"
+
+  # Exception! (isa Venus::Error)
+
+=back
+
+=over 4
+
+=item as example 4
+
+  package Virtual::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  package main;
+
+  my $error = Virtual::Error->new->as('on.SAVE.error');
+
+  $error->throw;
+
+  # name is "on_save_error"
+
+  # Exception! (isa Venus::Error)
+
+=back
 
 =cut
 
@@ -122,6 +283,356 @@ I<Since C<0.01>>
   #     ...
   #   ],
   # ]
+
+=back
+
+=cut
+
+=head2 is
+
+  is(Str $name) (Bool)
+
+The is method returns truthy or falsy based on the return value(s) of the "is"
+method specified, which should be defined as C<"is_${name}">, which will be
+called automatically by this method. If no C<"is_${name}"> method exists, this
+method will check if the L</name> attribute is equal to the value provided.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item is example 1
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $is = System::Error->new->as('auth_error')->is('auth_error');
+
+  # 1
+
+=back
+
+=over 4
+
+=item is example 2
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $is = System::Error->as('auth_error')->is('auth_error');
+
+  # 1
+
+=back
+
+=over 4
+
+=item is example 3
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('message', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->message eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->message eq 'role_error';
+  }
+
+  package main;
+
+  my $is = System::Error->as('auth_error')->is('role_error');
+
+  # 0
+
+=back
+
+=over 4
+
+=item is example 4
+
+  package Virtual::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  package main;
+
+  my $is = Virtual::Error->new->as('on_save_error')->is('on_save_error');
+
+  # 1
+
+=back
+
+=over 4
+
+=item is example 5
+
+  package Virtual::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  package main;
+
+  my $is = Virtual::Error->new->as('on.SAVE.error')->is('on_save_error');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 of
+
+  of(Str $name) (Bool)
+
+The of method returns truthy or falsy based on the return value(s) of the "of"
+method specified, which should be defined as C<"of_${name}">, which will be
+called automatically by this method. If no C<"of_${name}"> method exists, this
+method will check if the L</name> attribute contains the value provided.
+
+I<Since C<1.11>>
+
+=over 4
+
+=item of example 1
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('name', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('name', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->name eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->name eq 'role_error';
+  }
+
+  package main;
+
+  my $of = System::Error->as('auth_error')->of('role');
+
+  # 0
+
+=back
+
+=over 4
+
+=item of example 2
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('name', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('name', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->name eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->name eq 'role_error';
+  }
+
+  package main;
+
+  my $of = System::Error->as('auth_error')->of('auth');
+
+  # 1
+
+=back
+
+=over 4
+
+=item of example 3
+
+  package System::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  sub as_auth_error {
+    my ($self) = @_;
+
+    return $self->do('name', 'auth_error');
+  }
+
+  sub as_role_error {
+    my ($self) = @_;
+
+    return $self->do('name', 'role_error');
+  }
+
+  sub is_auth_error {
+    my ($self) = @_;
+
+    return $self->name eq 'auth_error';
+  }
+
+  sub is_role_error {
+    my ($self) = @_;
+
+    return $self->name eq 'role_error';
+  }
+
+  package main;
+
+  my $of = System::Error->as('auth_error')->of('role_error');
+
+  # 0
+
+=back
+
+=over 4
+
+=item of example 4
+
+  package Virtual::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  package main;
+
+  my $of = Virtual::Error->new->as('on_save_error')->of('on.save');
+
+  # 1
+
+=back
+
+=over 4
+
+=item of example 5
+
+  package Virtual::Error;
+
+  use Venus::Class;
+
+  base 'Venus::Error';
+
+  package main;
+
+  my $of = Virtual::Error->new->as('on.SAVE.error')->of('on.save');
+
+  # 1
 
 =back
 
@@ -267,16 +778,34 @@ B<example 1>
 
 =back
 
-=head1 AUTHORS
+=over 4
 
-Cpanery, C<cpanery@cpan.org>
+=item operation: C<("")>
 
-=cut
+This package overloads the C<""> operator.
 
-=head1 LICENSE
+B<example 1>
 
-Copyright (C) 2021, Cpanery
+  # given: synopsis;
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+  my $result = "$error";
 
-=cut
+  # "Exception!"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $error ~~ 'Exception!';
+
+  # 1
+
+=back

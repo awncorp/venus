@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 use File::Temp;
 
 my $test = test(__FILE__);
@@ -44,6 +42,7 @@ method: all
 method: append
 method: array
 method: arrays
+method: attributes
 method: authority
 method: basename
 method: blessed
@@ -54,7 +53,6 @@ method: child
 method: children
 method: cop
 method: data
-method: destroy
 method: eval
 method: explain
 method: hash
@@ -67,11 +65,13 @@ method: inject
 method: load
 method: loaded
 method: locate
+method: meta
 method: name
 method: parent
 method: parse
 method: parts
 method: prepend
+method: purge
 method: rebase
 method: reload
 method: require
@@ -82,10 +82,12 @@ method: scalar
 method: scalars
 method: sibling
 method: siblings
+method: splice
 method: tryload
 method: use
-method: used
+method: unload
 method: variables
+method: visible
 method: version
 
 =cut
@@ -191,8 +193,9 @@ $test->for('example', 2, 'all', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [
-    ["Venus::Space", ["Venus::Name"]],
-    ["Venus::Name", ["Venus::Kind::Utility"]]
+    ["Venus::Space", ["Venus::Name", "Venus::Core::Class"]],
+    ["Venus::Name", ["Venus::Kind::Utility", "Venus::Core::Class"]],
+    ["Venus::Core::Class", ["Venus::Core"]]
   ];
 
   $result
@@ -224,7 +227,7 @@ $test->for('example', 2, 'all', sub {
  $test->for('example', 3, 'all', sub {
    my ($tryable) = @_;
    ok my $result = $tryable->result;
-   ok @$result == 2;
+   ok @$result == 3;
    ok @{$result->[0]} == 2;
    ok $result->[0][0] eq 'Venus::Space';
    ok $result->[0][1] =~ 'Venus/Space';
@@ -366,6 +369,86 @@ $test->for('example', 1, 'arrays', sub {
   $result
 });
 
+=method attributes
+
+The attributes method searches the package namespace for attributes and returns
+their names. This will not include attributes from roles, mixins, or superclasses.
+
+=signature attributes
+
+  attributes() (ArrayRef)
+
+=metadata attributes
+
+{
+  since => '1.02',
+}
+
+=example-1 attributes
+
+  package Foo::Attrs;
+
+  use Venus::Class 'attr';
+
+  attr 'start';
+  attr 'abort';
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/attrs');
+
+  my $attributes = $space->attributes;
+
+  # ["start", "abort"]
+
+=cut
+
+$test->for('example', 1, 'attributes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["start", "abort"];
+
+  $result
+});
+
+=example-2 attributes
+
+  package Foo::Base;
+
+  use Venus::Class 'attr', 'base';
+
+  attr 'start';
+  attr 'abort';
+
+  package Foo::Attrs;
+
+  use Venus::Class 'attr';
+
+  attr 'show';
+  attr 'hide';
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/attrs');
+
+  my $attributes = $space->attributes;
+
+  # ["show", "hide"]
+
+=cut
+
+$test->for('example', 2, 'attributes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ["show", "hide"];
+
+  $result
+});
+
 =method authority
 
 The authority method returns the C<AUTHORITY> declared on the target package,
@@ -469,7 +552,7 @@ returns an object. If no value is given, an empty hashref is used.
 
 =signature blessed
 
-  blessed(Ref $data) (Object)
+  blessed(Ref $data) (Self)
 
 =metadata blessed
 
@@ -534,7 +617,7 @@ successful returns the resulting object.
 
 =signature build
 
-  build(Any @args) (Object)
+  build(Any @args) (Self)
 
 =metadata build
 
@@ -1027,47 +1110,6 @@ $test->for('example', 1, 'data', sub {
   !$result
 });
 
-=method destroy
-
-The destroy method attempts to wipe out a namespace and also remove it and its
-children from C<%INC>. B<NOTE:> This can cause catastrophic failures if used
-incorrectly.
-
-=signature destroy
-
-  destroy() (Object)
-
-=metadata destroy
-
-{
-  since => '0.01',
-}
-
-=example-1 destroy
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('data/dumper');
-
-  $space->load; # Data/Dumper
-
-  my $destroy = $space->destroy;
-
-  # bless({ value => "data/dumper" }, "Venus::Space")
-
-=cut
-
-$test->for('example', 1, 'destroy', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Space');
-  ok $result =~ m{Data::Dumper};
-
-  $result
-});
-
 =method eval
 
 The eval method takes a list of strings and evaluates them under the namespace
@@ -1528,12 +1570,12 @@ $test->for('example', 2, 'load', sub {
 
 =method loaded
 
-The loaded method checks whether the package namespace is already loaded
+The loaded method checks whether the package namespace is already loaded and
 returns truthy or falsy.
 
 =signature loaded
 
-  loaded() (Int)
+  loaded() (Bool)
 
 =metadata loaded
 
@@ -1547,9 +1589,11 @@ returns truthy or falsy.
 
   use Venus::Space;
 
-  my $space = Venus::Space->new('data/dumper');
+  my $space = Venus::Space->new('Kit');
 
-  $space->destroy;
+  $space->init;
+
+  $space->unload;
 
   my $loaded = $space->loaded;
 
@@ -1570,9 +1614,9 @@ $test->for('example', 1, 'loaded', sub {
 
   use Venus::Space;
 
-  my $space = Venus::Space->new('data/dumper');
+  my $space = Venus::Space->new('Kit');
 
-  $space->load;
+  $space->init;
 
   my $loaded = $space->loaded;
 
@@ -1645,6 +1689,64 @@ $test->for('example', 2, 'locate', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result =~ m{Data/Dumper.pm$};
+
+  $result
+});
+
+=method meta
+
+The meta method returns a L<Venus::Meta> object representing the underlying
+package namespace. To access the meta object for the instance itself, use the
+superclass' L<Venus::Core/META> method.
+
+=signature meta
+
+  meta() (Meta)
+
+=metadata meta
+
+{
+  since => '1.02',
+}
+
+=example-1 meta
+
+  # given: synopsis
+
+  package main;
+
+  my $meta = $space->meta;
+
+  # bless({'name' => 'Foo::Bar'}, 'Venus::Meta')
+
+=cut
+
+$test->for('example', 1, 'meta', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Meta');
+  ok $result->{name} eq 'Foo::Bar';
+
+  $result
+});
+
+=example-2 meta
+
+  # given: synopsis
+
+  package main;
+
+  my $meta = $space->META;
+
+  # bless({'name' => 'Venus::Space'}, 'Venus::Meta')
+
+=cut
+
+$test->for('example', 2, 'meta', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Meta');
+  ok $result->{name} eq 'Venus::Space';
 
   $result
 });
@@ -1969,6 +2071,62 @@ $test->for('example', 2, 'prepend', sub {
   $result
 });
 
+=method purge
+
+The purge method purges a package space by expunging its symbol table and
+removing it from C<%INC>.
+
+=signature purge
+
+  purge() (Self)
+
+=metadata purge
+
+{
+  since => '1.02',
+}
+
+=example-1 purge
+
+  package main;
+
+  use Venus::Space;
+
+  # Bar::Gen is generated with $VERSION as 0.01
+
+  my $space = Venus::Space->new('Bar/Gen');
+
+  $space->load;
+
+  my $purge = $space->purge;
+
+  # bless({ value => "Bar::Gen" }, "Venus::Space")
+
+  # Bar::Gen->VERSION was 0.01, now undef
+
+  # Symbol table is gone, $space->visible is 0
+
+=cut
+
+$test->for('example', 1, 'purge', sub {
+  require File::Spec::Functions;
+  mkdir File::Spec::Functions::catdir($path, 'Bar');
+  my $file = File::Spec::Functions::catfile($path, 'Bar', 'Gen.pm');
+  open my $fh, '>', $file or die "File error: $!";
+  my @subs = map "sub $_ {1}", 'a'..'d';
+  print $fh join ";\n\n", 'package Bar::Gen', 'our $VERSION = 0.01', @subs, 1;
+  close $fh;
+  push @INC, $path;
+
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok !$result->visible;
+  is Bar::Gen->VERSION, undef;
+
+  $result
+});
+
 =method rebase
 
 The rebase method returns an object by prepending the package namespace
@@ -2025,7 +2183,7 @@ symbols but does not remove symbols.
 
   use Venus::Space;
 
-  # Foo::Gen is generate with $VERSION as 0.01
+  # Foo::Gen is generated with $VERSION as 0.01
 
   my $space = Venus::Space->new('Foo/Gen');
 
@@ -2062,7 +2220,7 @@ $test->for('example', 1, 'reload', sub {
 
   use Venus::Space;
 
-  # Foo::Gen is generate with $VERSION as 0.02
+  # Foo::Gen is generated with $VERSION as 0.02
 
   my $space = Venus::Space->new('Foo/Gen');
 
@@ -2112,7 +2270,7 @@ specified.
 
   # given: synopsis;
 
-  my $require = $space->require('Moo');
+  my $require = $space->require('Venus');
 
   # 1
 
@@ -2411,6 +2569,113 @@ $test->for('example', 1, 'siblings', sub {
   $result
 });
 
+=method splice
+
+The splice method perform a Perl L<perlfunc/splice> operation on the package
+namespace.
+
+=signature splice
+
+  splice(Int $offset, Int $length, Any @list) (Space)
+
+=metadata splice
+
+{
+  since => '0.09',
+}
+
+=example-1 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1, 0, 'bar');
+
+  # bless({ value => "Foo/Bar/Baz" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 1, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Foo::Bar::Baz";
+
+  $result
+});
+
+=example-2 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1, 1);
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 2, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Foo";
+
+  $result
+});
+
+=example-3 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(-2, 1);
+
+  # bless({ value => "Baz" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 3, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Baz";
+
+  $result
+});
+
+=example-4 splice
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/baz');
+
+  my $splice = $space->splice(1);
+
+  # bless({ value => "Foo" }, "Venus::Space")
+
+=cut
+
+$test->for('example', 4, 'splice', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok "$result" eq "Foo";
+
+  $result
+});
+
 =method tryload
 
 The tryload method attempt to C<load> the represented package using the
@@ -2493,7 +2758,7 @@ specified.
 
   my $space = Venus::Space->new('foo/goo');
 
-  my $use = $space->use('Moo');
+  my $use = $space->use('Venus');
 
   # bless({ value => "foo/goo" }, "Venus::Space")
 
@@ -2504,13 +2769,11 @@ $test->for('example', 1, 'use', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   ok "$result" eq 'Foo::Goo';
-  ok 'Foo::Goo'->isa('Moo::Object');
   is $result->package, 'Foo::Goo';
-  ok $result->package->can('after');
-  ok $result->package->can('before');
-  ok $result->package->can('extends');
-  ok $result->package->can('has');
-  ok $result->package->can('with');
+  ok !$result->package->can('error');
+  ok $result->package->can('false');
+  ok !$result->package->can('raise');
+  ok $result->package->can('true');
 
   $result
 });
@@ -2523,7 +2786,7 @@ $test->for('example', 1, 'use', sub {
 
   my $space = Venus::Space->new('foo/hoo');
 
-  my $use = $space->use('Moo', 'has');
+  my $use = $space->use('Venus', 'error');
 
   # bless({ value => "foo/hoo" }, "Venus::Space")
 
@@ -2534,13 +2797,11 @@ $test->for('example', 2, 'use', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   ok "$result" eq 'Foo::Hoo';
-  ok 'Foo::Hoo'->isa('Moo::Object');
   is $result->package, 'Foo::Hoo';
-  ok $result->package->can('after');
-  ok $result->package->can('before');
-  ok $result->package->can('extends');
-  ok $result->package->can('has');
-  ok $result->package->can('with');
+  ok $result->package->can('error');
+  ok $result->package->can('false');
+  ok !$result->package->can('raise');
+  ok $result->package->can('true');
 
   $result
 });
@@ -2553,7 +2814,7 @@ $test->for('example', 2, 'use', sub {
 
   my $space = Venus::Space->new('foo/foo');
 
-  my $use = $space->use(['Moo', 9.99], 'has');
+  my $use = $space->use(['Venus', 9.99], 'error');
 
 =cut
 
@@ -2568,102 +2829,133 @@ $test->for('example', 3, 'use', sub {
   ok my $result = $tryable->result;
   is $result->package, 'Foo::Foo';
   ok $failed;
-  ok !$result->package->can('after');
-  ok !$result->package->can('before');
-  ok !$result->package->can('extends');
-  ok !$result->package->can('has');
-  ok !$result->package->can('with');
+  ok !$result->package->can('error');
+  ok !$result->package->can('false');
+  ok !$result->package->can('raise');
+  ok !$result->package->can('true');
 
   $result
 });
 
-=method used
+=method unload
 
-The used method searches C<%INC> for the package namespace and if found returns
-the filepath and complete filepath for the loaded package, otherwise returns
-falsy with an empty string.
+The unload method unloads a package space by nullifying its symbol table and
+removing it from C<%INC>.
 
-=signature used
+=signature unload
 
-  used() (Str)
+  unload() (Self)
 
-=metadata used
+=metadata unload
 
 {
-  since => '0.01',
+  since => '1.02',
 }
 
-=example-1 used
+=example-1 unload
 
   package main;
 
   use Venus::Space;
 
-  my $space = Venus::Space->new('foo/oof');
+  # Bar::Gen is generated with $VERSION as 0.01
 
-  my $used = $space->used;
+  my $space = Venus::Space->new('Bar/Gen');
 
-  # ""
+  $space->load;
+
+  my $unload = $space->unload;
+
+  # bless({ value => "Bar::Gen" }, "Venus::Space")
+
+  # Bar::Gen->VERSION was 0.01, now undef
+
+  # Symbol table remains, $space->visible is 1
 
 =cut
 
-$test->for('example', 1, 'used', sub {
+$test->for('example', 1, 'unload', sub {
+  require File::Spec::Functions;
+  mkdir File::Spec::Functions::catdir($path, 'Bar');
+  my $file = File::Spec::Functions::catfile($path, 'Bar', 'Gen.pm');
+  open my $fh, '>', $file or die "File error: $!";
+  my @subs = map "sub $_ {1}", 'a'..'d';
+  print $fh join ";\n\n", 'package Bar::Gen', 'our $VERSION = 0.01', @subs, 1;
+  close $fh;
+  push @INC, $path;
+
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok $result->visible;
+  is Bar::Gen->VERSION, undef;
+
+  $result
+});
+
+=method unloaded
+
+The unloaded method checks whether the package namespace is not loaded and
+returns truthy or falsy.
+
+=signature unloaded
+
+  unloaded() (Bool)
+
+=metadata unloaded
+
+{
+  since => '1.02',
+}
+
+=example-1 unloaded
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Kit');
+
+  $space->init;
+
+  $space->unload;
+
+  my $unloaded = $space->unloaded;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'unloaded', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 unloaded
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Kit');
+
+  $space->init;
+
+  my $unloaded = $space->unloaded;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'unloaded', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
+  ok $result == 0;
 
   !$result
-});
-
-=example-2 used
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('c_p_a_n');
-
-  $space->load;
-
-  my $used = $space->used;
-
-  # "CPAN"
-
-=cut
-
-$test->for('example', 2, 'used', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq 'CPAN';
-
-  $result
-});
-
-=example-3 used
-
-  package Foo::Bar;
-
-  sub import;
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('foo/bar');
-
-  $space->load;
-
-  my $used = $space->used;
-
-  # "Foo/Bar"
-
-=cut
-
-$test->for('example', 3, 'used', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq 'Foo/Bar';
-
-  $result
 });
 
 =method variables
@@ -2714,6 +3006,117 @@ $test->for('example', 1, 'variables', sub {
   my $hashes = ['hashes', ['sets']];
   my $scalars = ['scalars', ['func', 'init']];
   is_deeply $result, [$arrays, $hashes, $scalars];
+
+  $result
+});
+
+=method visible
+
+The visible method returns truthy is the package namespace is visible, i.e. has
+symbols defined.
+
+=signature visible
+
+  visible() (Bool)
+
+=metadata visible
+
+{
+  since => '1.02',
+}
+
+=example-1 visible
+
+  # given: synopsis
+
+  package main;
+
+  my $visible = $space->visible;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'visible', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 visible
+
+  package Foo::Fe;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/fe');
+
+  my $visible = $space->visible;
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'visible', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
+});
+
+=example-3 visible
+
+  package Foo::Fe;
+
+  our $VERSION = 0.01;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/fe');
+
+  my $visible = $space->visible;
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'visible', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-4 visible
+
+  package Foo::Fi;
+
+  sub import;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/fi');
+
+  my $visible = $space->visible;
+
+  # 1
+
+=cut
+
+$test->for('example', 4, 'visible', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
 
   $result
 });
@@ -2783,20 +3186,6 @@ $test->for('example', 2, 'version', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

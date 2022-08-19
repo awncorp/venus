@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -18,6 +18,12 @@ sub throw {
   require Venus::Throw;
 
   return Venus::Throw->new(package => $package, context => $context);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['throw']
 }
 
 1;

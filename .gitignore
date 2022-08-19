@@ -1,35 +1,42 @@
 /*
 
 !/.github
+!/benchmarks
 !/bin
+!/changelog
 !/cpanfiles
 !/dev
+!/examples
 !/lib
+!/plx
 !/t
+!/xt
 
 !CHANGES
-!CHANGES.json
 !CHANGES.md
 !CODE_OF_CONDUCT.md
 !CONTRIBUTING.md
+!GITHUB.md
 !INSTALL
 !LICENSE
-!LICENSE.md
+!MANIFEST
 !MANIFEST.SKIP
 !META.json
 !META.yml
 !Makefile.PL
 !README
 !README.md
-!STABILITY.md
+!RELEASE.md
 !VERSION
 !cpanfile
 !dist.ini
 
+!.ctags
 !.editorconfig
 !.gitattributes
 !.gitignore
+!.gitlab-ci.yml
 !.mailmap
-!.perltidyrc
 !.perlcriticrc
+!.perltidyrc
 !.replyrc

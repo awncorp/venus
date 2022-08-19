@@ -5,38 +5,20 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 use Scalar::Util ();
 
 # ATTRIBUTES
 
-has 'invocant' => (
-  is => 'ro'
-);
-
-has 'arguments' => (
-  is => 'ro'
-);
-
-has 'on_try' => (
-  is => 'rw'
-);
-
-has 'on_catch' => (
-  is => 'rw',
-  default => sub {[]},
-);
-
-has 'on_default' => (
-  is => 'rw'
-);
-
-has 'on_finally' => (
-  is => 'rw'
-);
+attr 'invocant';
+attr 'arguments';
+attr 'on_try';
+attr 'on_catch';
+attr 'on_default';
+attr 'on_finally';
 
 # BUILDERS
 
@@ -46,6 +28,14 @@ sub build_arg {
   return {
     on_try => $data,
   };
+}
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->on_catch([]) if !defined $self->on_catch;
+
+  return $self;
 }
 
 # METHODS
@@ -65,11 +55,15 @@ sub callback {
     my $invocant = $self->invocant;
     my $method = $invocant ? $invocant->can($callback) : $self->can($callback);
 
-    $self->throw->error({
-      message => sprintf(qq(Can't locate object method "%s" on package "%s"),
-        ($callback, $invocant ? ref($invocant) : ref($self)))
-    })
-    if !$method;
+    if (!$method) {
+      my $throw;
+      my $error = sprintf(qq(Can't locate object method "%s" on package "%s"),
+        ($callback, $invocant ? ref($invocant) : ref($self)));
+      $throw = $self->throw;
+      $throw->name('on.callback');
+      $throw->message($error);
+      $throw->error;
+    }
 
     $callback = sub {goto $method};
   }
@@ -96,7 +90,7 @@ sub default {
 sub error {
   my ($self, $variable) = @_;
 
-  $self->on_default(sub{($$variable) = @_});
+  $self->on_default(sub{($$variable) = @_}) if $variable;
 
   return $self;
 }

@@ -18,7 +18,7 @@ Vars Class for Perl 5
   use Venus::Vars;
 
   my $vars = Venus::Vars->new(
-    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    value => { USER => 'awncorp', HOME => '/home/awncorp', },
     named => { iam => 'USER', root => 'HOME', },
   );
 
@@ -68,7 +68,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Proxyable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -94,7 +98,7 @@ I<Since C<0.01>>
 
   my $default = $vars->default;
 
-  # { USER => 'cpanery', HOME => '/home/cpanery', ... }
+  # { USER => 'awncorp', HOME => '/home/awncorp', ... }
 
 =back
 
@@ -175,7 +179,7 @@ I<Since C<0.01>>
 
   my $get = $vars->get('iam');
 
-  # "cpanery"
+  # "awncorp"
 
 =back
 
@@ -187,7 +191,7 @@ I<Since C<0.01>>
 
   my $get = $vars->get('USER');
 
-  # "cpanery"
+  # "awncorp"
 
 =back
 
@@ -211,7 +215,7 @@ I<Since C<0.01>>
 
   my $get = $vars->get('user');
 
-  # "cpanery"
+  # "awncorp"
 
 =back
 
@@ -353,28 +357,14 @@ I<Since C<0.01>>
   use Venus::Vars;
 
   my $vars = Venus::Vars->new(
-    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    value => { USER => 'awncorp', HOME => '/home/awncorp', },
     named => { root => 'HOME', },
   );
 
   my $unnamed = $vars->unnamed;
 
-  # { USER => "cpanery" }
+  # { USER => "awncorp" }
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

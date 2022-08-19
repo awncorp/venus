@@ -52,7 +52,8 @@ This package provides the following methods:
 
   unbox() (Any)
 
-The unbox method returns the un-boxed underlying object.
+The unbox method returns the un-boxed underlying object. This is a virtual
+method that dispatches to C<__handle__unbox>.
 
 I<Since C<0.01>>
 
@@ -67,19 +68,5 @@ I<Since C<0.01>>
   # bless({ value => {} }, "Venus::Hash")
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

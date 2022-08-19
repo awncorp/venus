@@ -28,9 +28,10 @@ Json Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides methods for reading and writing L<JSON|https://json.org>
-data. B<Note:> This package requires that a suitable JSON is installed,
+data. B<Note:> This package requires that a suitable JSON library is installed,
 currently either C<JSON::XS> C<3.0+>, C<JSON::PP> C<2.27105+>, or
-C<Cpanel::JSON::XS> C<4.09+>.
+C<Cpanel::JSON::XS> C<4.09+>. You can use the C<VENUS_JSON_PACKAGE> environment
+variable to include or prioritize your preferred JSON library.
 
 =cut
 
@@ -70,7 +71,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Explainable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -123,19 +128,5 @@ I<Since C<0.01>>
   # '{ "name": ["Ready", "Robot"], "stable": true, "version": 0.12 }'
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

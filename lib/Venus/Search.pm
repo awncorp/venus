@@ -5,36 +5,40 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Explainable';
 with 'Venus::Role::Stashable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{"$_[0]" . "$_[1]"},
   'eq' => sub{"$_[0]" eq "$_[1]"},
   'ne' => sub{"$_[0]" ne "$_[1]"},
   'qr' => sub{qr{@{[quotemeta("$_[0]")]}}},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has flags => (
-  is => 'rw',
-  default => '',
-);
+attr 'flags';
+attr 'regexp';
+attr 'string';
 
-has regexp => (
-  is => 'rw',
-  default => sub{qr//},
-);
+# BUILDERS
 
-has string => (
-  is => 'rw',
-  default => '',
-);
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->flags('') if !$self->flags;
+  $self->regexp(qr//) if !$self->regexp;
+  $self->string('') if !$self->string;
+
+  return $self;
+}
 
 # METHODS
 
@@ -78,7 +82,11 @@ sub evaluate {
   my $error = $@;
 
   if ($error) {
-    $self->throw->error({message => $error});
+    my $throw;
+    $throw = $self->throw;
+    $throw->name('on.evaluate');
+    $throw->message($error);
+    $throw->error;
   }
 
   return $self->stash(evaluation => [

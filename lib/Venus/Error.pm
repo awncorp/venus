@@ -5,31 +5,29 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Explainable';
 with 'Venus::Role::Stashable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{$_[0]->message . "$_[1]"},
   'eq' => sub{$_[0]->message eq "$_[1]"},
   'ne' => sub{$_[0]->message ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->message)]}/},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 # ATTRIBUTES
 
-has context => (
-  is => 'rw',
-  default => '(None)',
-);
-
-has message => (
-  is => 'rw',
-  default => 'Exception!',
-);
+attr 'name';
+attr 'context';
+attr 'message';
+attr 'verbose';
 
 # BUILDERS
 
@@ -44,12 +42,40 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
+  $self->name($data->{name}) if $self->name;
+  $self->context('(None)') if !$self->context;
+  $self->message('Exception!') if !$self->message;
+  $self->verbose(1) if !exists $data->{verbose};
   $self->trace(2) if !@{$self->frames};
 
   return $self;
 }
 
 # METHODS
+
+sub id {
+  my ($self, $name) = @_;
+
+  $name = lc $name =~ s/\W+/_/gr if $name;
+
+  return $name;
+}
+
+sub as {
+  my ($self, $name) = @_;
+
+  $name = $self->id($name);
+
+  my $method = "as_${name}";
+
+  $self = ref $self ? $self : $self->new;
+
+  if (!$self->can($method)) {
+    return $self->do('name', $name);
+  }
+
+  return $self->$method;
+}
 
 sub explain {
   my ($self) = @_;
@@ -67,6 +93,9 @@ sub explain {
 
   my @stacktrace = ("$message in $file at line $line");
 
+  return join "\n", @stacktrace, "" if !$self->verbose;
+
+  push @stacktrace, 'Name:', $self->name || '(None)';
   push @stacktrace, 'Type:', ref($self);
   push @stacktrace, 'Context:', $self->context || '(None)';
 
@@ -123,6 +152,62 @@ sub frames {
   my ($self) = @_;
 
   return $self->{'$frames'} //= [];
+}
+
+sub is {
+  my ($self, $name) = @_;
+
+  $name = $self->id($name);
+
+  my $method = "is_${name}";
+
+  if ($self->name && !$self->can($method)) {
+    return $self->name eq $name ? 1 : 0;
+  }
+
+  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
+}
+
+sub name {
+  my ($self, $name) = @_;
+
+  return $self->ITEM('name', $self->id($name) // ());
+}
+
+sub of {
+  my ($self, $name) = @_;
+
+  $name = $self->id($name);
+
+  my $method = "of_${name}";
+
+  if ($self->name && !$self->can($method)) {
+    return $self->name =~ /$name/ ? 1 : 0;
+  }
+
+  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
+}
+
+sub origin {
+  my ($self, $index) = @_;
+
+  my $frames = $self->frames;
+
+  $index //= 0;
+
+  return {
+    package => $frames->[$index][0],
+    filename => $frames->[$index][1],
+    line => $frames->[$index][2],
+    subroutine => $frames->[$index][3],
+    hasargs => $frames->[$index][4],
+    wantarray => $frames->[$index][5],
+    evaltext => $frames->[$index][6],
+    is_require => $frames->[$index][7],
+    hints => $frames->[$index][8],
+    bitmask => $frames->[$index][9],
+    hinthash => $frames->[$index][10],
+  };
 }
 
 sub throw {

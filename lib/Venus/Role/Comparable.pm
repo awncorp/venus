@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 require Scalar::Util;
 require Venus::Type;
@@ -152,6 +152,12 @@ sub tv {
   else {
     return 0;
   }
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['eq', 'ge', 'gele', 'gt', 'gtlt', 'lt', 'le', 'ne', 'tv']
 }
 
 1;

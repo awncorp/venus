@@ -36,6 +36,14 @@ This package has the following attributes:
 
 =cut
 
+=head2 name
+
+  name(Str)
+
+This attribute is read-write, accepts C<(Str)> values, and is optional.
+
+=cut
+
 =head2 message
 
   message(Str)
@@ -227,22 +235,31 @@ I<Since C<0.01>>
     message => 'Example error (no thing)!',
   });
 
+  # No::Thing does not exist
+
   # Exception! Venus::Throw::Error (isa Venus::Error)
 
 =back
 
-=cut
+=over 4
 
-=head1 AUTHORS
+=item error example 7
 
-Cpanery, C<cpanery@cpan.org>
+  # given: synopsis;
 
-=cut
+  my $error = $throw->error({
+    name => 'on.test.error',
+    context => 'Test.error',
+    message => 'Something failed!',
+  });
 
-=head1 LICENSE
+  # bless({
+  #   ...,
+  #   "context"  => "Test.error",
+  #   "message"  => "Something failed!",
+  #   "name"  => "on_test_error",
+  # }, "Main::Error")
 
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+=back
 
 =cut

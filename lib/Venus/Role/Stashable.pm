@@ -5,22 +5,14 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # BUILDERS
 
 sub BUILD {
-  return $_[0];
-}
+  my ($self, $data) = @_;
 
-# MODIFIERS
-
-around BUILD => sub {
-  my ($orig, $self, $args) = @_;
-
-  $self->$orig($args);
-
-  $self->{'$stash'} = delete $args->{'$stash'} || {} if !$self->{'$stash'};
+  $self->{'$stash'} = delete $data->{'$stash'} || {} if !$self->{'$stash'};
 
   return $self;
 };
@@ -37,6 +29,12 @@ sub stash {
   $self->{'$stash'}->{$key} = $value;
 
   return $value;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['stash']
 }
 
 1;

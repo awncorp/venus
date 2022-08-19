@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -55,7 +53,7 @@ $test->for('includes');
 
   with 'Venus::Role::Buildable';
 
-  has 'test';
+  attr 'test';
 
   package main;
 
@@ -106,8 +104,8 @@ when a single non-hashref is provided.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -160,8 +158,8 @@ hook into the handling of the arguments provided.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -215,8 +213,8 @@ after all arguments have been handled and set.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -270,8 +268,8 @@ when a single empty hashref is provided.
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -302,20 +300,6 @@ $test->for('example', 1, 'build_nil', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

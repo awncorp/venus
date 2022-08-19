@@ -17,9 +17,10 @@ Printable Role for Perl 5
 
   use Venus::Class;
 
+  with 'Venus::Role::Dumpable';
   with 'Venus::Role::Printable';
 
-  has 'test';
+  attr 'test';
 
   sub execute {
     return [@_];
@@ -41,14 +42,6 @@ Printable Role for Perl 5
 
 This package provides a mechanism for outputting (printing) objects or the
 return value of a dispatched method call to STDOUT.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Dumpable>
 
 =cut
 
@@ -148,6 +141,34 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 print_string
+
+  print_string(Str | CodeRef $method, Any @args) (Any)
+
+The print_string method prints a string representation of the underlying data
+without using a dump. This method supports dispatching, i.e. providing a
+method name and arguments whose return value will be acted on by this method.
+
+I<Since C<0.09>>
+
+=over 4
+
+=item print_string example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_string = $example->print_string;
+
+  # 'Example'
+
+  # 1
+
+=back
+
+=cut
+
 =head2 say
 
   say(Any @data) (Any)
@@ -239,16 +260,31 @@ I<Since C<0.01>>
 
 =cut
 
-=head1 AUTHORS
+=head2 say_string
 
-Cpanery, C<cpanery@cpan.org>
+  say_string(Str | CodeRef $method, Any @args) (Any)
 
-=cut
+The say_string method prints a string representation of the underlying data
+without using a dump, with a trailing newline. This method supports
+dispatching, i.e. providing a method name and arguments whose return value will
+be acted on by this method.
 
-=head1 LICENSE
+I<Since C<0.09>>
 
-Copyright (C) 2021, Cpanery
+=over 4
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+=item say_string example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_string = $example->say_string;
+
+  # "Example\n"
+
+  # 1
+
+=back
 
 =cut

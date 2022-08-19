@@ -5,9 +5,19 @@ use 5.014;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
-with 'Venus::Role::Dumpable';
+# AUDITS
+
+sub AUDIT {
+  my ($self, $from) = @_;
+
+  if (!$from->does('Venus::Role::Dumpable')) {
+    die "${self} requires ${from} to consume Venus::Role::Dumpable";
+  }
+
+  return $self;
+}
 
 # METHODS
 
@@ -45,6 +55,12 @@ sub hexdigest {
   my ($self, $algorithm, $method, @args) = @_;
 
   return $self->digester($algorithm, $method, @args)->hexdigest;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['digester', 'digest', 'b64digest', 'bindigest', 'hexdigest']
 }
 
 1;

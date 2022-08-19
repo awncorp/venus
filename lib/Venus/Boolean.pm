@@ -5,9 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base';
 
-extends 'Venus::Kind::Value';
+base 'Venus::Kind::Value';
 
 use Scalar::Util ();
 
@@ -31,6 +31,7 @@ use overload (
   'eq' => sub{"$_[0]" eq "$_[1]" ? $true : $false},
   'ne' => sub{"$_[0]" ne "$_[1]" ? $true : $false},
   'qr' => sub{"$_[0]" ? qr/$true/ : qr/$false/},
+  fallback => 1,
 );
 
 # BUILDERS

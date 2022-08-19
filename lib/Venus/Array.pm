@@ -5,33 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base', 'with';
 
-extends 'Venus::Kind::Value';
+base 'Venus::Kind::Value';
 
 with 'Venus::Role::Mappable';
-
-# MODIFIERS
-
-around get => sub {
-  my ($orig, $self, @args) = @_;
-
-  return $self->$orig if $#_ < 2;
-
-  my ($index) = @args;
-
-  return $self->value->[$index];
-};
-
-around set => sub {
-  my ($orig, $self, @args) = @_;
-
-  return $self->$orig(@args) if $#_ < 3;
-
-  my ($index, $value) = @args;
-
-  return $self->value->[$index] = $value;
-};
 
 # METHODS
 
@@ -77,6 +55,17 @@ sub any {
   }
 
   return $found ? 1 : 0;
+}
+
+sub call {
+  my ($self, $mapper, $method, @args) = @_;
+
+  require Venus::Type;
+
+  return $self->$mapper(sub{
+    my ($key, $val) = @_;
+    Venus::Type->new($val)->deduce->$method(@args)
+  });
 }
 
 sub count {
@@ -170,6 +159,16 @@ sub first {
   my ($self) = @_;
 
   return $self->get->[0];
+}
+
+sub get {
+  my ($self, @args) = @_;
+
+  return $self->value if !int@args;
+
+  my ($index) = @args;
+
+  return $self->value->[$index];
 }
 
 sub grep {
@@ -402,6 +401,16 @@ sub rsort {
   my $data = $self->get;
 
   return [CORE::sort { $b cmp $a } @$data];
+}
+
+sub set {
+  my ($self, @args) = @_;
+
+  return $self->value if !int@args;
+
+  my ($index, $value) = @args;
+
+  return $self->value->[$index] = $value;
 }
 
 sub shift {

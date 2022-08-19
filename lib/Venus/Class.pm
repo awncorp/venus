@@ -8,228 +8,118 @@ use warnings;
 # IMPORT
 
 sub import {
-  my ($package, @exports) = @_;
+  my ($self, @args) = @_;
 
-  my $target = caller;
+  my $from = caller;
 
-  require Moo;
-
-  die $@ if not eval "package $target; use Moo; use Venus; 1";
-
-  my $has = $target->can('has') or return;
+  require Venus::Core::Class;
 
   no strict 'refs';
   no warnings 'redefine';
+  no warnings 'once';
 
-  *{"${target}::base"} = *{"${target}::extends"} if !$target->can('base');
-  *{"${target}::has"} = generate([$package, $target], $has);
+  my %exports = map +($_,$_), @args ? @args : qw(
+    attr
+    base
+    false
+    from
+    mixin
+    role
+    test
+    true
+    with
+  );
 
-  return;
-}
+  @{"${from}::ISA"} = 'Venus::Core::Class';
 
-# FUNCTIONS
-
-my $wrappers = {
-};
-
-sub generate {
-  my ($info, $orig) = @_;
-
-  return sub { @_ = options($info, @_); goto $orig };
-}
-
-sub options {
-  my ($info, $name, %opts) = @_;
-
-  %opts = (is => 'rw') unless %opts;
-
-  $opts{mod} = 1 if $name =~ s/^\+//;
-
-  %opts = (%opts, $wrappers->{new}->($info, $name, %opts)) if defined $opts{new};
-  %opts = (%opts, $wrappers->{bld}->($info, $name, %opts)) if defined $opts{bld};
-  %opts = (%opts, $wrappers->{clr}->($info, $name, %opts)) if defined $opts{clr};
-  %opts = (%opts, $wrappers->{crc}->($info, $name, %opts)) if defined $opts{crc};
-  %opts = (%opts, $wrappers->{def}->($info, $name, %opts)) if defined $opts{def};
-  %opts = (%opts, $wrappers->{hnd}->($info, $name, %opts)) if defined $opts{hnd};
-  %opts = (%opts, $wrappers->{isa}->($info, $name, %opts)) if defined $opts{isa};
-  %opts = (%opts, $wrappers->{lzy}->($info, $name, %opts)) if defined $opts{lzy};
-  %opts = (%opts, $wrappers->{opt}->($info, $name, %opts)) if defined $opts{opt};
-  %opts = (%opts, $wrappers->{pre}->($info, $name, %opts)) if defined $opts{pre};
-  %opts = (%opts, $wrappers->{rdr}->($info, $name, %opts)) if defined $opts{rdr};
-  %opts = (%opts, $wrappers->{req}->($info, $name, %opts)) if defined $opts{req};
-  %opts = (%opts, $wrappers->{tgr}->($info, $name, %opts)) if defined $opts{tgr};
-  %opts = (%opts, $wrappers->{use}->($info, $name, %opts)) if defined $opts{use};
-  %opts = (%opts, $wrappers->{wkr}->($info, $name, %opts)) if defined $opts{wkr};
-  %opts = (%opts, $wrappers->{wrt}->($info, $name, %opts)) if defined $opts{wrt};
-
-  $name = "+$name" if delete $opts{mod} || delete $opts{modify};
-
-  return ($name, %opts);
-}
-
-$wrappers->{new} = sub {
-  my ($info, $name, %opts) = @_;
-
-  if (delete $opts{new}) {
-    $opts{builder} = "new_${name}";
-    $opts{lazy} = 1;
+  if ($exports{"attr"} && !*{"${from}::attr"}{"CODE"}) {
+    *{"${from}::attr"} = sub {@_ = ($from, @_); goto \&attr};
+  }
+  if ($exports{"base"} && !*{"${from}::base"}{"CODE"}) {
+    *{"${from}::base"} = sub {@_ = ($from, @_); goto \&base};
+  }
+  if ($exports{"catch"} && !*{"${from}::catch"}{"CODE"}) {
+    *{"${from}::catch"} = sub (&) {require Venus; goto \&Venus::catch};
+  }
+  if ($exports{"error"} && !*{"${from}::error"}{"CODE"}) {
+    *{"${from}::error"} = sub (;$) {require Venus; goto \&Venus::error};
+  }
+  if (!*{"${from}::false"}{"CODE"}) {
+    *{"${from}::false"} = sub {require Venus; Venus::false()};
+  }
+  if ($exports{"from"} && !*{"${from}::from"}{"CODE"}) {
+    *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
+  }
+  if ($exports{"raise"} && !*{"${from}::raise"}{"CODE"}) {
+    *{"${from}::raise"} = sub ($;$) {require Venus; goto \&Venus::raise};
+  }
+  if ($exports{"mixin"} && !*{"${from}::mixin"}{"CODE"}) {
+    *{"${from}::mixin"} = sub {@_ = ($from, @_); goto \&mixin};
+  }
+  if ($exports{"role"} && !*{"${from}::role"}{"CODE"}) {
+    *{"${from}::role"} = sub {@_ = ($from, @_); goto \&role};
+  }
+  if ($exports{"test"} && !*{"${from}::test"}{"CODE"}) {
+    *{"${from}::test"} = sub {@_ = ($from, @_); goto \&test};
+  }
+  if (!*{"${from}::true"}{"CODE"}) {
+    *{"${from}::true"} = sub {require Venus; Venus::true()};
+  }
+  if ($exports{"with"} && !*{"${from}::with"}{"CODE"}) {
+    *{"${from}::with"} = sub {@_ = ($from, @_); goto \&test};
   }
 
-  return (%opts);
-};
+  ${"${from}::META"} = {};
 
-$wrappers->{bld} = sub {
-  my ($info, $name, %opts) = @_;
+  return $self;
+}
 
-  $opts{builder} = delete $opts{bld};
+sub attr {
+  my ($from, @args) = @_;
 
-  return (%opts);
-};
+  $from->ATTR(@args);
 
-$wrappers->{clr} = sub {
-  my ($info, $name, %opts) = @_;
+  return $from;
+}
 
-  $opts{clearer} = delete $opts{clr};
+sub base {
+  my ($from, @args) = @_;
 
-  return (%opts);
-};
+  $from->BASE(@args);
 
-$wrappers->{crc} = sub {
-  my ($info, $name, %opts) = @_;
+  return $from;
+}
 
-  $opts{coerce} = delete $opts{crc};
+sub from {
+  my ($from, @args) = @_;
 
-  return (%opts);
-};
+  $from->FROM(@args);
 
-$wrappers->{def} = sub {
-  my ($info, $name, %opts) = @_;
+  return $from;
+}
 
-  $opts{default} = delete $opts{def};
+sub mixin {
+  my ($from, @args) = @_;
 
-  return (%opts);
-};
+  $from->MIXIN(@args);
 
-$wrappers->{hnd} = sub {
-  my ($info, $name, %opts) = @_;
+  return $from;
+}
 
-  $opts{handles} = delete $opts{hnd};
+sub role {
+  my ($from, @args) = @_;
 
-  return (%opts);
-};
+  $from->ROLE(@args);
 
-$wrappers->{isa} = sub {
-  my ($info, $name, %opts) = @_;
+  return $from;
+}
 
-  return (%opts) if ref($opts{isa});
+sub test {
+  my ($from, @args) = @_;
 
-  die $@ if not eval "require registry; 1";
+  $from->TEST(@args);
 
-  my $registry = registry::access($info->[1]);
-
-  return (%opts) if !$registry;
-
-  my $constraint = $registry->lookup($opts{isa});
-
-  return (%opts) if !$constraint;
-
-  $opts{isa} = $constraint;
-
-  return (%opts);
-};
-
-$wrappers->{lzy} = sub {
-  my ($info, $name, %opts) = @_;
-
-  $opts{lazy} = delete $opts{lzy};
-
-  return (%opts);
-};
-
-$wrappers->{opt} = sub {
-  my ($info, $name, %opts) = @_;
-
-  delete $opts{opt};
-
-  $opts{required} = 0;
-
-  return (%opts);
-};
-
-$wrappers->{pre} = sub {
-  my ($info, $name, %opts) = @_;
-
-  $opts{predicate} = delete $opts{pre};
-
-  return (%opts);
-};
-
-$wrappers->{rdr} = sub {
-  my ($info, $name, %opts) = @_;
-
-  $opts{reader} = delete $opts{rdr};
-
-  return (%opts);
-};
-
-$wrappers->{req} = sub {
-  my ($info, $name, %opts) = @_;
-
-  delete $opts{req};
-
-  $opts{required} = 1;
-
-  return (%opts);
-};
-
-$wrappers->{tgr} = sub {
-  my ($info, $name, %opts) = @_;
-
-  $opts{trigger} = delete $opts{tgr};
-
-  return (%opts);
-};
-
-$wrappers->{use} = sub {
-  my ($info, $name, %opts) = @_;
-
-  if (my $use = delete $opts{use}) {
-    $opts{builder} = $wrappers->{use_builder}->($info, $name, @$use);
-    $opts{lazy} = 1;
-  }
-
-  return (%opts);
-};
-
-$wrappers->{use_builder} = sub {
-  my ($info, $name, $sub, @args) = @_;
-
-  return sub {
-    my ($self) = @_;
-
-    my $point = $self->can($sub);
-    die "$name cannot 'use' method '$sub' via @{[$info->[1]]}" if !$point;
-
-    @_ = ($self, @args);
-
-    goto $point;
-  };
-};
-
-$wrappers->{wkr} = sub {
-  my ($info, $name, %opts) = @_;
-
-  $opts{weak_ref} = delete $opts{wkr};
-
-  return (%opts);
-};
-
-$wrappers->{wrt} = sub {
-  my ($info, $name, %opts) = @_;
-
-  $opts{writer} = delete $opts{wrt};
-
-  return (%opts);
-};
+  return $from;
+}
 
 1;

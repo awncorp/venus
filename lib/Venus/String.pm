@@ -5,15 +5,16 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base';
 
-extends 'Venus::Kind::Value';
+base 'Venus::Kind::Value';
 
 use overload (
   '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
+  fallback => 1,
 );
 
 # METHODS
@@ -42,7 +43,7 @@ sub camelcase {
   $result =~ s/[^a-zA-Z0-9]+([a-z])/\U$1/g;
   $result =~ s/[^a-zA-Z0-9]+//g;
 
-  return $result;
+  return CORE::lcfirst($result);
 }
 
 sub chomp {
@@ -118,6 +119,18 @@ sub index {
   return CORE::index($data, $substr, $start);
 }
 
+sub kebabcase {
+  my ($self) = @_;
+
+  my $data = $self->get;
+  my $re = qr/[\W_]+/;
+
+  $data =~ s/$re/-/g;
+  $data =~ s/^$re|$re$//g;
+
+  return $data;
+}
+
 sub lc {
   my ($self) = @_;
 
@@ -164,6 +177,19 @@ sub numified {
   my $data = $self->get;
 
   return $self->comparer eq 'numified' ? (0 + $data) : $self->SUPER::numified();
+}
+
+sub pascalcase {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  my $result = CORE::ucfirst(CORE::lc($data));
+
+  $result =~ s/[^a-zA-Z0-9]+([a-z])/\U$1/g;
+  $result =~ s/[^a-zA-Z0-9]+//g;
+
+  return $result;
 }
 
 sub prepend {

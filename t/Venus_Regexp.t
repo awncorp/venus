@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -2305,7 +2303,7 @@ introspect the result of the operation.
     qr/(?<username>\w+)$/,
   );
 
-  my $replace = $regexp->replace('Hey, unknown', 'cpanery');
+  my $replace = $regexp->replace('Hey, unknown', 'awncorp');
 
   # bless({ ... }, 'Venus::Replace')
 
@@ -2345,7 +2343,7 @@ introspect the result of the operation.
     qr/(?<greet>\w+), (?<username>\w+)/,
   );
 
-  my $search = $regexp->search('hey, cpanery');
+  my $search = $regexp->search('hey, awncorp');
 
   # bless({ ... }, 'Venus::Search')
 
@@ -2724,20 +2722,6 @@ $test->for('example', 1, '(qr)', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

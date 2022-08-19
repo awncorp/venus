@@ -5,22 +5,25 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use overload (
+  '""' => 'explain',
+  '~~' => 'explain',
+  fallback => 1,
+);
 
-extends 'Venus::Kind::Utility';
+use Venus::Class 'attr', 'base', 'with';
 
+base 'Venus::Kind::Utility';
+
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
 # ATTRIBUTES
 
-has decoder => (
-  is => 'rw',
-);
-
-has encoder => (
-  is => 'rw',
-);
+attr 'decoder';
+attr 'encoder';
 
 # BUILDERS
 
@@ -35,9 +38,13 @@ sub build_self {
 sub config {
   my ($self, $package) = @_;
 
-  $package ||= $self->package or $self->throw->error({
-    message => 'No suitable YAML package',
-  });
+  $package ||= $self->package or do {
+    my $throw;
+    $throw = $self->throw;
+    $throw->name('on.config');
+    $throw->message('No suitable YAML package');
+    $throw->error;
+  };
 
   # YAML::XS
   if ($package eq 'YAML::XS') {
@@ -112,7 +119,12 @@ sub package {
     'YAML::PP::LibYAML' => '0.004',
     'YAML::PP' => '0.023',
   );
-  for my $package (qw(YAML::XS YAML::PP::LibYAML YAML::PP)) {
+  for my $package (
+    grep defined,
+    $ENV{VENUS_YAML_PACKAGE},
+    qw(YAML::XS YAML::PP::LibYAML YAML::PP)
+  )
+  {
     my $criteria = "require $package; $package->VERSION($packages{$package})";
     if (do {local $@; eval "$criteria"; $@}) {
       next;

@@ -5,16 +5,20 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
-
-with 'Venus::Role::Buildable';
+use Venus::Role 'with';
 
 # MODIFIERS
 
-around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
+sub BUILD {
+  my ($self, $data) = @_;
 
-  return $class->coercion($class->$orig(@args));
+  $data = $self->coercion($data);
+
+  for my $name (keys %$data) {
+    $self->{$name} = $data->{$name};
+  }
+
+  return $self;
 };
 
 # METHODS
@@ -22,7 +26,7 @@ around BUILDARGS => sub {
 sub coerce {
   my ($self) = @_;
 
-  return ();
+  return {};
 }
 
 sub coerce_args {
@@ -73,15 +77,23 @@ sub coerce_onto {
 sub coercion {
   my ($self, $data) = @_;
 
-  my @args = $self->coerce;
-
-  return $data if !@args;
-
-  my $spec = (@args > 1) ? {@args} : (ref($args[0]) eq 'HASH') ? $args[0] : {};
+  my $spec = $self->coerce;
 
   return $data if !%$spec;
 
   return $self->coerce_args($data, $spec);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  [
+    'coerce',
+    'coerce_args',
+    'coerce_into',
+    'coerce_onto',
+    'coercion',
+  ]
 }
 
 1;
