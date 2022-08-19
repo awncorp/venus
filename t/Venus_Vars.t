@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -56,7 +54,7 @@ $test->for('includes');
   use Venus::Vars;
 
   my $vars = Venus::Vars->new(
-    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    value => { USER => 'awncorp', HOME => '/home/awncorp', },
     named => { iam => 'USER', root => 'HOME', },
   );
 
@@ -76,8 +74,8 @@ $test->for('synopsis', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Vars');
-  is $result->iam, 'cpanery';
-  is $result->root, '/home/cpanery';
+  is $result->iam, 'awncorp';
+  is $result->root, '/home/awncorp';
 
   $result
 });
@@ -101,7 +99,9 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Accessible
+Venus::Role::Buildable
 Venus::Role::Proxyable
+Venus::Role::Valuable
 
 =cut
 
@@ -135,7 +135,7 @@ The default method returns the default value, i.e. C<{%ENV}>.
 
   my $default = $vars->default;
 
-  # { USER => 'cpanery', HOME => '/home/cpanery', ... }
+  # { USER => 'awncorp', HOME => '/home/awncorp', ... }
 
 =cut
 
@@ -254,14 +254,14 @@ The get method takes a name or index and returns the associated value.
 
   my $get = $vars->get('iam');
 
-  # "cpanery"
+  # "awncorp"
 
 =cut
 
 $test->for('example', 1, 'get', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "cpanery";
+  ok $result eq "awncorp";
 
   $result
 });
@@ -272,14 +272,14 @@ $test->for('example', 1, 'get', sub {
 
   my $get = $vars->get('USER');
 
-  # "cpanery"
+  # "awncorp"
 
 =cut
 
 $test->for('example', 2, 'get', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "cpanery";
+  ok $result eq "awncorp";
 
   $result
 });
@@ -308,14 +308,14 @@ $test->for('example', 3, 'get', sub {
 
   my $get = $vars->get('user');
 
-  # "cpanery"
+  # "awncorp"
 
 =cut
 
 $test->for('example', 4, 'get', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "cpanery";
+  ok $result eq "awncorp";
 
   $result
 });
@@ -516,37 +516,23 @@ using the C<named> attribute.
   use Venus::Vars;
 
   my $vars = Venus::Vars->new(
-    value => { USER => 'cpanery', HOME => '/home/cpanery', },
+    value => { USER => 'awncorp', HOME => '/home/awncorp', },
     named => { root => 'HOME', },
   );
 
   my $unnamed = $vars->unnamed;
 
-  # { USER => "cpanery" }
+  # { USER => "awncorp" }
 
 =cut
 
 $test->for('example', 1, 'unnamed', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, { USER => "cpanery" };
+  is_deeply $result, { USER => "awncorp" };
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

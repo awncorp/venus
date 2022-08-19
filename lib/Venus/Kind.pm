@@ -5,14 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'with';
 
 with 'Venus::Role::Boxable';
+with 'Venus::Role::Tryable';
 with 'Venus::Role::Catchable';
 with 'Venus::Role::Comparable';
+with 'Venus::Role::Dumpable';
 with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';
-with 'Venus::Role::Dumpable';
 with 'Venus::Role::Matchable';
 with 'Venus::Role::Printable';
 with 'Venus::Role::Testable';

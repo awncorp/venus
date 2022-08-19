@@ -19,6 +19,7 @@ Catchable Role for Perl 5
 
   use Venus 'error';
 
+  with 'Venus::Role::Tryable';
   with 'Venus::Role::Catchable';
 
   sub pass {
@@ -41,14 +42,6 @@ Catchable Role for Perl 5
 
 This package modifies the consuming package and provides methods for trapping
 errors thrown from dispatched method calls.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Tryable>
 
 =cut
 
@@ -125,19 +118,5 @@ I<Since C<0.01>>
   # (bless({...}, "Venus::Error"), undef)
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

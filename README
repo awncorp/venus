@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    0.08
+    1.23
 
 SYNOPSIS
 
@@ -41,15 +41,15 @@ SYNOPSIS
 DESCRIPTION
 
     This library provides an object-orientation framework and extendible
-    standard library for Perl 5, built on top of Moo with classes which
-    wrap most native Perl data types. Venus has a simple modular
-    architecture, robust library of classes and methods, supports pure-Perl
-    autoboxing, advanced exception handling, "true" and "false" keywords,
-    package introspection, command-line options parsing, and more. This
-    package will always automatically exports true and false keyword
-    functions (unless existing routines of the same name already exist in
-    the calling package), otherwise exports keyword functions as requested
-    at import. This library requires Perl 5.18+.
+    standard library for Perl 5, built on top of the Mars architecture with
+    classes which wrap most native Perl data types. Venus has a simple
+    modular architecture, robust library of classes, methods, and roles,
+    supports pure-Perl autoboxing, advanced exception handling, "true" and
+    "false" functions, package introspection, command-line options parsing,
+    and more. This package will always automatically exports true and false
+    keyword functions (unless existing routines of the same name already
+    exist in the calling package or its parents), otherwise exports keyword
+    functions as requested at import. This library requires Perl 5.18+.
 
 FUNCTIONS
 
@@ -73,7 +73,9 @@ FUNCTIONS
       
         my $error = catch {die};
       
-        $error; # 'Died at ...'
+        $error;
+      
+        # "Died at ..."
 
     catch example 2
 
@@ -83,7 +85,9 @@ FUNCTIONS
       
         my ($error, $result) = catch {error};
       
-        $error; # Venus::Error
+        $error;
+      
+        # bless({...}, 'Venus::Error')
 
     catch example 3
 
@@ -93,7 +97,9 @@ FUNCTIONS
       
         my ($error, $result) = catch {true};
       
-        $result; # 1
+        $result;
+      
+        # 1
 
  error
 
@@ -111,6 +117,8 @@ FUNCTIONS
         use Venus 'error';
       
         my $error = error;
+      
+        # bless({...}, 'Venus::Error')
 
     error example 2
 
@@ -121,6 +129,8 @@ FUNCTIONS
         my $error = error {
           message => 'Something failed!',
         };
+      
+        # bless({message => 'Something failed!', ...}, 'Venus::Error')
 
  false
 
@@ -139,6 +149,8 @@ FUNCTIONS
         use Venus;
       
         my $false = false;
+      
+        # 0
 
     false example 2
 
@@ -147,6 +159,8 @@ FUNCTIONS
         use Venus;
       
         my $true = !false;
+      
+        # 1
 
  raise
 
@@ -165,6 +179,8 @@ FUNCTIONS
         use Venus 'raise';
       
         my $error = raise 'MyApp::Error';
+      
+        # bless({...}, 'MyApp::Error')
 
     raise example 2
 
@@ -173,6 +189,8 @@ FUNCTIONS
         use Venus 'raise';
       
         my $error = raise ['MyApp::Error', 'Venus::Error'];
+      
+        # bless({...}, 'MyApp::Error')
 
     raise example 3
 
@@ -183,6 +201,8 @@ FUNCTIONS
         my $error = raise ['MyApp::Error', 'Venus::Error'], {
           message => 'Something failed!',
         };
+      
+        # bless({message => 'Something failed!', ...}, 'MyApp::Error')
 
  true
 
@@ -201,6 +221,8 @@ FUNCTIONS
         use Venus;
       
         my $true = true;
+      
+        # 1
 
     true example 2
 
@@ -209,6 +231,8 @@ FUNCTIONS
         use Venus;
       
         my $false = !true;
+      
+        # 0
 
 FEATURES
 
@@ -250,6 +274,8 @@ FEATURES
         # $hash->random;
       
         $array->count == $hash->count;
+      
+        # 1
 
     value-classes
 
@@ -263,6 +289,8 @@ FEATURES
         use Venus::Array;
       
         my $array = Venus::Array->new;
+      
+        # bless({...}, 'Venus::Array')
 
       example 2
 
@@ -271,6 +299,8 @@ FEATURES
         use Venus::Boolean;
       
         my $boolean = Venus::Boolean->new;
+      
+        # bless({...}, 'Venus::Boolean')
 
       example 3
 
@@ -279,6 +309,8 @@ FEATURES
         use Venus::Code;
       
         my $code = Venus::Code->new;
+      
+        # bless({...}, 'Venus::Code')
 
       example 4
 
@@ -287,6 +319,8 @@ FEATURES
         use Venus::Float;
       
         my $float = Venus::Float->new;
+      
+        # bless({...}, 'Venus::Float')
 
       example 5
 
@@ -295,6 +329,8 @@ FEATURES
         use Venus::Hash;
       
         my $hash = Venus::Hash->new;
+      
+        # bless({...}, 'Venus::Hash')
 
       example 6
 
@@ -303,6 +339,8 @@ FEATURES
         use Venus::Number;
       
         my $number = Venus::Number->new;
+      
+        # bless({...}, 'Venus::Number')
 
       example 7
 
@@ -311,6 +349,8 @@ FEATURES
         use Venus::Regexp;
       
         my $regexp = Venus::Regexp->new;
+      
+        # bless({...}, 'Venus::Regexp')
 
       example 8
 
@@ -319,6 +359,8 @@ FEATURES
         use Venus::Scalar;
       
         my $scalar = Venus::Scalar->new;
+      
+        # bless({...}, 'Venus::Scalar')
 
       example 9
 
@@ -327,6 +369,8 @@ FEATURES
         use Venus::String;
       
         my $string = Venus::String->new;
+      
+        # bless({...}, 'Venus::String')
 
       example 10
 
@@ -335,6 +379,8 @@ FEATURES
         use Venus::Undef;
       
         my $undef = Venus::Undef->new;
+      
+        # bless({...}, 'Venus::Undef')
 
     builtin-autoboxing
 
@@ -365,6 +411,8 @@ FEATURES
         use Venus::Args;
       
         my $args = Venus::Args->new;
+      
+        # bless({...}, 'Venus::Args')
 
       example 2
 
@@ -373,6 +421,8 @@ FEATURES
         use Venus::Box;
       
         my $box = Venus::Box->new;
+      
+        # bless({...}, 'Venus::Box')
 
       example 3
 
@@ -381,6 +431,8 @@ FEATURES
         use Venus::Data;
       
         my $docs = Venus::Data->new->docs;
+      
+        # bless({...}, 'Venus::Data')
 
       example 4
 
@@ -389,6 +441,8 @@ FEATURES
         use Venus::Date;
       
         my $date = Venus::Date->new;
+      
+        # bless({...}, 'Venus::Date')
 
       example 5
 
@@ -397,6 +451,8 @@ FEATURES
         use Venus::Error;
       
         my $error = Venus::Error->new;
+      
+        # bless({...}, 'Venus::Error')
 
       example 6
 
@@ -405,6 +461,8 @@ FEATURES
         use Venus::Json;
       
         my $json = Venus::Json->new;
+      
+        # bless({...}, 'Venus::Json')
 
       example 7
 
@@ -413,6 +471,8 @@ FEATURES
         use Venus::Name;
       
         my $name = Venus::Name->new;
+      
+        # bless({...}, 'Venus::Name')
 
       example 8
 
@@ -421,6 +481,8 @@ FEATURES
         use Venus::Opts;
       
         my $opts = Venus::Opts->new;
+      
+        # bless({...}, 'Venus::Opts')
 
       example 9
 
@@ -429,6 +491,8 @@ FEATURES
         use Venus::Path;
       
         my $path = Venus::Path->new;
+      
+        # bless({...}, 'Venus::Path')
 
       example 10
 
@@ -437,6 +501,8 @@ FEATURES
         use Venus::Data;
       
         my $text = Venus::Data->new->text;
+      
+        # bless({...}, 'Venus::Data')
 
       example 11
 
@@ -445,6 +511,8 @@ FEATURES
         use Venus::Space;
       
         my $space = Venus::Space->new;
+      
+        # bless({...}, 'Venus::Space')
 
       example 12
 
@@ -453,6 +521,8 @@ FEATURES
         use Venus::Throw;
       
         my $throw = Venus::Throw->new;
+      
+        # bless({...}, 'Venus::Throw')
 
       example 13
 
@@ -461,6 +531,8 @@ FEATURES
         use Venus::Try;
       
         my $try = Venus::Try->new;
+      
+        # bless({...}, 'Venus::Try')
 
       example 14
 
@@ -469,6 +541,8 @@ FEATURES
         use Venus::Type;
       
         my $type = Venus::Type->new;
+      
+        # bless({...}, 'Venus::Type')
 
       example 15
 
@@ -477,6 +551,48 @@ FEATURES
         use Venus::Vars;
       
         my $vars = Venus::Vars->new;
+      
+        # bless({...}, 'Venus::Vars')
+
+      example 16
+
+        package main;
+      
+        use Venus::Match;
+      
+        my $match = Venus::Match->new;
+      
+        # bless({...}, 'Venus::Match')
+
+      example 17
+
+        package main;
+      
+        use Venus::Process;
+      
+        my $process = Venus::Process->new;
+      
+        # bless({...}, 'Venus::Process')
+
+      example 18
+
+        package main;
+      
+        use Venus::Template;
+      
+        my $template = Venus::Template->new;
+      
+        # bless({...}, 'Venus::Template')
+
+      example 19
+
+        package main;
+      
+        use Venus::Yaml;
+      
+        my $yaml = Venus::Yaml->new;
+      
+        # bless({...}, 'Venus::Yaml')
 
     package-reflection
 
@@ -492,6 +608,8 @@ FEATURES
         my $space = Venus::Space->new('Venus');
       
         $space->do('tryload')->routines;
+      
+        # [...]
 
     exception-handling
 
@@ -504,6 +622,7 @@ FEATURES
       
         use Venus::Class;
       
+        with 'Venus::Role::Tryable';
         with 'Venus::Role::Throwable';
         with 'Venus::Role::Catchable';
       
@@ -519,7 +638,7 @@ FEATURES
       
         my $error = $myapp->catch('execute');
       
-        # $error->isa('MyApp::Error');
+        # bless({...}, 'MyApp::Error');
 
     composable-standards
 
@@ -574,6 +693,8 @@ FEATURES
         my $string = Venus::String->new('hello, world');
       
         $string->base64;
+      
+        # "aGVsbG8sIHdvcmxk\n"
 
     template-system
 
@@ -594,25 +715,17 @@ FEATURES
         ));
       
         $template->render;
+      
+        # "Welcome, friend!"
 
 AUTHORS
 
-    Cpanery, cpanery@cpan.org
+    Awncorp, awncorp@cpan.org
 
 LICENSE
 
-    Copyright (C) 2021, Cpanery
+    Copyright (C) 2000, Al Newkirk.
 
-    Read the "license"
-    <https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-PROJECT
-
-    https://venus.cpanery.com
-
-    https://github.com/cpanery/venus/wiki
-
-    https://github.com/cpanery/venus/issues
-
-    https://cpanery.com
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Apache license version 2.0.
 

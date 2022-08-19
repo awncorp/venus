@@ -5,19 +5,18 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Proxyable';
 
 # ATTRIBUTES
 
-has named => (
-  is => 'rw',
-  default => sub {{}},
-);
+attr 'named';
 
 # BUILDERS
 
@@ -30,6 +29,14 @@ sub build_proxy {
     return $self->get($method) if !$has_value; # no value
     return $self->set($method, $value);
   };
+}
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->named({}) if !$self->named;
+
+  return $self;
 }
 
 # METHODS

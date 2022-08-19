@@ -1,28 +1,27 @@
 ---
 abstract: 'OO Library for Perl 5'
 author:
-  - 'Cpanery <cpanery@cpan.org>'
+  - 'AWNCORP <awncorp@cpan.org>'
 build_requires:
-  Moo: '2.005004'
   perl: '5.018'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Venus
 requires:
-  Moo: '2.005004'
   perl: '5.018'
 resources:
-  bugtracker: https://github.com/cpanery/venus/issues
+  bugtracker: http://github.com/awncorp/venus/issues
   homepage: https://metacpan.org/dist/Venus
-  repository: git://github.com/cpanery/venus.git
-version: '0.08'
-x_authority: cpan:CPANERY
-x_generated_by_perl: v5.35.7
+  license: https://opensource.org/licenses/apache-2.0
+  repository: git://github.com/awncorp/venus.git
+version: '1.23'
+x_authority: cpan:AWNCORP
+x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Apache-2.0

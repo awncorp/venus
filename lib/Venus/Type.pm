@@ -5,10 +5,12 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 
 use Scalar::Util ();

@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -41,8 +41,10 @@ sub BUILDPROXY {
   Venus::Error->throw($error);
 }
 
-sub DESTROY {
-  return;
+# EXPORTS
+
+sub EXPORT {
+  ['AUTOLOAD', 'BUILDPROXY']
 }
 
 1;

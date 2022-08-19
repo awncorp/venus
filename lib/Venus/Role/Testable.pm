@@ -5,11 +5,11 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
-sub isfalse {
+sub is_false {
   my ($self, $code, @args) = @_;
 
   $code ||= $self->can('value') ? 'value' : sub{};
@@ -19,7 +19,13 @@ sub isfalse {
   return $self->$code(@args) ? Venus::Boolean::FALSE() : Venus::Boolean::TRUE();
 }
 
-sub istrue {
+sub isfalse {
+  my ($self, @args) = @_;
+
+  return $self->is_false(@args);
+}
+
+sub is_true {
   my ($self, $code, @args) = @_;
 
   $code ||= $self->can('value') ? 'value' : sub{};
@@ -27,6 +33,18 @@ sub istrue {
   require Venus::Boolean;
 
   return $self->$code(@args) ? Venus::Boolean::TRUE() : Venus::Boolean::FALSE();
+}
+
+sub istrue {
+  my ($self, @args) = @_;
+
+  return $self->is_true(@args);
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['is_false', 'is_true', 'isfalse', 'istrue']
 }
 
 1;

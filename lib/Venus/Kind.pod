@@ -17,7 +17,7 @@ Kind Base Class for Perl 5
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
   package main;
 
@@ -92,9 +92,9 @@ I<Since C<0.08>>
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -159,9 +159,9 @@ I<Since C<0.08>>
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -282,9 +282,9 @@ I<Since C<0.08>>
 
   use Venus::Class;
 
-  extends 'Venus::Kind';
+  base 'Venus::Kind';
 
-  has 'value';
+  attr 'value';
 
   package main;
 
@@ -412,19 +412,5 @@ I<Since C<0.01>>
   # bless({ value => bless({}, "Example") }, "Venus::Type")
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

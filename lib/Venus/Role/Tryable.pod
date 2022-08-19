@@ -15,7 +15,7 @@ Tryable Role for Perl 5
 
   package Example;
 
-  use Venus::Class;
+  use Venus::Class 'with';
   use Venus 'raise';
 
   with 'Venus::Role::Tryable';
@@ -68,19 +68,5 @@ I<Since C<0.01>>
   # my $value = $try->result;
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

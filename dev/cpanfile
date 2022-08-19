@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [ -z $1 ]; then
-  cpm install
-else
-  cpm install --cpanfile=./cpanfiles/$1
-fi

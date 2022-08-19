@@ -19,7 +19,7 @@ Buildable Role for Perl 5
 
   with 'Venus::Role::Buildable';
 
-  has 'test';
+  attr 'test';
 
   package main;
 
@@ -63,8 +63,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -104,8 +104,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -146,8 +146,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -187,8 +187,8 @@ I<Since C<0.01>>
 
   use Venus::Class;
 
-  has 'x';
-  has 'y';
+  attr 'x';
+  attr 'y';
 
   with 'Venus::Role::Buildable';
 
@@ -209,19 +209,5 @@ I<Since C<0.01>>
   # $example->y;
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

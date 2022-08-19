@@ -129,6 +129,47 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 call
+
+  call(Str $iterable, Str $method) (Any)
+
+The call method executes the given method (named using the first argument)
+which performs an iteration (i.e. takes a callback) and calls the method (named
+using the second argument) on the object (or value) and returns the result of
+the iterable method.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item call example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $call = $array->call('map', 'incr');
+
+  # [2..10]
+
+=back
+
+=over 4
+
+=item call example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $call = $array->call('grep', 'gt', 4);
+
+  # [4..9]
+
+=back
+
+=cut
+
 =head2 cast
 
   cast(Str $kind) (Object | Undef)
@@ -2897,19 +2938,5 @@ I<Since C<0.01>>
   # [-2..9]
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

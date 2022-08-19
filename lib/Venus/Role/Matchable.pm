@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -17,6 +17,12 @@ sub match {
   my $match = Venus::Match->new($method ? scalar($self->$method(@args)) : $self);
 
   return $match;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['match']
 }
 
 1;

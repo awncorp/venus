@@ -5,13 +5,21 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base';
 
-extends 'Venus::Name';
+base 'Venus::Name';
+
+# BUILDERS
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $self->{value} = $self->package if !$self->lookslike_a_pragma;
+
+  return $self;
+}
 
 # METHODS
-
-my %has;
 
 sub all {
   my ($self, $name, @args) = @_;
@@ -62,6 +70,12 @@ sub arrays {
   return $arrays;
 }
 
+sub attributes {
+  my ($self) = @_;
+
+  return $self->meta->local('attrs');
+}
+
 sub authority {
   my ($self) = @_;
 
@@ -101,6 +115,7 @@ sub call {
     my $throw;
     my $error = qq(Attempt to call undefined class method in package "$class");
     $throw = $self->throw;
+    $throw->name('on.call.undefined');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -119,6 +134,7 @@ sub call {
     my $throw;
     my $error = qq(Unable to locate class method "$func" via package "$class");
     $throw = $self->throw;
+    $throw->name('on.call.missing');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -192,6 +208,7 @@ sub cop {
     my $throw;
     my $error = qq(Attempt to cop undefined object method from package "$class");
     $throw = $self->throw;
+    $throw->name('on.cop.undefined');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -204,6 +221,7 @@ sub cop {
     my $throw;
     my $error = qq(Unable to locate object method "$func" via package "$class");
     $throw = $self->throw;
+    $throw->name('on.cop.missing');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->stash(routine => $func);
@@ -236,22 +254,6 @@ sub data {
   return $data;
 }
 
-sub destroy {
-  my ($self) = @_;
-
-  require Symbol;
-
-  Symbol::delete_package($self->package);
-
-  my $c_re = quotemeta $self->package;
-  my $p_re = quotemeta $self->path;
-
-  map {delete $has{$_}} grep /^$c_re/, keys %has;
-  map {delete $INC{$_}} grep /^$p_re/, keys %INC;
-
-  return $self;
-}
-
 sub eval {
   my ($self, @args) = @_;
 
@@ -262,6 +264,7 @@ sub eval {
   if (my $error = $@) {
     my $throw;
     $throw = $self->throw;
+    $throw->name('on.eval');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->error;
@@ -308,25 +311,11 @@ sub id {
 sub init {
   my ($self) = @_;
 
-  my $class = $self->package;
+  $self->tryload;
 
-  if ($self->routine('import')) {
-    return $class;
-  }
+  $self->eval('sub import') if !$self->loaded;
 
-  $class = $self->locate ? $self->load : $self->package;
-
-  if ($self->routine('import')) {
-    return $class;
-  }
-  else {
-    my $import = sub { $class };
-
-    $self->inject('import', $import);
-    $self->load;
-
-    return $class;
-  }
+  return $self->package;
 }
 
 sub inherits {
@@ -344,20 +333,12 @@ sub included {
 sub inject {
   my ($self, $name, $coderef) = @_;
 
-  my $class = $self->package;
-
-  local $@;
   no strict 'refs';
   no warnings 'redefine';
 
-  if (state $subutil = eval "require Sub::Util") {
-    return *{"${class}::${name}"} = Sub::Util::set_subname(
-      "${class}::${name}", $coderef || sub{$class}
-    );
-  }
-  else {
-    return *{"${class}::${name}"} = $coderef || sub{$class};
-  }
+  my $class = $self->package;
+
+  return *{"${class}::${name}"} = $coderef || sub{$class};
 }
 
 sub load {
@@ -365,40 +346,19 @@ sub load {
 
   my $class = $self->package;
 
-  return $class if $has{$class};
+  return $class if $class eq 'main' || $self->loaded;
 
-  if ($class eq "main") {
-    return do { $has{$class} = 1; $class };
-  }
+  my $error = do{local $@; eval "require $class"; $@};
 
-  my $failed = !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
-  my $loaded;
-
-  my $error = do {
-    local $@;
-    no strict 'refs';
-    $loaded = !!$class->can('new');
-    $loaded = !!$class->can('import') if !$loaded;
-    $loaded = !!$class->can('meta') if !$loaded;
-    $loaded = !!$class->can('with') if !$loaded;
-    $loaded = eval "require $class; 1" if !$loaded;
-    $@;
-  }
-  if !$failed;
-
-  do {
+  if ($error) {
     my $throw;
     $error = qq(Error attempting to load $class: @{[$error || 'cause unknown']});
     $throw = $self->throw;
+    $throw->name('on.load');
     $throw->message($error);
     $throw->stash(package => $self->package);
     $throw->error;
   }
-  if $error
-  or $failed
-  or not $loaded;
-
-  $has{$class} = 1;
 
   return $class;
 }
@@ -406,13 +366,7 @@ sub load {
 sub loaded {
   my ($self) = @_;
 
-  my $class = $self->package;
-  my $pexpr = $self->format('path', '%s.pm');
-
-  my $is_loaded_eval = $has{$class};
-  my $is_loaded_used = $INC{$pexpr};
-
-  return ($is_loaded_eval || $is_loaded_used) ? 1 : 0;
+  return ($self->included || @{$self->routines}) ? 1 : 0;
 }
 
 sub locate {
@@ -427,6 +381,14 @@ sub locate {
   }
 
   return $found;
+}
+
+sub meta {
+  my ($self) = @_;
+
+  require Venus::Meta;
+
+  return Venus::Meta->new(name => $self->package);
 }
 
 sub name {
@@ -475,6 +437,24 @@ sub prepend {
   return $class->new($path);
 }
 
+sub purge {
+  my ($self) = @_;
+
+  return $self if $self->unloaded;
+
+  my $package = $self->package;
+
+  no strict 'refs';
+
+  for my $name (grep !/\A[^:]+::\z/, keys %{"${package}::"}) {
+    undef *{"${package}::${name}"}; delete ${"${package}::"}{$name};
+  }
+
+  delete $INC{$self->format('path', '%s.pm')};
+
+  return $self;
+}
+
 sub rebase {
   my ($self, @args) = @_;
 
@@ -488,17 +468,7 @@ sub rebase {
 sub reload {
   my ($self) = @_;
 
-  my $class = $self->package;
-
-  delete $has{$class};
-
-  my $path = $self->format('path', '%s.pm');
-
-  delete $INC{$path};
-
-  no strict 'refs';
-
-  @{"${class}::ISA"} = ();
+  $self->unload;
 
   return $self->load;
 }
@@ -604,6 +574,25 @@ sub siblings {
   ];
 }
 
+sub splice {
+  my ($self, $offset, $length, @list) = @_;
+
+  my $class = $self->class;
+  my $parts = $self->parts;
+
+  if (@list) {
+    CORE::splice(@{$parts}, $offset, $length, @list);
+  }
+  elsif (defined $length) {
+    CORE::splice(@{$parts}, $offset, $length);
+  }
+  elsif (defined $offset) {
+    CORE::splice(@{$parts}, $offset);
+  }
+
+  return $class->new(join '/', @$parts);
+}
+
 sub tryload {
   my ($self) = @_;
 
@@ -614,8 +603,6 @@ sub use {
   my ($self, $target, @params) = @_;
 
   my $version;
-
-  my $class = $self->package;
 
   ($target, $version) = @$target if ref $target eq 'ARRAY';
 
@@ -632,25 +619,9 @@ sub use {
     'sub{ my ($target, @params) = @_; $target->import(@params)}'
   );
 
-  $self->eval(join("\n", @statement))->($target, $class, @params);
+  $self->eval(join("\n", @statement))->($target, @params);
 
   return $self;
-}
-
-sub used {
-  my ($self) = @_;
-
-  my $class = $self->package;
-  my $path = $self->path;
-  my $regexp = quotemeta $path;
-
-  return $path if $has{$class};
-
-  for my $item (keys %INC) {
-    return $path if $item =~ /$regexp\.pm$/;
-  }
-
-  return '';
 }
 
 sub variables {
@@ -663,6 +634,40 @@ sub version {
   my ($self) = @_;
 
   return $self->scalar('VERSION');
+}
+
+sub unload {
+  my ($self) = @_;
+
+  return $self if $self->unloaded;
+
+  my $package = $self->package;
+
+  no strict 'refs';
+
+  for my $name (grep !/\A[^:]+::\z/, keys %{"${package}::"}) {
+    undef *{"${package}::${name}"};
+  }
+
+  delete $INC{$self->format('path', '%s.pm')};
+
+  return $self;
+}
+
+sub unloaded {
+  my ($self) = @_;
+
+  return $self->loaded ? 0 : 1;
+}
+
+sub visible {
+  my ($self) = @_;
+
+  no strict 'refs';
+
+  my $package = $self->package;
+
+  return (grep !/\A[^:]+::\z/, keys %{"${package}::"}) ? 1 : 0;
 }
 
 1;

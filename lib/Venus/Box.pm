@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'with';
 
 with 'Venus::Role::Buildable';
 with 'Venus::Role::Proxyable';
@@ -57,10 +57,8 @@ sub build_proxy {
     );
   }
   if (!$value->can($method)) {
-    if (lc($method) eq 'unbox') {
-      return sub {
-        $self->{value}
-      };
+    if (my $handler = $self->can("__handle__${method}")) {
+      return sub {$self->$handler(@args)};
     }
     elsif (!$value->can('AUTOLOAD')) {
       return undef;
@@ -83,6 +81,13 @@ sub build_proxy {
       );
     }
   };
+}
+
+# METHODS
+
+sub __handle__unbox {
+  my ($self) = @_;
+  return $self->{value};
 }
 
 1;

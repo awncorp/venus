@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -54,9 +52,10 @@ $test->for('abstract');
 
   use Venus::Class;
 
+  with 'Venus::Role::Proxyable';
   with 'Venus::Role::Pluggable';
 
-  has 'secret';
+  attr 'secret';
 
   package main;
 
@@ -82,28 +81,6 @@ This package provides a mechanism for dispatching to plugin classes.
 =cut
 
 $test->for('description');
-
-=integrates
-
-Venus::Role::Proxyable
-
-=cut
-
-$test->for('integrates');
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

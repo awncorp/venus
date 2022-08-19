@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -99,8 +97,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
 
   @@ end
 
-+=cut
-
 +=head2 DATA syntax (nested)
 
   __DATA__
@@ -118,8 +114,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
   +@@ end
 
   @@ end
-
-+=cut
 
 +=head2 POD syntax
 
@@ -151,8 +145,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
 
   =cut
 
-+=cut
-
 +=head2 POD syntax (nested)
 
   # pod syntax (nested)
@@ -171,8 +163,6 @@ DATA blocks, and it defaults to being configured for POD blocks.
   previous section demonstrating the topic, obviously from said section.
 
   =cut
-
-+=cut
 
 =cut
 
@@ -552,20 +542,6 @@ $test->for('example', 1, 'text', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

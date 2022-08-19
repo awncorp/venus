@@ -5,9 +5,9 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base';
 
-extends 'Venus::Kind::Value';
+base 'Venus::Kind::Value';
 
 use overload (
   '!' => sub{!$_[0]->get},
@@ -29,6 +29,7 @@ use overload (
   'ne' => sub{"$_[0]" ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->get)]}/},
   'x' => sub{$_[0]->get x ($_[1] + 0)},
+  fallback => 1,
 );
 
 # METHODS

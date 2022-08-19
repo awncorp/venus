@@ -5,18 +5,23 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base', 'with';
 
-extends 'Venus::Kind::Utility';
+base 'Venus::Kind::Utility';
 
+with 'Venus::Role::Valuable';
+with 'Venus::Role::Buildable';
 with 'Venus::Role::Accessible';
 with 'Venus::Role::Explainable';
 
 use overload (
+  '""' => 'explain',
   '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
+  '~~' => 'explain',
+  fallback => 1,
 );
 
 my $sep = qr/'|__|::|\\|\//;

@@ -1,13 +1,13 @@
-package Test::Venus;
+package Venus::Test;
 
 use 5.018;
 
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'base', 'with';
 
-extends 'Venus::Data';
+base 'Venus::Data';
 
 with 'Venus::Role::Buildable';
 
@@ -23,17 +23,21 @@ sub test {
   __PACKAGE__->new($_[0]);
 }
 
-# MODIFIERS
+# BUILDERS
 
-around build_self => sub {
-  my ($orig, $self, $data) = @_;
+sub build_self {
+  my ($self, $data) = @_;
 
-  $self->$orig($data);
-
+  $self->SUPER::build_self($data);
   for my $item (qw(name abstract tagline synopsis description)) {
-    @{$self->find(undef, $item)} || $self->throw->error({
-      message => "Test missing pod section =$item",
-    });
+    if (!@{$self->find(undef, $item)}) {
+      my $throw;
+      $throw = $self->throw;
+      $throw->name('on.build');
+      $throw->message("Test missing pod section =$item");
+      $throw->stash(section => $item);
+      $throw->error;
+    }
   }
 
   return $self;
@@ -45,6 +49,8 @@ sub data {
   my ($self, $name, @args) = @_;
 
   my $method = "data_for_$name";
+
+  $self->throw->error if !$self->can($method);
 
   wantarray ? ($self->$method(@args)) : $self->$method(@args);
 }
@@ -63,6 +69,19 @@ sub data_for_attributes {
   my ($self) = @_;
 
   my $data = $self->find(undef, 'attributes');
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_attribute {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'attribute',
+    name => $name,
+  });
 
   $self->throw->error if !@$data;
 
@@ -305,7 +324,7 @@ sub eval {
 
   local $@;
 
-  my @result = CORE::eval($perl);
+  my @result = CORE::eval(join("\n\n", "no warnings q(redefine);", $perl));
 
   die $@ if $@;
 
@@ -318,6 +337,8 @@ sub for {
   my $result;
 
   my $method = "test_for_$name";
+
+  $self->throw->error if !$self->can($method);
 
   subtest(join(' ', $method, grep !ref, @args), sub {
     $result = $self->$method(@args);
@@ -361,6 +382,8 @@ sub pdml {
 
   my $method = "pdml_for_$name";
 
+  $self->throw->error if !$self->can($method);
+
   wantarray ? ($self->$method(@args)) : $self->$method(@args);
 }
 
@@ -374,7 +397,7 @@ sub pdml_for_abstract {
   return $text ? ($self->head1('abstract', $text)) : ();
 }
 
-sub pdml_for_attribute {
+sub pdml_for_attribute_type1 {
   my ($self, $name, $is, $pre, $isa, $def) = @_;
 
   my @output;
@@ -390,7 +413,51 @@ sub pdml_for_attribute {
   return ($self->head2($name, @output));
 }
 
+sub pdml_for_attribute_type2 {
+  my ($self, $name) = @_;
+
+  my @output;
+
+  my $metadata = $self->text('metadata', $name);
+  my $signature = $self->text('signature', $name);
+
+  push @output, ($signature, '') if $signature;
+
+  my $text = $self->text('attribute', $name);
+
+  return () if !$text;
+
+  push @output, $text;
+
+  if ($metadata) {
+    local $@;
+    if ($metadata = eval $metadata) {
+      if (my $since = $metadata->{since}) {
+        push @output, "", "I<Since C<$since>>";
+      }
+    }
+  }
+
+  my @results = $self->search({name => $name});
+
+  for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+    push @output, $self->pdml('example', $i, $name),
+  }
+
+  return ($self->head2($name, @output));
+}
+
 sub pdml_for_attributes {
+  my ($self) = @_;
+
+  my $method = $self->text('attributes')
+    ? 'pdml_for_attributes_type1'
+    : 'pdml_for_attributes_type2';
+
+  return $self->$method;
+}
+
+sub pdml_for_attributes_type1 {
   my ($self) = @_;
 
   my @output;
@@ -400,12 +467,30 @@ sub pdml_for_attributes {
   return () if !$text;
 
   for my $line (split /\n/, $text) {
-    push @output, $self->pdml('attribute', (
+    push @output, $self->pdml('attribute_type1', (
       map { split /,\s*/ } split /:\s*/, $line, 2
     ));
   }
 
   return () if !@output;
+
+  if (@output) {
+    unshift @output, $self->head1('attributes',
+      "This package has the following attributes:",
+    );
+  }
+
+  return join "\n", @output;
+}
+
+sub pdml_for_attributes_type2 {
+  my ($self) = @_;
+
+  my @output;
+
+  for my $list ($self->search({list => 'attribute'})) {
+    push @output, $self->pdml('attribute_type2', $list->{name});
+  }
 
   if (@output) {
     unshift @output, $self->head1('attributes',
@@ -809,9 +894,11 @@ sub test_for_abstract {
     length($data) > 1;
   };
 
-  ok($code->(), '=abstract');
+  my $result = $code->();
 
-  return;
+  ok($result, '=abstract');
+
+  return $result;
 }
 
 sub test_for_attributes {
@@ -832,9 +919,31 @@ sub test_for_attributes {
     $data
   };
 
-  ok($code->(), "=attributes");
+  my $result = $code->();
 
-  return;
+  ok($result, "=attributes");
+
+  return $result;
+}
+
+sub test_for_attribute {
+  my ($self, $name, $code) = @_;
+
+  my $data = $self->data('attribute', $name);
+
+  $code ||= sub {
+    length($data) > 1;
+  };
+
+  my $result = $code->();
+
+  ok($result, "=attribute $name");
+
+  my $package = $self->data('name');
+
+  ok($package->can($name), "$package has $name");
+
+  return $result;
 }
 
 sub test_for_authors {
@@ -846,9 +955,11 @@ sub test_for_authors {
     length($data) > 1;
   };
 
-  ok($code->(), '=author');
+  my $result = $code->();
 
-  return;
+  ok($result, '=author');
+
+  return $result;
 }
 
 sub test_for_description {
@@ -860,9 +971,11 @@ sub test_for_description {
     length($data) > 1;
   };
 
-  ok($code->(), '=description');
+  my $result = $code->();
 
-  return;
+  ok($result, '=description');
+
+  return $result;
 }
 
 sub test_for_example {
@@ -872,10 +985,12 @@ sub test_for_example {
 
   $code ||= sub{1};
 
-  ok($data, "=example-$number $name");
-  ok($code->($self->try('eval', $data)), "=example-$number $name returns ok");
+  my $result = $code->($self->try('eval', $data));
 
-  return;
+  ok($data, "=example-$number $name");
+  ok($result, "=example-$number $name returns ok");
+
+  return $result;
 }
 
 sub test_for_feature {
@@ -887,9 +1002,11 @@ sub test_for_feature {
     length($data) > 1;
   };
 
-  ok($code->(), "=feature $name");
+  my $result = $code->();
 
-  return;
+  ok($result, "=feature $name");
+
+  return $result;
 }
 
 sub test_for_function {
@@ -901,9 +1018,11 @@ sub test_for_function {
     length($data) > 1;
   };
 
-  ok($code->(), "=function $name");
+  my $result = $code->();
 
-  return;
+  ok($result, "=function $name");
+
+  return $result;
 }
 
 sub test_for_include {
@@ -911,14 +1030,11 @@ sub test_for_include {
 
   my ($type, $name) = @$text;
 
-  my @blocks = $self->search({
-    list => $type,
-    name => $name,
-  });
+  my $blocks = [$self->search({ list => $type, name => $name })];
 
-  ok(@blocks, "=$type $name");
+  ok(@$blocks, "=$type $name");
 
-  return;
+  return $blocks;
 }
 
 sub test_for_includes {
@@ -930,9 +1046,12 @@ sub test_for_includes {
 
   ok($data, '=includes');
 
-  $self->$code($_) for map [split /\:\s*/], split /\n/, $data;
+  my $results = [];
 
-  return;
+  push @$results, $self->$code($_)
+    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $data;
+
+  return $results;
 }
 
 sub test_for_inherits {
@@ -944,13 +1063,15 @@ sub test_for_inherits {
     length($data) > 1;
   };
 
-  ok($code->(), "=inherits");
+  my $result = $code->();
+
+  ok($result, "=inherits");
 
   my $package = $self->data('name');
 
   ok($package->isa($_), "$package isa $_") for split /\n/, $data;
 
-  return;
+  return $result;
 }
 
 sub test_for_integrates {
@@ -962,16 +1083,16 @@ sub test_for_integrates {
     length($data) > 1;
   };
 
-  ok($code->(), "=integrates");
+  my $result = $code->();
+
+  ok($result, "=integrates");
 
   my $package = $self->data('name');
 
-  require Role::Tiny;
+  ok($package->can('does'), "$package has does");
+  ok($package->does($_), "$package does $_") for split /\n/, $data;
 
-  ok(Role::Tiny::does_role($package, $_), "$package does $_")
-    for split /\n/, $data;
-
-  return;
+  return $result;
 }
 
 sub test_for_libraries {
@@ -983,10 +1104,12 @@ sub test_for_libraries {
     length($data) > 1;
   };
 
-  ok($code->(), "=libraries");
+  my $result = $code->();
+
+  ok($result, "=libraries");
   ok(eval("require $_"), "$_ ok") for split /\n/, $data;
 
-  return;
+  return $result;
 }
 
 sub test_for_license {
@@ -998,9 +1121,11 @@ sub test_for_license {
     length($data) > 1;
   };
 
-  ok($code->(), "=license");
+  my $result = $code->();
 
-  return;
+  ok($result, "=license");
+
+  return $result;
 }
 
 sub test_for_method {
@@ -1012,13 +1137,15 @@ sub test_for_method {
     length($data) > 1;
   };
 
-  ok($code->(), "=method $name");
+  my $result = $code->();
+
+  ok($result, "=method $name");
 
   my $package = $self->data('name');
 
   ok($package->can($name), "$package has $name");
 
-  return;
+  return $result;
 }
 
 sub test_for_name {
@@ -1030,10 +1157,12 @@ sub test_for_name {
     length($data) > 1;
   };
 
-  ok($code->(), '=name');
+  my $result = $code->();
+
+  ok($result, '=name');
   ok(eval("require $data"), $data);
 
-  return;
+  return $result;
 }
 
 sub test_for_operator {
@@ -1045,9 +1174,11 @@ sub test_for_operator {
     length($data) > 1;
   };
 
-  ok($code->(), "=operator $name");
+  my $result = $code->();
 
-  return;
+  ok($result, "=operator $name");
+
+  return $result;
 }
 
 sub test_for_project {
@@ -1059,9 +1190,11 @@ sub test_for_project {
     length($data) > 1;
   };
 
-  ok($code->(), "=project");
+  my $result = $code->();
 
-  return;
+  ok($result, "=project");
+
+  return $result;
 }
 
 sub test_for_synopsis {
@@ -1071,10 +1204,12 @@ sub test_for_synopsis {
 
   $code ||= sub{$_[0]->result};
 
-  ok($data, '=synopsis');
-  ok($code->($self->try('eval', $data)), '=synopsis returns ok');
+  my $result = $code->($self->try('eval', $data));
 
-  return;
+  ok($data, '=synopsis');
+  ok($result, '=synopsis returns ok');
+
+  return $result;
 }
 
 sub test_for_tagline {
@@ -1086,9 +1221,11 @@ sub test_for_tagline {
     length($data) > 1;
   };
 
-  ok($code->(), "=tagline");
+  my $result = $code->();
 
-  return;
+  ok($result, "=tagline");
+
+  return $result;
 }
 
 sub test_for_version {
@@ -1100,19 +1237,23 @@ sub test_for_version {
     length($data) > 1;
   };
 
-  ok($code->(), "=version");
+  my $result = $code->();
+
+  ok($result, "=version");
 
   my $package = $self->data('name');
 
   ok(($package->VERSION // '') eq $data, "$data matched");
 
-  return;
+  return $result;
 }
 
 sub text {
   my ($self, $name, @args) = @_;
 
   my $method = "text_for_$name";
+
+  $self->throw->error if !$self->can($method);
 
   my $result = $self->$method(@args);
 
@@ -1137,6 +1278,20 @@ sub text_for_attributes {
   my ($self) = @_;
 
   my ($error, $result) = $self->catch('data', 'attributes');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_attribute {
+  my ($self, $name) = @_;
+
+  my ($error, $result) = $self->catch('data', 'attribute', $name);
 
   my $output = [];
 
@@ -1423,6 +1578,13 @@ sub text_for_version {
 
   if (!$error) {
     push @$output, $result;
+  }
+
+  if (!@$output) {
+    my $name = $self->text_for_name;
+    if (my $version = ($name->[0] =~ m/([:\w]+)/m)[0]->VERSION) {
+      push @$output, $version;
+    }
   }
 
   return $output;

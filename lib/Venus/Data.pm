@@ -5,23 +5,15 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo;
+use Venus::Class 'attr', 'base';
 
-extends 'Venus::Path';
+base 'Venus::Path';
 
 # ATTRIBUTES
 
-has from => (
-  is => 'rw',
-);
-
-has stag => (
-  is => 'rw',
-);
-
-has etag => (
-  is => 'rw',
-);
+attr 'from';
+attr 'stag';
+attr 'etag';
 
 # BUILDERS
 

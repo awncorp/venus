@@ -1678,7 +1678,7 @@ I<Since C<0.01>>
     qr/(?<username>\w+)$/,
   );
 
-  my $replace = $regexp->replace('Hey, unknown', 'cpanery');
+  my $replace = $regexp->replace('Hey, unknown', 'awncorp');
 
   # bless({ ... }, 'Venus::Replace')
 
@@ -1708,7 +1708,7 @@ I<Since C<0.01>>
     qr/(?<greet>\w+), (?<username>\w+)/,
   );
 
-  my $search = $regexp->search('hey, cpanery');
+  my $search = $regexp->search('hey, awncorp');
 
   # bless({ ... }, 'Venus::Search')
 
@@ -1985,17 +1985,3 @@ B<example 1>
   # 1
 
 =back
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut

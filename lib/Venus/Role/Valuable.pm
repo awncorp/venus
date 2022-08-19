@@ -5,19 +5,30 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'attr';
 
 # ATTRIBUTES
 
-has value => (
-  is => 'rw',
-  default => sub {$_[0]->default},
-);
+attr 'value';
+
+# BUILDERS
+
+sub BUILD {
+  my ($self, $data) = @_;
+
+  $self->value($self->default) if !exists $data->{value};
+}
 
 # METHODS
 
 sub default {
   return;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['value', 'default']
 }
 
 1;

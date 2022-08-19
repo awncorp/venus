@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -723,19 +721,53 @@ $test->for('example', 1, '(qr)', sub {
   $result
 });
 
-=license
+=operator ("")
 
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+This package overloads the C<""> operator.
 
 =cut
 
-=authors
+$test->for('operator', '("")');
 
-Cpanery, C<cpanery@cpan.org>
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$replace";
+
+  # "hello universe"
 
 =cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'hello universe';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $replace ~~ 'hello universe';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
+});
 
 # END
 

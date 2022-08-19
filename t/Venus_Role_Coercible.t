@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -56,11 +54,10 @@ $test->for('includes');
 
   with 'Venus::Role::Coercible';
 
-  has 'name';
-
-  has 'father';
-  has 'mother';
-  has 'siblings';
+  attr 'name';
+  attr 'father';
+  attr 'mother';
+  attr 'siblings';
 
   sub coerce {
     {
@@ -457,20 +454,6 @@ $test->for('example', 2, 'coercion', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

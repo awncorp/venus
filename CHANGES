@@ -1,58 +1,117 @@
+1.23 2022-08-18
+
+- [change] Replace Venus::Role::Testable#{istrue,isfalse} with {is_true,is_false}
+- [change] Resolve cross-platform float precision test failures
+- [feature] Allow Venus::Class to IMPORT and EXPORT using FROM
+- [feature] Add caller info to Venus::Error stacktrace
+- [feature] Allow Venus::Error#{is,as} to fallback to name
+- [feature] Implement Venus:Random
+- [feature] Implement Venus::Error#of
+- [update] Set "srand" on fork in Venus::Process
+- [update] Include names (for Venus::Error#{as,is}) in all exceptions
+- [update] Update Venus::Box#unbox as alias to __handle__unbox
+- [update] Make all Venus imports strict
+
+1.10 2022-08-07
+
+- [change] Rename truncate_to_x methods to restart_x
+- [feature] Cascade DESTROY from Core
+- [feature] Implement Venus::Mixin to mix-in routines
+- [feature] Venus::{Json,Yaml} engine override via ENV VAR
+- [feature] Allow Venus::Meta to return configurations
+- [feature] Allow attr override (prevent accessor install)
+- [feature] Implement Venus::Error#{is,as} for better classification
+- [feature] Implement Venus::Match#test
+- [feature] Implement Venus::{Array,Hash}#call
+- [update] Allow Meta to return local-only attrs, bases, roles, and subs
+- [update] Improve Venus::Space algorithms, add additional methods
+- [update] Add missing documentation in Venus::Date, Venus::String
+- [update] Update Venus::Core to better handle non-hashref based objects
+- [update] Update criteria on require of classes and roles
+
+1.01 2022-07-23
+
+- [feature] Test, validate, and generate attributes the same as methods
+- [feature] Export (on-demand) catch, error, and raise from Venus::{Class,Role}
+- [update] Unravel and flattern roles
+- [update] Expose errors on require of classes and roles
+
+1.00 2022-07-22
+
+- [change] Replace Moo with Mars architecture
+- [feature] Auto-generate VERSION from the main module
+- [update] Fix Venus::Date#rfc822 test example 1 on Windows
+- [update] Fix Venus::String#camelcase, add pascalcase
+
+0.09 2022-06-28
+
+- [feature] Include Venus::Test in the library
+- [feature] Add splice to Venus::Space
+- [feature] Add kebabcase to Venus::String
+- [feature] Add truncate_to_x methods to Venus::Date
+- [feature] Add print_string and say_string to Venus::Role::Printable
+- [update] Cleanup documentation
+- [update] Generate CHANGELOG from .changelog
+- [update] Add "Ethic" to READMEs
+- [update] Marker =cut being rendered twice
+
 0.08 2022-03-08
 
-- [update] (#111) Document Venus::{Class,Role} configurations
-- [feature] (#114) Implement value casting
-- [feature] (#130) Implement Venus::Role::Testable
-- [update] (#128) Reimplement Venus::Box#unbox as a virtual method
-- [update] (#123) Document all exceptions and methods that throw them
-- [update] (#125) Refactor Venus::Role::Comparable
-- [feature] (#112) Implement Venus::Role::Comparable
-- [defect] (#121) Fix inability to deduce floats
-- [update] (#117) Fix operator overload documentation rendering
-- [feature] (#115) Implement Venus::Kind#{safe,trap}
-- [update] (#116) Address test failures reported via CPAN testers issues
+- [defect] Fix inability to deduce floats
+- [feature] Implement value casting
+- [feature] Implement Venus::Kind#{safe,trap}
+- [feature] Implement Venus::Role::Comparable
+- [feature] Implement Venus::Role::Testable
+- [update] Address test failures reported via CPAN testers issues
+- [update] Document all exceptions and methods that throw them
+- [update] Document Venus::{Class,Role} configurations
+- [update] Fix operator overload documentation rendering
+- [update] Refactor Venus::Role::Comparable
+- [update] Reimplement Venus::Box#unbox as a virtual method
 
 0.07 2022-02-13
 
-- [update] (#96) Update documentation
-- [feature] (#97) Implement Venus::Match#data
-- [feature] (#98) Implement Venus::Match#expr
-- [feature] (#99) Extend Venus::Role::Coercion with new abilities
-- [defect] (#100) Fix Venus::Class attribute declaration issue
+- [defect] Fix Venus::Class attribute declaration issue
+- [feature] Extend Venus::Role::Coercion with new abilities
+- [feature] Implement Venus::Match#data
+- [feature] Implement Venus::Match#expr
+- [update] Update documentation
 
 0.06 2022-02-12
 
-- [feature] (#79) Implement Venus::Process
-- [defect] (#90) Fix Venus::Path#mkdirs empty rootdir issue
+- [defect] Fix Venus::Path#mkdirs empty rootdir issue
+- [feature] Implement Venus::Process
 
 0.04 2022-02-04
 
-- [feature] (#80) Implement Venus::Role::Matchable
-- [update] (#82) Address CPAN Testers reports
+- [feature] Implement Venus::Role::Matchable
+- [update] Address CPAN Testers reports
 
 0.03 2022-02-01
 
-- [feature] (#7) Implement Venus::Match
-- [update] (#69) Address CPAN Testers reports
+- [feature] Implement Venus::Match
+- [update] Address CPAN Testers reports
 
 0.02 2022-01-30
 
-- [update] (#58) Update String#render token syntax
-- [feature] (#56) Implement Venus::Template
-- [feature] (#8) Implement Venus::Role::Coercible
-- [update] (#27) Document all proxyable methods
-- [feature] (#42) Implement String#substr
-- [feature] (#47) Implement String#append_with,prepend_with
-- [feature] (#43) Implement String#repeat
-- [feature] (#41) Implement String#prepend
-- [feature] (#3) Implement Venus::Role::Digestable
-- [update] (#29) Require Perl version 5.18+
-- [defect] (#23) Fix Dumpable method calls in list context
-- [update] (#10) Minor refactors to source, documentation, and automation
-- [update] (#14) Document overrides in Venus::Boolean
-- [update] (#17) Update Venus::Json to use encoder/decoder callbacks
-- [feature] (#2) Support any YAML library, deduce booleans
-- [feature] (#1) Support any JSON library via encode/decode callbacks
-- [update] (#4) Document overrides, i.e. overloaded operators
-- [update] (#5) Update CONTRIBUTING.md
-- [update] (#9) JSON::PP support requires 4.00
+- [defect] Fix Dumpable method calls in list context
+- [feature] Implement String#append_with,prepend_with
+- [feature] Implement String#prepend
+- [feature] Implement String#repeat
+- [feature] Implement String#substr
+- [feature] Implement Venus::Role::Coercible
+- [feature] Implement Venus::Role::Digestable
+- [feature] Implement Venus::Template
+- [feature] Support any JSON library via encode/decode callbacks
+- [feature] Support any YAML library, deduce booleans
+- [update] Document all proxyable methods
+- [update] Document overrides, i.e. overloaded operators
+- [update] Document overrides in Venus::Boolean
+- [update] JSON::PP support requires 4.00
+- [update] Minor refactors to source, documentation, and automation
+- [update] Require Perl version 5.18+
+- [update] Update CONTRIBUTING.md
+- [update] Update String#render token syntax
+- [update] Update Venus::Json to use encoder/decoder callbacks
+
+

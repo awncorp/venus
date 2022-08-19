@@ -19,11 +19,10 @@ Coercible Role for Perl 5
 
   with 'Venus::Role::Coercible';
 
-  has 'name';
-
-  has 'father';
-  has 'mother';
-  has 'siblings';
+  attr 'name';
+  attr 'father';
+  attr 'mother';
+  attr 'siblings';
 
   sub coerce {
     {
@@ -286,19 +285,5 @@ I<Since C<0.02>>
   # [bless({...}, 'Person'), bless({...}, 'Person'), ...]
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

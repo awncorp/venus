@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -98,6 +96,8 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Accessible
+Venus::Role::Buildable
+Venus::Role::Valuable
 
 =cut
 
@@ -664,6 +664,109 @@ $test->for('example', 3, 'result', sub {
   $result
 });
 
+=method test
+
+The test method evaluates the registered conditions and returns truthy if a
+match can be made, without executing any of the actions (i.e. the L</then>
+code) or the special L</none> condition.
+
+=signature test
+
+  test() (Bool)
+
+=metadata test
+
+{
+  since => '1.02',
+}
+
+=example-1 test
+
+  package Match;
+
+  use Venus::Match;
+
+  our $TEST = 0;
+
+  my $match = Venus::Match->new('a');
+
+  $match->just('a')->then(sub{$TEST = 1});
+  $match->just('b')->then(sub{$TEST = 2});
+  $match->just('c')->then(sub{$TEST = 3});
+
+  my $test = $match->test;
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'test', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+  is $Match::TEST, 0;
+
+  $result
+});
+
+=example-2 test
+
+  package Match;
+
+  use Venus::Match;
+
+  our $TEST = 0;
+
+  my $match = Venus::Match->new('b');
+
+  $match->just('a')->then(sub{$TEST = 1});
+  $match->just('b')->then(sub{$TEST = 2});
+  $match->just('c')->then(sub{$TEST = 3});
+
+  my $test = $match->test;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'test', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+  is $Match::TEST, 0;
+
+  $result
+});
+
+=example-3 test
+
+  package Match;
+
+  use Venus::Match;
+
+  our $TEST = 0;
+
+  my $match = Venus::Match->new('z');
+
+  $match->just('a')->then(sub{$TEST = 1});
+  $match->just('b')->then(sub{$TEST = 2});
+  $match->just('c')->then(sub{$TEST = 3});
+
+  my $test = $match->test;
+
+  # 0
+
+=cut
+
+$test->for('example', 3, 'test', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+  is $Match::TEST, 0;
+
+  !$result
+});
+
 =method then
 
 The then method registers an action to be executed if the corresponding match
@@ -842,20 +945,6 @@ $test->for('example', 3, 'when', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

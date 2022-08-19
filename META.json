@@ -1,10 +1,10 @@
 {
    "abstract" : "OO Library for Perl 5",
    "author" : [
-      "Cpanery <cpanery@cpan.org>"
+      "AWNCORP <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -21,13 +21,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "2.005004",
             "perl" : "5.018"
          }
       },
       "test" : {
          "requires" : {
-            "Moo" : "2.005004",
             "perl" : "5.018"
          }
       }
@@ -35,19 +33,22 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/cpanery/venus/issues"
+         "web" : "http://github.com/awncorp/venus/issues"
       },
       "homepage" : "https://metacpan.org/dist/Venus",
+      "license" : [
+         "https://opensource.org/licenses/apache-2.0"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/cpanery/venus.git",
-         "web" : "http://github.com/cpanery/venus"
+         "url" : "git://github.com/awncorp/venus.git",
+         "web" : "http://github.com/awncorp/venus"
       }
    },
-   "version" : "0.08",
-   "x_authority" : "cpan:CPANERY",
-   "x_generated_by_perl" : "v5.35.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "1.23",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
    "x_spdx_expression" : "Apache-2.0"
 }
 

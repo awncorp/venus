@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -88,6 +86,8 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Accessible
+Venus::Role::Buildable
+Venus::Role::Valuable
 
 =cut
 
@@ -567,20 +567,6 @@ $test->for('example', 2, 'package', sub {
 
   $result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

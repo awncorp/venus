@@ -518,16 +518,34 @@ B<example 1>
 
 =back
 
-=head1 AUTHORS
+=over 4
 
-Cpanery, C<cpanery@cpan.org>
+=item operation: C<("")>
 
-=cut
+This package overloads the C<""> operator.
 
-=head1 LICENSE
+B<example 1>
 
-Copyright (C) 2021, Cpanery
+  # given: synopsis;
 
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
+  my $result = "$replace";
 
-=cut
+  # "hello universe"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $replace ~~ 'hello universe';
+
+  # 1
+
+=back

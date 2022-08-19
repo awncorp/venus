@@ -89,7 +89,11 @@ This package integrates behaviors from:
 
 L<Venus::Role::Accessible>
 
+L<Venus::Role::Buildable>
+
 L<Venus::Role::Proxyable>
+
+L<Venus::Role::Valuable>
 
 =cut
 
@@ -364,19 +368,5 @@ I<Since C<0.01>>
   # [1]
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

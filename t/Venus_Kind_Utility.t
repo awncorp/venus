@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -42,7 +40,7 @@ $test->for('abstract');
 
   use Venus::Class;
 
-  extends 'Venus::Kind::Utility';
+  base 'Venus::Kind::Utility';
 
   package main;
 
@@ -82,20 +80,6 @@ Venus::Role::Buildable
 =cut
 
 $test->for('integrates');
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 

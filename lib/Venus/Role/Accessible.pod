@@ -17,11 +17,12 @@ Accessible Role for Perl 5
 
   use Venus::Class;
 
+  with 'Venus::Role::Valuable';
   with 'Venus::Role::Accessible';
 
   package main;
 
-  my $example = Example->new('hello, there');
+  my $example = Example->new(value => 'hello, there');
 
 =cut
 
@@ -29,16 +30,6 @@ Accessible Role for Perl 5
 
 This package modifies the consuming package and provides a C<value> attribute
 as well as C<get> and C<set> methods for modifying the value.
-
-=cut
-
-=head1 INTEGRATES
-
-This package integrates behaviors from:
-
-L<Venus::Role::Buildable>
-
-L<Venus::Role::Valuable>
 
 =cut
 
@@ -93,19 +84,5 @@ I<Since C<0.01>>
   # "hi, there"
 
 =back
-
-=cut
-
-=head1 AUTHORS
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-=head1 LICENSE
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
 
 =cut

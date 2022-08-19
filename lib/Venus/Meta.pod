@@ -1,0 +1,757 @@
+
+=head1 NAME
+
+Venus::Meta - Class Metadata
+
+=cut
+
+=head1 ABSTRACT
+
+Class Metadata for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Person;
+
+  use Venus::Class;
+
+  attr 'fname';
+  attr 'lname';
+
+  package Identity;
+
+  use Venus::Role;
+
+  attr 'id';
+  attr 'login';
+  attr 'password';
+
+  sub EXPORT {
+    # explicitly declare routines to be consumed
+    ['id', 'login', 'password']
+  }
+
+  package Authenticable;
+
+  use Venus::Role;
+
+  sub authenticate {
+    return true;
+  }
+
+  sub AUDIT {
+    my ($self, $from) = @_;
+    # ensure the caller has a login and password when consumed
+    die "${from} missing the login attribute" if !$from->can('login');
+    die "${from} missing the password attribute" if !$from->can('password');
+  }
+
+  sub EXPORT {
+    # explicitly declare routines to be consumed
+    ['authenticate']
+  }
+
+  package Novice;
+
+  use Venus::Mixin;
+
+  sub points {
+    100
+  }
+
+  package User;
+
+  use Venus::Class 'attr', 'base', 'mixin', 'test', 'with';
+
+  base 'Person';
+
+  with 'Identity';
+
+  mixin 'Novice';
+
+  attr 'email';
+
+  test 'Authenticable';
+
+  sub valid {
+    my ($self) = @_;
+    return $self->login && $self->password ? true : false;
+  }
+
+  package main;
+
+  my $user = User->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  my $meta = $user->meta;
+
+  # bless({name => 'User'}, 'Venus::Meta')
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides configuration information for L<Venus> derived classes,
+roles, and interfaces.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 attr
+
+  attr(Str $name) (Bool)
+
+The attr method returns true or false if the package referenced has the
+attribute accessor named.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item attr example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $attr = $meta->attr('email');
+
+  # 1
+
+=back
+
+=over 4
+
+=item attr example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $attr = $meta->attr('username');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 attrs
+
+  attrs() (ArrayRef)
+
+The attrs method returns all of the attributes composed into the package
+referenced.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item attrs example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $attrs = $meta->attrs;
+
+  # [
+  #   'email',
+  #   'fname',
+  #   'id',
+  #   'lname',
+  #   'login',
+  #   'password',
+  # ]
+
+=back
+
+=cut
+
+=head2 base
+
+  base(Str $name) (Bool)
+
+The base method returns true or false if the package referenced has inherited
+the package named.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item base example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $base = $meta->base('Person');
+
+  # 1
+
+=back
+
+=over 4
+
+=item base example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $base = $meta->base('Student');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 bases
+
+  bases() (ArrayRef)
+
+The bases method returns returns all of the packages inherited by the package
+referenced.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item bases example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $bases = $meta->bases;
+
+  # [
+  #   'Person',
+  #   'Venus::Core::Class',
+  #   'Venus::Core',
+  # ]
+
+=back
+
+=cut
+
+=head2 data
+
+  data() (HashRef)
+
+The data method returns a data structure representing the shallow configuration
+for the package referenced.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $data = $meta->data;
+
+  # {
+  #   'ATTR' => {
+  #     'email' => [
+  #       'email'
+  #     ]
+  #   },
+  #   'BASE' => {
+  #     'Person' => [
+  #       'Person'
+  #     ]
+  #   },
+  #   'ROLE' => {
+  #     'Authenticable' => [
+  #       'Authenticable'
+  #     ],
+  #     'Identity' => [
+  #       'Identity'
+  #     ]
+  #   }
+  # }
+
+=back
+
+=cut
+
+=head2 find
+
+  find(Str $type, Str $name) (Tuple[Str,Tuple[Int,ArrayRef]])
+
+The find method finds and returns the first configuration for the property type
+specified. This method uses the L</search> method to search C<roles>, C<bases>,
+C<mixins>, and the source package, in the order listed. The "property type" can
+be any one of C<attr>, C<base>, C<mixin>, or C<role>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item find example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find;
+
+  # ()
+
+=back
+
+=over 4
+
+=item find example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('attr', 'id');
+
+  # ['Identity', [ 1, ['id']]]
+
+=back
+
+=over 4
+
+=item find example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('sub', 'valid');
+
+  # ['User', [1, [sub {...}]]]
+
+=back
+
+=over 4
+
+=item find example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $find = $meta->find('sub', 'authenticate');
+
+  # ['Authenticable', [1, [sub {...}]]]
+
+=back
+
+=cut
+
+=head2 local
+
+  local(Str $type) (ArrayRef)
+
+The local method returns the names of properties defined in the package
+directly (not inherited) for the property type specified. The C<$type> provided
+can be either C<attrs>, C<bases>, C<roles>, or C<subs>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item local example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $attrs = $meta->local('attrs');
+
+  # ['email']
+
+=back
+
+=over 4
+
+=item local example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $bases = $meta->local('bases');
+
+  # ['Person', 'Venus::Core::Class']
+
+=back
+
+=over 4
+
+=item local example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $roles = $meta->local('roles');
+
+  # ['Identity', 'Authenticable']
+
+=back
+
+=over 4
+
+=item local example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $subs = $meta->local('subs');
+
+  # [
+  #   'attr',
+  #   'authenticate',
+  #   'base',
+  #   'email',
+  #   'false',
+  #   'id',
+  #   'login',
+  #   'password',
+  #   'test',
+  #   'true',
+  #   'valid',
+  #   'with',
+  # ]
+
+=back
+
+=cut
+
+=head2 mixin
+
+  mixin(Str $name) (Bool)
+
+The mixin method returns true or false if the package referenced has consumed
+the mixin named.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item mixin example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Novice');
+
+  # 1
+
+=back
+
+=over 4
+
+=item mixin example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $mixin = $meta->mixin('Intermediate');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 mixins
+
+  mixins() (ArrayRef)
+
+The mixins method returns all of the mixins composed into the package
+referenced.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item mixins example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mixins = $meta->mixins;
+
+  # [
+  #   'Novice',
+  # ]
+
+=back
+
+=cut
+
+=head2 new
+
+  new(Any %args | HashRef $args) (Object)
+
+The new method returns a new instance of this package.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item new example 1
+
+  # given: synopsis
+
+  package main;
+
+  $meta = Venus::Meta->new(name => 'User');
+
+  # bless({name => 'User'}, 'Venus::Meta')
+
+=back
+
+=over 4
+
+=item new example 2
+
+  # given: synopsis
+
+  package main;
+
+  $meta = Venus::Meta->new({name => 'User'});
+
+  # bless({name => 'User'}, 'Venus::Meta')
+
+=back
+
+=cut
+
+=head2 role
+
+  role(Str $name) (Bool)
+
+The role method returns true or false if the package referenced has consumed
+the role named.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item role example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $role = $meta->role('Identity');
+
+  # 1
+
+=back
+
+=over 4
+
+=item role example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $role = $meta->role('Builder');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 roles
+
+  roles() (ArrayRef)
+
+The roles method returns all of the roles composed into the package referenced.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item roles example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $roles = $meta->roles;
+
+  # [
+  #   'Identity',
+  #   'Authenticable'
+  # ]
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Str $from, Str $type, Str $name) (ArrayRef[Tuple[Str,Tuple[Int,ArrayRef]]])
+
+The search method searches the source specified and returns the configurations
+for the property type specified. The source can be any one of C<bases>,
+C<roles>, C<mixins>, or C<self> for the source package. The "property type" can
+be any one of C<attr>, C<base>, C<mixin>, or C<role>.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item search example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search;
+
+  # ()
+
+=back
+
+=over 4
+
+=item search example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('roles', 'attr', 'id');
+
+  # [['Identity', [ 1, ['id']]]]
+
+=back
+
+=over 4
+
+=item search example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('self', 'sub', 'valid');
+
+  # [['User', [1, [sub {...}]]]]
+
+=back
+
+=over 4
+
+=item search example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $search = $meta->search('self', 'sub', 'authenticate');
+
+  # [['User', [1, [sub {...}]]]]
+
+=back
+
+=cut
+
+=head2 sub
+
+  sub(Str $name) (Bool)
+
+The sub method returns true or false if the package referenced has the
+subroutine named on the package directly, or any of its superclasses.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item sub example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $sub = $meta->sub('authenticate');
+
+  # 1
+
+=back
+
+=over 4
+
+=item sub example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $sub = $meta->sub('authorize');
+
+  # 0
+
+=back
+
+=cut
+
+=head2 subs
+
+  subs() (ArrayRef)
+
+The subs method returns all of the subroutines composed into the package
+referenced.
+
+I<Since C<1.00>>
+
+=over 4
+
+=item subs example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $subs = $meta->subs;
+
+  # [
+  #   'attr', ...,
+  #   'base',
+  #   'email',
+  #   'false',
+  #   'fname', ...,
+  #   'id',
+  #   'lname',
+  #   'login',
+  #   'new', ...,
+  #   'role',
+  #   'test',
+  #   'true',
+  #   'with', ...,
+  # ]
+
+=back
+
+=cut

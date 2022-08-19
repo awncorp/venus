@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -50,7 +48,7 @@ $test->for('includes');
 
   use Venus::Class;
 
-  has 'test';
+  attr 'test';
 
   sub explain {
     "okay"
@@ -118,74 +116,6 @@ $test->for('example', 1, 'explain', sub {
 
   $result
 });
-
-=operator ("")
-
-This package overloads the C<""> operator.
-
-=cut
-
-$test->for('operator', '("")');
-
-=example-1 ("")
-
-  package main;
-
-  my $example = Example->new(test => 123);
-
-  my $string = "$example";
-
-  # "okay"
-
-=cut
-
-$test->for('example', 1, '("")', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq 'okay';
-
-  $result
-});
-
-=operator (~~)
-
-This package overloads the C<~~> operator.
-
-=cut
-
-$test->for('operator', '(~~)');
-
-=example-1 (~~)
-
-  package main;
-
-  my $example = Example->new(test => 123);
-
-  my $result = $example ~~ 'okay';
-
-  # 1
-
-=cut
-
-$test->for('example', 1, '(~~)', sub {
-  1;
-});
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
-
-# END
 
 $test->render('lib/Venus/Role/Explainable.pod') if $ENV{RENDER};
 

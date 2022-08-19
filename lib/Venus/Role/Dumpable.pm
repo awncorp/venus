@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Venus::Role 'with';
 
 # METHODS
 
@@ -70,6 +70,12 @@ sub dump_pretty {
   chomp $data;
 
   return $data;
+}
+
+# EXPORTS
+
+sub EXPORT {
+  ['dump', 'dump_pretty']
 }
 
 1;

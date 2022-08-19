@@ -5,10 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
-use lib 't/lib';
-
 use Test::More;
-use Test::Venus;
+use Venus::Test;
 
 my $test = test(__FILE__);
 
@@ -38,8 +36,8 @@ $test->for('abstract');
 
 =includes
 
-method: isfalse
-method: istrue
+method: is_false
+method: is_true
 
 =cut
 
@@ -53,7 +51,7 @@ $test->for('includes');
 
   with 'Venus::Role::Testable';
 
-  has 'value';
+  attr 'value';
 
   sub execute {
     return pop;
@@ -63,7 +61,7 @@ $test->for('includes');
 
   my $example = Example->new;
 
-  # $example->istrue(sub{0});
+  # $example->is_true(sub{0});
 
 =cut
 
@@ -86,35 +84,35 @@ as false boolean values.
 
 $test->for('description');
 
-=method isfalse
+=method is_false
 
-The isfalse method dispatches the method call or executes the callback and
+The is_false method dispatches the method call or executes the callback and
 returns truthy returns as C<false> and falsy returns as C<true>
 L<"boolean"|Venus::Boolean> values.
 
-=signature isfalse
+=signature is_false
 
-  isfalse(Str | CodeRef $method, Any @args) (Bool)
+  is_false(Str | CodeRef $method, Any @args) (Bool)
 
-=metadata isfalse
+=metadata is_false
 
 {
   since => '0.08',
 }
 
-=example-1 isfalse
+=example-1 is_false
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->isfalse(execute => 0);
+  my $true = $example->is_false(execute => 0);
 
   # 1
 
 =cut
 
-$test->for('example', 1, 'isfalse', sub {
+$test->for('example', 1, 'is_false', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 1;
@@ -122,19 +120,19 @@ $test->for('example', 1, 'isfalse', sub {
   $result
 });
 
-=example-2 isfalse
+=example-2 is_false
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->isfalse(sub{0});
+  my $true = $example->is_false(sub{0});
 
   # 1
 
 =cut
 
-$test->for('example', 2, 'isfalse', sub {
+$test->for('example', 2, 'is_false', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 1;
@@ -142,19 +140,19 @@ $test->for('example', 2, 'isfalse', sub {
   $result
 });
 
-=example-3 isfalse
+=example-3 is_false
 
   package main;
 
   my $example = Example->new;
 
-  my $false = $example->isfalse(execute => 1);
+  my $false = $example->is_false(execute => 1);
 
   # 0
 
 =cut
 
-$test->for('example', 3, 'isfalse', sub {
+$test->for('example', 3, 'is_false', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
   is $result, 0;
@@ -162,35 +160,35 @@ $test->for('example', 3, 'isfalse', sub {
   !$result
 });
 
-=method istrue
+=method is_true
 
-The istrue method dispatches the method call or executes the callback and
+The is_true method dispatches the method call or executes the callback and
 returns truthy returns as C<true> and falsy returns as C<false>
 L<"boolean"|Venus::Boolean> values.
 
-=signature istrue
+=signature is_true
 
-  istrue(Str | CodeRef $method, Any @args) (Bool)
+  is_true(Str | CodeRef $method, Any @args) (Bool)
 
-=metadata istrue
+=metadata is_true
 
 {
   since => '0.08',
 }
 
-=example-1 istrue
+=example-1 is_true
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->istrue(execute => 1);
+  my $true = $example->is_true(execute => 1);
 
   # 1
 
 =cut
 
-$test->for('example', 1, 'istrue', sub {
+$test->for('example', 1, 'is_true', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 1;
@@ -198,19 +196,19 @@ $test->for('example', 1, 'istrue', sub {
   $result
 });
 
-=example-2 istrue
+=example-2 is_true
 
   package main;
 
   my $example = Example->new;
 
-  my $true = $example->istrue(sub{1});
+  my $true = $example->is_true(sub{1});
 
   # 1
 
 =cut
 
-$test->for('example', 2, 'istrue', sub {
+$test->for('example', 2, 'is_true', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 1;
@@ -218,39 +216,25 @@ $test->for('example', 2, 'istrue', sub {
   $result
 });
 
-=example-3 istrue
+=example-3 is_true
 
   package main;
 
   my $example = Example->new;
 
-  my $false = $example->istrue(execute => 0);
+  my $false = $example->is_true(execute => 0);
 
   # 0
 
 =cut
 
-$test->for('example', 3, 'istrue', sub {
+$test->for('example', 3, 'is_true', sub {
   my ($tryable) = @_;
   ok !(my $result = $tryable->result);
   is $result, 0;
 
   !$result
 });
-
-=license
-
-Copyright (C) 2021, Cpanery
-
-Read the L<"license"|https://github.com/cpanery/venus/blob/master/LICENSE> file.
-
-=cut
-
-=authors
-
-Cpanery, C<cpanery@cpan.org>
-
-=cut
 
 # END
 
