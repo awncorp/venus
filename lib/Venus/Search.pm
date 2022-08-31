@@ -14,7 +14,6 @@ with 'Venus::Role::Stashable';
 
 use overload (
   '""' => 'explain',
-  '.' => sub{"$_[0]" . "$_[1]"},
   'eq' => sub{"$_[0]" eq "$_[1]"},
   'ne' => sub{"$_[0]" ne "$_[1]"},
   'qr' => sub{qr{@{[quotemeta("$_[0]")]}}},

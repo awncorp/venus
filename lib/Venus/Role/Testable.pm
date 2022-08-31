@@ -19,12 +19,6 @@ sub is_false {
   return $self->$code(@args) ? Venus::Boolean::FALSE() : Venus::Boolean::TRUE();
 }
 
-sub isfalse {
-  my ($self, @args) = @_;
-
-  return $self->is_false(@args);
-}
-
 sub is_true {
   my ($self, $code, @args) = @_;
 
@@ -35,16 +29,10 @@ sub is_true {
   return $self->$code(@args) ? Venus::Boolean::TRUE() : Venus::Boolean::FALSE();
 }
 
-sub istrue {
-  my ($self, @args) = @_;
-
-  return $self->is_true(@args);
-}
-
 # EXPORTS
 
 sub EXPORT {
-  ['is_false', 'is_true', 'isfalse', 'istrue']
+  ['is_false', 'is_true']
 }
 
 1;

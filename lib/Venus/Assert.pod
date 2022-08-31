@@ -1,0 +1,401 @@
+
+=head1 NAME
+
+Venus::Assert - Assert Class
+
+=cut
+
+=head1 ABSTRACT
+
+Assert Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Assert;
+
+  my $assert = Venus::Assert->new('Example');
+
+  # $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+
+  # $assert->constraint(float => sub { $_->value > 1 });
+
+  # $assert->check;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for asserting type constraints and coercions
+on data.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 message
+
+  message(Str)
+
+This attribute is read-write, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 name
+
+  name(Str)
+
+This attribute is read-write, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 check
+
+  check(Any $data) (Bool)
+
+The check method returns true or false if the data provided passes the
+registered constraints.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item check example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $check = $assert->check;
+
+  # 0
+
+=back
+
+=over 4
+
+=item check example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $check = $assert->check('0.01');
+
+  # 0
+
+=back
+
+=over 4
+
+=item check example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $check = $assert->check('1.01');
+
+  # 1
+
+=back
+
+=over 4
+
+=item check example 4
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $check = $assert->check(time);
+
+  # 0
+
+=back
+
+=cut
+
+=head2 coerce
+
+  coerce(Any $data) (Any)
+
+The coerce method returns the coerced data if the data provided matches any of
+the registered coercions.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item coerce example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+
+  my $coerce = $assert->coerce;
+
+  # undef
+
+=back
+
+=over 4
+
+=item coerce example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+
+  my $coerce = $assert->coerce('1.01');
+
+  # "1.01"
+
+=back
+
+=over 4
+
+=item coerce example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+
+  my $coerce = $assert->coerce('1.00001');
+
+  # "1.00"
+
+=back
+
+=over 4
+
+=item coerce example 4
+
+  # given: synopsis
+
+  package main;
+
+  $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+
+  my $coerce = $assert->coerce('hello world');
+
+  # "hello world"
+
+=back
+
+=cut
+
+=head2 coercion
+
+  coercion(Str $type, CodeRef $code) (Object)
+
+The coercion method returns registers a coercion based on the type provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item coercion example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $coercion = $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+
+  # bless(..., "Venus::Assert")
+
+=back
+
+=cut
+
+=head2 coercions
+
+  coercions() (Match)
+
+The coercions method returns the registered coercions as a L<Venus::Match> object.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item coercions example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $coercions = $assert->coercions;
+
+  # bless(..., "Venus::Match")
+
+=back
+
+=cut
+
+=head2 constraint
+
+  constraint(Str $type, CodeRef $code) (Object)
+
+The constraint method returns registers a constraint based on the type provided.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item constraint example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $constraint = $assert->constraint(float => sub { $_->value > 1 });
+
+  # bless(..., "Venus::Assert")
+
+=back
+
+=cut
+
+=head2 constraints
+
+  constraints() (Match)
+
+The constraints method returns the registered constraints as a L<Venus::Match>
+object.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item constraints example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $constraints = $assert->constraints;
+
+  # bless(..., "Venus::Match")
+
+=back
+
+=cut
+
+=head2 validate
+
+  validate(Any $data) (Any)
+
+The validate method returns the data provided if the data provided passes the
+registered constraints, or throws an exception.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item validate example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $result = $assert->validate;
+
+  # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=over 4
+
+=item validate example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $result = $assert->validate('0.01');
+
+  # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=over 4
+
+=item validate example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $result = $assert->validate('1.01');
+
+  # "1.01"
+
+=back
+
+=over 4
+
+=item validate example 4
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $result = $assert->validate(time);
+
+  # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=cut

@@ -15,6 +15,35 @@ with 'Venus::Role::Accessible';
 
 use Scalar::Util ();
 
+# BUILDERS
+
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    value => $data
+  };
+}
+
+sub build_args {
+  my ($self, $data) = @_;
+
+  if (keys %$data == 1 && exists $data->{value}) {
+    return $data;
+  }
+  return {
+    value => $self->default
+  };
+}
+
+sub build_nil {
+  my ($self, $data) = @_;
+
+  return {
+    value => $data
+  };
+}
+
 # METHODS
 
 sub cast {
@@ -38,20 +67,13 @@ sub cast {
 sub code {
   my ($self) = @_;
 
-  my $package = $self->package;
+  return scalar $self->identify;
+}
 
-  return "ARRAY" if $package eq "Venus::Array";
-  return "BOOLEAN" if $package eq "Venus::Boolean";
-  return "HASH" if $package eq "Venus::Hash";
-  return "CODE" if $package eq "Venus::Code";
-  return "FLOAT" if $package eq "Venus::Float";
-  return "NUMBER" if $package eq "Venus::Number";
-  return "STRING" if $package eq "Venus::String";
-  return "SCALAR" if $package eq "Venus::Scalar";
-  return "REGEXP" if $package eq "Venus::Regexp";
-  return "UNDEF" if $package eq "Venus::Undef";
+sub coded {
+  my ($self, $code) = @_;
 
-  return undef;
+  return uc($self->code) eq uc("$code");
 }
 
 sub deduce {
@@ -151,6 +173,11 @@ sub deduce_stringlike {
   my $data = $self->get;
 
   return $self->into_string;
+}
+
+sub default {
+
+  return undef;
 }
 
 sub detract {
@@ -794,6 +821,54 @@ sub from_undef_to_undef {
   my ($self, $data) = @_;
 
   return $self->into_undef($data);
+}
+
+sub identify {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  my $defined = true;
+  my $blessed = false;
+
+  my $type_name;
+
+  if (not(defined($data))) {
+    $type_name = 'UNDEF';
+    $defined = false;
+  }
+  elsif (scalar_is_blessed($data)) {
+    $type_name = $data->isa('Regexp') ? 'REGEXP' : 'OBJECT';
+    $blessed = true;
+  }
+  elsif (ref($data)) {
+    if (ref($data) eq 'ARRAY') {
+      $type_name = 'ARRAY';
+    }
+    elsif (ref($data) eq 'CODE') {
+      $type_name = 'CODE';
+    }
+    elsif (ref($data) eq 'HASH') {
+      $type_name = 'HASH';
+    }
+    else {
+      $type_name = 'SCALAR';
+    }
+  }
+  elsif (scalar_is_boolean($data)) {
+    $type_name = 'BOOLEAN';
+  }
+  elsif (scalar_is_float($data)) {
+    $type_name = 'FLOAT';
+  }
+  elsif (scalar_is_numeric($data)) {
+    $type_name = 'NUMBER';
+  }
+  else {
+    $type_name = 'STRING';
+  }
+
+  return wantarray ? ($defined, $blessed, $type_name) : $type_name;
 }
 
 sub into_array {

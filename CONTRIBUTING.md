@@ -1,31 +1,32 @@
 ## Contributing
 
 Venus is an object-orientation framework and extendible standard library for
-Perl 5, built on top of Moo with classes which wrap most native Perl data
-types.
+Perl 5, built on top of the Mars architecture with classes which wrap most
+native Perl data types.
 
 ## Philosophy
 
-The main goal of Venus is to act as a standard library, i.e. to provide a
+The goal of Venus is to be a viable non-core standard library, i.e. to provide a
 robust set of methods for dealing with common computing tasks when operating on
 primitive data types. Venus is concerned about developer ergonomics much more
 than speed or conciseness.
 
 ## Aspirations
 
-The following feeatures and goals should anchor the direction and development
+The following features and goals should anchor the direction and development
 of this project:
 
+- No dependencies
+- Performance-minded
 - Exception handling
-- Optional autoboxing
+- Pure-Perl autoboxing
 - Pluggable standard library
+- Consistent naming, intuitive behaviors
 - Robust and accurate documentation
-- Simple package reflection
-- No non-core dependencies
 - Small, flexible, powerful, optional
-- Standard library, intuitive behaviors
-- Utility classes for common computing tasks
-- Value classes for primitives
+- Simple package reflection
+- Utility classes for common behaviors
+- Value classes for primitives data types
 - Composable standards via traits (roles)
 
 ## Installation
@@ -33,7 +34,7 @@ of this project:
 The following steps configures the local environment for developing on this
 project.
 
-**Space**
+**Setup**
 
 ```bash
 mkdir venus && cd venus
@@ -48,13 +49,13 @@ git clone git@github.com:awncorp/venus.git .
 **Build**
 
 ```bash
-cpanm -qn --installdeps .
+cpanm -llocal -qn --installdeps .
 ```
 
 **Validate**
 
 ```bash
-prove -r t
+prove -Ilib -Ilocal/lib/perl5 -r t
 ```
 
 ## Directory Structure
@@ -93,21 +94,21 @@ URL), e.g. `issue-1`.
 Create or find an issue on GitHub:
 
 ```bash
-$ open https://github.com/awncorp/venus/issues/1
+open https://github.com/awncorp/venus/issues/1
 ```
 
 Create a local branch based on the issue (ticket) number (found in the URL):
 
 ```bash
-$ git checkout master
-$ git pull origin master
-$ git checkout -b issue-1
+git checkout master
+git pull origin master
+git checkout -b issue-1
 ```
 
 Make some code changes and push the branch to the remote:
 
 ```bash
-$ git push origin issue-1
+git push origin issue-1
 ```
 
 ## Testing
@@ -115,13 +116,21 @@ $ git push origin issue-1
 Running the test suite using `prove`:
 
 ```bash
-$ prove -r t
+prove -Ilib -Ilocal/lib/perl5 -r t
 ```
 
-Testing the code using the `reply` (REPL):
+## Experiment
+
+Experiment with the code using `perl` (REPL):
 
 ```bash
-$ reply -e 'use Venus'
+perl -Ilib -Ilocal/lib/perl5 -MVenus -de0
+```
+
+Experiment with the code using the `reply` (REPL):
+
+```bash
+reply -Ilib -Ilocal/lib/perl5 -e 'use Venus'
 ```
 
 ## Support

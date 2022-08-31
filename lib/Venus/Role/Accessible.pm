@@ -12,8 +12,8 @@ use Venus::Role 'with';
 sub AUDIT {
   my ($self, $from) = @_;
 
-  if (!$from->does('Venus::Role::Valuable')) {
-    die "${self} requires ${from} to consume Venus::Role::Valuable";
+  if (!$from->isa('Venus::Core')) {
+    die "${self} requires ${from} to derive from Venus::Core";
   }
 
   return $self;
@@ -21,22 +21,27 @@ sub AUDIT {
 
 # METHODS
 
-sub get {
-  my ($self) = @_;
+sub access {
+  my ($self, $name, @args) = @_;
 
-  return $self->value;
+  return if !$name;
+
+  return $self->$name(@args);
 }
 
-sub set {
-  my ($self, $value) = @_;
+sub assign {
+  my ($self, $name, $code, @args) = @_;
 
-  return $self->value($value);
+  return if !$name;
+  return if !$code;
+
+  return $self->access($name, $self->$code(@args));
 }
 
 # EXPORTS
 
 sub EXPORT {
-  ['get', 'set']
+  ['access', 'assign']
 }
 
 1;

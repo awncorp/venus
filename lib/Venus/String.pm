@@ -10,7 +10,6 @@ use Venus::Class 'base';
 base 'Venus::Kind::Value';
 
 use overload (
-  '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
@@ -31,6 +30,21 @@ sub append_with {
   my $data = $self->get;
 
   return CORE::join($delimiter // '', $data, @args);
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('boolean', true);
+  $assert->constraint('float', true);
+  $assert->constraint('number', true);
+  $assert->constraint('string', true);
+
+  return $assert;
 }
 
 sub camelcase {
@@ -95,7 +109,7 @@ sub contains {
 
   return CORE::index($data, $pattern) < 0 ? 0 : 1 if !$regexp;
 
-  return ($data =~ $pattern) ? 1 : 0;
+  return ($data =~ $pattern) ? true : false;
 }
 
 sub default {

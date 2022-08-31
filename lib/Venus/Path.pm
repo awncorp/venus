@@ -16,7 +16,6 @@ with 'Venus::Role::Explainable';
 
 use overload (
   '""' => 'explain',
-  '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
@@ -25,6 +24,18 @@ use overload (
 );
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
 
 sub absolute {
   my ($self) = @_;
@@ -176,6 +187,14 @@ sub is_relative {
   my ($self) = @_;
 
   return int!$self->is_absolute;
+}
+
+sub lines {
+  my ($self, $separator, $binmode) = @_;
+
+  $separator //= "\n";
+
+  return [split /$separator/, $binmode ? $self->read($binmode) : $self->read];
 }
 
 sub lineage {

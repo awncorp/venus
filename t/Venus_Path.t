@@ -54,6 +54,7 @@ method: is_absolute
 method: is_directory
 method: is_file
 method: is_relative
+method: lines
 method: lineage
 method: open
 method: mkcall
@@ -318,6 +319,7 @@ method can return a list of values in list-context.
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -330,7 +332,7 @@ $test->for('example', 1, 'children', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result;
-  ok @$result == 13;
+  ok @$result == 14;
 
   ok $result->[0]->isa('Venus::Path');
   ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
@@ -360,16 +362,19 @@ $test->for('example', 1, 'children', sub {
   ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}planet9};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+
+  ok $result->[13]->isa('Venus::Path');
+  ok $result->[13] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -553,6 +558,7 @@ can return a list of values in list-context.
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -565,7 +571,7 @@ $test->for('example', 1, 'find', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result;
-  ok @$result == 13;
+  ok @$result == 14;
 
   ok $result->[0]->isa('Venus::Path');
   like $result->[0], qr{t${fsds}data${fsds}planets${fsds}ceres};
@@ -595,16 +601,19 @@ $test->for('example', 1, 'find', sub {
   like $result->[8], qr{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  like $result->[9], qr{t${fsds}data${fsds}planets${fsds}pluto};
+  like $result->[9], qr{t${fsds}data${fsds}planets${fsds}planet9};
 
   ok $result->[10]->isa('Venus::Path');
-  like $result->[10], qr{t${fsds}data${fsds}planets${fsds}saturn};
+  like $result->[10], qr{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[11]->isa('Venus::Path');
-  like $result->[11], qr{t${fsds}data${fsds}planets${fsds}uranus};
+  like $result->[11], qr{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[12]->isa('Venus::Path');
-  like $result->[12], qr{t${fsds}data${fsds}planets${fsds}venus};
+  like $result->[12], qr{t${fsds}data${fsds}planets${fsds}uranus};
+
+  ok $result->[13]->isa('Venus::Path');
+  like $result->[13], qr{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -696,6 +705,7 @@ This method can return a list of values in list-context.
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -708,7 +718,7 @@ $test->for('example', 1, 'files', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result;
-  ok @$result == 13;
+  ok @$result == 14;
 
   ok $result->[0]->isa('Venus::Path');
   ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
@@ -738,16 +748,19 @@ $test->for('example', 1, 'files', sub {
   ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}planet9};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+
+  ok $result->[13]->isa('Venus::Path');
+  ok $result->[13] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -784,6 +797,7 @@ values in list-context.
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -796,7 +810,7 @@ $test->for('example', 1, 'glob', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result;
-  ok @$result == 13;
+  ok @$result == 14;
 
   ok $result->[0]->isa('Venus::Path');
   ok $result->[0] =~ m{t${fsds}data${fsds}planets${fsds}ceres};
@@ -826,16 +840,19 @@ $test->for('example', 1, 'glob', sub {
   ok $result->[8] =~ m{t${fsds}data${fsds}planets${fsds}neptune};
 
   ok $result->[9]->isa('Venus::Path');
-  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
+  ok $result->[9] =~ m{t${fsds}data${fsds}planets${fsds}planet9};
 
   ok $result->[10]->isa('Venus::Path');
-  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
+  ok $result->[10] =~ m{t${fsds}data${fsds}planets${fsds}pluto};
 
   ok $result->[11]->isa('Venus::Path');
-  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+  ok $result->[11] =~ m{t${fsds}data${fsds}planets${fsds}saturn};
 
   ok $result->[12]->isa('Venus::Path');
-  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}venus};
+  ok $result->[12] =~ m{t${fsds}data${fsds}planets${fsds}uranus};
+
+  ok $result->[13]->isa('Venus::Path');
+  ok $result->[13] =~ m{t${fsds}data${fsds}planets${fsds}venus};
 
   $result
 });
@@ -964,6 +981,58 @@ $test->for('example', 1, 'is_relative', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method lines
+
+The lines method returns the list of lines from the underlying file. By default
+the file contents are separated by newline.
+
+=signature lines
+
+  lines(Str|Regexp $separator, Str $binmode) (ArrayRef[Str])
+
+=metadata lines
+
+{
+  since => '1.23',
+}
+
+=example-1 lines
+
+  # given: synopsis;
+
+  my $lines = $path->child('mercury')->lines;
+
+  # ['mercury']
+
+=cut
+
+$test->for('example', 1, 'lines', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['mercury'];
+
+  $result
+});
+
+=example-2 lines
+
+  # given: synopsis;
+
+  my $lines = $path->child('planet9')->lines($^O =~ /win32/i ? "\n" : "\r\n");
+
+  # ['planet', 'nine']
+
+=cut
+
+$test->for('example', 2, 'lines', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  is_deeply $result, ['planet', 'nine'];
 
   $result
 });
@@ -2217,6 +2286,26 @@ $test->for('example', 1, '("")', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq 't/data/planets';
+
+  $result
+});
+
+=example-2 ("")
+
+  # given: synopsis;
+
+  my $mercury = $path->child('mercury');
+
+  my $result = "$path, $path";
+
+  # "t/data/planets, t/data/planets"
+
+=cut
+
+$test->for('example', 2, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 't/data/planets, t/data/planets';
 
   $result
 });

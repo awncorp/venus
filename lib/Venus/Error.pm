@@ -14,7 +14,6 @@ with 'Venus::Role::Stashable';
 
 use overload (
   '""' => 'explain',
-  '.' => sub{$_[0]->message . "$_[1]"},
   'eq' => sub{$_[0]->message eq "$_[1]"},
   'ne' => sub{$_[0]->message ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->message)]}/},
@@ -52,6 +51,18 @@ sub build_self {
 }
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
 
 sub id {
   my ($self, $name) = @_;
@@ -162,10 +173,10 @@ sub is {
   my $method = "is_${name}";
 
   if ($self->name && !$self->can($method)) {
-    return $self->name eq $name ? 1 : 0;
+    return $self->name eq $name ? true : false;
   }
 
-  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
+  return (ref $self ? $self: $self->new)->$method ? true : false;
 }
 
 sub name {
@@ -182,13 +193,13 @@ sub of {
   my $method = "of_${name}";
 
   if ($self->name && !$self->can($method)) {
-    return $self->name =~ /$name/ ? 1 : 0;
+    return $self->name =~ /$name/ ? true : false;
   }
 
-  return (ref $self ? $self: $self->new)->$method ? 1 : 0;
+  return (ref $self ? $self: $self->new)->$method ? true : false;
 }
 
-sub origin {
+sub frame {
   my ($self, $index) = @_;
 
   my $frames = $self->frames;

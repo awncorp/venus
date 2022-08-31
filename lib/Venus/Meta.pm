@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+use Venus;
+
 use base 'Venus::Core';
 
 # METHODS
@@ -16,7 +18,7 @@ sub attr {
 
   my $data = {map +($_,$_), @{$self->attrs}};
 
-  return $data->{$name} ? 1 : 0;
+  return $data->{$name} ? true : false;
 }
 
 sub attrs {
@@ -64,7 +66,7 @@ sub base {
 
   my $data = {map +($_,$_), @{$self->bases}};
 
-  return $data->{$name} ? 1 : 0;
+  return $data->{$name} ? true : false;
 }
 
 sub bases {
@@ -143,7 +145,7 @@ sub mixin {
 
   my $data = {map +($_,$_), @{$self->mixins}};
 
-  return $data->{$name} ? 1 : 0;
+  return $data->{$name} ? true : false;
 }
 
 sub mixins {
@@ -196,7 +198,7 @@ sub role {
 
   my $data = {map +($_,$_), @{$self->roles}};
 
-  return $data->{$name} ? 1 : 0;
+  return $data->{$name} ? true : false;
 }
 
 sub roles {
@@ -285,7 +287,7 @@ sub sub {
 
   my $data = {map +($_,$_), @{$self->subs}};
 
-  return $data->{$name} ? 1 : 0;
+  return $data->{$name} ? true : false;
 }
 
 sub subs {

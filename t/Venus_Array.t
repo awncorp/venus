@@ -2116,6 +2116,111 @@ $test->for('example', 9, 'gtlt', sub {
   !$result
 });
 
+=method head
+
+The head method returns the topmost elements, limited by the desired size
+specified.
+
+=signature head
+
+  head(Int $size) (ArrayRef)
+
+=metadata head
+
+{
+  since => '1.23',
+}
+
+=example-1 head
+
+  # given: synopsis;
+
+  my $head = $array->head;
+
+  # [1]
+
+=cut
+
+$test->for('example', 1, 'head', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-2 head
+
+  # given: synopsis;
+
+  my $head = $array->head(1);
+
+  # [1]
+
+=cut
+
+$test->for('example', 2, 'head', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-3 head
+
+  # given: synopsis;
+
+  my $head = $array->head(2);
+
+  # [1,2]
+
+=cut
+
+$test->for('example', 3, 'head', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1,2];
+
+  $result
+});
+
+=example-4 head
+
+  # given: synopsis;
+
+  my $head = $array->head(5);
+
+  # [1..5]
+
+=cut
+
+$test->for('example', 4, 'head', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1,2,3,4,5];
+
+  $result
+});
+
+=example-5 head
+
+  # given: synopsis;
+
+  my $head = $array->head(20);
+
+  # [1..9]
+
+=cut
+
+$test->for('example', 5, 'head', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1,2,3,4,5,6,7,8,9];
+
+  $result
+});
+
 =method iterator
 
 The iterator method returns a code reference which can be used to iterate over
@@ -3821,6 +3926,111 @@ $test->for('example', 1, 'sort', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ["a".."d"];
+
+  $result
+});
+
+=method tail
+
+The tail method returns the bottommost elements, limited by the desired size
+specified.
+
+=signature tail
+
+  tail(Int $size) (ArrayRef)
+
+=metadata tail
+
+{
+  since => '1.23',
+}
+
+=example-1 tail
+
+  # given: synopsis;
+
+  my $tail = $array->tail;
+
+  # [9]
+
+=cut
+
+$test->for('example', 1, 'tail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [9];
+
+  $result
+});
+
+=example-2 tail
+
+  # given: synopsis;
+
+  my $tail = $array->tail(1);
+
+  # [9]
+
+=cut
+
+$test->for('example', 2, 'tail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [9];
+
+  $result
+});
+
+=example-3 tail
+
+  # given: synopsis;
+
+  my $tail = $array->tail(2);
+
+  # [8,9]
+
+=cut
+
+$test->for('example', 3, 'tail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [8,9];
+
+  $result
+});
+
+=example-4 tail
+
+  # given: synopsis;
+
+  my $tail = $array->tail(5);
+
+  # [5..9]
+
+=cut
+
+$test->for('example', 4, 'tail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [5..9];
+
+  $result
+});
+
+=example-5 tail
+
+  # given: synopsis;
+
+  my $tail = $array->tail(20);
+
+  # [1..9]
+
+=cut
+
+$test->for('example', 5, 'tail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1,2,3,4,5,6,7,8,9];
 
   $result
 });

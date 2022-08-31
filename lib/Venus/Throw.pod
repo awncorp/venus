@@ -104,9 +104,6 @@ This package provides the following methods:
 
 The error method throws the prepared error object.
 
-
-
-
 I<Since C<0.01>>
 
 =over 4

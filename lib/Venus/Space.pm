@@ -366,7 +366,7 @@ sub load {
 sub loaded {
   my ($self) = @_;
 
-  return ($self->included || @{$self->routines}) ? 1 : 0;
+  return ($self->included || @{$self->routines}) ? true : false;
 }
 
 sub locate {
@@ -657,7 +657,7 @@ sub unload {
 sub unloaded {
   my ($self) = @_;
 
-  return $self->loaded ? 0 : 1;
+  return $self->loaded ? false : true;
 }
 
 sub visible {
@@ -667,7 +667,7 @@ sub visible {
 
   my $package = $self->package;
 
-  return (grep !/\A[^:]+::\z/, keys %{"${package}::"}) ? 1 : 0;
+  return (grep !/\A[^:]+::\z/, keys %{"${package}::"}) ? true : false;
 }
 
 1;

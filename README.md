@@ -24,18 +24,20 @@ cpanm -qn Venus
 Install Venus using Perl:
 
 ```bash
-$ curl -L https://cpanmin.us | perl - -qn Venus
+curl -sSL https://cpanmin.us | perl - -qn Venus
 ```
 
 Install Venus using Perl (from GitHub):
 
 ```bash
-$ curl -ssL https://cpanmin.us | perl - -qn git://github.com/awncorp/venus.git
+curl -ssL https://cpanmin.us | perl - -qn git://github.com/awncorp/venus.git
 ```
 
 ## Features
 
 - Zero Dependencies
+- Supports Perl 5.18.0+
+- Fast Object-Orientation
 - [Boolean Values](#feature-boolean-values)
 - [Standard Library](#feature-standard-library)
 - [Value Classes](#feature-value-classes)
@@ -45,7 +47,8 @@ $ curl -ssL https://cpanmin.us | perl - -qn git://github.com/awncorp/venus.git
 - [Exception Handling](#feature-exception-handling)
 - [Composable Standards](#feature-composable-standards)
 - [Pluggable Library](#feature-pluggable-library)
-- [Robust Documentation](#documentation)
+- Robust Documentation
+- Dispatcher Methods
 
 ### Feature: Boolean Values
 

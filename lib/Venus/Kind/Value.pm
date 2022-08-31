@@ -47,13 +47,19 @@ sub cast {
 sub defined {
   my ($self) = @_;
 
-  return int(CORE::defined($self->get));
+  return CORE::defined($self->get) ? true : false;
 }
 
 sub explain {
   my ($self) = @_;
 
   return $self->get;
+}
+
+sub mutate {
+  my ($self, $code, @args) = @_;
+
+  return $self->set($self->assert($self->coerce($self->$code(@args))));
 }
 
 sub TO_JSON {

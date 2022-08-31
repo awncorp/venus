@@ -36,6 +36,7 @@ $test->for('abstract');
 
 =includes
 
+method: clear
 method: data
 method: expr
 method: just
@@ -113,6 +114,49 @@ on_when: rw, opt, ArrayRef[CodeRef], C<[]>
 =cut
 
 $test->for('attributes');
+
+=method clear
+
+The clear method resets all match conditions and returns the invocant.
+
+=signature clear
+
+  clear() (Match)
+
+=metadata clear
+
+{
+  since => '1.23',
+}
+
+=example-1 clear
+
+  # given: synopsis
+
+  package main;
+
+  my $clear = $match->clear;
+
+  # bless(..., "Venus::Match")
+
+=cut
+
+$test->for('example', 1, 'clear', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->on_none;
+  ok !$result->on_none->();
+  ok $result->on_only;
+  ok $result->on_only->() == 1;
+  ok $result->on_then;
+  ok ref($result->on_then) eq 'ARRAY';
+  ok $#{$result->on_then} == -1;
+  ok $result->on_when;
+  ok ref($result->on_when) eq 'ARRAY';
+  ok $#{$result->on_when} == -1;
+
+  $result
+});
 
 =method data
 

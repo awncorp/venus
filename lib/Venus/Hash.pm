@@ -44,7 +44,7 @@ sub all {
     CORE::last if $failed;
   }
 
-  return $failed ? 0 : 1;
+  return $failed ? false : true;
 }
 
 sub any {
@@ -65,7 +65,19 @@ sub any {
     CORE::last if $found;
   }
 
-  return $found ? 1 : 0;
+  return $found ? true : false;
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('hash', true);
+
+  return $assert;
 }
 
 sub call {
@@ -133,7 +145,7 @@ sub exists {
 
   my $data = $self->get;
 
-  return CORE::exists($data->{$key}) ? 1 : 0;
+  return CORE::exists($data->{$key}) ? true : false;
 }
 
 sub find {
@@ -305,7 +317,7 @@ sub none {
     CORE::last if $found;
   }
 
-  return $found ? 0 : 1;
+  return $found ? false : true;
 }
 
 sub one {
@@ -326,7 +338,7 @@ sub one {
     CORE::last if $found > 1;
   }
 
-  return $found == 1 ? 1 : 0;
+  return $found == 1 ? true : false;
 }
 
 sub pairs {

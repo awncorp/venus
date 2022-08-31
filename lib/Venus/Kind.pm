@@ -16,15 +16,23 @@ with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';
 with 'Venus::Role::Matchable';
 with 'Venus::Role::Printable';
+with 'Venus::Role::Reflectable';
 with 'Venus::Role::Testable';
 with 'Venus::Role::Throwable';
+with 'Venus::Role::Assertable';
 
 # METHODS
 
-sub class {
+sub assertion {
   my ($self) = @_;
 
-  return ref($self) || $self;
+  require Venus::Assert;
+
+  my $assert = Venus::Assert->new(ref $self || $self);
+
+  $assert->constraints->when(sub{true})->then(true);
+
+  return $assert;
 }
 
 sub checksum {
@@ -56,6 +64,18 @@ sub numified {
   return CORE::length($self->stringified);
 }
 
+sub renew {
+  my ($self, @args) = @_;
+
+  my $data = $self->ARGS(@args);
+
+  for my $attr (@{$self->meta->attrs}) {
+    $data->{$attr} = $self->$attr if exists $self->{$attr} && !exists $data->{$attr};
+  }
+
+  return $self->class->new($data);
+}
+
 sub safe {
   my ($self, $method, @args) = @_;
 
@@ -64,12 +84,10 @@ sub safe {
   return(wantarray ? (@$result) : $result->[0]);
 }
 
-sub space {
+sub self {
   my ($self) = @_;
 
-  require Venus::Space;
-
-  return Venus::Space->new($self->class);
+  return $self;
 }
 
 sub stringified {
@@ -104,17 +122,6 @@ sub trap {
   };
 
   return(wantarray ? (@$result) : $result->[0]);
-}
-
-sub type {
-  my ($self, $method, @args) = @_;
-
-  require Venus::Type;
-
-  my $value = $method
-    ? $self->$method(@args) : $self->can('value') ? $self->value : $self;
-
-  return Venus::Type->new(value => $value);
 }
 
 1;

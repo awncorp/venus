@@ -72,6 +72,18 @@ sub _waitpid {
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('number', true);
+
+  return $assert;
+}
+
 sub chdir {
   my ($self, $path) = @_;
 
@@ -166,7 +178,10 @@ sub fork {
     }
 
     $process = $self->class->new;
-    srand;
+
+    my $orig_seed = srand;
+    my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
+    srand $self_seed;
 
     if ($code) {
       local $_ = $process;

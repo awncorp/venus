@@ -102,7 +102,6 @@ $test->for('attributes');
 
 The error method throws the prepared error object.
 
-
 =signature error
 
   error(HashRef $data) (Error)

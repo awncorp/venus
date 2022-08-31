@@ -18,6 +18,8 @@ sub import {
   no warnings 'redefine';
   no warnings 'once';
 
+  @args = grep defined && !ref && /^[A-Za-z]/, @args;
+
   my %exports = map +($_,$_), @args ? @args : qw(
     attr
     base

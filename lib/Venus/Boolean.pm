@@ -9,13 +9,14 @@ use Venus::Class 'base';
 
 base 'Venus::Kind::Value';
 
-use Scalar::Util ();
+use Venus::True;
+use Venus::False;
 
-state $true = Scalar::Util::dualvar(1, "1");
+state $true = Venus::True->value;
 state $true_ref = \$true;
 state $true_type = 'true';
 
-state $false = Scalar::Util::dualvar(0, "0");
+state $false = Venus::False->value;
 state $false_ref = \$false;
 state $false_type = 'false';
 
@@ -71,6 +72,18 @@ sub build_self {
 }
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('boolean', true);
+
+  return $assert;
+}
 
 sub comparer {
   my ($self) = @_;

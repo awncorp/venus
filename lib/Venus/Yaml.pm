@@ -27,6 +27,33 @@ attr 'encoder';
 
 # BUILDERS
 
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    value => $data
+  };
+}
+
+sub build_args {
+  my ($self, $data) = @_;
+
+  if (keys %$data == 1 && exists $data->{value}) {
+    return $data;
+  }
+  return {
+    value => $data
+  };
+}
+
+sub build_nil {
+  my ($self, $data) = @_;
+
+  return {
+    value => $data
+  };
+}
+
 sub build_self {
   my ($self, $data) = @_;
 
@@ -34,6 +61,18 @@ sub build_self {
 }
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('hash', true);
+
+  return $assert;
+}
 
 sub config {
   my ($self, $package) = @_;

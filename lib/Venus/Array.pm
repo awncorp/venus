@@ -32,7 +32,7 @@ sub all {
     CORE::last if $failed;
   }
 
-  return $failed ? 0 : 1;
+  return $failed ? false : true;
 }
 
 sub any {
@@ -54,7 +54,19 @@ sub any {
     CORE::last if $found;
   }
 
-  return $found ? 1 : 0;
+  return $found ? true : false;
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('array', true);
+
+  return $assert;
 }
 
 sub call {
@@ -123,7 +135,7 @@ sub exists {
 
   my $data = $self->get;
 
-  return $index <= $#{$data} ? 1 : 0;
+  return $index <= $#{$data} ? true : false;
 }
 
 sub find {
@@ -189,6 +201,18 @@ sub grep {
   }
 
   return wantarray ? (@$result) : $result;
+}
+
+sub head {
+  my ($self, $size) = @_;
+
+  my $data = $self->get;
+
+  $size = !$size ? 1 : $size > @$data ? @$data : $size;
+
+  my $index = $size - 1;
+
+  return [@{$data}[0..$index]];
 }
 
 sub iterator {
@@ -287,7 +311,7 @@ sub none {
     CORE::last if $found;
   }
 
-  return $found ? 0 : 1;
+  return $found ? false : true;
 }
 
 sub one {
@@ -309,7 +333,7 @@ sub one {
     CORE::last if $found > 1;
   }
 
-  return $found == 1 ? 1 : 0;
+  return $found == 1 ? true : false;
 }
 
 sub pairs {
@@ -435,6 +459,18 @@ sub sort {
   my $data = $self->get;
 
   return [CORE::sort { $a cmp $b } @$data];
+}
+
+sub tail {
+  my ($self, $size) = @_;
+
+  my $data = $self->get;
+
+  $size = !$size ? 1 : $size > @$data ? @$data : $size;
+
+  my $index = $#$data - ($size - 1);
+
+  return [@{$data}[$index..$#$data]];
 }
 
 sub unique {

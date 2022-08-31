@@ -18,6 +18,18 @@ use overload (
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('regexp', true);
+
+  return $assert;
+}
+
 sub comparer {
   my ($self) = @_;
 

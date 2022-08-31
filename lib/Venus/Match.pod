@@ -101,6 +101,30 @@ This package provides the following methods:
 
 =cut
 
+=head2 clear
+
+  clear() (Match)
+
+The clear method resets all match conditions and returns the invocant.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item clear example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $clear = $match->clear;
+
+  # bless(..., "Venus::Match")
+
+=back
+
+=cut
+
 =head2 data
 
   data(HashRef $data) (Match)

@@ -18,22 +18,22 @@ sub eq {
   $data = Venus::Type->new(value => $data)->deduce;
 
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
-    return 1;
+    return true;
   }
   if (Scalar::Util::blessed($data) && !$data->isa('Venus::Kind')) {
-    return 0;
+    return false;
   }
   if ($self->comparer('eq') eq 'numified') {
-    return $self->numified == $data->numified ? 1 : 0;
+    return $self->numified == $data->numified ? true : false;
   }
   elsif ($self->comparer('eq') eq 'stringified') {
-    return $self->stringified eq $data->stringified ? 1 : 0;
+    return $self->stringified eq $data->stringified ? true : false;
   }
   elsif (my $method = $self->comparer('eq')) {
-    return $self->$method eq $data->$method ? 1 : 0;
+    return $self->$method eq $data->$method ? true : false;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -41,10 +41,10 @@ sub ge {
   my ($self, $data) = @_;
 
   if ($self->gt($data) || $self->eq($data)) {
-    return 1;
+    return true;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -52,10 +52,10 @@ sub gele {
   my ($self, $ge, $le) = @_;
 
   if ($self->ge($ge) && $self->le($le)) {
-    return 1;
+    return true;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -65,22 +65,22 @@ sub gt {
   $data = Venus::Type->new(value => $data)->deduce;
 
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
-    return 0;
+    return false;
   }
   if (Scalar::Util::blessed($data) && !$data->isa('Venus::Kind')) {
-    return 0;
+    return false;
   }
   if ($self->comparer('gt') eq 'numified') {
-    return $self->numified > $data->numified ? 1 : 0;
+    return $self->numified > $data->numified ? true : false;
   }
   elsif ($self->comparer('gt') eq 'stringified') {
-    return $self->stringified gt $data->stringified ? 1 : 0;
+    return $self->stringified gt $data->stringified ? true : false;
   }
   elsif (my $method = $self->comparer('gt')) {
-    return $self->$method gt $data->$method ? 1 : 0;
+    return $self->$method gt $data->$method ? true : false;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -88,10 +88,10 @@ sub gtlt {
   my ($self, $gt, $lt) = @_;
 
   if ($self->gt($gt) && $self->lt($lt)) {
-    return 1;
+    return true;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -101,22 +101,22 @@ sub lt {
   $data = Venus::Type->new(value => $data)->deduce;
 
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
-    return 0;
+    return false;
   }
   if (Scalar::Util::blessed($data) && !$data->isa('Venus::Kind')) {
-    return 0;
+    return false;
   }
   if ($self->comparer('lt') eq 'numified') {
-    return $self->numified < $data->numified ? 1 : 0;
+    return $self->numified < $data->numified ? true : false;
   }
   elsif ($self->comparer('lt') eq 'stringified') {
-    return $self->stringified lt $data->stringified ? 1 : 0;
+    return $self->stringified lt $data->stringified ? true : false;
   }
   elsif (my $method = $self->comparer('lt')) {
-    return $self->$method lt $data->$method ? 1 : 0;
+    return $self->$method lt $data->$method ? true : false;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
@@ -124,33 +124,33 @@ sub le {
   my ($self, $data) = @_;
 
   if ($self->lt($data) || $self->eq($data)) {
-    return 1;
+    return true;
   }
   else {
-    return 0;
+    return false;
   }
 }
 
 sub ne {
   my ($self, $data) = @_;
 
-  return $self->eq($data) ? 0 : 1;
+  return $self->eq($data) ? false : true;
 }
 
 sub tv {
   my ($self, $data) = @_;
 
   if (!Scalar::Util::blessed($data)) {
-    return 0;
+    return false;
   }
   if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
-    return 1;
+    return true;
   }
   if ($data->isa($self->class)) {
     return $self->eq($data);
   }
   else {
-    return 0;
+    return false;
   }
 }
 

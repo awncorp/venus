@@ -41,6 +41,19 @@ sub build_self {
 
 # METHODS
 
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('array', true);
+
+  return $assert;
+}
+
 sub default {
   my ($self) = @_;
 

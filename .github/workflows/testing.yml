@@ -157,6 +157,9 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - Test-Environment
+      - Test-Locale
+      - Test-MacOs
+      - Test-Windows
 
     steps:
     - uses: actions/checkout@v2
@@ -169,6 +172,9 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - Test-Environment
+      - Test-Locale
+      - Test-MacOs
+      - Test-Windows
     container:
       image: perl:5.32
 
@@ -196,4 +202,3 @@ jobs:
       run: V=$(cat VERSION) DZIL_RELEASING=0 dzil build
     - name: Upload to CPAN
       run: cpan-upload -u ${{ secrets.CPAN_USER }} -p ${{ secrets.CPAN_PASS }} $(ls *.tar.gz)
-      continue-on-error: true

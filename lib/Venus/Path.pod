@@ -152,6 +152,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -335,6 +336,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -373,6 +375,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -441,6 +444,7 @@ I<Since C<0.01>>
   #   bless({ value => "t/data/planets/mars" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/mercury" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/neptune" }, "Venus::Path"),
+  #   bless({ value => "t/data/planets/planet9" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/pluto" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/saturn" }, "Venus::Path"),
   #   bless({ value => "t/data/planets/uranus" }, "Venus::Path"),
@@ -561,6 +565,41 @@ I<Since C<0.01>>
   #   bless({ value => "t/data" }, "Venus::Path"),
   #   bless({ value => "t" }, "Venus::Path"),
   # ]
+
+=back
+
+=cut
+
+=head2 lines
+
+  lines(Str|Regexp $separator, Str $binmode) (ArrayRef[Str])
+
+The lines method returns the list of lines from the underlying file. By default
+the file contents are separated by newline.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item lines example 1
+
+  # given: synopsis;
+
+  my $lines = $path->child('mercury')->lines;
+
+  # ['mercury']
+
+=back
+
+=over 4
+
+=item lines example 2
+
+  # given: synopsis;
+
+  my $lines = $path->child('planet9')->lines($^O =~ /win32/i ? "\n" : "\r\n");
+
+  # ['planet', 'nine']
 
 =back
 
@@ -1379,6 +1418,16 @@ B<example 1>
   my $result = "$path";
 
   # "t/data/planets"
+
+B<example 2>
+
+  # given: synopsis;
+
+  my $mercury = $path->child('mercury');
+
+  my $result = "$path, $path";
+
+  # "t/data/planets, t/data/planets"
 
 =back
 

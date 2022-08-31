@@ -532,6 +532,14 @@ B<example 1>
 
   # "hello universe"
 
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$replace, $replace";
+
+  # "hello universe, hello universe"
+
 =back
 
 =over 4

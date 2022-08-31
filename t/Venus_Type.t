@@ -37,10 +37,12 @@ $test->for('abstract');
 =includes
 
 method: code
+method: coded
 method: deduce
 method: deduce_deep
 method: detract
 method: detract_deep
+method: identify
 method: package
 
 =cut
@@ -167,6 +169,56 @@ $test->for('example', 3, 'code', sub {
   ok $result eq "REGEXP";
 
   $result
+});
+
+=method coded
+
+The coded method return true or false if the data type name provided matches
+the result of L</code>.
+
+=signature coded
+
+  coded(Str $code) (Bool)
+
+=metadata coded
+
+{
+  since => '1.23',
+}
+
+=example-1 coded
+
+  # given: synopsis;
+
+  my $coded = $type->coded('ARRAY');
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'coded', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 coded
+
+  # given: synopsis;
+
+  my $coded = $type->coded('HASH');
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'coded', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
 });
 
 =method deduce
@@ -511,6 +563,117 @@ $test->for('example', 2, 'detract_deep', sub {
   is_deeply $result, [1..4];
 
   $result
+});
+
+=method identify
+
+The identify method returns the value's data type, or L</code>, in scalar
+context. In list context, this method will return a tuple with (defined,
+blessed, and data type) elements. B<Note:> For globs and file handles this
+method will return "scalar" as the data type.
+
+=signature identify
+
+  identify() (Bool, Bool, Str)
+
+=metadata identify
+
+{
+  since => '1.23',
+}
+
+=example-1 identify
+
+  # given: synopsis
+
+  package main;
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 0, 'ARRAY')
+
+=cut
+
+$test->for('example', 1, 'identify', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0] == 1;
+  ok $result[1] == 0;
+  ok $result[2] eq 'ARRAY';
+
+  @result == 3
+});
+
+=example-2 identify
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => {});
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 0, 'HASH')
+
+=cut
+
+$test->for('example', 2, 'identify', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0] == 1;
+  ok $result[1] == 0;
+  ok $result[2] eq 'HASH';
+
+  @result == 3
+});
+
+=example-3 identify
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => qr//);
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 1, 'REGEXP')
+
+=cut
+
+$test->for('example', 3, 'identify', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0] == 1;
+  ok $result[1] == 1;
+  ok $result[2] eq 'REGEXP';
+
+  @result == 3
+});
+
+=example-4 identify
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => bless{});
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 1, 'OBJECT')
+
+=cut
+
+$test->for('example', 4, 'identify', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0] == 1;
+  ok $result[1] == 1;
+  ok $result[2] eq 'OBJECT';
+
+  @result == 3
 });
 
 =method package

@@ -31,6 +31,18 @@ sub build_self {
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('number', true);
+
+  return $assert;
+}
+
 sub bit {
   my ($self) = @_;
 
@@ -46,7 +58,7 @@ sub boolean {
 sub byte {
   my ($self) = @_;
 
-  return chr(int($self->make * 256));
+  return chr(int($self->pick * 256));
 }
 
 sub character {
@@ -66,7 +78,7 @@ sub collect {
 sub digit {
   my ($self) = @_;
 
-  return int($self->make(10));
+  return int($self->pick(10));
 }
 
 sub float {
@@ -96,7 +108,7 @@ sub lowercased {
   return lc(chr($self->range(97, 122)));
 }
 
-sub make {
+sub pick {
   my ($self, $data) = @_;
 
   return $data ? rand($data) : rand;
@@ -123,7 +135,7 @@ sub number {
 
   return $self->range($from, $upto) if $upto;
 
-  return int($self->make(10 ** ($from > 9 ? 9 : $from) -1));
+  return int($self->pick(10 ** ($from > 9 ? 9 : $from) -1));
 }
 
 sub range {
@@ -139,7 +151,7 @@ sub range {
   $from = 0 if !$from || $from > $ceil;
   $upto = $ceil if !$upto || $upto > $ceil;
 
-  return $from + int($self->make(($upto-$from) + 1));
+  return $from + int($self->pick(($upto-$from) + 1));
 }
 
 sub repeat {

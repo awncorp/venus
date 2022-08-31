@@ -157,7 +157,8 @@ $test->for('example', 1, 'append', sub {
 
 =method append_with
 
-The append_with method appends arugments to the string using the delimiter provided.
+The append_with method appends arugments to the string using the delimiter
+provided.
 
 =signature append_with
 
@@ -1910,7 +1911,7 @@ position of the first occurrence of the argument.
 
 =signature index
 
-  index(Str $substr, Int $start) (Str)
+  index(Str $substr, Int $start) (Num)
 
 =metadata index
 
@@ -4100,28 +4101,46 @@ $test->for('example', 1, 'words', sub {
   $result
 });
 
-=operator (.)
+=operator ("")
 
-This package overloads the C<.> operator.
+This package overloads the C<""> operator.
 
 =cut
 
-$test->for('operator', '(.)');
+$test->for('operator', '("")');
 
-=example-1 (.)
+=example-1 ("")
 
   # given: synopsis;
 
-  my $text = $string . ', welcome';
+  my $result = "$string";
 
-  # "hello world, welcome"
+  # "hello world"
 
 =cut
 
-$test->for('example', 1, '(.)', sub {
+$test->for('example', 1, '("")', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "hello world, welcome";
+  is $result, "hello world";
+
+  $result
+});
+
+=example-2 ("")
+
+  # given: synopsis;
+
+  my $result = "$string, $string";
+
+  # "hello world, hello world"
+
+=cut
+
+$test->for('example', 2, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "hello world, hello world";
 
   $result
 });

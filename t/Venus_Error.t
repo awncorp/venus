@@ -38,6 +38,7 @@ $test->for('abstract');
 
 method: as
 method: explain
+method: frame
 method: frames
 method: is
 method: of
@@ -313,6 +314,102 @@ $test->for('example', 1, 'explain', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result =~ /^Exception! /;
+
+  $result
+});
+
+=method frame
+
+The frame method returns the data from C<caller> on the frames captured, and
+returns a hashref where the keys map to the keys described by
+L<perlfunc/caller>.
+
+=signature frame
+
+  frame(Int $index) (HashRef)
+
+=metadata frame
+
+{
+  since => '1.11',
+}
+
+=example-1 frame
+
+  # given: synopsis;
+
+  my $frame = $error->frame;
+
+  # {
+  #   'bitmask' => '...',
+  #   'evaltext' => '...',
+  #   'filename' => '...',
+  #   'hasargs' => '...',
+  #   'hinthash' => '...',
+  #   'hints' => '...',
+  #   'is_require' => '...',
+  #   'line' => '...',
+  #   'package' => '...',
+  #   'subroutine' => '...',
+  #   'wantarray' => '...',
+  # }
+
+=cut
+
+$test->for('example', 1, 'frame', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok exists $result->{bitmask};
+  ok exists $result->{evaltext};
+  ok exists $result->{filename};
+  ok exists $result->{hasargs};
+  ok exists $result->{hinthash};
+  ok exists $result->{hints};
+  ok exists $result->{is_require};
+  ok exists $result->{line};
+  ok exists $result->{package};
+  ok exists $result->{subroutine};
+  ok exists $result->{wantarray};
+
+  $result
+});
+
+=example-2 frame
+
+  # given: synopsis;
+
+  my $frame = $error->frame(1);
+
+  # {
+  #   'bitmask' => '...',
+  #   'evaltext' => '...',
+  #   'filename' => '...',
+  #   'hasargs' => '...',
+  #   'hinthash' => '...',
+  #   'hints' => '...',
+  #   'is_require' => '...',
+  #   'line' => '...',
+  #   'package' => '...',
+  #   'subroutine' => '...',
+  #   'wantarray' => '...',
+  # }
+
+=cut
+
+$test->for('example', 2, 'frame', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok exists $result->{bitmask};
+  ok exists $result->{evaltext};
+  ok exists $result->{filename};
+  ok exists $result->{hasargs};
+  ok exists $result->{hinthash};
+  ok exists $result->{hints};
+  ok exists $result->{is_require};
+  ok exists $result->{line};
+  ok exists $result->{package};
+  ok exists $result->{subroutine};
+  ok exists $result->{wantarray};
 
   $result
 });
@@ -776,102 +873,6 @@ $test->for('example', 5, 'of', sub {
   $result
 });
 
-=method origin
-
-The origin method returns the data from C<caller> on the frames captured, and
-returns a hashref where the keys map to the keys described by
-L<perlfunc/caller>.
-
-=signature origin
-
-  origin(Int $index) (HashRef)
-
-=metadata origin
-
-{
-  since => '1.11',
-}
-
-=example-1 origin
-
-  # given: synopsis;
-
-  my $origin = $error->origin;
-
-  # {
-  #   'bitmask' => '...',
-  #   'evaltext' => '...',
-  #   'filename' => '...',
-  #   'hasargs' => '...',
-  #   'hinthash' => '...',
-  #   'hints' => '...',
-  #   'is_require' => '...',
-  #   'line' => '...',
-  #   'package' => '...',
-  #   'subroutine' => '...',
-  #   'wantarray' => '...',
-  # }
-
-=cut
-
-$test->for('example', 1, 'origin', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok exists $result->{bitmask};
-  ok exists $result->{evaltext};
-  ok exists $result->{filename};
-  ok exists $result->{hasargs};
-  ok exists $result->{hinthash};
-  ok exists $result->{hints};
-  ok exists $result->{is_require};
-  ok exists $result->{line};
-  ok exists $result->{package};
-  ok exists $result->{subroutine};
-  ok exists $result->{wantarray};
-
-  $result
-});
-
-=example-2 origin
-
-  # given: synopsis;
-
-  my $origin = $error->origin(1);
-
-  # {
-  #   'bitmask' => '...',
-  #   'evaltext' => '...',
-  #   'filename' => '...',
-  #   'hasargs' => '...',
-  #   'hinthash' => '...',
-  #   'hints' => '...',
-  #   'is_require' => '...',
-  #   'line' => '...',
-  #   'package' => '...',
-  #   'subroutine' => '...',
-  #   'wantarray' => '...',
-  # }
-
-=cut
-
-$test->for('example', 2, 'origin', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok exists $result->{bitmask};
-  ok exists $result->{evaltext};
-  ok exists $result->{filename};
-  ok exists $result->{hasargs};
-  ok exists $result->{hinthash};
-  ok exists $result->{hints};
-  ok exists $result->{is_require};
-  ok exists $result->{line};
-  ok exists $result->{package};
-  ok exists $result->{subroutine};
-  ok exists $result->{wantarray};
-
-  $result
-});
-
 =method throw
 
 The throw method throws an error if the invocant is an object, or creates an
@@ -973,32 +974,6 @@ $test->for('example', 3, 'trace', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Error');
   ok @{$result->frames} == 2;
-
-  $result
-});
-
-=operator (.)
-
-This package overloads the C<.> operator.
-
-=cut
-
-$test->for('operator', '(.)');
-
-=example-1 (.)
-
-  # given: synopsis;
-
-  my $string = $error . ' Unknown';
-
-  # "Exception! Unknown"
-
-=cut
-
-$test->for('example', 1, '(.)', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq "Exception! Unknown";
 
   $result
 });

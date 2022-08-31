@@ -8,6 +8,8 @@ use warnings;
 use Test::More;
 use Venus::Test;
 
+use Scalar::Util 'refaddr';
+
 my $test = test(__FILE__);
 
 =name
@@ -36,14 +38,14 @@ $test->for('abstract');
 
 =includes
 
+method: assertion
 method: checksum
-method: class
 method: numified
+method: renew
 method: safe
-method: space
+method: self
 method: stringified
 method: trap
-method: type
 
 =cut
 
@@ -60,6 +62,8 @@ $test->for('includes');
   package main;
 
   my $example = Example->new;
+
+  # bless({}, "Example")
 
 =cut
 
@@ -81,6 +85,7 @@ $test->for('description');
 
 =integrates
 
+Venus::Role::Assertable
 Venus::Role::Boxable
 Venus::Role::Catchable
 Venus::Role::Comparable
@@ -89,12 +94,50 @@ Venus::Role::Doable
 Venus::Role::Dumpable
 Venus::Role::Matchable
 Venus::Role::Printable
+Venus::Role::Reflectable
 Venus::Role::Testable
 Venus::Role::Throwable
+Venus::Role::Tryable
 
 =cut
 
 $test->for('integrates');
+
+=method assertion
+
+The assertion method returns a L<Venus::Assert> object based on the invocant.
+
+=signature assertion
+
+  assertion() (Assert)
+
+=metadata assertion
+
+{
+  since => '1.23',
+}
+
+=example-1 assertion
+
+  # given: synopsis
+
+  package main;
+
+  my $assertion = $example->assertion;
+
+  # bless({name => "Example"}, "Venus::Assert")
+
+=cut
+
+$test->for('example', 1, 'assertion', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->name eq 'Example';
+  ok $result->message eq 'Type assertion (%s) failed: received %s';
+
+  $result
+});
 
 =method checksum
 
@@ -157,38 +200,6 @@ $test->for('example', 2, 'checksum', sub {
   $result
 });
 
-=method class
-
-The class method returns the class name for the given class or object.
-
-=signature class
-
-  class() (Str)
-
-=metadata class
-
-{
-  since => '0.01',
-}
-
-=example-1 class
-
-  # given: synopsis;
-
-  my $class = $example->class;
-
-  # "Example"
-
-=cut
-
-$test->for('example', 1, 'class', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq "Example";
-
-  $result
-});
-
 =method numified
 
 The numified method returns the numerical representation of the object which is
@@ -246,6 +257,121 @@ $test->for('example', 2, 'numified', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 7;
+
+  $result
+});
+
+=method renew
+
+The renew method returns a new instance of the invocant by instantiating the
+underlying class passing all recognized class attributes to the constructor.
+B<Note:> This method is not analogous to C<clone>, i.e. attributes which are
+references will be passed to the new object as references.
+
+=signature renew
+
+  renew(Any @args) (Object)
+
+=metadata renew
+
+{
+  since => '1.23',
+}
+
+=example-1 renew
+
+  # given: synopsis
+
+  package main;
+
+  my $renew = $example->renew;
+
+  # bless({}, "Example")
+
+=cut
+
+$test->for('example', 1, 'renew', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  my $e1 = refaddr $result;
+  my $e2 = refaddr $result->renew;
+  isnt $e1, $e2;
+
+  $result
+});
+
+=example-2 renew
+
+  package Example;
+
+  use Venus::Class;
+
+  base 'Venus::Kind';
+
+  attr 'values';
+
+  package main;
+
+  my $example = Example->new(values => [1,2]);
+
+  my $renew = $example->renew;
+
+  # bless({values => [1,2]}, "Example")
+
+=cut
+
+$test->for('example', 2, 'renew', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  is_deeply $result->values, [1,2];
+  my $e1 = $result;
+  my $e2 = $e1->renew;
+  isnt refaddr($e1), refaddr($e2);
+  is_deeply $e1->values, $e2->values;
+
+  $result
+});
+
+=example-3 renew
+
+  package Example;
+
+  use Venus::Class;
+
+  base 'Venus::Kind';
+
+  attr 'keys';
+  attr 'values';
+
+  package main;
+
+  my $example = Example->new(values => [1,2]);
+
+  my $renew = $example->renew(keys => ['a','b']);
+
+  # bless({keys => ["a","b"], values => [1,2]}, "Example")
+
+=cut
+
+$test->for('example', 3, 'renew', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  is_deeply $result->keys, ['a','b'];
+  is_deeply $result->values, [1,2];
+  my $e1 = $result;
+  my $e2 = $result->renew;
+  isnt refaddr($e1), refaddr($e2);
+  is_deeply $e1->keys, $e2->keys;
+  is_deeply $e1->values, $e2->values;
+  my $e3 = $result->renew(values => [1..4]);
+  isnt refaddr($e1), refaddr($e3);
+  isnt refaddr($e2), refaddr($e3);
+  is_deeply $e1->keys, $e3->keys;
+  is_deeply $e2->keys, $e3->keys;
+  is_deeply $e3->values, [1..4];
 
   $result
 });
@@ -326,34 +452,39 @@ $test->for('example', 3, 'safe', sub {
   !$result
 });
 
-=method space
+=method self
 
-The space method returns a L<Venus::Space> object for the given object.
+The self method returns the invocant.
 
-=signature space
+=signature self
 
-  space() (Space)
+  self() (Any)
 
-=metadata space
+=metadata self
 
 {
-  since => '0.01',
+  since => '1.23',
 }
 
-=example-1 space
+=example-1 self
 
-  # given: synopsis;
+  # given: synopsis
 
-  my $space = $example->space;
+  package main;
 
-  # bless({ value => "Example" }, "Venus::Space")
+  my $self = $example->self;
+
+  # bless({}, "Example")
 
 =cut
 
-$test->for('example', 1, 'space', sub {
+$test->for('example', 1, 'self', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Space');
+  ok $result->isa('Example');
+  my $e1 = refaddr $result;
+  my $e2 = refaddr $result->self;
+  is $e1, $e2;
 
   $result
 });
@@ -559,39 +690,6 @@ $test->for('example', 6, 'trap', sub {
   like $result[2][0], qr/died/i;
 
   @result
-});
-
-=method type
-
-The type method returns a L<Venus::Type> object for the given object.
-
-=signature type
-
-  type() (Type)
-
-=metadata type
-
-{
-  since => '0.01',
-}
-
-=example-1 type
-
-  # given: synopsis;
-
-  my $type = $example->type;
-
-  # bless({ value => bless({}, "Example") }, "Venus::Type")
-
-=cut
-
-$test->for('example', 1, 'type', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Type');
-  ok $result->value->isa('Example');
-
-  $result
 });
 
 # END

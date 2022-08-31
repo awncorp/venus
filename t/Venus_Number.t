@@ -37,11 +37,17 @@ $test->for('abstract');
 =includes
 
 method: abs
+method: add
+method: append
+method: append_with
 method: atan2
 method: cast
+method: concat
+method: contains
 method: cos
 method: decr
 method: default
+method: div
 method: eq
 method: exp
 method: ge
@@ -50,18 +56,28 @@ method: gt
 method: gtlt
 method: hex
 method: incr
+method: index
 method: int
 method: le
+method: length
 method: log
+method: lshift
 method: lt
 method: mod
+method: multi
 method: ne
 method: neg
 method: numified
 method: pow
+method: prepend
+method: prepend_with
 method: range
+method: repeat
+method: rshift
 method: sin
 method: sqrt
+method: sub
+method: substr
 method: tv
 
 =cut
@@ -175,6 +191,104 @@ $test->for('example', 3, 'abs', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 12;
+
+  $result
+});
+
+=method add
+
+The add method returns the result of addition performed on the argument
+provided.
+
+=signature add
+
+  add(Num $value) (Num)
+
+=metadata add
+
+{
+  since => '1.23',
+}
+
+=example-1 add
+
+  # given: synopsis;
+
+  my $add = $number->add(1_000);
+
+  # 2000
+
+=cut
+
+$test->for('example', 1, 'add', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 2000;
+
+  $result
+});
+
+=method append
+
+The append method appends arugments to the number.
+
+=signature append
+
+  append(Str @parts) (Str)
+
+=metadata append
+
+{
+  since => '1.23',
+}
+
+=example-1 append
+
+  # given: synopsis;
+
+  my $append = $number->append(0);
+
+  # 10_000
+
+=cut
+
+$test->for('example', 1, 'append', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 10000;
+
+  $result
+});
+
+=method append_with
+
+The append_with method appends arugments to the number using the delimiter
+provided.
+
+=signature append_with
+
+  append_with(Str $delimiter, Str @parts) (Str)
+
+=metadata append_with
+
+{
+  since => '1.23',
+}
+
+=example-1 append_with
+
+  # given: synopsis;
+
+  my $append = $number->append_with('.', 0);
+
+  # "1000.0"
+
+=cut
+
+$test->for('example', 1, 'append_with', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == "1000.0";
 
   $result
 });
@@ -470,6 +584,123 @@ $test->for('example', 10, 'cast', sub {
   !$result
 });
 
+=method concat
+
+The concat method returns the number with the argument list appended to it.
+
+=signature concat
+
+  concat(Str @parts) (Str)
+
+=metadata concat
+
+{
+  since => '1.23',
+}
+
+=example-1 concat
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_000);
+
+  my $concat = $number->concat('.', '0001');
+
+  # "1000.0001"
+
+=cut
+
+$test->for('example', 1, 'concat', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == "1000.0001";
+
+  $result
+});
+
+=method contains
+
+The contains method searches the number for a substring or expression returns
+true or false if found.
+
+=signature contains
+
+  contains(Str $expr) (Bool)
+
+=metadata contains
+
+{
+  since => '1.23',
+}
+
+=example-1 contains
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $contains = $number->contains(10);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'contains', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 contains
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $contains = $number->contains(2);
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'contains', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
+});
+
+=example-3 contains
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $contains = $number->contains(qr/01$/);
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'contains', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
 =method cos
 
 The cos method computes the cosine of the number (expressed in radians).
@@ -570,7 +801,7 @@ The default method returns the default value, i.e. C<0>.
 
 =signature default
 
-  default() (Int)
+  default() (Num)
 
 =metadata default
 
@@ -594,6 +825,39 @@ $test->for('example', 1, 'default', sub {
   ok $result == 0;
 
   !$result
+});
+
+=method div
+
+The div method returns the result of division performed on the argument
+provided.
+
+=signature div
+
+  div(Num $value) (Num)
+
+=metadata div
+
+{
+  since => '1.23',
+}
+
+=example-1 div
+
+  # given: synopsis;
+
+  my $div = $number->div(2);
+
+  # 500
+
+=cut
+
+$test->for('example', 1, 'div', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 500;
+
+  $result
 });
 
 =method eq
@@ -1919,6 +2183,87 @@ $test->for('example', 2, 'incr', sub {
   $result
 });
 
+=method index
+
+The index method searches for the argument within the number and returns the
+position of the first occurrence of the argument.
+
+=signature index
+
+  index(Str $substr, Int $start) (Num)
+
+=metadata index
+
+{
+  since => '1.23',
+}
+
+=example-1 index
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $index = $number->index(0);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'index', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 1;
+
+  $result
+});
+
+=example-2 index
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $index = $number->index(1, 1);
+
+  # 4
+
+=cut
+
+$test->for('example', 2, 'index', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 4;
+
+  $result
+});
+
+=example-3 index
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1_0001);
+
+  my $index = $number->index(2);
+
+  # -1
+
+=cut
+
+$test->for('example', 3, 'index', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == -1;
+
+  $result
+});
+
 =method int
 
 The int method returns the integer portion of the number. Do not use this
@@ -1926,7 +2271,7 @@ method for rounding.
 
 =signature int
 
-  int() (Int)
+  int() (Num)
 
 =metadata int
 
@@ -2186,6 +2531,38 @@ $test->for('example', 9, 'le', sub {
   $result
 });
 
+=method length
+
+The length method returns the number of characters within the number.
+
+=signature length
+
+  length() (Num)
+
+=metadata length
+
+{
+  since => '1.23',
+}
+
+=example-1 length
+
+  # given: synopsis;
+
+  my $length = $number->length;
+
+  # 4
+
+=cut
+
+$test->for('example', 1, 'length', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 4;
+
+  $result
+});
+
 =method log
 
 The log method returns the natural logarithm (base e) of the number.
@@ -2218,6 +2595,39 @@ $test->for('example', 1, 'log', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   like $result, qr/9.42100/;
+
+  $result
+});
+
+=method lshift
+
+The lshift method returns the result of a left shift performed on the argument
+provided.
+
+=signature lshift
+
+  lshift(Num $value) (Num)
+
+=metadata lshift
+
+{
+  since => '1.23',
+}
+
+=example-1 lshift
+
+  # given: synopsis;
+
+  my $lshift = $number->lshift(2);
+
+  # 4000
+
+=cut
+
+$test->for('example', 1, 'lshift', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 4_000;
 
   $result
 });
@@ -2458,7 +2868,7 @@ argment.
 
 =signature mod
 
-  mod() (Int)
+  mod() (Num)
 
 =metadata mod
 
@@ -2528,6 +2938,39 @@ $test->for('example', 3, 'mod', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 2;
+
+  $result
+});
+
+=method multi
+
+The multi method returns the result multiplication performed on the argument
+provided.
+
+=signature multi
+
+  multi(Num $value) (Num)
+
+=metadata multi
+
+{
+  since => '1.23',
+}
+
+=example-1 multi
+
+  # given: synopsis;
+
+  my $multi = $number->multi(2);
+
+  # 2000
+
+=cut
+
+$test->for('example', 1, 'multi', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 2_000;
 
   $result
 });
@@ -2804,7 +3247,7 @@ number objects this method returns the object's underlying value.
 
 =signature numified
 
-  numified() (Int)
+  numified() (Num)
 
 =metadata numified
 
@@ -2870,6 +3313,71 @@ $test->for('example', 3, 'numified', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 10_000;
+
+  $result
+});
+
+=method prepend
+
+The prepend method prepends arugments to the number.
+
+=signature prepend
+
+  prepend(Str @parts) (Str)
+
+=metadata prepend
+
+{
+  since => '1.23',
+}
+
+=example-1 prepend
+
+  # given: synopsis;
+
+  my $prepend = $number->prepend(1);
+
+  # 11_000
+
+=cut
+
+$test->for('example', 1, 'prepend', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 11_000;
+
+  $result
+});
+
+=method prepend_with
+
+The prepend_with method prepends arugments to the number using the delimiter
+provided.
+
+=signature prepend_with
+
+  prepend_with(Str $delimiter, Str @parts) (Str)
+
+=metadata prepend_with
+
+{
+  since => '1.23',
+}
+
+=example-1 prepend_with
+
+  # given: synopsis;
+
+  my $prepend = $number->prepend_with('.', '11');
+
+  # "11.1000"
+
+=cut
+
+$test->for('example', 1, 'prepend_with', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == "11.1000";
 
   $result
 });
@@ -2970,6 +3478,99 @@ $test->for('example', 2, 'range', sub {
   $result
 });
 
+=method repeat
+
+The repeat method repeats the number value N times based on the argument provided
+and returns a new concatenated number. Optionally, a delimiter can be provided
+and be place between the occurences.
+
+=signature repeat
+
+  repeat(Num $number, Str $delimiter) (Str)
+
+=metadata repeat
+
+{
+  since => '1.23',
+}
+
+=example-1 repeat
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new('999');
+
+  my $repeat = $number->repeat(2);
+
+  # 999999
+
+=cut
+
+$test->for('example', 1, 'repeat', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 999999;
+
+  $result
+});
+
+=example-2 repeat
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new('999');
+
+  my $repeat = $number->repeat(2, '.');
+
+  # 999.999
+
+=cut
+
+$test->for('example', 2, 'repeat', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == "999.999";
+
+  $result
+});
+
+=method rshift
+
+The rshift method returns the result a right shift performed on the argument
+provided.
+
+=signature rshift
+
+  rshift(num $value) (Num)
+
+=metadata rshift
+
+{
+  since => '1.23',
+}
+
+=example-1 rshift
+
+  # given: synopsis;
+
+  my $rshift = $number->rshift(2);
+
+  # 250
+
+=cut
+
+$test->for('example', 1, 'rshift', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 250;
+
+  $result
+});
+
 =method sin
 
 The sin method returns the sine of the number (expressed in radians).
@@ -3040,6 +3641,143 @@ $test->for('example', 1, 'sqrt', sub {
   ok $result =~ '111.10';
 
   $result
+});
+
+=method sub
+
+The sub method returns the result subtraction performed on the argument
+provided.
+
+=signature sub
+
+  sub(Num $value) (Num)
+
+=metadata sub
+
+{
+  since => '1.23',
+}
+
+=example-1 sub
+
+  # given: synopsis;
+
+  my $sub = $number->sub(500);
+
+  # 500
+
+=cut
+
+$test->for('example', 1, 'sub', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 500;
+
+  $result
+});
+
+=method substr
+
+The substr method calls the core L</substr> function with the object's number
+value. In list context returns the result and the subject.
+
+=signature substr
+
+  substr(Num $offset, Num $length, Str $replace) (Str)
+
+=metadata substr
+
+{
+  since => '1.23',
+}
+
+=example-1 substr
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my $substr = $number->substr(0, 5);
+
+  # 12345
+
+=cut
+
+$test->for('example', 1, 'substr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 12345;
+
+  $result
+});
+
+=example-2 substr
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my $substr = $number->substr(6, 5);
+
+  # 7890
+
+=cut
+
+$test->for('example', 2, 'substr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == 7890;
+
+  $result
+});
+
+=example-3 substr
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my $substr = $number->substr(6, 5, '0000');
+
+  # "1234560000"
+
+=cut
+
+$test->for('example', 3, 'substr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result == "1234560000";
+
+  $result
+});
+
+=example-4 substr
+
+  package main;
+
+  use Venus::Number;
+
+  my $number = Venus::Number->new(1234567890);
+
+  my ($result, $subject) = $number->substr(6, 5, '0000');
+
+  # ("789", "1234560000")
+
+=cut
+
+$test->for('example', 4, 'substr', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0] == 7890;
+  ok $result[1] == "1234560000";
+
+  @result
 });
 
 =method tv

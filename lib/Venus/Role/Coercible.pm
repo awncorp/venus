@@ -41,6 +41,14 @@ sub coerce_args {
   return $data;
 }
 
+sub coerce_attr {
+  my ($self, $name, @args) = @_;
+
+  return $self->{$name} if !@args;
+
+  return $self->{$name} = $self->coercion({$name, $args[0]})->{$name};
+}
+
 sub coerce_into {
   my ($self, $class, $value) = @_;
 
@@ -90,6 +98,7 @@ sub EXPORT {
   [
     'coerce',
     'coerce_args',
+    'coerce_attr',
     'coerce_into',
     'coerce_onto',
     'coercion',

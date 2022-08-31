@@ -110,6 +110,41 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 coded
+
+  coded(Str $code) (Bool)
+
+The coded method return true or false if the data type name provided matches
+the result of L</code>.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item coded example 1
+
+  # given: synopsis;
+
+  my $coded = $type->coded('ARRAY');
+
+  # 1
+
+=back
+
+=over 4
+
+=item coded example 2
+
+  # given: synopsis;
+
+  my $coded = $type->coded('HASH');
+
+  # 0
+
+=back
+
+=cut
+
 =head2 deduce
 
   deduce() (Object)
@@ -353,6 +388,81 @@ I<Since C<0.01>>
   my $detract_deep = Venus::Type->new($type->deduce_deep)->detract_deep;
 
   # [1..4]
+
+=back
+
+=cut
+
+=head2 identify
+
+  identify() (Bool, Bool, Str)
+
+The identify method returns the value's data type, or L</code>, in scalar
+context. In list context, this method will return a tuple with (defined,
+blessed, and data type) elements. B<Note:> For globs and file handles this
+method will return "scalar" as the data type.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item identify example 1
+
+  # given: synopsis
+
+  package main;
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 0, 'ARRAY')
+
+=back
+
+=over 4
+
+=item identify example 2
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => {});
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 0, 'HASH')
+
+=back
+
+=over 4
+
+=item identify example 3
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => qr//);
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 1, 'REGEXP')
+
+=back
+
+=over 4
+
+=item identify example 4
+
+  package main;
+
+  use Venus::Type;
+
+  my $type = Venus::Type->new(value => bless{});
+
+  my ($defined, $blessed, $typename) = $type->identify;
+
+  # (1, 1, 'OBJECT')
 
 =back
 

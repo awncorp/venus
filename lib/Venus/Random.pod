@@ -427,76 +427,6 @@ I<Since C<1.11>>
 
 =cut
 
-=head2 make
-
-  make(Num $data) (Num)
-
-The make method is the random number generator and returns a random number. By
-default, calling this method is equivalent to call L<perlfunc/rand>. This
-method can be overridden in a subclass to provide a custom generator, e.g. a
-more cyptographically secure generator.
-
-I<Since C<1.11>>
-
-=over 4
-
-=item make example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make;
-
-  # 0.744525000061007
-
-  # $make = $random->make;
-
-  # 0.342701478718908
-
-=back
-
-=over 4
-
-=item make example 2
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make(100);
-
-  # 74.4525000061007
-
-  # $make = $random->make(100);
-
-  # 34.2701478718908
-
-=back
-
-=over 4
-
-=item make example 3
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make(2);
-
-  # 1.48905000012201
-
-  # $make = $random->make(2);
-
-  # 0.685402957437816
-
-
-
-
-=back
-
-=cut
-
 =head2 nonzero
 
   nonzero(Str|CodeRef $code, Any @args) (Int|Str)
@@ -533,11 +463,11 @@ I<Since C<1.11>>
 
   package main;
 
-  my $nonzero = $random->nonzero("make");
+  my $nonzero = $random->nonzero("pick");
 
   # 1.74452500006101
 
-  # $nonzero = $random->nonzero("make");
+  # $nonzero = $random->nonzero("pick");
 
   # 1.34270147871891
 
@@ -660,6 +590,73 @@ I<Since C<1.11>>
   # $number = $random->number(5);
 
   # 34269
+
+=back
+
+=cut
+
+=head2 pick
+
+  pick(Num $data) (Num)
+
+The pick method is the random number generator and returns a random number. By
+default, calling this method is equivalent to call L<perlfunc/rand>. This
+method can be overridden in a subclass to provide a custom generator, e.g. a
+more cyptographically secure generator.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item pick example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick;
+
+  # 0.744525000061007
+
+  # $pick = $random->pick;
+
+  # 0.342701478718908
+
+=back
+
+=over 4
+
+=item pick example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick(100);
+
+  # 74.4525000061007
+
+  # $pick = $random->pick(100);
+
+  # 34.2701478718908
+
+=back
+
+=over 4
+
+=item pick example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick(2);
+
+  # 1.48905000012201
+
+  # $pick = $random->pick(2);
+
+  # 0.685402957437816
 
 =back
 

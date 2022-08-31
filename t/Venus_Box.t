@@ -85,11 +85,13 @@ $test->for('integrates');
 =method unbox
 
 The unbox method returns the un-boxed underlying object. This is a virtual
-method that dispatches to C<__handle__unbox>.
+method that dispatches to C<__handle__unbox>. This method supports dispatching,
+i.e. providing a method name and arguments whose return value will be acted on
+by this method.
 
 =signature unbox
 
-  unbox() (Any)
+  unbox(Str $method, Any @args) (Any)
 
 =metadata unbox
 
@@ -113,6 +115,24 @@ $test->for('example', 1, 'unbox', sub {
   ok $result->isa('Venus::Hash');
 
   $result
+});
+
+=example-2 unbox
+
+  # given: synopsis;
+
+  my $unbox = $box->unbox('count');
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'unbox', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result == 0;
+
+  !$result
 });
 
 # END

@@ -460,6 +460,14 @@ B<example 1>
 
   # "Foo/Bar"
 
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$name, $name";
+
+  # "Foo/Bar, Foo/Bar"
+
 =back
 
 =over 4

@@ -16,6 +16,18 @@ use overload (
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('code', true);
+
+  return $assert;
+}
+
 sub call {
   my ($self, @args) = @_;
 

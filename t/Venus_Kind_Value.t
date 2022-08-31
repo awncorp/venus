@@ -8,6 +8,8 @@ use warnings;
 use Test::More;
 use Venus::Test;
 
+use Scalar::Util 'refaddr';
+
 my $test = test(__FILE__);
 
 =name
@@ -39,6 +41,7 @@ $test->for('abstract');
 method: cast
 method: defined
 method: explain
+method: mutate
 
 =cut
 
@@ -52,9 +55,13 @@ $test->for('includes');
 
   base 'Venus::Kind::Value';
 
+  sub test {
+    $_[0]->get + 1
+  }
+
   package main;
 
-  my $example = Example->new;
+  my $example = Example->new(1);
 
   # $example->defined;
 
@@ -62,10 +69,10 @@ $test->for('includes');
 
 $test->for('synopsis', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+  ok my $result = $tryable->result;
   ok $result->isa('Example');
 
-  !$result
+  $result
 });
 
 =description
@@ -91,6 +98,7 @@ Venus::Role::Accessible
 Venus::Role::Buildable
 Venus::Role::Explainable
 Venus::Role::Pluggable
+Venus::Role::Proxyable
 Venus::Role::Valuable
 
 =cut
@@ -269,7 +277,50 @@ $test->for('example', 1, 'explain', sub {
   $result
 });
 
-# END
+=method mutate
+
+The mutate method dispatches the method call or executes the callback and
+returns the result, which if is of the same type as the invocant's underlying
+data type will update the object's internal state or will throw an exception.
+
+=signature mutate
+
+  mutate(Str | CodeRef $code, Any @args) (Object)
+
+=metadata mutate
+
+{
+  since => '1.23',
+}
+
+=example-1 mutate
+
+  # given: synopsis
+
+  package main;
+
+  $example->mutate('test');
+
+  $example;
+
+  # bless({value => 2}, "Example")
+
+=cut
+
+$test->for('example', 1, 'mutate', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  ok $result->get eq 2;
+  my $e1 = refaddr $result;
+  $result->mutate('test');
+  ok $result->isa('Example');
+  ok $result->get eq 3;
+  my $e2 = refaddr $result;
+  is $e1, $e2;
+
+  $result
+});
 
 $test->render('lib/Venus/Kind/Value.pod') if $ENV{RENDER};
 

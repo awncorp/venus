@@ -86,8 +86,8 @@ sub build_proxy {
 # METHODS
 
 sub __handle__unbox {
-  my ($self) = @_;
-  return $self->{value};
+  my ($self, $code, @args) = @_;
+  return $code ? $self->$code(@args)->{value} : $self->{value};
 }
 
 1;

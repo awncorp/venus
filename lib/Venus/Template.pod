@@ -259,6 +259,14 @@ B<example 1>
 
   # "From: <>"
 
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$template, $template";
+
+  # "From: <>, From: <>"
+
 =back
 
 =over 4

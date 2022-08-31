@@ -37,6 +37,17 @@ sub build_self {
 
 # METHODS
 
+sub clear {
+  my ($self) = @_;
+
+  $self->on_none(sub{});
+  $self->on_only(sub{1});
+  $self->on_then([]);
+  $self->on_when([]);
+
+  return $self;
+}
+
 sub data {
   my ($self, $data) = @_;
 
@@ -54,22 +65,22 @@ sub expr {
     my $value = $self->value;
 
     if (!defined $value) {
-      return 0;
+      return false;
     }
     if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
-      return 0;
+      return false;
     }
     if (!Scalar::Util::blessed($value) && ref($value)) {
-      return 0;
+      return false;
     }
     if (ref($topic) eq 'Regexp' && "$value" =~ qr/$topic/) {
-      return 1;
+      return true;
     }
     elsif ("$value" eq "$topic") {
-      return 1;
+      return true;
     }
     else {
-      return 0;
+      return false;
     }
   });
 
@@ -83,19 +94,19 @@ sub just {
     my $value = $self->value;
 
     if (!defined $value) {
-      return 0;
+      return false;
     }
     if (Scalar::Util::blessed($value) && !overload::Overloaded($value)) {
-      return 0;
+      return false;
     }
     if (!Scalar::Util::blessed($value) && ref($value)) {
-      return 0;
+      return false;
     }
     if ("$value" eq "$topic") {
-      return 1;
+      return true;
     }
     else {
-      return 0;
+      return false;
     }
   });
 
@@ -183,8 +194,7 @@ sub when {
   my $next = (@{$self->on_when}-$#{$self->on_then}) > 1 ? -1 : @{$self->on_when};
 
   $self->on_when->[$next] = sub {
-    local $_ = $self->value;
-    $self->value->$code(@args);
+    (local $_ = $_[0])->$code(@args);
   };
 
   return $self;

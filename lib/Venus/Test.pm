@@ -326,7 +326,9 @@ sub eval {
 
   my @result = CORE::eval(join("\n\n", "no warnings q(redefine);", $perl));
 
-  die $@ if $@;
+  my $dollarat = $@;
+
+  die $dollarat if $dollarat;
 
   return wantarray ? (@result) : $result[0];
 }

@@ -1,0 +1,59 @@
+
+=head1 NAME
+
+Venus::False - False Class
+
+=cut
+
+=head1 ABSTRACT
+
+False Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::False;
+
+  my $false = Venus::False->new;
+
+  # $false->value;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides the global C<false> value used in L<Venus::Boolean> and
+the L<Venus/false> function.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 value
+
+  value() (Bool)
+
+The value method returns value representing the global C<false> value.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item value example 1
+
+  # given: synopsis;
+
+  my $value = $false->value;
+
+  # 0
+
+=back
+
+=cut

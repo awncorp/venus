@@ -726,6 +726,24 @@ $test->for('example', 1, '("")', sub {
   $result
 });
 
+=example-2 ("")
+
+  # given: synopsis;
+
+  my $result = "$search, $search";
+
+  # "hello world"
+
+=cut
+
+$test->for('example', 2, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq 'hello world, hello world';
+
+  $result
+});
+
 =operator (~~)
 
 This package overloads the C<~~> operator.

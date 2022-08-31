@@ -38,6 +38,7 @@ $test->for('abstract');
 
 method: coerce
 method: coerce_args
+method: coerce_attr
 method: coerce_into
 method: coerce_onto
 method: coercion
@@ -241,6 +242,71 @@ $test->for('example', 1, 'coerce_args', sub {
   is ref($result), 'HASH';
   ok $result->{father};
   ok $result->{father}->isa('Person');
+
+  $result
+});
+
+=method coerce_attr
+
+The coerce_attr method is a surrogate accessor and gets and/or sets an instance
+attribute based on the coercion rules, returning the coerced value.
+
+=signature coerce_attr
+
+  coerce_attr(Str $name, Any $value) (Any)
+
+=metadata coerce_attr
+
+{
+  since => '1.23',
+}
+
+=example-1 coerce_attr
+
+  # given: synopsis
+
+  package main;
+
+  $person = Person->new(
+    name => 'me',
+  );
+
+  my $coerce_name = $person->coerce_attr('name');
+
+  # bless({value => "me"}, "Venus::String")
+
+=cut
+
+$test->for('example', 1, 'coerce_attr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::String');
+  ok $result->get eq "me";
+
+  $result
+});
+
+=example-2 coerce_attr
+
+  # given: synopsis
+
+  package main;
+
+  $person = Person->new(
+    name => 'me',
+  );
+
+  my $coerce_name = $person->coerce_attr('name', 'myself');
+
+  # bless({value => "myself"}, "Venus::String")
+
+=cut
+
+$test->for('example', 2, 'coerce_attr', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::String');
+  ok $result->get eq "myself";
 
   $result
 });

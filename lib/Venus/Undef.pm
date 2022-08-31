@@ -23,6 +23,18 @@ sub build_self {
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('undef', true);
+
+  return $assert;
+}
+
 sub comparer {
   my ($self) = @_;
 
@@ -30,6 +42,7 @@ sub comparer {
 }
 
 sub default {
+
   return undef;
 }
 

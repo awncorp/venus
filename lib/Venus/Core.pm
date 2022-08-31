@@ -137,7 +137,7 @@ sub ITEM {
   my ($self, $name, @args) = @_;
 
   return undef if !$name;
-  return $self->{$name} if !int @args;
+  return $self->{$name} if !@args;
   return $self->{$name} = $args[0];
 }
 

@@ -16,7 +16,6 @@ with 'Venus::Role::Explainable';
 
 use overload (
   '""' => 'explain',
-  '.' => sub{$_[0]->value . "$_[1]"},
   'eq' => sub{$_[0]->value eq "$_[1]"},
   'ne' => sub{$_[0]->value ne "$_[1]"},
   'qr' => sub{qr/@{[quotemeta($_[0]->value)]}/},
@@ -37,6 +36,18 @@ sub build_arg {
 }
 
 # METHODS
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
 
 sub default {
   return 'Venus';

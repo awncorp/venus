@@ -512,6 +512,14 @@ B<example 1>
 
   # "hello world"
 
+B<example 2>
+
+  # given: synopsis;
+
+  my $result = "$search, $search";
+
+  # "hello world"
+
 =back
 
 =over 4

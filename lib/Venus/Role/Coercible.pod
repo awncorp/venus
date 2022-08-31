@@ -154,6 +154,53 @@ I<Since C<0.07>>
 
 =cut
 
+=head2 coerce_attr
+
+  coerce_attr(Str $name, Any $value) (Any)
+
+The coerce_attr method is a surrogate accessor and gets and/or sets an instance
+attribute based on the coercion rules, returning the coerced value.
+
+I<Since C<1.23>>
+
+=over 4
+
+=item coerce_attr example 1
+
+  # given: synopsis
+
+  package main;
+
+  $person = Person->new(
+    name => 'me',
+  );
+
+  my $coerce_name = $person->coerce_attr('name');
+
+  # bless({value => "me"}, "Venus::String")
+
+=back
+
+=over 4
+
+=item coerce_attr example 2
+
+  # given: synopsis
+
+  package main;
+
+  $person = Person->new(
+    name => 'me',
+  );
+
+  my $coerce_name = $person->coerce_attr('name', 'myself');
+
+  # bless({value => "myself"}, "Venus::String")
+
+=back
+
+=cut
+
 =head2 coerce_into
 
   coerce_into(Str $class, Any $value) (Object)

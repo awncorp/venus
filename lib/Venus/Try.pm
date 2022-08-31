@@ -52,8 +52,15 @@ sub callback {
   my ($self, $callback) = @_;
 
   if (not(UNIVERSAL::isa($callback, 'CODE'))) {
+    my $method;
     my $invocant = $self->invocant;
-    my $method = $invocant ? $invocant->can($callback) : $self->can($callback);
+
+    if (defined($invocant)) {
+      $method = $invocant->can($callback);
+    }
+    else {
+      $method = $self->can($callback);
+    }
 
     if (!$method) {
       my $throw;
@@ -100,8 +107,9 @@ sub execute {
 
   unshift @args, @{$self->arguments}
     if $self->arguments && @{$self->arguments};
+
   unshift @args, $self->invocant
-    if $self->invocant;
+    if defined($self->invocant);
 
   return wantarray ? ($callback->(@args)) : $callback->(@args);
 }

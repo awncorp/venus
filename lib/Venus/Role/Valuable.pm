@@ -22,13 +22,26 @@ sub BUILD {
 # METHODS
 
 sub default {
+
   return;
+}
+
+sub get {
+  my ($self) = @_;
+
+  return $self->value;
+}
+
+sub set {
+  my ($self, $value) = @_;
+
+  return $self->value($value);
 }
 
 # EXPORTS
 
 sub EXPORT {
-  ['value', 'default']
+  ['default', 'get', 'set', 'value']
 }
 
 1;

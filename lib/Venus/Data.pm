@@ -25,6 +25,18 @@ sub build_self {
 
 # METHODS
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('string', true);
+
+  return $assert;
+}
+
 sub count {
   my ($self, $data) = @_;
 

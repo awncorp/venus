@@ -36,8 +36,8 @@ $test->for('abstract');
 
 =includes
 
-method: get
-method: set
+method: access
+method: assign
 
 =cut
 
@@ -49,12 +49,23 @@ $test->for('includes');
 
   use Venus::Class;
 
-  with 'Venus::Role::Valuable';
   with 'Venus::Role::Accessible';
+
+  attr 'value';
+
+  sub downcase {
+    lc $_[0]->value
+  }
+
+  sub upcase {
+    uc $_[0]->value
+  }
 
   package main;
 
   my $example = Example->new(value => 'hello, there');
+
+  # $example->value;
 
 =cut
 
@@ -62,83 +73,208 @@ $test->for('synopsis', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Example');
+  ok $result->does('Venus::Role::Accessible');
+  ok $result->value eq 'hello, there';
 
   $result
 });
 
 =description
 
-This package modifies the consuming package and provides a C<value> attribute
-as well as C<get> and C<set> methods for modifying the value.
+This package modifies the consuming package and provides the C<access> method
+for getting and setting attributes.
 
 =cut
 
 $test->for('description');
 
-=method get
+=method access
 
-The get method gets and returns the value.
+The access method gets or sets the class attribute specified.
 
-=signature get
+=signature access
 
-  get() (Any)
+  access(Str $name, Any $value) (Any)
 
-=metadata get
+=metadata access
 
 {
-  since => '0.01',
+  since => '1.23',
 }
 
-=example-1 get
+=example-1 access
+
+  # given: synopsis
 
   package main;
 
-  my $example = Example->new(value => 'hey, there');
+  my $access = $example->access;
 
-  my $get = $example->get;
-
-  # "hey, there"
+  # undef
 
 =cut
 
-$test->for('example', 1, 'get', sub {
+$test->for('example', 1, 'access', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-2 access
+
+  # given: synopsis
+
+  package main;
+
+  my $access = $example->access('value');
+
+  # "hello, there"
+
+=cut
+
+$test->for('example', 2, 'access', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "hey, there";
+  ok $result eq 'hello, there';
 
   $result
 });
 
-=method set
+=example-3 access
 
-The set method set the value and returns the value set.
-
-=signature set
-
-  set(Any $value) (Any)
-
-=metadata set
-
-{
-  since => '0.01',
-}
-
-=example-1 set
+  # given: synopsis
 
   package main;
 
-  my $example = Example->new(value => 'hey, there');
+  my $access = $example->access('value', 'something');
 
-  my $set = $example->set('hi, there');
-
-  # "hi, there"
+  # "something"
 
 =cut
 
-$test->for('example', 1, 'set', sub {
+$test->for('example', 3, 'access', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result eq "hi, there";
+  ok $result eq 'something';
+
+  $result
+});
+
+=example-4 access
+
+  # given: synopsis
+
+  package main;
+
+  my $instance = $example;
+
+  # bless({}, "Example")
+
+  $example->access('value', 'something');
+
+  # "something"
+
+  $instance = $example;
+
+  # bless({value => "something"}, "Example")
+
+=cut
+
+$test->for('example', 4, 'access', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  ok $result->value eq 'something';
+  ok $result->access('value') eq 'something';
+  ok $result->access('value', 'anything') eq 'anything';
+  ok $result->value eq 'anything';
+
+  $result
+});
+
+=method assign
+
+The assign method dispatches the method call or executes the callback, sets the
+class attribute specified to the result, and returns the result.
+
+=signature assign
+
+  assign(Str $name, Str | CodeRef $code, Any @args) (Any)
+
+=metadata assign
+
+{
+  since => '1.23',
+}
+
+=example-1 assign
+
+  # given: synopsis
+
+  package main;
+
+  my $assign = $example->assign('value', 'downcase');
+
+  # "hello, there"
+
+=cut
+
+$test->for('example', 1, 'assign', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "hello, there";
+
+  $result
+});
+
+=example-2 assign
+
+  # given: synopsis
+
+  package main;
+
+  my $assign = $example->assign('value', 'upcase');
+
+  # "HELLO, THERE"
+
+=cut
+
+$test->for('example', 2, 'assign', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "HELLO, THERE";
+
+  $result
+});
+
+=example-3 assign
+
+  # given: synopsis
+
+  package main;
+
+  my $instance = $example;
+
+  # bless({value => "hello, there"}, "Example")
+
+  my $assign = $example->assign('value', 'downcase');
+
+  # "hello, there"
+
+  $instance = $example;
+
+  # bless({value => "hello, there"}, "Example")
+
+=cut
+
+$test->for('example', 3, 'assign', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  ok $result->value eq 'hello, there';
+  ok $result->assign('value', 'upcase') eq 'HELLO, THERE';
+  ok $result->value eq 'HELLO, THERE';
 
   $result
 });

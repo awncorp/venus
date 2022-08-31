@@ -167,6 +167,18 @@ sub add_years {
   return $self->reset($self->epoch + $size);
 }
 
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('number', true);
+
+  return $assert;
+}
+
 sub epoch {
   my ($self) = @_;
 

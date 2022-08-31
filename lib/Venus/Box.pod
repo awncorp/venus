@@ -50,10 +50,12 @@ This package provides the following methods:
 
 =head2 unbox
 
-  unbox() (Any)
+  unbox(Str $method, Any @args) (Any)
 
 The unbox method returns the un-boxed underlying object. This is a virtual
-method that dispatches to C<__handle__unbox>.
+method that dispatches to C<__handle__unbox>. This method supports dispatching,
+i.e. providing a method name and arguments whose return value will be acted on
+by this method.
 
 I<Since C<0.01>>
 
@@ -66,6 +68,18 @@ I<Since C<0.01>>
   my $unbox = $box->unbox;
 
   # bless({ value => {} }, "Venus::Hash")
+
+=back
+
+=over 4
+
+=item unbox example 2
+
+  # given: synopsis;
+
+  my $unbox = $box->unbox('count');
+
+  # 0
 
 =back
 

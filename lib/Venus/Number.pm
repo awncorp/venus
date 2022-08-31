@@ -16,7 +16,6 @@ use overload (
   '*' => sub{$_[0]->get * ($_[1] + 0)},
   '+' => sub{$_[0]->get + ($_[1] + 0)},
   '-' => sub{$_[0]->get - ($_[1] + 0)},
-  '.' => sub{$_[0]->get . ($_[1] + 0)},
   '/' => sub{$_[0]->get / ($_[1] + 0)},
   '0+' => sub{$_[0]->get + 0},
   '<' => sub{$_[0]->get < ($_[1] + 0)},
@@ -42,6 +41,41 @@ sub abs {
   return CORE::abs($data);
 }
 
+sub add {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data + ($arg + 0);
+}
+
+sub append {
+  my ($self, @args) = @_;
+
+  return $self->append_with(undef, @args);
+}
+
+sub append_with {
+  my ($self, $delimiter, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', $data, @args);
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->constraints->clear;
+
+  $assert->constraint('number', true);
+  $assert->constraint('float', true);
+
+  return $assert;
+}
+
 sub atan2 {
   my ($self, $arg) = @_;
 
@@ -54,6 +88,28 @@ sub comparer {
   my ($self) = @_;
 
   return 'numified';
+}
+
+sub concat {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join('', $data, @args);
+}
+
+sub contains {
+  my ($self, $pattern) = @_;
+
+  my $data = $self->get;
+
+  return 0 unless CORE::defined($pattern);
+
+  my $regexp = UNIVERSAL::isa($pattern, 'Regexp');
+
+  return CORE::index($data, $pattern) < 0 ? 0 : 1 if !$regexp;
+
+  return ($data =~ $pattern) ? true : false;
 }
 
 sub cos {
@@ -73,7 +129,16 @@ sub decr {
 }
 
 sub default {
+
   return 0;
+}
+
+sub div {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data / ($arg + 0);
 }
 
 sub exp {
@@ -100,12 +165,29 @@ sub incr {
   return $data + (($arg || 1) + 0);
 }
 
+sub index {
+  my ($self, $substr, $start) = @_;
+
+  my $data = $self->get;
+
+  return CORE::index($data, $substr) if not(CORE::defined($start));
+  return CORE::index($data, $substr, $start);
+}
+
 sub int {
   my ($self) = @_;
 
   my $data = $self->get;
 
   return CORE::int($data);
+}
+
+sub length {
+  my ($self) = @_;
+
+  my $data = $self->get;
+
+  return CORE::length($data);
 }
 
 sub log {
@@ -116,12 +198,28 @@ sub log {
   return CORE::log($data);
 }
 
+sub lshift {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data << ($arg + 0);
+}
+
 sub mod {
   my ($self, $arg) = @_;
 
   my $data = $self->get;
 
   return $data % ($arg + 0);
+}
+
+sub multi {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data * ($arg + 0);
 }
 
 sub neg {
@@ -148,6 +246,20 @@ sub pow {
   return $data ** ($arg + 0);
 }
 
+sub prepend {
+  my ($self, @args) = @_;
+
+  return $self->prepend_with(undef, @args);
+}
+
+sub prepend_with {
+  my ($self, $delimiter, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', @args, $data);
+}
+
 sub range {
   my ($self, $arg) = @_;
 
@@ -156,6 +268,22 @@ sub range {
   return [
     ($data > ($arg + 0)) ? CORE::reverse(($arg + 0)..$data) : ($data..($arg + 0))
   ];
+}
+
+sub repeat {
+  my ($self, $count, $delimiter) = @_;
+
+  my $data = $self->get;
+
+  return CORE::join($delimiter // '', CORE::map $data, 1..($count || 1));
+}
+
+sub rshift {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data >> ($arg + 0);
 }
 
 sub sin {
@@ -172,6 +300,29 @@ sub sqrt {
   my $data = $self->get;
 
   return CORE::sqrt($data);
+}
+
+sub sub {
+  my ($self, $arg) = @_;
+
+  my $data = $self->get;
+
+  return $data - ($arg + 0);
+}
+
+sub substr {
+  my ($self, $offset, $length, $replace) = @_;
+
+  my $data = $self->get;
+
+  if (CORE::defined($replace)) {
+    my $result = CORE::substr($data, $offset // 0, $length // 0, $replace);
+    return wantarray ? ($result, $data) : $data;
+  }
+  else {
+    my $result = CORE::substr($data, $offset // 0, $length // 0);
+    return wantarray ? ($result, $data) : $result;
+  }
 }
 
 1;

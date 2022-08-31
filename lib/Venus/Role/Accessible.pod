@@ -17,19 +17,30 @@ Accessible Role for Perl 5
 
   use Venus::Class;
 
-  with 'Venus::Role::Valuable';
   with 'Venus::Role::Accessible';
+
+  attr 'value';
+
+  sub downcase {
+    lc $_[0]->value
+  }
+
+  sub upcase {
+    uc $_[0]->value
+  }
 
   package main;
 
   my $example = Example->new(value => 'hello, there');
 
+  # $example->value;
+
 =cut
 
 =head1 DESCRIPTION
 
-This package modifies the consuming package and provides a C<value> attribute
-as well as C<get> and C<set> methods for modifying the value.
+This package modifies the consuming package and provides the C<access> method
+for getting and setting attributes.
 
 =cut
 
@@ -39,49 +50,136 @@ This package provides the following methods:
 
 =cut
 
-=head2 get
+=head2 access
 
-  get() (Any)
+  access(Str $name, Any $value) (Any)
 
-The get method gets and returns the value.
+The access method gets or sets the class attribute specified.
 
-I<Since C<0.01>>
+I<Since C<1.23>>
 
 =over 4
 
-=item get example 1
+=item access example 1
+
+  # given: synopsis
 
   package main;
 
-  my $example = Example->new(value => 'hey, there');
+  my $access = $example->access;
 
-  my $get = $example->get;
+  # undef
 
-  # "hey, there"
+=back
+
+=over 4
+
+=item access example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $access = $example->access('value');
+
+  # "hello, there"
+
+=back
+
+=over 4
+
+=item access example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $access = $example->access('value', 'something');
+
+  # "something"
+
+=back
+
+=over 4
+
+=item access example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $instance = $example;
+
+  # bless({}, "Example")
+
+  $example->access('value', 'something');
+
+  # "something"
+
+  $instance = $example;
+
+  # bless({value => "something"}, "Example")
 
 =back
 
 =cut
 
-=head2 set
+=head2 assign
 
-  set(Any $value) (Any)
+  assign(Str $name, Str | CodeRef $code, Any @args) (Any)
 
-The set method set the value and returns the value set.
+The assign method dispatches the method call or executes the callback, sets the
+class attribute specified to the result, and returns the result.
 
-I<Since C<0.01>>
+I<Since C<1.23>>
 
 =over 4
 
-=item set example 1
+=item assign example 1
+
+  # given: synopsis
 
   package main;
 
-  my $example = Example->new(value => 'hey, there');
+  my $assign = $example->assign('value', 'downcase');
 
-  my $set = $example->set('hi, there');
+  # "hello, there"
 
-  # "hi, there"
+=back
+
+=over 4
+
+=item assign example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $assign = $example->assign('value', 'upcase');
+
+  # "HELLO, THERE"
+
+=back
+
+=over 4
+
+=item assign example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $instance = $example;
+
+  # bless({value => "hello, there"}, "Example")
+
+  my $assign = $example->assign('value', 'downcase');
+
+  # "hello, there"
+
+  $instance = $example;
+
+  # bless({value => "hello, there"}, "Example")
 
 =back
 

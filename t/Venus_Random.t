@@ -8,6 +8,11 @@ use warnings;
 use Test::More;
 use Venus::Test;
 
+if (require Venus::Random && Venus::Random->new(42)->range(1, 50) != 38) {
+  diag "OS ($^O) rand function is undeterministic";
+  goto SKIP;
+}
+
 my $test = test(__FILE__);
 
 sub trunc {
@@ -49,9 +54,9 @@ method: digit
 method: float
 method: letter
 method: lowercased
-method: make
 method: nonzero
 method: number
+method: pick
 method: range
 method: repeat
 method: reseed
@@ -1387,252 +1392,6 @@ $test->for('example', 1, 'lowercased', sub {
   $result
 });
 
-=method make
-
-The make method is the random number generator and returns a random number. By
-default, calling this method is equivalent to call L<perlfunc/rand>. This
-method can be overridden in a subclass to provide a custom generator, e.g. a
-more cyptographically secure generator.
-
-=signature make
-
-  make(Num $data) (Num)
-
-=metadata make
-
-{
-  since => '1.11',
-}
-
-=example-1 make
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make;
-
-  # 0.744525000061007
-
-  # $make = $random->make;
-
-  # 0.342701478718908
-
-=cut
-
-$test->for('example', 1, 'make', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-
-  my $random = Venus::Random->new(42);
-
-  is trunc($random->make), trunc("0.74452500006100");
-  is trunc($random->make), trunc("0.342701478718908");
-  is trunc($random->make), trunc("0.111085282444161");
-  is trunc($random->make), trunc("0.422338957988309");
-  is trunc($random->make), trunc("0.0811111711783106");
-  is trunc($random->make), trunc("0.856440708026625");
-  is trunc($random->make), trunc("0.498799422194079");
-  is trunc($random->make), trunc("0.478814290644628");
-  is trunc($random->make), trunc("0.690812444305639");
-  is trunc($random->make), trunc("0.834593765962154");
-  is trunc($random->make), trunc("0.462899834399462");
-  is trunc($random->make), trunc("0.577638060310598");
-  is trunc($random->make), trunc("0.53397276092527");
-  is trunc($random->make), trunc("0.0258899224807152");
-  is trunc($random->make), trunc("0.769812041501151");
-  is trunc($random->make), trunc("0.601136413955935");
-  is trunc($random->make), trunc("0.908832753514449");
-  is trunc($random->make), trunc("0.489384814281067");
-  is trunc($random->make), trunc("0.535989747213943");
-  is trunc($random->make), trunc("0.496690956018035");
-  is trunc($random->make), trunc("0.437637516830268");
-  is trunc($random->make), trunc("0.349677252863827");
-  is trunc($random->make), trunc("0.921922185727137");
-  is trunc($random->make), trunc("0.0603915988287085");
-  is trunc($random->make), trunc("0.859894102366727");
-  is trunc($random->make), trunc("0.971989986776236");
-  is trunc($random->make), trunc("0.848903724785583");
-  is trunc($random->make), trunc("0.251877319902214");
-  is trunc($random->make), trunc("0.205785604346421");
-  is trunc($random->make), trunc("0.0967722492353715");
-  is trunc($random->make), trunc("0.301869908518537");
-  is trunc($random->make), trunc("0.728484952808849");
-  is trunc($random->make), trunc("0.0553971736268331");
-  is trunc($random->make), trunc("0.273961811237854");
-  is trunc($random->make), trunc("0.289771392729346");
-  is trunc($random->make), trunc("0.565730099539969");
-  is trunc($random->make), trunc("0.855175439700094");
-  is trunc($random->make), trunc("0.216100809336339");
-  is trunc($random->make), trunc("0.801730449235915");
-  is trunc($random->make), trunc("0.816847529858215");
-  is trunc($random->make), trunc("0.213684453045094");
-  is trunc($random->make), trunc("0.088734388991611");
-  is trunc($random->make), trunc("0.557174209260136");
-  is trunc($random->make), trunc("0.524785089620856");
-  is trunc($random->make), trunc("0.864121192952201");
-  is trunc($random->make), trunc("0.933160761293848");
-  is trunc($random->make), trunc("0.138959891303895");
-  is trunc($random->make), trunc("0.544464237964569");
-  is trunc($random->make), trunc("0.519219732083403");
-  is trunc($random->make), trunc("0.293497175387671");
-
-  $result
-});
-
-=example-2 make
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make(100);
-
-  # 74.4525000061007
-
-  # $make = $random->make(100);
-
-  # 34.2701478718908
-
-=cut
-
-$test->for('example', 2, 'make', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-
-  my $random = Venus::Random->new(42);
-
-  is trunc($random->make(100)), trunc("74.4525000061007");
-  is trunc($random->make(100)), trunc("34.2701478718908");
-  is trunc($random->make(100)), trunc("11.1085282444161");
-  is trunc($random->make(100)), trunc("42.2338957988309");
-  is trunc($random->make(100)), trunc("8.11111711783106");
-  is trunc($random->make(100)), trunc("85.6440708026625");
-  is trunc($random->make(100)), trunc("49.8799422194079");
-  is trunc($random->make(100)), trunc("47.8814290644628");
-  is trunc($random->make(100)), trunc("69.0812444305639");
-  is trunc($random->make(100)), trunc("83.4593765962154");
-  is trunc($random->make(100)), trunc("46.2899834399462");
-  is trunc($random->make(100)), trunc("57.7638060310598");
-  is trunc($random->make(100)), trunc("53.397276092527");
-  is trunc($random->make(100)), trunc("2.58899224807152");
-  is trunc($random->make(100)), trunc("76.9812041501151");
-  is trunc($random->make(100)), trunc("60.1136413955935");
-  is trunc($random->make(100)), trunc("90.8832753514449");
-  is trunc($random->make(100)), trunc("48.9384814281067");
-  is trunc($random->make(100)), trunc("53.5989747213943");
-  is trunc($random->make(100)), trunc("49.6690956018035");
-  is trunc($random->make(100)), trunc("43.7637516830268");
-  is trunc($random->make(100)), trunc("34.9677252863827");
-  is trunc($random->make(100)), trunc("92.1922185727137");
-  is trunc($random->make(100)), trunc("6.03915988287085");
-  is trunc($random->make(100)), trunc("85.9894102366727");
-  is trunc($random->make(100)), trunc("97.1989986776236");
-  is trunc($random->make(100)), trunc("84.8903724785583");
-  is trunc($random->make(100)), trunc("25.1877319902214");
-  is trunc($random->make(100)), trunc("20.5785604346421");
-  is trunc($random->make(100)), trunc("9.67722492353715");
-  is trunc($random->make(100)), trunc("30.1869908518537");
-  is trunc($random->make(100)), trunc("72.8484952808849");
-  is trunc($random->make(100)), trunc("5.53971736268331");
-  is trunc($random->make(100)), trunc("27.3961811237854");
-  is trunc($random->make(100)), trunc("28.9771392729346");
-  is trunc($random->make(100)), trunc("56.5730099539969");
-  is trunc($random->make(100)), trunc("85.5175439700094");
-  is trunc($random->make(100)), trunc("21.6100809336339");
-  is trunc($random->make(100)), trunc("80.1730449235915");
-  is trunc($random->make(100)), trunc("81.6847529858215");
-  is trunc($random->make(100)), trunc("21.3684453045094");
-  is trunc($random->make(100)), trunc("8.8734388991611");
-  is trunc($random->make(100)), trunc("55.7174209260136");
-  is trunc($random->make(100)), trunc("52.4785089620856");
-  is trunc($random->make(100)), trunc("86.4121192952201");
-  is trunc($random->make(100)), trunc("93.3160761293848");
-  is trunc($random->make(100)), trunc("13.8959891303895");
-  is trunc($random->make(100)), trunc("54.4464237964569");
-  is trunc($random->make(100)), trunc("51.9219732083403");
-  is trunc($random->make(100)), trunc("29.3497175387671");
-
-  $result
-});
-
-=example-3 make
-
-  # given: synopsis
-
-  package main;
-
-  my $make = $random->make(2);
-
-  # 1.48905000012201
-
-  # $make = $random->make(2);
-
-  # 0.685402957437816
-
-
-=cut
-
-$test->for('example', 3, 'make', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-
-  my $random = Venus::Random->new(42);
-
-  is trunc($random->make(2)), trunc("1.48905000012201");
-  is trunc($random->make(2)), trunc("0.685402957437816");
-  is trunc($random->make(2)), trunc("0.222170564888323");
-  is trunc($random->make(2)), trunc("0.844677915976618");
-  is trunc($random->make(2)), trunc("0.162222342356621");
-  is trunc($random->make(2)), trunc("1.71288141605325");
-  is trunc($random->make(2)), trunc("0.997598844388158");
-  is trunc($random->make(2)), trunc("0.957628581289256");
-  is trunc($random->make(2)), trunc("1.38162488861128");
-  is trunc($random->make(2)), trunc("1.66918753192431");
-  is trunc($random->make(2)), trunc("0.925799668798923");
-  is trunc($random->make(2)), trunc("1.1552761206212");
-  is trunc($random->make(2)), trunc("1.06794552185054");
-  is trunc($random->make(2)), trunc("0.0517798449614304");
-  is trunc($random->make(2)), trunc("1.5396240830023");
-  is trunc($random->make(2)), trunc("1.20227282791187");
-  is trunc($random->make(2)), trunc("1.8176655070289");
-  is trunc($random->make(2)), trunc("0.978769628562134");
-  is trunc($random->make(2)), trunc("1.07197949442789");
-  is trunc($random->make(2)), trunc("0.993381912036071");
-  is trunc($random->make(2)), trunc("0.875275033660536");
-  is trunc($random->make(2)), trunc("0.699354505727655");
-  is trunc($random->make(2)), trunc("1.84384437145427");
-  is trunc($random->make(2)), trunc("0.120783197657417");
-  is trunc($random->make(2)), trunc("1.71978820473345");
-  is trunc($random->make(2)), trunc("1.94397997355247");
-  is trunc($random->make(2)), trunc("1.69780744957117");
-  is trunc($random->make(2)), trunc("0.503754639804427");
-  is trunc($random->make(2)), trunc("0.411571208692841");
-  is trunc($random->make(2)), trunc("0.193544498470743");
-  is trunc($random->make(2)), trunc("0.603739817037074");
-  is trunc($random->make(2)), trunc("1.4569699056177");
-  is trunc($random->make(2)), trunc("0.110794347253666");
-  is trunc($random->make(2)), trunc("0.547923622475707");
-  is trunc($random->make(2)), trunc("0.579542785458692");
-  is trunc($random->make(2)), trunc("1.13146019907994");
-  is trunc($random->make(2)), trunc("1.71035087940019");
-  is trunc($random->make(2)), trunc("0.432201618672678");
-  is trunc($random->make(2)), trunc("1.60346089847183");
-  is trunc($random->make(2)), trunc("1.63369505971643");
-  is trunc($random->make(2)), trunc("0.427368906090187");
-  is trunc($random->make(2)), trunc("0.177468777983222");
-  is trunc($random->make(2)), trunc("1.11434841852027");
-  is trunc($random->make(2)), trunc("1.04957017924171");
-  is trunc($random->make(2)), trunc("1.7282423859044");
-  is trunc($random->make(2)), trunc("1.8663215225877");
-  is trunc($random->make(2)), trunc("0.277919782607789");
-  is trunc($random->make(2)), trunc("1.08892847592914");
-  is trunc($random->make(2)), trunc("1.03843946416681");
-  is trunc($random->make(2)), trunc("0.586994350775342");
-
-  $result
-});
-
 =method nonzero
 
 The nonzero method dispatches to the specified method or coderef and returns
@@ -1731,11 +1490,11 @@ $test->for('example', 1, 'nonzero', sub {
 
   package main;
 
-  my $nonzero = $random->nonzero("make");
+  my $nonzero = $random->nonzero("pick");
 
   # 1.74452500006101
 
-  # $nonzero = $random->nonzero("make");
+  # $nonzero = $random->nonzero("pick");
 
   # 1.34270147871891
 
@@ -1747,56 +1506,56 @@ $test->for('example', 2, 'nonzero', sub {
 
   my $random = Venus::Random->new(42);
 
-  is trunc($random->nonzero("make")), trunc("1.74452500006101");
-  is trunc($random->nonzero("make")), trunc("1.34270147871891");
-  is trunc($random->nonzero("make")), trunc("1.11108528244416");
-  is trunc($random->nonzero("make")), trunc("1.42233895798831");
-  is trunc($random->nonzero("make")), trunc("1.08111117117831");
-  is trunc($random->nonzero("make")), trunc("1.85644070802662");
-  is trunc($random->nonzero("make")), trunc("1.49879942219408");
-  is trunc($random->nonzero("make")), trunc("1.47881429064463");
-  is trunc($random->nonzero("make")), trunc("1.69081244430564");
-  is trunc($random->nonzero("make")), trunc("1.83459376596215");
-  is trunc($random->nonzero("make")), trunc("1.46289983439946");
-  is trunc($random->nonzero("make")), trunc("1.5776380603106");
-  is trunc($random->nonzero("make")), trunc("1.53397276092527");
-  is trunc($random->nonzero("make")), trunc("1.02588992248072");
-  is trunc($random->nonzero("make")), trunc("1.76981204150115");
-  is trunc($random->nonzero("make")), trunc("1.60113641395593");
-  is trunc($random->nonzero("make")), trunc("1.90883275351445");
-  is trunc($random->nonzero("make")), trunc("1.48938481428107");
-  is trunc($random->nonzero("make")), trunc("1.53598974721394");
-  is trunc($random->nonzero("make")), trunc("1.49669095601804");
-  is trunc($random->nonzero("make")), trunc("1.43763751683027");
-  is trunc($random->nonzero("make")), trunc("1.34967725286383");
-  is trunc($random->nonzero("make")), trunc("1.92192218572714");
-  is trunc($random->nonzero("make")), trunc("1.06039159882871");
-  is trunc($random->nonzero("make")), trunc("1.85989410236673");
-  is trunc($random->nonzero("make")), trunc("1.97198998677624");
-  is trunc($random->nonzero("make")), trunc("1.84890372478558");
-  is trunc($random->nonzero("make")), trunc("1.25187731990221");
-  is trunc($random->nonzero("make")), trunc("1.20578560434642");
-  is trunc($random->nonzero("make")), trunc("1.09677224923537");
-  is trunc($random->nonzero("make")), trunc("1.30186990851854");
-  is trunc($random->nonzero("make")), trunc("1.72848495280885");
-  is trunc($random->nonzero("make")), trunc("1.05539717362683");
-  is trunc($random->nonzero("make")), trunc("1.27396181123785");
-  is trunc($random->nonzero("make")), trunc("1.28977139272935");
-  is trunc($random->nonzero("make")), trunc("1.56573009953997");
-  is trunc($random->nonzero("make")), trunc("1.85517543970009");
-  is trunc($random->nonzero("make")), trunc("1.21610080933634");
-  is trunc($random->nonzero("make")), trunc("1.80173044923592");
-  is trunc($random->nonzero("make")), trunc("1.81684752985822");
-  is trunc($random->nonzero("make")), trunc("1.21368445304509");
-  is trunc($random->nonzero("make")), trunc("1.08873438899161");
-  is trunc($random->nonzero("make")), trunc("1.55717420926014");
-  is trunc($random->nonzero("make")), trunc("1.52478508962086");
-  is trunc($random->nonzero("make")), trunc("1.8641211929522");
-  is trunc($random->nonzero("make")), trunc("1.93316076129385");
-  is trunc($random->nonzero("make")), trunc("1.13895989130389");
-  is trunc($random->nonzero("make")), trunc("1.54446423796457");
-  is trunc($random->nonzero("make")), trunc("1.5192197320834");
-  is trunc($random->nonzero("make")), trunc("1.29349717538767");
+  is trunc($random->nonzero("pick")), trunc("1.74452500006101");
+  is trunc($random->nonzero("pick")), trunc("1.34270147871891");
+  is trunc($random->nonzero("pick")), trunc("1.11108528244416");
+  is trunc($random->nonzero("pick")), trunc("1.42233895798831");
+  is trunc($random->nonzero("pick")), trunc("1.08111117117831");
+  is trunc($random->nonzero("pick")), trunc("1.85644070802662");
+  is trunc($random->nonzero("pick")), trunc("1.49879942219408");
+  is trunc($random->nonzero("pick")), trunc("1.47881429064463");
+  is trunc($random->nonzero("pick")), trunc("1.69081244430564");
+  is trunc($random->nonzero("pick")), trunc("1.83459376596215");
+  is trunc($random->nonzero("pick")), trunc("1.46289983439946");
+  is trunc($random->nonzero("pick")), trunc("1.5776380603106");
+  is trunc($random->nonzero("pick")), trunc("1.53397276092527");
+  is trunc($random->nonzero("pick")), trunc("1.02588992248072");
+  is trunc($random->nonzero("pick")), trunc("1.76981204150115");
+  is trunc($random->nonzero("pick")), trunc("1.60113641395593");
+  is trunc($random->nonzero("pick")), trunc("1.90883275351445");
+  is trunc($random->nonzero("pick")), trunc("1.48938481428107");
+  is trunc($random->nonzero("pick")), trunc("1.53598974721394");
+  is trunc($random->nonzero("pick")), trunc("1.49669095601804");
+  is trunc($random->nonzero("pick")), trunc("1.43763751683027");
+  is trunc($random->nonzero("pick")), trunc("1.34967725286383");
+  is trunc($random->nonzero("pick")), trunc("1.92192218572714");
+  is trunc($random->nonzero("pick")), trunc("1.06039159882871");
+  is trunc($random->nonzero("pick")), trunc("1.85989410236673");
+  is trunc($random->nonzero("pick")), trunc("1.97198998677624");
+  is trunc($random->nonzero("pick")), trunc("1.84890372478558");
+  is trunc($random->nonzero("pick")), trunc("1.25187731990221");
+  is trunc($random->nonzero("pick")), trunc("1.20578560434642");
+  is trunc($random->nonzero("pick")), trunc("1.09677224923537");
+  is trunc($random->nonzero("pick")), trunc("1.30186990851854");
+  is trunc($random->nonzero("pick")), trunc("1.72848495280885");
+  is trunc($random->nonzero("pick")), trunc("1.05539717362683");
+  is trunc($random->nonzero("pick")), trunc("1.27396181123785");
+  is trunc($random->nonzero("pick")), trunc("1.28977139272935");
+  is trunc($random->nonzero("pick")), trunc("1.56573009953997");
+  is trunc($random->nonzero("pick")), trunc("1.85517543970009");
+  is trunc($random->nonzero("pick")), trunc("1.21610080933634");
+  is trunc($random->nonzero("pick")), trunc("1.80173044923592");
+  is trunc($random->nonzero("pick")), trunc("1.81684752985822");
+  is trunc($random->nonzero("pick")), trunc("1.21368445304509");
+  is trunc($random->nonzero("pick")), trunc("1.08873438899161");
+  is trunc($random->nonzero("pick")), trunc("1.55717420926014");
+  is trunc($random->nonzero("pick")), trunc("1.52478508962086");
+  is trunc($random->nonzero("pick")), trunc("1.8641211929522");
+  is trunc($random->nonzero("pick")), trunc("1.93316076129385");
+  is trunc($random->nonzero("pick")), trunc("1.13895989130389");
+  is trunc($random->nonzero("pick")), trunc("1.54446423796457");
+  is trunc($random->nonzero("pick")), trunc("1.5192197320834");
+  is trunc($random->nonzero("pick")), trunc("1.29349717538767");
 
   $result
 });
@@ -2269,6 +2028,251 @@ $test->for('example', 4, 'number', sub {
   is $random->number(5), 54445;
   is $random->number(5), 51921;
   is $random->number(5), 29349;
+
+  $result
+});
+
+=method pick
+
+The pick method is the random number generator and returns a random number. By
+default, calling this method is equivalent to call L<perlfunc/rand>. This
+method can be overridden in a subclass to provide a custom generator, e.g. a
+more cyptographically secure generator.
+
+=signature pick
+
+  pick(Num $data) (Num)
+
+=metadata pick
+
+{
+  since => '1.23',
+}
+
+=example-1 pick
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick;
+
+  # 0.744525000061007
+
+  # $pick = $random->pick;
+
+  # 0.342701478718908
+
+=cut
+
+$test->for('example', 1, 'pick', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is trunc($random->pick), trunc("0.74452500006100");
+  is trunc($random->pick), trunc("0.342701478718908");
+  is trunc($random->pick), trunc("0.111085282444161");
+  is trunc($random->pick), trunc("0.422338957988309");
+  is trunc($random->pick), trunc("0.0811111711783106");
+  is trunc($random->pick), trunc("0.856440708026625");
+  is trunc($random->pick), trunc("0.498799422194079");
+  is trunc($random->pick), trunc("0.478814290644628");
+  is trunc($random->pick), trunc("0.690812444305639");
+  is trunc($random->pick), trunc("0.834593765962154");
+  is trunc($random->pick), trunc("0.462899834399462");
+  is trunc($random->pick), trunc("0.577638060310598");
+  is trunc($random->pick), trunc("0.53397276092527");
+  is trunc($random->pick), trunc("0.0258899224807152");
+  is trunc($random->pick), trunc("0.769812041501151");
+  is trunc($random->pick), trunc("0.601136413955935");
+  is trunc($random->pick), trunc("0.908832753514449");
+  is trunc($random->pick), trunc("0.489384814281067");
+  is trunc($random->pick), trunc("0.535989747213943");
+  is trunc($random->pick), trunc("0.496690956018035");
+  is trunc($random->pick), trunc("0.437637516830268");
+  is trunc($random->pick), trunc("0.349677252863827");
+  is trunc($random->pick), trunc("0.921922185727137");
+  is trunc($random->pick), trunc("0.0603915988287085");
+  is trunc($random->pick), trunc("0.859894102366727");
+  is trunc($random->pick), trunc("0.971989986776236");
+  is trunc($random->pick), trunc("0.848903724785583");
+  is trunc($random->pick), trunc("0.251877319902214");
+  is trunc($random->pick), trunc("0.205785604346421");
+  is trunc($random->pick), trunc("0.0967722492353715");
+  is trunc($random->pick), trunc("0.301869908518537");
+  is trunc($random->pick), trunc("0.728484952808849");
+  is trunc($random->pick), trunc("0.0553971736268331");
+  is trunc($random->pick), trunc("0.273961811237854");
+  is trunc($random->pick), trunc("0.289771392729346");
+  is trunc($random->pick), trunc("0.565730099539969");
+  is trunc($random->pick), trunc("0.855175439700094");
+  is trunc($random->pick), trunc("0.216100809336339");
+  is trunc($random->pick), trunc("0.801730449235915");
+  is trunc($random->pick), trunc("0.816847529858215");
+  is trunc($random->pick), trunc("0.213684453045094");
+  is trunc($random->pick), trunc("0.088734388991611");
+  is trunc($random->pick), trunc("0.557174209260136");
+  is trunc($random->pick), trunc("0.524785089620856");
+  is trunc($random->pick), trunc("0.864121192952201");
+  is trunc($random->pick), trunc("0.933160761293848");
+  is trunc($random->pick), trunc("0.138959891303895");
+  is trunc($random->pick), trunc("0.544464237964569");
+  is trunc($random->pick), trunc("0.519219732083403");
+  is trunc($random->pick), trunc("0.293497175387671");
+
+  $result
+});
+
+=example-2 pick
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick(100);
+
+  # 74.4525000061007
+
+  # $pick = $random->pick(100);
+
+  # 34.2701478718908
+
+=cut
+
+$test->for('example', 2, 'pick', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is trunc($random->pick(100)), trunc("74.4525000061007");
+  is trunc($random->pick(100)), trunc("34.2701478718908");
+  is trunc($random->pick(100)), trunc("11.1085282444161");
+  is trunc($random->pick(100)), trunc("42.2338957988309");
+  is trunc($random->pick(100)), trunc("8.11111711783106");
+  is trunc($random->pick(100)), trunc("85.6440708026625");
+  is trunc($random->pick(100)), trunc("49.8799422194079");
+  is trunc($random->pick(100)), trunc("47.8814290644628");
+  is trunc($random->pick(100)), trunc("69.0812444305639");
+  is trunc($random->pick(100)), trunc("83.4593765962154");
+  is trunc($random->pick(100)), trunc("46.2899834399462");
+  is trunc($random->pick(100)), trunc("57.7638060310598");
+  is trunc($random->pick(100)), trunc("53.397276092527");
+  is trunc($random->pick(100)), trunc("2.58899224807152");
+  is trunc($random->pick(100)), trunc("76.9812041501151");
+  is trunc($random->pick(100)), trunc("60.1136413955935");
+  is trunc($random->pick(100)), trunc("90.8832753514449");
+  is trunc($random->pick(100)), trunc("48.9384814281067");
+  is trunc($random->pick(100)), trunc("53.5989747213943");
+  is trunc($random->pick(100)), trunc("49.6690956018035");
+  is trunc($random->pick(100)), trunc("43.7637516830268");
+  is trunc($random->pick(100)), trunc("34.9677252863827");
+  is trunc($random->pick(100)), trunc("92.1922185727137");
+  is trunc($random->pick(100)), trunc("6.03915988287085");
+  is trunc($random->pick(100)), trunc("85.9894102366727");
+  is trunc($random->pick(100)), trunc("97.1989986776236");
+  is trunc($random->pick(100)), trunc("84.8903724785583");
+  is trunc($random->pick(100)), trunc("25.1877319902214");
+  is trunc($random->pick(100)), trunc("20.5785604346421");
+  is trunc($random->pick(100)), trunc("9.67722492353715");
+  is trunc($random->pick(100)), trunc("30.1869908518537");
+  is trunc($random->pick(100)), trunc("72.8484952808849");
+  is trunc($random->pick(100)), trunc("5.53971736268331");
+  is trunc($random->pick(100)), trunc("27.3961811237854");
+  is trunc($random->pick(100)), trunc("28.9771392729346");
+  is trunc($random->pick(100)), trunc("56.5730099539969");
+  is trunc($random->pick(100)), trunc("85.5175439700094");
+  is trunc($random->pick(100)), trunc("21.6100809336339");
+  is trunc($random->pick(100)), trunc("80.1730449235915");
+  is trunc($random->pick(100)), trunc("81.6847529858215");
+  is trunc($random->pick(100)), trunc("21.3684453045094");
+  is trunc($random->pick(100)), trunc("8.8734388991611");
+  is trunc($random->pick(100)), trunc("55.7174209260136");
+  is trunc($random->pick(100)), trunc("52.4785089620856");
+  is trunc($random->pick(100)), trunc("86.4121192952201");
+  is trunc($random->pick(100)), trunc("93.3160761293848");
+  is trunc($random->pick(100)), trunc("13.8959891303895");
+  is trunc($random->pick(100)), trunc("54.4464237964569");
+  is trunc($random->pick(100)), trunc("51.9219732083403");
+  is trunc($random->pick(100)), trunc("29.3497175387671");
+
+  $result
+});
+
+=example-3 pick
+
+  # given: synopsis
+
+  package main;
+
+  my $pick = $random->pick(2);
+
+  # 1.48905000012201
+
+  # $pick = $random->pick(2);
+
+  # 0.685402957437816
+
+=cut
+
+$test->for('example', 3, 'pick', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  my $random = Venus::Random->new(42);
+
+  is trunc($random->pick(2)), trunc("1.48905000012201");
+  is trunc($random->pick(2)), trunc("0.685402957437816");
+  is trunc($random->pick(2)), trunc("0.222170564888323");
+  is trunc($random->pick(2)), trunc("0.844677915976618");
+  is trunc($random->pick(2)), trunc("0.162222342356621");
+  is trunc($random->pick(2)), trunc("1.71288141605325");
+  is trunc($random->pick(2)), trunc("0.997598844388158");
+  is trunc($random->pick(2)), trunc("0.957628581289256");
+  is trunc($random->pick(2)), trunc("1.38162488861128");
+  is trunc($random->pick(2)), trunc("1.66918753192431");
+  is trunc($random->pick(2)), trunc("0.925799668798923");
+  is trunc($random->pick(2)), trunc("1.1552761206212");
+  is trunc($random->pick(2)), trunc("1.06794552185054");
+  is trunc($random->pick(2)), trunc("0.0517798449614304");
+  is trunc($random->pick(2)), trunc("1.5396240830023");
+  is trunc($random->pick(2)), trunc("1.20227282791187");
+  is trunc($random->pick(2)), trunc("1.8176655070289");
+  is trunc($random->pick(2)), trunc("0.978769628562134");
+  is trunc($random->pick(2)), trunc("1.07197949442789");
+  is trunc($random->pick(2)), trunc("0.993381912036071");
+  is trunc($random->pick(2)), trunc("0.875275033660536");
+  is trunc($random->pick(2)), trunc("0.699354505727655");
+  is trunc($random->pick(2)), trunc("1.84384437145427");
+  is trunc($random->pick(2)), trunc("0.120783197657417");
+  is trunc($random->pick(2)), trunc("1.71978820473345");
+  is trunc($random->pick(2)), trunc("1.94397997355247");
+  is trunc($random->pick(2)), trunc("1.69780744957117");
+  is trunc($random->pick(2)), trunc("0.503754639804427");
+  is trunc($random->pick(2)), trunc("0.411571208692841");
+  is trunc($random->pick(2)), trunc("0.193544498470743");
+  is trunc($random->pick(2)), trunc("0.603739817037074");
+  is trunc($random->pick(2)), trunc("1.4569699056177");
+  is trunc($random->pick(2)), trunc("0.110794347253666");
+  is trunc($random->pick(2)), trunc("0.547923622475707");
+  is trunc($random->pick(2)), trunc("0.579542785458692");
+  is trunc($random->pick(2)), trunc("1.13146019907994");
+  is trunc($random->pick(2)), trunc("1.71035087940019");
+  is trunc($random->pick(2)), trunc("0.432201618672678");
+  is trunc($random->pick(2)), trunc("1.60346089847183");
+  is trunc($random->pick(2)), trunc("1.63369505971643");
+  is trunc($random->pick(2)), trunc("0.427368906090187");
+  is trunc($random->pick(2)), trunc("0.177468777983222");
+  is trunc($random->pick(2)), trunc("1.11434841852027");
+  is trunc($random->pick(2)), trunc("1.04957017924171");
+  is trunc($random->pick(2)), trunc("1.7282423859044");
+  is trunc($random->pick(2)), trunc("1.8663215225877");
+  is trunc($random->pick(2)), trunc("0.277919782607789");
+  is trunc($random->pick(2)), trunc("1.08892847592914");
+  is trunc($random->pick(2)), trunc("1.03843946416681");
+  is trunc($random->pick(2)), trunc("0.586994350775342");
 
   $result
 });
