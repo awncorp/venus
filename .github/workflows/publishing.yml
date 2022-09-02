@@ -1,0 +1,24 @@
+name: Publishing
+
+on:
+  push:
+    paths:
+    - 'wiki/**'
+    branches:
+      - master
+
+jobs:
+  Publish:
+    runs-on: ubuntu-latest
+    container:
+      image: perl:5.32
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Push Wiki Changes
+      uses: andrew-chen-wang/github-wiki-action@v3
+      env:
+        WIKI_DIR: wiki/
+        GH_TOKEN: ${{ secrets.REPO_USER_TOKEN }}
+        GH_MAIL: ${{ secrets.REPO_USER_EMAIL }}
+        GH_NAME: ${{ secrets.REPO_USER_HANDLE }}
