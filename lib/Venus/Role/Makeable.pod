@@ -1,13 +1,13 @@
 
 =head1 NAME
 
-Venus::Role::Coercible - Coercible Role
+Venus::Role::Makeable - Makeable Role
 
 =cut
 
 =head1 ABSTRACT
 
-Coercible Role for Perl 5
+Makeable Role for Perl 5
 
 =cut
 
@@ -15,16 +15,24 @@ Coercible Role for Perl 5
 
   package Person;
 
-  use Venus::Class;
+  use Venus::Class 'attr', 'error', 'with';
 
-  with 'Venus::Role::Coercible';
+  with 'Venus::Role::Makeable';
 
   attr 'name';
   attr 'father';
   attr 'mother';
   attr 'siblings';
 
-  sub coercers {
+  sub make {
+    my ($self, $value) = @_;
+
+    error if !ref $value;
+
+    return $self->new($value);
+  }
+
+  sub makers {
     {
       father => 'Person',
       mother => 'Person',
@@ -33,13 +41,13 @@ Coercible Role for Perl 5
     }
   }
 
-  sub coerce_name {
+  sub make_name {
     my ($self, $code, @args) = @_;
 
     return $self->$code(@args);
   }
 
-  sub coerce_siblings {
+  sub make_siblings {
     my ($self, $code, $class, $value) = @_;
 
     return [map $self->$code($class, $_), @$value];
@@ -47,12 +55,12 @@ Coercible Role for Perl 5
 
   package main;
 
-  my $person = Person->new(
+  my $person = Person->make({
     name => 'me',
     father => {name => 'father'},
     mother => {name => 'mother'},
     siblings => [{name => 'brother'}, {name => 'sister'}],
-  );
+  });
 
   # $person
   # bless({...}, 'Person')
@@ -74,7 +82,9 @@ Coercible Role for Perl 5
 =head1 DESCRIPTION
 
 This package modifies the consuming package and provides methods for hooking
-into object construction and coercing arguments into objects and values.
+into object construction and coercing arguments into objects and values using
+the I<"make"> protocol, i.e. using the C<"make"> method (which performs fatal
+type checking and coercions) instead of the typical C<"new"> method.
 
 =cut
 
@@ -84,26 +94,26 @@ This package provides the following methods:
 
 =cut
 
-=head2 coerce_args
+=head2 make_args
 
-  coerce_args(HashRef $data, HashRef $spec) (HashRef)
+  make_args(HashRef $data, HashRef $spec) (HashRef)
 
-The coerce_args method replaces values in the data provided with objects
+The make_args method replaces values in the data provided with objects
 corresponding to the specification provided. The specification should contains
 key/value pairs where the keys map to class attributes (or input parameters)
 and the values are L<Venus::Space> compatible package names.
 
-I<Since C<0.07>>
+I<Since C<1.30>>
 
 =over 4
 
-=item coerce_args example 1
+=item make_args example 1
 
   package main;
 
   my $person = Person->new;
 
-  my $data = $person->coerce_args(
+  my $data = $person->make_args(
     {
       father => { name => 'father' }
     },
@@ -120,18 +130,18 @@ I<Since C<0.07>>
 
 =cut
 
-=head2 coerce_attr
+=head2 make_attr
 
-  coerce_attr(Str $name, Any $value) (Any)
+  make_attr(Str $name, Any $value) (Any)
 
-The coerce_attr method is a surrogate accessor and gets and/or sets an instance
-attribute based on the coercion rules, returning the coerced value.
+The make_attr method is a surrogate accessor and gets and/or sets an instance
+attribute based on the C<makers> rules, returning the made value.
 
-I<Since C<1.23>>
+I<Since C<1.30>>
 
 =over 4
 
-=item coerce_attr example 1
+=item make_attr example 1
 
   # given: synopsis
 
@@ -141,7 +151,7 @@ I<Since C<1.23>>
     name => 'me',
   );
 
-  my $coerce_name = $person->coerce_attr('name');
+  my $make_name = $person->make_attr('name');
 
   # bless({value => "me"}, "Venus::String")
 
@@ -149,7 +159,7 @@ I<Since C<1.23>>
 
 =over 4
 
-=item coerce_attr example 2
+=item make_attr example 2
 
   # given: synopsis
 
@@ -159,7 +169,7 @@ I<Since C<1.23>>
     name => 'me',
   );
 
-  my $coerce_name = $person->coerce_attr('name', 'myself');
+  my $make_name = $person->make_attr('name', 'myself');
 
   # bless({value => "myself"}, "Venus::String")
 
@@ -167,25 +177,25 @@ I<Since C<1.23>>
 
 =cut
 
-=head2 coerce_into
+=head2 make_into
 
-  coerce_into(Str $class, Any $value) (Object)
+  make_into(Str $class, Any $value) (Object)
 
-The coerce_into method attempts to build and return an object based on the
+The make_into method attempts to build and return an object based on the
 class name and value provided, unless the value provided is already an object
 derived from the specified class.
 
-I<Since C<0.07>>
+I<Since C<1.30>>
 
 =over 4
 
-=item coerce_into example 1
+=item make_into example 1
 
   package main;
 
   my $person = Person->new;
 
-  my $friend = $person->coerce_into('Person', {
+  my $friend = $person->make_into('Person', {
     name => 'friend',
   });
 
@@ -195,20 +205,20 @@ I<Since C<0.07>>
 
 =cut
 
-=head2 coerce_onto
+=head2 make_onto
 
-  coerce_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+  make_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
 
-The coerce_onto method attempts to build and assign an object based on the
+The make_onto method attempts to build and assign an object based on the
 class name and value provided, as the value corresponding to the name
 specified, in the data provided. If the C<$value> is omitted, the value
 corresponding to the name in the C<$data> will be used.
 
-I<Since C<0.07>>
+I<Since C<1.30>>
 
 =over 4
 
-=item coerce_onto example 1
+=item make_onto example 1
 
   package main;
 
@@ -216,7 +226,7 @@ I<Since C<0.07>>
 
   my $data = { friend => { name => 'friend' } };
 
-  my $friend = $person->coerce_onto($data, 'friend', 'Person');
+  my $friend = $person->make_onto($data, 'friend', 'Person');
 
   # bless({...}, 'Person'),
 
@@ -230,36 +240,36 @@ I<Since C<0.07>>
 
 =over 4
 
-=item coerce_onto example 2
+=item make_onto example 2
 
   package Player;
 
   use Venus::Class;
 
-  with 'Venus::Role::Coercible';
+  with 'Venus::Role::Makeable';
 
   attr 'name';
   attr 'teammates';
 
-  sub coercers {
+  sub makers {
     {
       teammates => 'Person',
     }
   }
 
-  sub coerce_into_person {
+  sub make_into_person {
     my ($self, $class, $value) = @_;
 
-    return $class->new($value);
+    return $class->make($value);
   }
 
-  sub coerce_into_venus_string {
+  sub make_into_venus_string {
     my ($self, $class, $value) = @_;
 
-    return $class->new($value);
+    return $class->make($value);
   }
 
-  sub coerce_teammates {
+  sub make_teammates {
     my ($self, $code, $class, $value) = @_;
 
     return [map $self->$code($class, $_), @$value];
@@ -271,7 +281,7 @@ I<Since C<0.07>>
 
   my $data = { teammates => [{ name => 'player2' }, { name => 'player3' }] };
 
-  my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
+  my $teammates = $player->make_onto($data, 'teammates', 'Person');
 
   # [bless({...}, 'Person'), bless({...}, 'Person')]
 
@@ -285,20 +295,20 @@ I<Since C<0.07>>
 
 =cut
 
-=head2 coercers
+=head2 makers
 
-  coercers() (HashRef)
+  makers() (HashRef)
 
-The coercers method, if defined, is called during object construction, or by the
-L</coercion> method, and returns key/value pairs where the keys map to class
+The makers method, if defined, is called during object construction, or by the
+L</making> method, and returns key/value pairs where the keys map to class
 attributes (or input parameters) and the values are L<Venus::Space> compatible
 package names.
 
-I<Since C<0.02>>
+I<Since C<1.30>>
 
 =over 4
 
-=item coercers example 1
+=item makers example 1
 
   package main;
 
@@ -306,7 +316,7 @@ I<Since C<0.02>>
     name => 'me',
   );
 
-  my $coercers = $person->coercers;
+  my $makers = $person->makers;
 
   # {
   #   father   => "Person",
@@ -319,71 +329,71 @@ I<Since C<0.02>>
 
 =cut
 
-=head2 coercion
+=head2 making
 
-  coercion(HashRef $data) (HashRef)
+  making(HashRef $data) (HashRef)
 
-The coercion method is called automatically during object construction but can
-be called manually as well, and is passed a hashref to coerce and return.
+The making method is called automatically during object construction but can
+be called manually as well, and is passed a hashref to make and return.
 
-I<Since C<0.02>>
+I<Since C<1.30>>
 
 =over 4
 
-=item coercion example 1
+=item making example 1
 
   package main;
 
   my $person = Person->new;
 
-  my $coercion = $person->coercion({
+  my $making = $person->making({
     name => 'me',
   });
 
-  # $coercion
+  # $making
   # {...}
 
-  # $coercion->{name}
+  # $making->{name}
   # bless({...}, 'Venus::String')
 
-  # $coercion->{father}
+  # $making->{father}
   # undef
 
-  # $coercion->{mother}
+  # $making->{mother}
   # undef
 
-  # $coercion->{siblings}
+  # $making->{siblings}
   # undef
 
 =back
 
 =over 4
 
-=item coercion example 2
+=item making example 2
 
   package main;
 
   my $person = Person->new;
 
-  my $coercion = $person->coercion({
+  my $making = $person->making({
     name => 'me',
     mother => {name => 'mother'},
     siblings => [{name => 'brother'}, {name => 'sister'}],
   });
 
-  # $coercion
+  # $making
   # {...}
 
-  # $coercion->{name}
+  # $making->{name}
   # bless({...}, 'Venus::String')
 
-  # $coercion->{father}
+  # $making->{father}
   # undef
 
-  # $coercion->{mother}
+  # $making->{mother}
   # bless({...}, 'Person')
 
-  # $coercion->{siblings}
+  # $making->{siblings}
   # [bless({...}, 'Person'), bless({...}, 'Person'), ...]
 
 =back

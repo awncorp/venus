@@ -341,6 +341,20 @@ sub inject {
   return *{"${class}::${name}"} = $coderef || sub{$class};
 }
 
+sub integrates {
+  my ($self) = @_;
+
+  my $roles = $self->meta->roles;
+
+  return $roles || [];
+}
+
+sub lfile {
+  my ($self) = @_;
+
+  return $self->format('path', '%s.pm');
+}
+
 sub load {
   my ($self) = @_;
 
@@ -424,6 +438,12 @@ sub parts {
   my ($self) = @_;
 
   return $self->parse;
+}
+
+sub pfile {
+  my ($self) = @_;
+
+  return $self->format('path', '%s.pod');
 }
 
 sub prepend {
@@ -591,6 +611,12 @@ sub splice {
   }
 
   return $class->new(join '/', @$parts);
+}
+
+sub tfile {
+  my ($self) = @_;
+
+  return $self->format('label', '%s.t');
 }
 
 sub tryload {

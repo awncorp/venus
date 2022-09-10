@@ -22,19 +22,19 @@ OO Standard Library for Perl 5
 
 =head1 DESCRIPTION
 
-Unlike Ruby, Python, and other languages, in Perl everything is B<not> an object.
-In-fact, in Perl, most things aren't objects. Couple this with the fact that
-Perl has a small function-based standard library and you have a recipe for
-re-inventing the wheel.
+Unlike Ruby, Python, JavaScript, and other languages, in Perl most things are
+B<not> objects despite that fact that Perl supports object-orientation.  Couple
+this with the fact that Perl has a small function-based standard library and
+you have a recipe for re-inventing the wheel, even for simple tasks, every time
+you work on a new project.
 
 The Venus project was designed to provide a pure Perl non-core object-oriented
 standard library for Perl 5. At a high-level the idea is to provide an
 architecture and implementation that leverages the Perl core functionality and
-makes it more consistent, easily accessible, and intuitive.
-
-The synopsis serves as an example of how Venus leverages pre-existing
-functionality in the Perl core to provide an intuitive API for performing (in
-this case) moderately complex date/time operations.
+makes it more consistent, easily accessible, and intuitive. The synopsis serves
+as an example of how Venus leverages pre-existing functionality in the Perl
+core, providing an intuitive API for performing (in this case) moderately
+complex date/time operations.
 
 =cut
 
@@ -49,8 +49,8 @@ The following are some of the features of L<Venus>:
 =item frictionless
 
 This library has zero dependencies and supports Perl 5.18.0+ in an effort to be
-frictionless, i.e. to help ease the decision (legal, technical, etc) of whether or
-not to install and/or adopt.
+frictionless, i.e. to help ease the decision (legal, technical, or otherwise)
+of whether or not to install and/or adopt.
 
 B<example 1>
 
@@ -163,7 +163,7 @@ B<example 1>
 
 =item autoboxing
 
-This library provides opt-in pure Perl autoboxing allowing you to chain methods
+This library provides opt-in pure Perl autoboxing allowing you to chain method
 calls across objects and values.
 
 B<example 1>
@@ -208,7 +208,7 @@ B<example 1>
 =item reflection
 
 This library provides a package reflection class, L<Venus::Space>, which can be
-used to perform meta-programming in package namespaces.
+used to introspect package namespaces and perform metaprogramming.
 
 B<example 1>
 
@@ -218,24 +218,19 @@ B<example 1>
 
   my $space = Venus::Space->new('Venus');
 
-  $space->do('tryload')->variables;
+  my $authority = $space->authority;
+
+  # "cpan:AWNCORP"
+
+  $space = Venus::Space->new('CPAN');
+
+  my $children = $space->children;
 
   # [
-  #   [
-  #     'arrays',
-  #     []
-  #   ],
-  #   [
-  #     'hashes',
-  #     []
-  #   ],
-  #   [
-  #     'scalars',
-  #     [
-  #       'AUTHORITY',
-  #       'VERSION'
-  #     ]
-  #   ]
+  #   bless({ value => "CPAN/Author" }, "Venus::Space"),
+  #   bless({ value => "CPAN/Bundle" }, "Venus::Space"),
+  #   bless({ value => "CPAN/CacheMgr" }, "Venus::Space"),
+  #   ...
   # ]
 
 =back
@@ -300,7 +295,7 @@ B<example 4>
 
 =item composable
 
-This library provides a library of composable roles which can be used to extend
+This library provides a suite of composable roles which can be used to extend
 core behaviors to custom objects.
 
 B<example 1>

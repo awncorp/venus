@@ -31,9 +31,16 @@ sub build_args {
   if (keys %$data == 1 && exists $data->{value}) {
     return $data;
   }
-  return {
-    value => $self->default
-  };
+  elsif (keys %$data) {
+    return {
+      value => $data,
+    }
+  }
+  else {
+    return {
+      value => $self->default
+    };
+  }
 }
 
 sub build_nil {
@@ -989,6 +996,7 @@ sub scalar_is_boolean {
   my ($value) = @_;
 
   return Scalar::Util::isdual($value) && (
+    ("$value" eq "" && ($value + 0) == 0) || # support !!0
     ("$value" == "1" && ($value + 0) == 1) ||
     ("$value" == "0" && ($value + 0) == 0)
   );

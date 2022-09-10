@@ -27,9 +27,8 @@ sub ATTR {
   no strict 'refs';
   no warnings 'redefine';
 
-  *{"@{[$self->NAME]}::$attr"}
-    = sub { @_ = ($_[0], $attr, @_[1 .. $#_]); goto \&ITEM }
-      if !$self->can($attr);
+  *{"@{[$self->NAME]}::$attr"} = sub {$_[0]->ITEM($attr, @_[1..$#_])}
+    if !$self->can($attr);
 
   my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ATTR}})) + 1;
 

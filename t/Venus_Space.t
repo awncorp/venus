@@ -58,10 +58,12 @@ method: explain
 method: hash
 method: hashes
 method: id
+method: lfile
 method: init
 method: inherits
 method: included
 method: inject
+method: integrates
 method: load
 method: loaded
 method: locate
@@ -70,6 +72,7 @@ method: name
 method: parent
 method: parse
 method: parts
+method: pfile
 method: prepend
 method: purge
 method: rebase
@@ -83,6 +86,7 @@ method: scalars
 method: sibling
 method: siblings
 method: splice
+method: tfile
 method: tryload
 method: use
 method: unload
@@ -1321,6 +1325,40 @@ $test->for('example', 1, 'id', sub {
   $result
 });
 
+=method lfile
+
+The lfile method returns a C<.pm> file path for the underlying package.
+
+=signature lfile
+
+  lfile() (Str)
+
+=metadata lfile
+
+{
+  since => '1.30',
+}
+
+=example-1 lfile
+
+  # given: synopsis
+
+  package main;
+
+  my $lfile = $space->lfile;
+
+  # "Foo/Bar.pm"
+
+=cut
+
+$test->for('example', 1, 'lfile', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Foo/Bar.pm";
+
+  $result
+});
+
 =method init
 
 The init method ensures that the package namespace is loaded and, whether
@@ -1500,6 +1538,63 @@ $test->for('example', 1, 'inject', sub {
 
   my $package = 'Kit';
   is $package->build, 'finished';
+
+  $result
+});
+
+=method integrates
+
+The integrates method returns the list of roles integrated into the target
+package.
+
+=signature integrates
+
+  integrates() (ArrayRef)
+
+=metadata integrates
+
+{
+  since => '1.30',
+}
+
+=example-1 integrates
+
+  # given: synopsis
+
+  package main;
+
+  my $integrates = $space->integrates;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'integrates', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok !@$result;
+
+  $result
+});
+
+=example-2 integrates
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('Venus::Test');
+
+  my $integrates = $space->integrates;
+
+  # [...]
+
+=cut
+
+$test->for('example', 2, 'integrates', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result;
 
   $result
 });
@@ -2014,6 +2109,40 @@ $test->for('example', 3, 'parts', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ["FooBar"];
+
+  $result
+});
+
+=method pfile
+
+The pfile method returns a C<.pod> file path for the underlying package.
+
+=signature pfile
+
+  pfile() (Str)
+
+=metadata pfile
+
+{
+  since => '1.30',
+}
+
+=example-1 pfile
+
+  # given: synopsis
+
+  package main;
+
+  my $pfile = $space->pfile;
+
+  # "Foo/Bar.pod"
+
+=cut
+
+$test->for('example', 1, 'pfile', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Foo/Bar.pod";
 
   $result
 });
@@ -2672,6 +2801,40 @@ $test->for('example', 4, 'splice', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   ok "$result" eq "Foo";
+
+  $result
+});
+
+=method tfile
+
+The tfile method returns a C<.t> file path for the underlying package.
+
+=signature tfile
+
+  tfile() (Str)
+
+=metadata tfile
+
+{
+  since => '1.30',
+}
+
+=example-1 tfile
+
+  # given: synopsis
+
+  package main;
+
+  my $tfile = $space->tfile;
+
+  # "Foo_Bar.t"
+
+=cut
+
+$test->for('example', 1, 'tfile', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Foo_Bar.t";
 
   $result
 });

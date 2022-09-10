@@ -108,6 +108,16 @@ sub data_for_description {
   return join "\n\n", @{$data->[0]{data}};
 }
 
+sub data_for_encoding {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'encoding');
+
+  $self->throw->error if !@$data;
+
+  return (map {map uc, split /\n+/} @{$data->[0]{data}})[0];
+}
+
 sub data_for_example {
   my ($self, $number, $name) = @_;
 
@@ -118,21 +128,7 @@ sub data_for_example {
 
   $self->throw->error if !@$data;
 
-  my $example = join "\n\n", @{$data->[0]{data}};
-
-  my @includes;
-
-  if ($example =~ /# given: synopsis/) {
-    push @includes, $self->data('synopsis');
-  }
-
-  if (my ($number, $name) = $example =~ /# given: example-(\d+) (\w+)/) {
-    push @includes, $self->data('example', $number, $name);
-  }
-
-  $example =~ s/.*# given: .*//g;
-
-  return join "\n\n", @includes, $example;
+  return join "\n\n", @{$data->[0]{data}};
 }
 
 sub data_for_feature {
@@ -153,6 +149,19 @@ sub data_for_function {
 
   my $data = $self->search({
     list => 'function',
+    name => $name,
+  });
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_heading {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'heading',
     name => $name,
   });
 
@@ -185,6 +194,16 @@ sub data_for_integrates {
   my ($self) = @_;
 
   my $data = $self->find(undef, 'integrates');
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_layout {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'layout');
 
   $self->throw->error if !@$data;
 
@@ -317,6 +336,12 @@ sub default {
   my ($self) = @_;
 
   return '';
+}
+
+sub encoding {
+  my ($self, $name) = @_;
+
+  return join("\n", "", "=encoding \U$name", "", "=cut");
 }
 
 sub eval {
@@ -478,7 +503,9 @@ sub pdml_for_attributes_type1 {
 
   if (@output) {
     unshift @output, $self->head1('attributes',
-      "This package has the following attributes:",
+      $self->safe('text', 'heading', 'attribute')
+      || $self->safe('text', 'heading', 'attributes')
+      || 'This package has the following attributes:',
     );
   }
 
@@ -496,7 +523,9 @@ sub pdml_for_attributes_type2 {
 
   if (@output) {
     unshift @output, $self->head1('attributes',
-      "This package has the following attributes:",
+      $self->safe('text', 'heading', 'attribute')
+      || $self->safe('text', 'heading', 'attributes')
+      || 'This package has the following attributes:',
     );
   }
 
@@ -521,6 +550,16 @@ sub pdml_for_description {
   my $text = $self->text('description');
 
   return $text ? ($self->head1('description', $text)) : ();
+}
+
+sub pdml_for_encoding {
+  my ($self) = @_;
+
+  my $output;
+
+  my $text = $self->text('encoding');
+
+  return $text ? ($self->encoding($text)) : ();
 }
 
 sub pdml_for_example {
@@ -566,7 +605,9 @@ sub pdml_for_features {
 
   if (@output) {
     unshift @output, $self->head1('features',
-      "This package provides the following features:",
+      $self->safe('text', 'heading', 'feature')
+      || $self->safe('text', 'heading', 'features')
+      || 'This package provides the following features:',
     );
   }
 
@@ -621,7 +662,9 @@ sub pdml_for_functions {
 
   if (@output) {
     unshift @output, $self->head1('functions',
-      "This package provides the following functions:",
+      $self->safe('text', 'heading', 'function')
+      || $self->safe('text', 'heading', 'functions')
+      || 'This package provides the following functions:',
     );
   }
 
@@ -763,7 +806,9 @@ sub pdml_for_methods {
 
   if (@output) {
     unshift @output, $self->head1('methods',
-      "This package provides the following methods:",
+      $self->safe('text', 'heading', 'method')
+      || $self->safe('text', 'heading', 'methods')
+      || 'This package provides the following methods:',
     );
   }
 
@@ -809,7 +854,9 @@ sub pdml_for_operators {
 
   if (@output) {
     unshift @output, $self->head1('operators',
-      "This package overloads the following operators:",
+      $self->safe('text', 'heading', 'operator')
+      || $self->safe('text', 'heading', 'operators')
+      || 'This package overloads the following operators:',
     );
   }
 
@@ -865,26 +912,110 @@ sub render {
 
   $path->parent->mkdirs;
 
-  $path->write(join "\n", grep !!$_, map $self->pdml($_), qw(
-    name
-    abstract
-    version
-    synopsis
-    description
-    attributes
-    inherits
-    integrates
-    libraries
-    functions
-    methods
-    features
-    operators
-    authors
-    license
-    project
-  ));
+  my @layout = (
+    'encoding',
+    'name',
+    'abstract',
+    'version',
+    'synopsis',
+    'description',
+    'attributes: attribute',
+    'inherits',
+    'integrates',
+    'libraries',
+    'functions: function',
+    'methods: method',
+    'features: feature',
+    'operators: operator',
+    'authors',
+    'license',
+    'project',
+  );
+
+  if (@{$self->find(undef, 'layout')}) {
+    @layout = (split /\n/, $self->text('layout'));
+  }
+
+  $path->write(join "\n", grep !!$_, map $self->show($_), @layout);
 
   return $path;
+}
+
+sub show {
+  my ($self, $spec) = @_;
+
+  my ($name, $list) = split /:\s*/, $spec;
+
+  my $method = "pdml_for_$name";
+
+  if ($self->can($method)) {
+    return $self->pdml($name);
+  }
+
+  my $results = $self->search({$list ? (list => $list) : (name => $name)});
+
+  $self->throw->error if !@$results;
+
+  my @output;
+  my $textual = 1;
+
+  for my $result (@$results) {
+    my @block;
+
+    my $examples = 0;
+    my $metadata = $self->text('metadata', $result->{name});
+    my $signature = $self->text('signature', $result->{name});
+
+    push @block, ($signature, '') if $signature;
+
+    my $text = join "\n\n", @{$result->{data}};
+
+    if (!$text) {
+      next;
+    }
+    else {
+      push @block, $text;
+    }
+
+    if ($metadata) {
+      local $@;
+      if ($metadata = eval $metadata) {
+        if (my $since = $metadata->{since}) {
+          push @block, "", "I<Since C<$since>>";
+        }
+      }
+    }
+
+    my @results = $self->search({name => $result->{name}});
+
+    for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+      push @block, $self->pdml('example', $i, $result->{name});
+      $examples++;
+    }
+
+    if ($signature || $metadata || $examples) {
+      push @output, ($self->head2($result->{name}, @block));
+      $textual = 0;
+    }
+    else {
+      push @output, @block;
+    }
+  }
+
+  if (@output) {
+    if ($textual) {
+      @output = $self->head1($name, join "\n\n", @output);
+    }
+    else {
+      unshift @output, $self->head1($name,
+        ($self->count({list => 'heading'})
+          ? ($self->text('heading', $name) || $self->text('heading', $list))
+          : "This package provides the following $name:"),
+      );
+    }
+  }
+
+  return join "\n", @output;
 }
 
 sub test_for_abstract {
@@ -980,10 +1111,41 @@ sub test_for_description {
   return $result;
 }
 
+sub test_for_encoding {
+  my ($self, $name, $code) = @_;
+
+  my $data = $self->data('encoding');
+
+  $code ||= sub {
+    length($data) > 1;
+  };
+
+  my $result = $code->();
+
+  ok($result, "=encoding");
+
+  return $result;
+}
+
 sub test_for_example {
   my ($self, $number, $name, $code) = @_;
 
   my $data = $self->data('example', $number, $name);
+
+  my @includes;
+
+  if ($data =~ /# given: synopsis/) {
+    push @includes, $self->data('synopsis');
+  }
+
+  for my $given ($data =~ /# given: example-((?:\d+) (?:[\-\w]+))/gm) {
+    my ($number, $name) = split /\s+/, $given, 2;
+    push @includes, $self->data('example', $number, $name);
+  }
+
+  $data =~ s/.*# given: .*\n\n*//g;
+
+  $data = join "\n\n", @includes, $data;
 
   $code ||= sub{1};
 
@@ -1204,6 +1366,17 @@ sub test_for_synopsis {
 
   my $data = $self->data('synopsis');
 
+  my @includes;
+
+  for my $given ($data =~ /# given: example-((?:\d+) (?:[\-\w]+))/gm) {
+    my ($number, $name) = split /\s+/, $given, 2;
+    push @includes, $self->data('example', $number, $name);
+  }
+
+  $data =~ s/.*# given: .*\n\n*//g;
+
+  $data = join "\n\n", @includes, $data;
+
   $code ||= sub{$_[0]->result};
 
   my $result = $code->($self->try('eval', $data));
@@ -1332,6 +1505,20 @@ sub text_for_description {
   return $output;
 }
 
+sub text_for_encoding {
+  my ($self) = @_;
+
+  my ($error, $result) = $self->catch('data', 'encoding');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
 sub text_for_example {
   my ($self, $number, $name) = @_;
 
@@ -1365,6 +1552,20 @@ sub text_for_function {
   my ($self, $name) = @_;
 
   my ($error, $result) = $self->catch('data', 'function', $name);
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_heading {
+  my ($self, $name) = @_;
+
+  my ($error, $result) = $self->catch('data', 'heading', $name);
 
   my $output = [];
 
@@ -1421,6 +1622,20 @@ sub text_for_integrates {
   my ($self) = @_;
 
   my ($error, $result) = $self->catch('data', 'integrates');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_layout {
+  my ($self) = @_;
+
+  my ($error, $result) = $self->catch('data', 'layout');
 
   my $output = [];
 

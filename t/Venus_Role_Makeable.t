@@ -12,7 +12,7 @@ my $test = test(__FILE__);
 
 =name
 
-Venus::Role::Coercible
+Venus::Role::Makeable
 
 =cut
 
@@ -20,7 +20,7 @@ $test->for('name');
 
 =tagline
 
-Coercible Role
+Makeable Role
 
 =cut
 
@@ -28,7 +28,7 @@ $test->for('tagline');
 
 =abstract
 
-Coercible Role for Perl 5
+Makeable Role for Perl 5
 
 =cut
 
@@ -36,12 +36,12 @@ $test->for('abstract');
 
 =includes
 
-method: coerce_args
-method: coerce_attr
-method: coerce_into
-method: coerce_onto
-method: coercers
-method: coercion
+method: make_args
+method: make_attr
+method: make_into
+method: make_onto
+method: makers
+method: making
 
 =cut
 
@@ -51,16 +51,24 @@ $test->for('includes');
 
   package Person;
 
-  use Venus::Class;
+  use Venus::Class 'attr', 'error', 'with';
 
-  with 'Venus::Role::Coercible';
+  with 'Venus::Role::Makeable';
 
   attr 'name';
   attr 'father';
   attr 'mother';
   attr 'siblings';
 
-  sub coercers {
+  sub make {
+    my ($self, $value) = @_;
+
+    error if !ref $value;
+
+    return $self->new($value);
+  }
+
+  sub makers {
     {
       father => 'Person',
       mother => 'Person',
@@ -69,13 +77,13 @@ $test->for('includes');
     }
   }
 
-  sub coerce_name {
+  sub make_name {
     my ($self, $code, @args) = @_;
 
     return $self->$code(@args);
   }
 
-  sub coerce_siblings {
+  sub make_siblings {
     my ($self, $code, $class, $value) = @_;
 
     return [map $self->$code($class, $_), @$value];
@@ -83,12 +91,12 @@ $test->for('includes');
 
   package main;
 
-  my $person = Person->new(
+  my $person = Person->make({
     name => 'me',
     father => {name => 'father'},
     mother => {name => 'mother'},
     siblings => [{name => 'brother'}, {name => 'sister'}],
-  );
+  });
 
   # $person
   # bless({...}, 'Person')
@@ -113,28 +121,28 @@ $test->for('synopsis', sub {
 
   # $person
   ok $result->isa('Person');
-  ok $result->does('Venus::Role::Coercible');
+  ok $result->does('Venus::Role::Makeable');
 
   # $person->name
   ok $result->name->isa('Venus::String');
 
   # $person->father
   ok $result->father->isa('Person');
-  ok $result->father->does('Venus::Role::Coercible');
+  ok $result->father->does('Venus::Role::Makeable');
   ok $result->father->name('Venus::String');
 
   # $person->mother
   ok $result->mother->isa('Person');
-  ok $result->mother->does('Venus::Role::Coercible');
+  ok $result->mother->does('Venus::Role::Makeable');
   ok $result->mother->name('Venus::String');
 
   # $person->siblings
   ok ref($result->siblings) eq 'ARRAY';
   ok $result->siblings->[0]->isa('Person');
-  ok $result->siblings->[0]->does('Venus::Role::Coercible');
+  ok $result->siblings->[0]->does('Venus::Role::Makeable');
   ok $result->siblings->[0]->name('Venus::String');
   ok $result->siblings->[1]->isa('Person');
-  ok $result->siblings->[1]->does('Venus::Role::Coercible');
+  ok $result->siblings->[1]->does('Venus::Role::Makeable');
   ok $result->siblings->[1]->name('Venus::String');
 
   $result
@@ -143,36 +151,38 @@ $test->for('synopsis', sub {
 =description
 
 This package modifies the consuming package and provides methods for hooking
-into object construction and coercing arguments into objects and values.
+into object construction and coercing arguments into objects and values using
+the I<"make"> protocol, i.e. using the C<"make"> method (which performs fatal
+type checking and coercions) instead of the typical C<"new"> method.
 
 =cut
 
 $test->for('description');
 
-=method coerce_args
+=method make_args
 
-The coerce_args method replaces values in the data provided with objects
+The make_args method replaces values in the data provided with objects
 corresponding to the specification provided. The specification should contains
 key/value pairs where the keys map to class attributes (or input parameters)
 and the values are L<Venus::Space> compatible package names.
 
-=signature coerce_args
+=signature make_args
 
-  coerce_args(HashRef $data, HashRef $spec) (HashRef)
+  make_args(HashRef $data, HashRef $spec) (HashRef)
 
-=metadata coerce_args
+=metadata make_args
 
 {
-  since => '0.07',
+  since => '1.30',
 }
 
-=example-1 coerce_args
+=example-1 make_args
 
   package main;
 
   my $person = Person->new;
 
-  my $data = $person->coerce_args(
+  my $data = $person->make_args(
     {
       father => { name => 'father' }
     },
@@ -187,7 +197,7 @@ and the values are L<Venus::Space> compatible package names.
 
 =cut
 
-$test->for('example', 1, 'coerce_args', sub {
+$test->for('example', 1, 'make_args', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is ref($result), 'HASH';
@@ -197,22 +207,22 @@ $test->for('example', 1, 'coerce_args', sub {
   $result
 });
 
-=method coerce_attr
+=method make_attr
 
-The coerce_attr method is a surrogate accessor and gets and/or sets an instance
-attribute based on the coercion rules, returning the coerced value.
+The make_attr method is a surrogate accessor and gets and/or sets an instance
+attribute based on the C<makers> rules, returning the made value.
 
-=signature coerce_attr
+=signature make_attr
 
-  coerce_attr(Str $name, Any $value) (Any)
+  make_attr(Str $name, Any $value) (Any)
 
-=metadata coerce_attr
+=metadata make_attr
 
 {
-  since => '1.23',
+  since => '1.30',
 }
 
-=example-1 coerce_attr
+=example-1 make_attr
 
   # given: synopsis
 
@@ -222,13 +232,13 @@ attribute based on the coercion rules, returning the coerced value.
     name => 'me',
   );
 
-  my $coerce_name = $person->coerce_attr('name');
+  my $make_name = $person->make_attr('name');
 
   # bless({value => "me"}, "Venus::String")
 
 =cut
 
-$test->for('example', 1, 'coerce_attr', sub {
+$test->for('example', 1, 'make_attr', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::String');
@@ -237,7 +247,7 @@ $test->for('example', 1, 'coerce_attr', sub {
   $result
 });
 
-=example-2 coerce_attr
+=example-2 make_attr
 
   # given: synopsis
 
@@ -247,13 +257,13 @@ $test->for('example', 1, 'coerce_attr', sub {
     name => 'me',
   );
 
-  my $coerce_name = $person->coerce_attr('name', 'myself');
+  my $make_name = $person->make_attr('name', 'myself');
 
   # bless({value => "myself"}, "Venus::String")
 
 =cut
 
-$test->for('example', 2, 'coerce_attr', sub {
+$test->for('example', 2, 'make_attr', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::String');
@@ -262,29 +272,29 @@ $test->for('example', 2, 'coerce_attr', sub {
   $result
 });
 
-=method coerce_into
+=method make_into
 
-The coerce_into method attempts to build and return an object based on the
+The make_into method attempts to build and return an object based on the
 class name and value provided, unless the value provided is already an object
 derived from the specified class.
 
-=signature coerce_into
+=signature make_into
 
-  coerce_into(Str $class, Any $value) (Object)
+  make_into(Str $class, Any $value) (Object)
 
-=metadata coerce_into
+=metadata make_into
 
 {
-  since => '0.07',
+  since => '1.30',
 }
 
-=example-1 coerce_into
+=example-1 make_into
 
   package main;
 
   my $person = Person->new;
 
-  my $friend = $person->coerce_into('Person', {
+  my $friend = $person->make_into('Person', {
     name => 'friend',
   });
 
@@ -292,7 +302,7 @@ derived from the specified class.
 
 =cut
 
-$test->for('example', 1, 'coerce_into', sub {
+$test->for('example', 1, 'make_into', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Person');
@@ -302,24 +312,24 @@ $test->for('example', 1, 'coerce_into', sub {
   $result
 });
 
-=method coerce_onto
+=method make_onto
 
-The coerce_onto method attempts to build and assign an object based on the
+The make_onto method attempts to build and assign an object based on the
 class name and value provided, as the value corresponding to the name
 specified, in the data provided. If the C<$value> is omitted, the value
 corresponding to the name in the C<$data> will be used.
 
-=signature coerce_onto
+=signature make_onto
 
-  coerce_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+  make_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
 
-=metadata coerce_onto
+=metadata make_onto
 
 {
-  since => '0.07',
+  since => '1.30',
 }
 
-=example-1 coerce_onto
+=example-1 make_onto
 
   package main;
 
@@ -327,7 +337,7 @@ corresponding to the name in the C<$data> will be used.
 
   my $data = { friend => { name => 'friend' } };
 
-  my $friend = $person->coerce_onto($data, 'friend', 'Person');
+  my $friend = $person->make_onto($data, 'friend', 'Person');
 
   # bless({...}, 'Person'),
 
@@ -339,7 +349,7 @@ corresponding to the name in the C<$data> will be used.
 
 =cut
 
-$test->for('example', 1, 'coerce_onto', sub {
+$test->for('example', 1, 'make_onto', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Person');
@@ -349,36 +359,36 @@ $test->for('example', 1, 'coerce_onto', sub {
   $result
 });
 
-=example-2 coerce_onto
+=example-2 make_onto
 
   package Player;
 
   use Venus::Class;
 
-  with 'Venus::Role::Coercible';
+  with 'Venus::Role::Makeable';
 
   attr 'name';
   attr 'teammates';
 
-  sub coercers {
+  sub makers {
     {
       teammates => 'Person',
     }
   }
 
-  sub coerce_into_person {
+  sub make_into_person {
     my ($self, $class, $value) = @_;
 
-    return $class->new($value);
+    return $class->make($value);
   }
 
-  sub coerce_into_venus_string {
+  sub make_into_venus_string {
     my ($self, $class, $value) = @_;
 
-    return $class->new($value);
+    return $class->make($value);
   }
 
-  sub coerce_teammates {
+  sub make_teammates {
     my ($self, $code, $class, $value) = @_;
 
     return [map $self->$code($class, $_), @$value];
@@ -390,7 +400,7 @@ $test->for('example', 1, 'coerce_onto', sub {
 
   my $data = { teammates => [{ name => 'player2' }, { name => 'player3' }] };
 
-  my $teammates = $player->coerce_onto($data, 'teammates', 'Person');
+  my $teammates = $player->make_onto($data, 'teammates', 'Person');
 
   # [bless({...}, 'Person'), bless({...}, 'Person')]
 
@@ -402,7 +412,7 @@ $test->for('example', 1, 'coerce_onto', sub {
 
 =cut
 
-$test->for('example', 2, 'coerce_onto', sub {
+$test->for('example', 2, 'make_onto', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->[0]->isa('Person');
@@ -413,24 +423,24 @@ $test->for('example', 2, 'coerce_onto', sub {
   $result
 });
 
-=method coercers
+=method makers
 
-The coercers method, if defined, is called during object construction, or by the
-L</coercion> method, and returns key/value pairs where the keys map to class
+The makers method, if defined, is called during object construction, or by the
+L</making> method, and returns key/value pairs where the keys map to class
 attributes (or input parameters) and the values are L<Venus::Space> compatible
 package names.
 
-=signature coercers
+=signature makers
 
-  coercers() (HashRef)
+  makers() (HashRef)
 
-=metadata coercers
+=metadata makers
 
 {
-  since => '0.02',
+  since => '1.30',
 }
 
-=example-1 coercers
+=example-1 makers
 
   package main;
 
@@ -438,7 +448,7 @@ package names.
     name => 'me',
   );
 
-  my $coercers = $person->coercers;
+  my $makers = $person->makers;
 
   # {
   #   father   => "Person",
@@ -449,7 +459,7 @@ package names.
 
 =cut
 
-$test->for('example', 1, 'coercers', sub {
+$test->for('example', 1, 'makers', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, {
@@ -462,49 +472,49 @@ $test->for('example', 1, 'coercers', sub {
   $result
 });
 
-=method coercion
+=method making
 
-The coercion method is called automatically during object construction but can
-be called manually as well, and is passed a hashref to coerce and return.
+The making method is called automatically during object construction but can
+be called manually as well, and is passed a hashref to make and return.
 
-=signature coercion
+=signature making
 
-  coercion(HashRef $data) (HashRef)
+  making(HashRef $data) (HashRef)
 
-=metadata coercion
+=metadata making
 
 {
-  since => '0.02',
+  since => '1.30',
 }
 
-=example-1 coercion
+=example-1 making
 
   package main;
 
   my $person = Person->new;
 
-  my $coercion = $person->coercion({
+  my $making = $person->making({
     name => 'me',
   });
 
-  # $coercion
+  # $making
   # {...}
 
-  # $coercion->{name}
+  # $making->{name}
   # bless({...}, 'Venus::String')
 
-  # $coercion->{father}
+  # $making->{father}
   # undef
 
-  # $coercion->{mother}
+  # $making->{mother}
   # undef
 
-  # $coercion->{siblings}
+  # $making->{siblings}
   # undef
 
 =cut
 
-$test->for('example', 1, 'coercion', sub {
+$test->for('example', 1, 'making', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
 
@@ -526,36 +536,36 @@ $test->for('example', 1, 'coercion', sub {
   $result
 });
 
-=example-2 coercion
+=example-2 making
 
   package main;
 
   my $person = Person->new;
 
-  my $coercion = $person->coercion({
+  my $making = $person->making({
     name => 'me',
     mother => {name => 'mother'},
     siblings => [{name => 'brother'}, {name => 'sister'}],
   });
 
-  # $coercion
+  # $making
   # {...}
 
-  # $coercion->{name}
+  # $making->{name}
   # bless({...}, 'Venus::String')
 
-  # $coercion->{father}
+  # $making->{father}
   # undef
 
-  # $coercion->{mother}
+  # $making->{mother}
   # bless({...}, 'Person')
 
-  # $coercion->{siblings}
+  # $making->{siblings}
   # [bless({...}, 'Person'), bless({...}, 'Person'), ...]
 
 =cut
 
-$test->for('example', 2, 'coercion', sub {
+$test->for('example', 2, 'making', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
 
@@ -570,16 +580,16 @@ $test->for('example', 2, 'coercion', sub {
 
   # $result->{mother}
   ok $result->{mother}->isa('Person');
-  ok $result->{mother}->does('Venus::Role::Coercible');
+  ok $result->{mother}->does('Venus::Role::Makeable');
   ok $result->{mother}->name('Venus::String');
 
   # $result->siblings
   ok ref($result->{siblings}) eq 'ARRAY';
   ok $result->{siblings}->[0]->isa('Person');
-  ok $result->{siblings}->[0]->does('Venus::Role::Coercible');
+  ok $result->{siblings}->[0]->does('Venus::Role::Makeable');
   ok $result->{siblings}->[0]->name('Venus::String');
   ok $result->{siblings}->[1]->isa('Person');
-  ok $result->{siblings}->[1]->does('Venus::Role::Coercible');
+  ok $result->{siblings}->[1]->does('Venus::Role::Makeable');
   ok $result->{siblings}->[1]->name('Venus::String');
 
   $result
@@ -587,6 +597,6 @@ $test->for('example', 2, 'coercion', sub {
 
 # END
 
-$test->render('lib/Venus/Role/Coercible.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Role/Makeable.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

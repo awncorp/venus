@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Push Wiki Changes
+    - name: Publish Wiki
       uses: andrew-chen-wang/github-wiki-action@v3
       env:
         WIKI_DIR: wiki/

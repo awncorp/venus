@@ -1328,8 +1328,8 @@ $test->for('example', 1, 'meta', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Meta');
   ok $result->{name} eq 'User';
-  is_deeply $result->bases, ['Entity', 'Engineer', 'Venus::Core'];
-  is_deeply [sort @{$result->roles}], ['Admin', 'HasType'];
+  is_deeply scalar $result->bases, ['Entity', 'Engineer', 'Venus::Core'];
+  is_deeply [sort $result->roles], ['Admin', 'HasType'];
 
   $result
 });

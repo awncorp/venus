@@ -1,0 +1,142 @@
+
+=head1 NAME
+
+Venus - Backstory
+
+=cut
+
+=head1 ABSTRACT
+
+OO Standard Library for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  use Venus::Date;
+
+  # return iso8601 string, 2 days from the start of the month
+  my $date = Venus::Date->new->restart_month->add_days(2)->iso8601;
+
+=cut
+
+=head1 DESCRIPTION
+
+The Venus project consists of an object system, value classes, utility classes,
+and abstract behaviors as roles.
+
+The Venus project was designed to provide a pure Perl non-core object-oriented
+standard library for Perl 5. Although Perl is a multi-paradigm programming
+language the CPAN is overwhelmingly object-oriented and thus speaks to the
+community's preferred architectural style. Venus brings "everything is an
+object" to Perl 5.
+
+The synopsis serves as an example of how Venus leverages pre-existing
+functionality in the Perl core, providing an intuitive API for performing (in
+this case) moderately complex date/time operations.
+
+In the 2000s, I like many others flocked to the marvelous Moose object system.
+It was the state of the art. Moose worked very well for me in the long running
+HTTP server processes I was developing at the time but became untenable as the
+need arose for robust but quick and short-lived applications. Moose wasn't
+performant. Thankfully, Moo was created in-part to solve the Moose performance
+problem and was a decent drop-in replacement, but eventually I began to
+struggle with Moo as well. I wanted to further automate my classes, roles, and
+tests using reflection but Moo only provides reflection by inflating Moose
+classes, at which point negates the main benefit of using Moo.
+
+My frustration turned into vitriol upon realizing that something as simple as
+writing code to get a list of the names of the attributes I just declared was
+extremely difficult and fragile. This exposed the reality that both Moo and
+Moose endeavor to hide the object system from you and I started to wonder what
+it would be like to have an object system that put the framework in front of
+you and let you engage with it.
+
+The idea for Venus, according to BackPAN, originated around 2013 with the
+release of Bubblegum which was an opinionated Perl development environment akin
+to Perl5i. Essentially, Bubblegum was a shim (of sorts) that automatically
+enabled certain pragmas (e.g. autobox, autodie, strict, etc), provided common
+methods for autoboxing native data types, bundled popular Tiny packages, and
+was based on the Moo object system. The goal was to facilitate rapid Perl
+development. This project lived on until October of 2014.
+
+If I recall correctly, there was an error in a production environment caused by
+an unforeseen side effect of using Bubblegum which automatically enabled
+autoboxing, which inadvertently dispatched method calls in error. The following
+is an example of what I mean by "inadvertently dispatched method calls in
+error".
+
+E.g.
+
+  package Thing;
+
+  use autobox::Core;
+
+  sub new { bless{} }
+  sub to { 'report has been run' }
+  sub run { int(rand(2)) ? shift : 0 }
+
+  package main;
+
+  # Thing->new->run->to('device')
+  # 0> Argument "device" isn't numeric in numeric lt (<) at autobox/Core.pm
+
+  # Thing->new->run->to('device')
+  # 1> Argument "device" isn't numeric in numeric lt (<) at autobox/Core.pm
+
+  # Thing->new->run->to('device')
+  # 2> Argument "device" isn't numeric in numeric lt (<) at autobox/Core.pm
+
+  # Thing->new->run->to('device')
+  # 3> Argument "device" isn't numeric in numeric lt (<) at autobox/Core.pm
+
+  # Thing->new->run->to('device')
+  # 4> 'report has been run'
+
+TL;DR;
+
+The big problem illustrated with this example is that the code issues a warning
+and continues, and always works but will only sometimes do what you expect.
+
+End;
+
+Bubblegum was considered dangerous (due to its use of autobox) and was
+subsequently removed from that environment but I still believed in the core
+tenets of what the project was all about and what it enabled, i.e. rapid
+application development via standardization.
+
+"Everything as an object" provides identity, consistency, and predictability.
+It means that you can use a single simple data structure to represent anything
+and everything, and by encapsulating that data structure within a class, giving
+that thing an identity, you can logically group and provide behaviors specific
+to that thing, then, you can further standardize the names of those behaviors
+providing predictability across things.
+
+In December of 2014, Data-Object was born. Data object, as the name suggests,
+was strictly about providing data objects for native Perl data types and
+allowing opt-in method chaining without the autobox pragma, thus solving the
+Bubblegum always-on autoboxing problem. Additionally, this project was designed
+to be highly modular and "opt-in-able" and was distributed as a suite of
+distributions. The project saw continued development until around April of
+2020.
+
+While Data-Object felt like an impressive feat, with a modular architecture I
+was particularly impressed with, the experience of using Data-Object
+distributions felt disjointed and unintuitive and I knew then that what I
+really wanted was a Data-Object-inspired standard library. In January of 2022,
+Venus version 0.01 was uploaded to the CPAN.
+
+Again, originally Venus was based on the Moo object system but has since been
+refactored to use it's own "progressive" object system referred to as the Mars
+architecture. One of Venus' guiding ideals is that everything is opt-in. You
+can use all of it, some of it, or none of it. Obviously, for the purpose of
+this explanation using none of it is uninteresting so let me show you how you
+could opt into some of it and/or all of it.
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut

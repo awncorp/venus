@@ -3358,6 +3358,7 @@ $test->for('example', 1, 'uppercased', sub {
 
 # END
 
+SKIP:
 $test->render('lib/Venus/Random.pod') if $ENV{RENDER};
 
 ok 1 and done_testing;

@@ -40,7 +40,9 @@ sub attrs {
   }
 
   my %seen;
-  return $self->{attrs} ||= [grep !$seen{$_}++, @attrs];
+  my $results = $self->{attrs} ||= [grep !$seen{$_}++, @attrs];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub attrs_resolver {
@@ -84,7 +86,9 @@ sub bases {
   }
 
   my %seen;
-  return $self->{bases} ||= [grep !$seen{$_}++, @bases];
+  my $results = $self->{bases} ||= [grep !$seen{$_}++, @bases];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub bases_resolver {
@@ -119,7 +123,7 @@ sub find {
     last if @$configs;
   }
 
-  return $configs->[0];
+  return $configs ? $configs->[0] : undef;
 }
 
 sub local {
@@ -135,7 +139,9 @@ sub local {
 
   my $function = "${type}_resolver";
 
-  return [&{"${function}"}($name)];
+  my $results = [&{"${function}"}($name)];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub mixin {
@@ -167,7 +173,9 @@ sub mixins {
   }
 
   my %seen;
-  return $self->{mixins} ||= [grep !$seen{$_}++, @mixins];
+  my $results = $self->{mixins} ||= [grep !$seen{$_}++, @mixins];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub mixins_resolver {
@@ -220,7 +228,9 @@ sub roles {
   }
 
   my %seen;
-  return $self->{roles} ||= [grep !$seen{$_}++, @roles];
+  my $results = $self->{roles} ||= [grep !$seen{$_}++, @roles];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub roles_resolver {
@@ -277,7 +287,9 @@ sub search {
     }
   }
 
-  return [@configs];
+  my $results = [@configs];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub sub {
@@ -305,7 +317,9 @@ sub subs {
   }
 
   my %seen;
-  return $self->{subs} ||= [grep !$seen{$_}++, @subs];
+  my $results = $self->{subs} ||= [grep !$seen{$_}++, @subs];
+
+  return wantarray ? (@$results) : $results;
 }
 
 sub subs_resolver {
