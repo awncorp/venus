@@ -41,18 +41,22 @@ curl -ssL https://cpanmin.us | perl - -qn git://github.com/awncorp/venus.git
 - Boolean Values
 - Standard Library
 - Value Classes
-- Builtin Autoboxing
+- Pure Perl Autoboxing
 - Utility Classes
 - Package Reflection
 - Exception Handling
 - Composable Standards
 - Pluggable Library
-- Robust Documentation
-- Dispatcher Methods
+- Intuitive APIs
+- Type Assertions/Coercions
+- Value Casting
+- Proxyable Methods
+- Complete Documentation
+- Robust Test Coverage
 
 ## Resources
 
-- [Info](https://github.com/awncorp/venus/wiki/info) - Info
+- [Information](https://github.com/awncorp/venus/wiki/info) - Information
 - [Values](https://github.com/awncorp/venus/wiki/values) - Value classes
 - [Utilities](https://github.com/awncorp/venus/wiki/utilities) - Utilities classes
 - [Roles/Traits](https://github.com/awncorp/venus/wiki/roles) - Abstract behaviors

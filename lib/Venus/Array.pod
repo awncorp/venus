@@ -2669,6 +2669,30 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 shuffle
+
+  shuffle() (ArrayRef)
+
+The shuffle method returns an array with the items in a randomized order.
+
+I<Since C<1.40>>
+
+=over 4
+
+=item shuffle example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $shuffle = $array->shuffle;
+
+  # [4, 5, 8, 7, 2, 9, 6, 3, 1]
+
+=back
+
+=cut
+
 =head2 slice
 
   slice(Str @keys) (ArrayRef)

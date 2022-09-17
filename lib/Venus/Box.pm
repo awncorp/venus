@@ -65,6 +65,7 @@ sub build_proxy {
     }
   }
   return sub {
+    local $_ = $value;
     my $result = [
       $value->$method(@args)
     ];

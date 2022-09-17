@@ -732,7 +732,7 @@ $test->for('example', 1, '("")', sub {
 
   my $result = "$search, $search";
 
-  # "hello world"
+  # "hello world, hello world"
 
 =cut
 

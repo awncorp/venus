@@ -1,16 +1,16 @@
 # Release
 
-## Version: 1.40
+## Version: 1.50
 
-- [change] Update callback naming in Venus::Role::Coercible
-- [feature] Implement Venus::Space#integrates
-- [feature] Implement Venus::Role::Rejectable
-- [feature] Implement Venus::Role::Unacceptable
-- [feature] Implement Venus::Role::Defaultable
-- [feature] Implement Venus::Role::Makeable
-- [feature] Implement Venus::Space#{lfile,pfile,tfile}
-- [update] Include examples in the distribution
-- [update] Update Venus::Meta methods to return with wantarray
-- [update] Update Venus::Test to support rendering the encoding tag
+- [feature] Implement Venus::Assert#accept
+- [feature] Implement exportable "cast" function
+- [feature] Implement Venus::Assert#format
+- [feature] Support Venus::Assert#conditions
+- [feature] Implement Venus::Assert $type methods
+- [feature] Implement Venus::Assert#validator
+- [feature] Implement Venus::Match#where
+- [feature] Allow Venus::Match#result to accept/set a value
+- [feature] Implement Venus::Assert#{clear,within}
+- [feature] Implement Venus::Array#shuffle
 
 

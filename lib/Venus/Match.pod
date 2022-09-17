@@ -367,7 +367,7 @@ I<Since C<0.03>>
 
 =head2 none
 
-  none(CodeRef $code) (Match)
+  none(Any | CodeRef $code) (Match)
 
 The none method registers a special condition that returns a result only when
 no other conditions have been matched.
@@ -475,12 +475,13 @@ I<Since C<0.03>>
 
 =head2 result
 
-  result() (Any)
+  result(Any $data) (Any)
 
 The result method evaluates the registered conditions and returns the result of
 the action (i.e. the L</then> code) or the special L</none> condition if there
 were no matches. In list context, this method returns both the result and
-whether or not a condition matched.
+whether or not a condition matched. Optionally, when passed an argument this
+method assign the argument as the value/topic and then perform the operation.
 
 I<Since C<0.03>>
 
@@ -547,11 +548,51 @@ I<Since C<0.03>>
 
 =back
 
+=over 4
+
+=item result example 4
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('a');
+
+  $match->just('a')->then('a');
+  $match->just('b')->then('b');
+  $match->just('c')->then('c');
+
+  my $result = $match->result('b');
+
+  # "b"
+
+=back
+
+=over 4
+
+=item result example 5
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('a');
+
+  $match->just('a')->then('a');
+  $match->just('b')->then('b');
+  $match->just('c')->then('c');
+
+  my $result = $match->result('z');
+
+  # undef
+
+=back
+
 =cut
 
 =head2 then
 
-  then(CodeRef $code) (Match)
+  then(Any | CodeRef $code) (Match)
 
 The then method registers an action to be executed if the corresponding match
 condition returns truthy.
@@ -685,6 +726,102 @@ I<Since C<0.03>>
   my $result = $match->result;
 
   # "Venus::String"
+
+=back
+
+=cut
+
+=head2 where
+
+  where() (Match)
+
+The where method registers an action as a sub-match operation, to be executed
+if the corresponding match condition returns truthy. This method returns the
+sub-match object.
+
+I<Since C<1.40>>
+
+=over 4
+
+=item where example 1
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  my $submatch1 = $match->expr(qr/^p([a-z]+)ch/)->where;
+
+  $submatch1->just('peach')->then('peach-123');
+  $submatch1->just('patch')->then('patch-456');
+  $submatch1->just('punch')->then('punch-789');
+
+  my $submatch2 = $match->expr(qr/^m([a-z]+)ch/)->where;
+
+  $submatch2->just('merch')->then('merch-123');
+  $submatch2->just('march')->then('march-456');
+  $submatch2->just('mouch')->then('mouch-789');
+
+  my $result = $match->result('peach');
+
+  # "peach-123"
+
+=back
+
+=over 4
+
+=item where example 2
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  my $submatch1 = $match->expr(qr/^p([a-z]+)ch/)->where;
+
+  $submatch1->just('peach')->then('peach-123');
+  $submatch1->just('patch')->then('patch-456');
+  $submatch1->just('punch')->then('punch-789');
+
+  my $submatch2 = $match->expr(qr/^m([a-z]+)ch/)->where;
+
+  $submatch2->just('merch')->then('merch-123');
+  $submatch2->just('march')->then('march-456');
+  $submatch2->just('mouch')->then('mouch-789');
+
+  my $result = $match->result('march');
+
+  # "march-456"
+
+=back
+
+=over 4
+
+=item where example 3
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  my $submatch1 = $match->expr(qr/^p([a-z]+)ch/)->where;
+
+  $submatch1->just('peach')->then('peach-123');
+  $submatch1->just('patch')->then('patch-456');
+  $submatch1->just('punch')->then('punch-789');
+
+  my $submatch2 = $match->expr(qr/^m([a-z]+)ch/)->where;
+
+  $submatch2->just('merch')->then('merch-123');
+  $submatch2->just('march')->then('march-456');
+  $submatch2->just('mouch')->then('mouch-789');
+
+  my $result = $match->result('pirch');
+
+  # undef
 
 =back
 

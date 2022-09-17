@@ -8,6 +8,8 @@ use warnings;
 use Test::More;
 use Venus::Test;
 
+use Venus 'catch';
+
 my $test = test(__FILE__);
 
 =name
@@ -36,13 +38,38 @@ $test->for('abstract');
 
 =includes
 
+method: any
+method: accept
 method: check
+method: clear
+method: code
 method: coerce
 method: coercion
 method: coercions
+method: conditions
 method: constraint
 method: constraints
+method: defined
+method: enum
+method: format
+method: float
+method: hash
+method: identity
+method: maybe
+method: number
+method: object
+method: package
+method: reference
+method: regexp
+method: routines
+method: scalar
+method: string
+method: tuple
+method: undef
 method: validate
+method: validator
+method: value
+method: within
 
 =cut
 
@@ -56,9 +83,9 @@ $test->for('includes');
 
   my $assert = Venus::Assert->new('Example');
 
-  # $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+  # $assert->format(float => sub {sprintf('%.2f', $_->value)});
 
-  # $assert->constraint(float => sub { $_->value > 1 });
+  # $assert->accept(float => sub {$_->value > 1});
 
   # $assert->check;
 
@@ -105,6 +132,319 @@ name: rw, opt, Str
 =cut
 
 $test->for('attributes');
+
+=method any
+
+The any method configures the object to accept any value and returns the
+invocant.
+
+=signature any
+
+  any() (Assert)
+
+=metadata any
+
+{
+  since => '1.40',
+}
+
+=example-1 any
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->any;
+
+  # $assert->check;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'any', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check(0);
+  ok $result->check(1);
+  ok $result->check({});
+  ok $result->check([]);
+  ok $result->check(bless{});
+
+  $result
+});
+
+=method accept
+
+The accept method registers a constraint based on the built-in type or package
+name provided. Optionally, you can provide a callback to further
+constrain/validate the provided value, returning truthy or falsy. The built-in
+types are I<"array">, I<"boolean">, I<"code">, I<"float">, I<"hash">,
+I<"number">, I<"object">, I<"regexp">, I<"scalar">, I<"string">, or I<"undef">.
+Any name given that is not a built-in type is assumed to be an I<"object"> of
+the name provided.
+
+=signature accept
+
+  accept(Str $name, CodeRef $callback) (Object)
+
+=metadata accept
+
+{
+  since => '1.40',
+}
+
+=example-1 accept
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->accept('float');
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->check;
+
+  # 0
+
+  # $assert->check(1.01);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'accept', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->check, 0;
+  is $result->check(1), 0;
+  is $result->check(1.01), 1;
+
+  $result
+});
+
+=example-2 accept
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->accept('number');
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->check(1.01);
+
+  # 0
+
+  # $assert->check(1_01);
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'accept', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->check, 0;
+  is $result->check(1.01), 0;
+  is $result->check(1_01), 1;
+
+  $result
+});
+
+=example-3 accept
+
+  # given: synopsis
+
+  package Example1;
+
+  sub new {
+    bless {};
+  }
+
+  package Example2;
+
+  sub new {
+    bless {};
+  }
+
+  package main;
+
+  $assert = $assert->accept('object');
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->check;
+
+  # 0
+
+  # $assert->check(qr//);
+
+  # 0
+
+  # $assert->check(Example1->new);
+
+  # 1
+
+  # $assert->check(Example2->new);
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'accept', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->check, 0;
+  is $result->check(qr//), 0;
+  is $result->check(Example1->new), 1;
+  is $result->check(Example2->new), 1;
+
+  $result
+});
+
+=example-4 accept
+
+  # given: synopsis
+
+  package Example1;
+
+  sub new {
+    bless {};
+  }
+
+  package Example2;
+
+  sub new {
+    bless {};
+  }
+
+  package main;
+
+  $assert = $assert->accept('Example1');
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->check;
+
+  # 0
+
+  # $assert->check(qr//);
+
+  # 0
+
+  # $assert->check(Example1->new);
+
+  # 1
+
+  # $assert->check(Example2->new);
+
+  # 0
+
+=cut
+
+$test->for('example', 4, 'accept', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->check, 0;
+  is $result->check(qr//), 0;
+  is $result->check(Example1->new), 1;
+  is $result->check(Example2->new), 0;
+
+  $result
+});
+
+=method array
+
+The array method configures the object to accept array references and returns
+the invocant.
+
+=signature array
+
+  array(CodeRef $check) (Assert)
+
+=metadata array
+
+{
+  since => '1.40',
+}
+
+=example-1 array
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->array;
+
+  # $assert->check([]);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'array', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check([]);
+  ok !$result->check(0);
+  ok !$result->check({});
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method boolean
+
+The boolean method configures the object to accept boolean values and returns
+the invocant.
+
+=signature boolean
+
+  boolean(CodeRef $check) (Assert)
+
+=metadata boolean
+
+{
+  since => '1.40',
+}
+
+=example-1 boolean
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->boolean;
+
+  # $assert->check(false);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'boolean', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(false);
+  ok $result->check(true);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
 
 =method check
 
@@ -203,6 +543,105 @@ $test->for('example', 4, 'check', sub {
   ok !(my $result = $tryable->result);
 
   !$result
+});
+
+=method clear
+
+The clear method resets all match conditions for both constraints and coercions
+and returns the invocant.
+
+=signature clear
+
+  clear() (Assert)
+
+=metadata clear
+
+{
+  since => '1.40',
+}
+
+=example-1 clear
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->clear;
+
+  # bless(..., "Venus::Assert")
+
+=cut
+
+$test->for('example', 1, 'clear', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+
+  my $constraints = $result->constraints;
+  ok $constraints->on_none;
+  ok !$constraints->on_none->();
+  ok $constraints->on_only;
+  ok $constraints->on_only->() == 1;
+  ok $constraints->on_then;
+  ok ref($constraints->on_then) eq 'ARRAY';
+  ok $#{$constraints->on_then} == -1;
+  ok $constraints->on_when;
+  ok ref($constraints->on_when) eq 'ARRAY';
+  ok $#{$constraints->on_when} == -1;
+
+  my $coercions = $result->coercions;
+  ok $coercions->on_none;
+  ok !$coercions->on_none->();
+  ok $coercions->on_only;
+  ok $coercions->on_only->() == 1;
+  ok $coercions->on_then;
+  ok ref($coercions->on_then) eq 'ARRAY';
+  ok $#{$coercions->on_then} == -1;
+  ok $coercions->on_when;
+  ok ref($coercions->on_when) eq 'ARRAY';
+  ok $#{$coercions->on_when} == -1;
+
+  $result
+});
+
+=method code
+
+The code method configures the object to accept code references and returns
+the invocant.
+
+=signature code
+
+  code(CodeRef $check) (Assert)
+
+=metadata code
+
+{
+  since => '1.40',
+}
+
+=example-1 code
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->code;
+
+  # $assert->check(sub{});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'code', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(sub{});
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
 });
 
 =method coerce
@@ -309,7 +748,7 @@ $test->for('example', 4, 'coerce', sub {
 
 =method coercion
 
-The coercion method returns registers a coercion based on the type provided.
+The coercion method registers a coercion based on the type provided.
 
 =signature coercion
 
@@ -327,7 +766,7 @@ The coercion method returns registers a coercion based on the type provided.
 
   package main;
 
-  my $coercion = $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
+  $assert = $assert->coercion(float => sub { sprintf('%.2f', $_->value) });
 
   # bless(..., "Venus::Assert")
 
@@ -375,9 +814,88 @@ $test->for('example', 1, 'coercions', sub {
   $result
 });
 
+=method conditions
+
+The conditions method is an object construction hook that allows subclasses to
+configure the object on construction setting up constraints and coercions and
+returning the invocant.
+
+=signature conditions
+
+  conditions() (Assert)
+
+=metadata conditions
+
+{
+  since => '1.40',
+}
+
+=example-1 conditions
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->conditions;
+
+=cut
+
+$test->for('example', 1, 'conditions', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+
+  $result
+});
+
+=example-2 conditions
+
+  package Example::Type::PositveNumber;
+
+  use base 'Venus::Assert';
+
+  sub conditions {
+    my ($self) = @_;
+
+    $self->number(sub {
+      $_->value >= 0
+    });
+
+    return $self;
+  }
+
+  package main;
+
+  my $assert = Example::Type::PositveNumber->new;
+
+  # $assert->check(0);
+
+  # true
+
+  # $assert->check(1);
+
+  # true
+
+  # $assert->check(-1);
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'conditions', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example::Type::PositveNumber');
+  ok $result->check(0);
+  ok $result->check(1);
+  ok !$result->check(-1);
+
+  $result
+});
+
 =method constraint
 
-The constraint method returns registers a constraint based on the type provided.
+The constraint method registers a constraint based on the type provided.
 
 =signature constraint
 
@@ -395,7 +913,7 @@ The constraint method returns registers a constraint based on the type provided.
 
   package main;
 
-  my $constraint = $assert->constraint(float => sub { $_->value > 1 });
+  $assert = $assert->constraint(float => sub { $_->value > 1 });
 
   # bless(..., "Venus::Assert")
 
@@ -440,6 +958,905 @@ $test->for('example', 1, 'constraints', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Match');
+
+  $result
+});
+
+=method consumes
+
+The consumes method configures the object to accept objects which consume the
+role provided, and returns the invocant.
+
+=signature consumes
+
+  consumes(Str $name) (Assert)
+
+=metadata consumes
+
+{
+  since => '1.40',
+}
+
+=example-1 consumes
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->consumes('Venus::Role::Doable');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'consumes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(Venus::Assert->new);
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method defined
+
+The defined method configures the object to accept any value that's not
+undefined and returns the invocant.
+
+=signature defined
+
+  defined(CodeRef $check) (Assert)
+
+=metadata defined
+
+{
+  since => '1.40',
+}
+
+=example-1 defined
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->defined;
+
+  # $assert->check(0);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'defined', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(0);
+  ok !$result->check(undef);
+  ok $result->check('');
+  ok $result->check(1);
+  ok $result->check(bless{});
+
+  $result
+});
+
+=method enum
+
+The enum method configures the object to accept any one of the provide options,
+and returns the invocant.
+
+=signature enum
+
+  enum(Any @data) (Assert)
+
+=metadata enum
+
+{
+  since => '1.40',
+}
+
+=example-1 enum
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->enum('s', 'm', 'l', 'xl');
+
+  # $assert->check('s');
+
+  # true
+
+  # $assert->check('xs');
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'enum', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check('s');
+  ok $result->check('m');
+  ok $result->check('l');
+  ok $result->check('xl');
+  ok !$result->check('xs');
+  ok !$result->check('');
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method float
+
+The float method configures the object to accept floating-point values and
+returns the invocant.
+
+=signature float
+
+  float(CodeRef $check) (Assert)
+
+=metadata float
+
+{
+  since => '1.40',
+}
+
+=example-1 float
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->float;
+
+  # $assert->check(1.23);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'float', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(1.23);
+  ok $result->check(rand);
+  ok !$result->check(1);
+  ok !$result->check('0');
+  ok !$result->check('1');
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method format
+
+The format method registers a coercion based on the built-in type or package
+name and callback provided. The built-in types are I<"array">, I<"boolean">,
+I<"code">, I<"float">, I<"hash">, I<"number">, I<"object">, I<"regexp">,
+I<"scalar">, I<"string">, or I<"undef">.  Any name given that is not a built-in
+type is assumed to be an I<"object"> of the name provided.
+
+=signature format
+
+  format(Str $name, CodeRef $callback) (Object)
+
+=metadata format
+
+{
+  since => '1.40',
+}
+
+=example-1 format
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->format('float', sub{int $_->value});
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->coerce;
+
+  # undef
+
+  # $assert->coerce(1.01);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->coerce, undef;
+  is $result->coerce(1.01), 1;
+
+  $result
+});
+
+=example-2 format
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->format('number', sub{ sprintf('%.2f', $_->value) });
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->coerce(1.01);
+
+  # 1.01
+
+  # $assert->coerce(1_01);
+
+  # 101.00
+
+=cut
+
+$test->for('example', 2, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->coerce(1.01), 1.01;
+  is $result->coerce(1_01), '101.00';
+
+  $result
+});
+
+=example-3 format
+
+  # given: synopsis
+
+  package Example1;
+
+  sub new {
+    bless {};
+  }
+
+  package Example2;
+
+  sub new {
+    bless {};
+  }
+
+  package main;
+
+  $assert = $assert->format('object', sub{ ref $_->value });
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->coerce(qr//);
+
+  # qr//
+
+  # $assert->coerce(Example1->new);
+
+  # "Example1"
+
+  # $assert->coerce(Example2->new);
+
+  # "Example2"
+
+=cut
+
+$test->for('example', 3, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->coerce(qr//), qr//;
+  is $result->coerce(Example1->new), "Example1";
+  is $result->coerce(Example2->new), "Example2";
+
+  $result
+});
+
+=example-4 format
+
+  # given: synopsis
+
+  package Example1;
+
+  sub new {
+    bless {};
+  }
+
+  package Example2;
+
+  sub new {
+    bless {};
+  }
+
+  package main;
+
+  $assert = $assert->format('Example1', sub{ ref $_->value });
+
+  # bless(..., "Venus::Assert")
+
+  # ...
+
+  # $assert->coerce(qr//);
+
+  # qr//
+
+  # $assert->coerce(Example1->new);
+
+  # "Example1"
+
+  # $assert->coerce(Example2->new);
+
+  # bless({}, "Example2")
+
+=cut
+
+$test->for('example', 4, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result->coerce(qr//), qr//;
+  is $result->coerce(Example1->new), "Example1";
+  my $object = Example2->new;
+  is $result->coerce($object), $object;
+
+  $result
+});
+
+=method hash
+
+The hash method configures the object to accept hash references and returns
+the invocant.
+
+=signature hash
+
+  hash(CodeRef $check) (Assert)
+
+=metadata hash
+
+{
+  since => '1.40',
+}
+
+=example-1 hash
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hash;
+
+  # $assert->check({});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'hash', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check({});
+  ok !$result->check(0);
+  ok !$result->check([]);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method identity
+
+The identity method configures the object to accept objects of the type
+specified as the argument, and returns the invocant.
+
+=signature identity
+
+  identity(Str $name) (Assert)
+
+=metadata identity
+
+{
+  since => '1.40',
+}
+
+=example-1 identity
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->identity('Venus::Assert');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'identity', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(Venus::Assert->new);
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method maybe
+
+The maybe method configures the object to accept the type provided as an
+argument, or undef, and returns the invocant.
+
+=signature maybe
+
+  maybe(Str $type, Any @args) (Assert)
+
+=metadata maybe
+
+{
+  since => '1.40',
+}
+
+=example-1 maybe
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->maybe('code');
+
+  # $assert->check(sub{});
+
+  # true
+
+  # $assert->check(undef);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'maybe', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(undef);
+  ok $result->check(sub{});
+  ok !$result->check('');
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method number
+
+The number method configures the object to accept numberic values and returns
+the invocant.
+
+=signature number
+
+  number(CodeRef $check) (Assert)
+
+=metadata number
+
+{
+  since => '1.40',
+}
+
+=example-1 number
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->number;
+
+  # $assert->check(0);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'number', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(0);
+  ok $result->check(1);
+  ok !$result->check('0');
+  ok !$result->check('1');
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method object
+
+The object method configures the object to accept objects and returns the
+invocant.
+
+=signature object
+
+  object(CodeRef $check) (Assert)
+
+=metadata object
+
+{
+  since => '1.40',
+}
+
+=example-1 object
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->object;
+
+  # $assert->check(bless{});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'object', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(bless{});
+  ok !$result->check(1);
+  ok !$result->check('main');
+  ok !$result->check({});
+  ok !$result->check([]);
+
+  $result
+});
+
+=method package
+
+The package method configures the object to accept package names (which are
+loaded) and returns the invocant.
+
+=signature package
+
+  package() (Assert)
+
+=metadata package
+
+{
+  since => '1.40',
+}
+
+=example-1 package
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->package;
+
+  # $assert->check(false);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'package', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check('Venus');
+  ok $result->check('Venus::Assert');
+  ok !$result->check('Example');
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method reference
+
+The reference method configures the object to accept references and returns the
+invocant.
+
+=signature reference
+
+  reference(CodeRef $check) (Assert)
+
+=metadata reference
+
+{
+  since => '1.40',
+}
+
+=example-1 reference
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->reference;
+
+  # $assert->check(sub{});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'reference', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(sub{});
+  ok $result->check({});
+  ok $result->check([]);
+  ok !$result->check(1);
+  ok !$result->check('main');
+  ok !$result->check(true);
+  ok $result->check(bless{});
+
+  $result
+});
+
+=method regexp
+
+The regexp method configures the object to accept regular expression objects
+and returns the invocant.
+
+=signature regexp
+
+  regexp(CodeRef $check) (Assert)
+
+=metadata regexp
+
+{
+  since => '1.40',
+}
+
+=example-1 regexp
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->regexp;
+
+  # $assert->check(qr//);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'regexp', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(qr//);
+  ok !$result->check('');
+  ok !$result->check([]);
+  ok !$result->check(1);
+  ok !$result->check('main');
+  ok !$result->check(true);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method routines
+
+The routines method configures the object to accept an object having all of the
+routines provided, and returns the invocant.
+
+=signature routines
+
+  routines(Str @names) (Assert)
+
+=metadata routines
+
+{
+  since => '1.40',
+}
+
+=example-1 routines
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->routines('new', 'print', 'say');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'routines', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(Venus::Assert->new);
+  ok !$result->check(bless{});
+  ok !$result->check(1);
+  ok !$result->check('main');
+  ok !$result->check({});
+  ok !$result->check([]);
+
+  $result
+});
+
+=method scalar
+
+The scalar method configures the object to accept scalar references and returns
+the invocant.
+
+=signature scalar
+
+  scalar(CodeRef $check) (Assert)
+
+=metadata scalar
+
+{
+  since => '1.40',
+}
+
+=example-1 scalar
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->scalar;
+
+  # $assert->check(\1);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'scalar', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(\1);
+  ok !$result->check(0);
+  ok !$result->check({});
+  ok !$result->check([]);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method string
+
+The string method configures the object to accept string values and returns the
+invocant.
+
+=signature string
+
+  string(CodeRef $check) (Assert)
+
+=metadata string
+
+{
+  since => '1.40',
+}
+
+=example-1 string
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->string;
+
+  # $assert->check('');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check('');
+  ok $result->check('hello');
+  ok $result->check('hello world');
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(qr//);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method tuple
+
+The tuple method configures the object to accept array references which conform
+to a tuple specification, and returns the invocant.
+
+=signature tuple
+
+  tuple(Str | ArrayRef[Str] @types) (Assert)
+
+=metadata tuple
+
+{
+  since => '1.40',
+}
+
+=example-1 tuple
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->tuple('number', ['maybe', 'array'], 'code');
+
+  # $assert->check([200, [], sub{}]);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'tuple', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check([200, [], sub{}]);
+  ok !$result->check([200, []]);
+  ok $result->check([200, undef, sub{}]);
+  ok !$result->check(['200', [], sub{}]);
+  ok !$result->check([200, {}, sub{}]);
+  ok !$result->check([200, [], bless{}]);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(qr//);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method undef
+
+The undef method configures the object to accept undefined values and returns
+the invocant.
+
+=signature undef
+
+  undef(CodeRef $check) (Assert)
+
+=metadata undef
+
+{
+  since => '1.40',
+}
+
+=example-1 undef
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->undef;
+
+  # $assert->check(undef);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'undef', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(undef);
+  ok !$result->check(true);
+  ok !$result->check(false);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
 
   $result
 });
@@ -552,6 +1969,200 @@ $test->for('example', 4, 'validate', sub {
   ok $result->isa('Venus::Error');
   ok $result->is('on.validate');
   ok $result->stash('identity') eq 'number';
+
+  $result
+});
+
+=method validator
+
+The validator method returns a coderef that can be used as a value validator,
+which returns the data provided if the data provided passes the registered
+constraints, or throws an exception.
+
+=signature validator
+
+  validator() (CodeRef)
+
+=metadata validator
+
+{
+  since => '1.40',
+}
+
+=example-1 validator
+
+  # given: synopsis
+
+  package main;
+
+  $assert->constraint(float => sub { $_->value > 1 });
+
+  my $result = $assert->validator;
+
+  # sub {...}
+
+=cut
+
+$test->for('example', 1, 'validator', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref $result eq 'CODE';
+  ok $result->(1.23);
+  my ($return, $error) = catch {$result->()};
+  ok $return->isa('Venus::Error');
+  ok $return->is('on.validate');
+  ok $return->stash('identity') eq 'undef';
+
+  $result
+});
+
+=method value
+
+The value method configures the object to accept defined, non-reference,
+values, and returns the invocant.
+
+=signature value
+
+  value(CodeRef $check) (Assert)
+
+=metadata value
+
+{
+  since => '1.40',
+}
+
+=example-1 value
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->value;
+
+  # $assert->check(1_000_000);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'value', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(1_000_000);
+  ok !$result->check({});
+  ok !$result->check([]);
+  ok $result->check(1);
+  ok $result->check('main');
+  ok $result->check(true);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method within
+
+The within method configures the object, registering a constraint action as a
+sub-match operation, to accept array or hash based values, and returns the
+invocant.
+
+=signature within
+
+  within(Str $type) (Assert)
+
+=metadata within
+
+{
+  since => '1.40',
+}
+
+=example-1 within
+
+  # given: synopsis
+
+  package main;
+
+  my $within = $assert->within('array')->code;
+
+  my $action = $assert;
+
+  # $assert->check([]);
+
+  # true
+
+  # $assert->check([sub{}]);
+
+  # true
+
+  # $assert->check([{}]);
+
+  # false
+
+  # $assert->check(bless[]);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'within', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check([]);
+  ok $result->check([sub{}]);
+  ok !$result->check([{}]);
+  ok !$result->check([sub{}, 1]);
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+  ok $result->check(bless[]);
+  ok $result->check(bless[sub{}]);
+  ok !$result->check(bless[{}]);
+
+  $result
+});
+
+=example-2 within
+
+  # given: synopsis
+
+  package main;
+
+  my $within = $assert->within('hash')->code;
+
+  my $action = $assert;
+
+  # $assert->check({});
+
+  # true
+
+  # $assert->check({test => sub{}});
+
+  # true
+
+  # $assert->check({test => {}});
+
+  # false
+
+  # $assert->check({test => bless{}});
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'within', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check({});
+  ok $result->check({test => sub{}});
+  ok !$result->check({test => {}});
+  ok !$result->check({test => sub{}, name => 1});
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless[]);
+  ok $result->check(bless{});
+  ok $result->check(bless{test => sub{}});
+  ok !$result->check(bless{test => sub{}, name => 1});
 
   $result
 });

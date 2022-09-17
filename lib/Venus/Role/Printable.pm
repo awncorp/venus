@@ -36,6 +36,8 @@ sub print_pretty {
 sub print_string {
   my ($self, $method, @args) = @_;
 
+  local $_ = $self;
+
   return $self->printer($method ? scalar($self->$method(@args)) : $self);
 }
 
@@ -59,6 +61,8 @@ sub say_pretty {
 
 sub say_string {
   my ($self, $method, @args) = @_;
+
+  local $_ = $self;
 
   return $self->printer(($method ? scalar($self->$method(@args)) : $self), "\n");
 }

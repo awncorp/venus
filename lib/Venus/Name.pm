@@ -81,6 +81,8 @@ sub file {
 sub format {
   my ($self, $method, $format) = @_;
 
+  local $_ = $self;
+
   my $string = $self->$method;
 
   return sprintf($format || '%s', $string);

@@ -7,7 +7,7 @@ use warnings;
 
 use Venus::Role 'with';
 
-# MODIFIERS
+# BUILDERS
 
 sub BUILD {
   my ($self, $data) = @_;

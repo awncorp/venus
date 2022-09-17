@@ -77,6 +77,7 @@ method: reverse
 method: rotate
 method: rsort
 method: shift
+method: shuffle
 method: slice
 method: sort
 method: tv
@@ -3856,6 +3857,40 @@ $test->for('example', 1, 'shift', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method shuffle
+
+The shuffle method returns an array with the items in a randomized order.
+
+=signature shuffle
+
+  shuffle() (ArrayRef)
+
+=metadata shuffle
+
+{
+  since => '1.40',
+}
+
+=example-1 shuffle
+
+  # given: synopsis
+
+  package main;
+
+  my $shuffle = $array->shuffle;
+
+  # [4, 5, 8, 7, 2, 9, 6, 3, 1]
+
+=cut
+
+$test->for('example', 1, 'shuffle', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  isnt "@$result", "1 2 3 4 5 6 7 8 9";
 
   $result
 });

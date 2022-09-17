@@ -7,7 +7,7 @@ use warnings;
 
 use Venus::Role 'with';
 
-# MODIFIERS
+# BUILDERS
 
 sub BUILD {
   my ($self, $data) = @_;
@@ -26,8 +26,7 @@ sub BUILD {
 sub coerce {
   my ($self) = @_;
 
-  # deprecate coerce
-  return {};
+  return {}; # deprecate coerce soon!
 }
 
 sub coercers {

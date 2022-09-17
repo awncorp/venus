@@ -14,6 +14,8 @@ sub match {
 
   require Venus::Match;
 
+  local $_ = $self;
+
   my $match = Venus::Match->new($method ? scalar($self->$method(@args)) : $self);
 
   return $match;

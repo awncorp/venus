@@ -45,6 +45,7 @@ method: only
 method: result
 method: then
 method: when
+method: where
 
 =cut
 
@@ -477,7 +478,7 @@ no other conditions have been matched.
 
 =signature none
 
-  none(CodeRef $code) (Match)
+  none(Any | CodeRef $code) (Match)
 
 =metadata none
 
@@ -615,11 +616,12 @@ $test->for('example', 2, 'only', sub {
 The result method evaluates the registered conditions and returns the result of
 the action (i.e. the L</then> code) or the special L</none> condition if there
 were no matches. In list context, this method returns both the result and
-whether or not a condition matched.
+whether or not a condition matched. Optionally, when passed an argument this
+method assign the argument as the value/topic and then perform the operation.
 
 =signature result
 
-  result() (Any)
+  result(Any $data) (Any)
 
 =metadata result
 
@@ -706,6 +708,58 @@ $test->for('example', 3, 'result', sub {
   ok my $result = $tryable->result;
   is_deeply $result, [3, 8, 144];
   $result
+});
+
+=example-4 result
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('a');
+
+  $match->just('a')->then('a');
+  $match->just('b')->then('b');
+  $match->just('c')->then('c');
+
+  my $result = $match->result('b');
+
+  # "b"
+
+=cut
+
+$test->for('example', 4, 'result', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'b';
+
+  $result
+});
+
+=example-5 result
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new('a');
+
+  $match->just('a')->then('a');
+  $match->just('b')->then('b');
+  $match->just('c')->then('c');
+
+  my $result = $match->result('z');
+
+  # undef
+
+=cut
+
+$test->for('example', 5, 'result', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok !defined $result;
+
+  !$result
 });
 
 =method test
@@ -818,7 +872,7 @@ condition returns truthy.
 
 =signature then
 
-  then(CodeRef $code) (Match)
+  then(Any | CodeRef $code) (Match)
 
 =metadata then
 
@@ -988,6 +1042,124 @@ $test->for('example', 3, 'when', sub {
   is $result, 'Venus::String';
 
   $result
+});
+
+=method where
+
+The where method registers an action as a sub-match operation, to be executed
+if the corresponding match condition returns truthy. This method returns the
+sub-match object.
+
+=signature where
+
+  where() (Match)
+
+=metadata where
+
+{
+  since => '1.40',
+}
+
+=example-1 where
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  my $submatch1 = $match->expr(qr/^p([a-z]+)ch/)->where;
+
+  $submatch1->just('peach')->then('peach-123');
+  $submatch1->just('patch')->then('patch-456');
+  $submatch1->just('punch')->then('punch-789');
+
+  my $submatch2 = $match->expr(qr/^m([a-z]+)ch/)->where;
+
+  $submatch2->just('merch')->then('merch-123');
+  $submatch2->just('march')->then('march-456');
+  $submatch2->just('mouch')->then('mouch-789');
+
+  my $result = $match->result('peach');
+
+  # "peach-123"
+
+=cut
+
+$test->for('example', 1, 'where', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'peach-123';
+
+  $result
+});
+
+=example-2 where
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  my $submatch1 = $match->expr(qr/^p([a-z]+)ch/)->where;
+
+  $submatch1->just('peach')->then('peach-123');
+  $submatch1->just('patch')->then('patch-456');
+  $submatch1->just('punch')->then('punch-789');
+
+  my $submatch2 = $match->expr(qr/^m([a-z]+)ch/)->where;
+
+  $submatch2->just('merch')->then('merch-123');
+  $submatch2->just('march')->then('march-456');
+  $submatch2->just('mouch')->then('mouch-789');
+
+  my $result = $match->result('march');
+
+  # "march-456"
+
+=cut
+
+$test->for('example', 2, 'where', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'march-456';
+
+  $result
+});
+
+=example-3 where
+
+  package main;
+
+  use Venus::Match;
+
+  my $match = Venus::Match->new;
+
+  my $submatch1 = $match->expr(qr/^p([a-z]+)ch/)->where;
+
+  $submatch1->just('peach')->then('peach-123');
+  $submatch1->just('patch')->then('patch-456');
+  $submatch1->just('punch')->then('punch-789');
+
+  my $submatch2 = $match->expr(qr/^m([a-z]+)ch/)->where;
+
+  $submatch2->just('merch')->then('merch-123');
+  $submatch2->just('march')->then('march-456');
+  $submatch2->just('mouch')->then('mouch-789');
+
+  my $result = $match->result('pirch');
+
+  # undef
+
+=cut
+
+$test->for('example', 3, 'where', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok !defined $result;
+
+  !$result
 });
 
 # END

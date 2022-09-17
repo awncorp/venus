@@ -76,7 +76,12 @@ sub call {
 
   return $self->$mapper(sub{
     my ($key, $val) = @_;
-    Venus::Type->new($val)->deduce->$method(@args)
+
+    my $type = Venus::Type->new($val)->deduce;
+
+    local $_ = $type;
+
+    $type->$method(@args)
   });
 }
 
@@ -443,6 +448,22 @@ sub shift {
   my $data = $self->get;
 
   return CORE::shift(@$data);
+}
+
+sub shuffle {
+  my ($self) = @_;
+
+  my $data = $self->get;
+  my $result = [@$data];
+
+  for my $index (0..$#$result) {
+    my $other = int(rand(@$result));
+    my $stash = $result->[$index];
+    $result->[$index] = $result->[$other];
+    $result->[$other] = $stash;
+  }
+
+  return $result;
 }
 
 sub slice {

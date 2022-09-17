@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    1.40
+    1.50
 
 SYNOPSIS
 
@@ -54,6 +54,57 @@ DESCRIPTION
 FUNCTIONS
 
     This package provides the following functions:
+
+ cast
+
+      cast(Any $data, Str $type) (Object)
+
+    The cast function returns the argument provided as an object, promoting
+    native Perl data types to data type objects. The optional second
+    argument can be the name of the type for the object to cast to
+    explicitly.
+
+    Since 1.40
+
+    cast example 1
+
+        package main;
+      
+        use Venus 'cast';
+      
+        my $undef = cast;
+      
+        # bless({value => undef}, "Venus::Undef")
+
+    cast example 2
+
+        package main;
+      
+        use Venus 'cast';
+      
+        my @booleans = map cast, true, false;
+      
+        # (bless({value => 1}, "Venus::Boolean"), bless({value => 0}, "Venus::Boolean"))
+
+    cast example 3
+
+        package main;
+      
+        use Venus 'cast';
+      
+        my $example = cast bless({}, "Example");
+      
+        # bless({value => 1}, "Example")
+
+    cast example 4
+
+        package main;
+      
+        use Venus 'cast';
+      
+        my $float = cast 1.23;
+      
+        # bless({value => "1.23"}, "Venus::Float")
 
  catch
 

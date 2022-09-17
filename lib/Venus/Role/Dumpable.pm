@@ -25,6 +25,8 @@ sub dump {
   local $Data::Dumper::Terse = 1;
   local $Data::Dumper::Useqq = 1;
 
+  local $_ = $self;
+
   my $data = Data::Dumper->Dump([
     $method ? scalar($self->$method(@args)) : $self
   ]);
@@ -60,6 +62,8 @@ sub dump_pretty {
   local $Data::Dumper::Sortkeys = 1;
   local $Data::Dumper::Deparse = 1;
   local $Data::Dumper::Sparseseen = 0;
+
+  local $_ = $self;
 
   my $data = Data::Dumper->Dump([
     $method ? scalar($self->$method(@args)) : $self

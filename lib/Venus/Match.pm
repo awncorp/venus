@@ -130,7 +130,9 @@ sub only {
 }
 
 sub result {
-  my ($self) = @_;
+  my ($self, @args) = @_;
+
+  $self->value($args[0]) if @args;
 
   my $result;
   my $matched = 0;
@@ -198,6 +200,16 @@ sub when {
   };
 
   return $self;
+}
+
+sub where {
+  my ($self) = @_;
+
+  my $where = $self->new;
+
+  $self->then(sub{$where->result(@_)});
+
+  return $where;
 }
 
 1;

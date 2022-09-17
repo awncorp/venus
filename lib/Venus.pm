@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.40';
+our $VERSION = '1.50';
 
 # AUTHORITY
 
@@ -23,6 +23,7 @@ sub import {
   no strict 'refs';
 
   my %exports = (
+    cast => 1,
     catch => 1,
     error => 1,
     false => 1,
@@ -41,6 +42,16 @@ sub import {
 }
 
 # FUNCTIONS
+
+sub cast (;$$) {
+  my ($data, $into) = (@_ ? (@_) : ($_));
+
+  require Venus::Type;
+
+  my $type = Venus::Type->new($data);
+
+  return $into ? $type->cast($into) : $type->deduce;
+}
 
 sub catch (&) {
   my ($data) = @_;

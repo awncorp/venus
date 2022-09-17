@@ -14,6 +14,8 @@ sub box {
 
   require Venus::Box;
 
+  local $_ = $self;
+
   my $value = $method ? $self->$method(@args) : $self;
 
   return Venus::Box->new(value => $value);

@@ -87,7 +87,12 @@ sub call {
 
   return $self->$mapper(sub{
     my ($key, $val) = @_;
-    $key, Venus::Type->new($val)->deduce->$method(@args)
+
+    my $type = Venus::Type->new($val)->deduce;
+
+    local $_ = $type;
+
+    $key, $type->$method(@args)
   });
 }
 

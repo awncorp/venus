@@ -42,6 +42,8 @@ sub type {
 
   require Venus::Type;
 
+  local $_ = $self;
+
   my $value = $method
     ? $self->$method(@args) : $self->can('value') ? $self->value : $self;
 

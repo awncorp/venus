@@ -36,6 +36,7 @@ $test->for('abstract');
 
 =includes
 
+function: cast
 function: catch
 function: error
 function: false
@@ -99,6 +100,106 @@ requires Perl C<5.18+>.
 =cut
 
 $test->for('description');
+
+=function cast
+
+The cast function returns the argument provided as an object, promoting native
+Perl data types to data type objects. The optional second argument can be the
+name of the type for the object to cast to explicitly.
+
+=signature cast
+
+  cast(Any $data, Str $type) (Object)
+
+=metadata cast
+
+{
+  since => '1.40',
+}
+
+=example-1 cast
+
+  package main;
+
+  use Venus 'cast';
+
+  my $undef = cast;
+
+  # bless({value => undef}, "Venus::Undef")
+
+=cut
+
+$test->for('example', 1, 'cast', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok $result->isa('Venus::Undef');
+
+  !$result
+});
+
+=example-2 cast
+
+  package main;
+
+  use Venus 'cast';
+
+  my @booleans = map cast, true, false;
+
+  # (bless({value => 1}, "Venus::Boolean"), bless({value => 0}, "Venus::Boolean"))
+
+=cut
+
+$test->for('example', 2, 'cast', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0]->isa('Venus::Boolean');
+  is $result[0]->get, 1;
+  ok $result[1]->isa('Venus::Boolean');
+  is $result[1]->get, 0;
+
+  @result
+});
+
+=example-3 cast
+
+  package main;
+
+  use Venus 'cast';
+
+  my $example = cast bless({}, "Example");
+
+  # bless({value => 1}, "Example")
+
+=cut
+
+$test->for('example', 3, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+
+  $result
+});
+
+=example-4 cast
+
+  package main;
+
+  use Venus 'cast';
+
+  my $float = cast 1.23;
+
+  # bless({value => "1.23"}, "Venus::Float")
+
+=cut
+
+$test->for('example', 4, 'cast', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Float');
+  is $result->get, 1.23;
+
+  $result
+});
 
 =function catch
 
