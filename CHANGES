@@ -1,3 +1,8 @@
+1.55 2022-11-21
+
+- [feature] Implement Venus::Prototype
+- [feature] Support Venus::Role::Pluggable#construct
+
 1.50 2022-09-17
 
 - [feature] Implement Venus::Assert#accept

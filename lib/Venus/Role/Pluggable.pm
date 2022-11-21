@@ -31,7 +31,16 @@ sub build_proxy {
   return undef if !$space->tryload;
 
   return sub {
-    return $space->build->execute($self, @args);
+    if ($space->package->can('construct')) {
+      my $class = $space->load;
+
+      return $class->construct($self, @args)->execute;
+    }
+    else {
+      my $class = $space->load;
+
+      return $class->new->execute($self, @args);
+    }
   };
 }
 

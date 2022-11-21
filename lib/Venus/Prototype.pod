@@ -1,0 +1,241 @@
+
+=head1 NAME
+
+Venus::Prototype - Prototype Class
+
+=cut
+
+=head1 ABSTRACT
+
+Prototype Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Prototype;
+
+  my $prototype = Venus::Prototype->new;
+
+  # bless({value => {}}, 'Venus::Prototype')
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a simple construct for enabling prototype-base
+programming. Properties can be called as methods when prefixed with a dollar or
+ampersand symbol. See L</call> for more details.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+L<Venus::Role::Proxyable>
+
+L<Venus::Role::Valuable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 apply
+
+  apply(HashRef $data) (Prototype)
+
+The apply method extends the underlying data structure by merging the data
+provided, and then returns the invocant.
+
+I<Since C<1.50>>
+
+=over 4
+
+=item apply example 1
+
+  package main;
+
+  my $person = Venus::Prototype->new({
+    '$name' => '',
+  });
+
+  $person->apply;
+
+  # bless({value => {'$name' => ''}}, 'Venus::Prototype')
+
+=back
+
+=over 4
+
+=item apply example 2
+
+  package main;
+
+  my $person = Venus::Prototype->new({
+    '$name' => '',
+  });
+
+  $person->apply({
+    '$name' => 'anonymous',
+  });
+
+  # bless({value => {'$name' => 'anonymous'}}, 'Venus::Prototype')
+
+=back
+
+=over 4
+
+=item apply example 3
+
+  package main;
+
+  my $person = Venus::Prototype->new({
+    '$name' => '',
+    '&greet' => sub {'hello'},
+  });
+
+  $person->apply({
+    '$name' => 'anonymous',
+  });
+
+  # bless({value => {...}}, 'Venus::Prototype')
+
+=back
+
+=cut
+
+=head2 call
+
+  call(Str $method, Any @args) (Any)
+
+The call method dispatches method calls based on the method name provided and
+the state of the object, and returns the results. If the method name provided
+matches an object property of the same name with an ampersand prefix, denoting
+a method, then the dispatched method call acts as a method call providing the
+invocant as the first argument. If the method name provided matches an object
+property of the same name with a dollar sign prefix, denoting an attribute,
+then the dispatched method call acts as an attribute accessor call.
+
+I<Since C<1.50>>
+
+=over 4
+
+=item call example 1
+
+  package main;
+
+  my $person = Venus::Prototype->new({
+    '$name' => 'anonymous',
+  });
+
+  my $name = $person->call('name');
+
+  # "anonymous"
+
+=back
+
+=over 4
+
+=item call example 2
+
+  package main;
+
+  my $person = Venus::Prototype->new({
+    '$name' => 'anonymous',
+  });
+
+  my $name = $person->call('name', 'unidentified');
+
+  # "unidentified"
+
+=back
+
+=cut
+
+=head2 extend
+
+  extend(HashRef $data) (Prototype)
+
+The extend method copies the underlying data structure, merging the data
+provided if any, and then returns a new prototype object.
+
+I<Since C<1.50>>
+
+=over 4
+
+=item extend example 1
+
+  package main;
+
+  my $mrrobot = Venus::Prototype->new({
+    '$name' => 'Edward Alderson',
+    '$group' => 'fsociety',
+  });
+
+  my $elliot = $mrrobot->extend({
+    '$name' => 'Elliot Alderson',
+  });
+
+  # bless({value => {...}}, 'Venus::Prototype')
+
+=back
+
+=over 4
+
+=item extend example 2
+
+  package main;
+
+  my $mrrobot = Venus::Prototype->new({
+    '$name' => 'Edward Alderson',
+    '$group' => 'fsociety',
+    '$login' => { username => 'admin', password => 'secret', },
+  });
+
+  my $elliot = $mrrobot->extend({
+    '$name' => 'Elliot Alderson',
+    '$login' => { password => '$ecr3+', },
+  });
+
+  # bless({value => {...}}, 'Venus::Prototype')
+
+=back
+
+=over 4
+
+=item extend example 3
+
+  package main;
+
+  my $ability = {
+    '&access' => sub {time},
+  };
+
+  my $person = Venus::Prototype->new;
+
+  my $mrrobot = $person->extend($ability);
+
+  my $elliot = $mrrobot->extend($ability);
+
+  # bless({value => {...}}, 'Venus::Prototype')
+
+=back
+
+=cut

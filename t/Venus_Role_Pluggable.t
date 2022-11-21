@@ -36,7 +36,7 @@ $test->for('abstract');
 
 =synopsis
 
-  package Example::Plugin::Password;
+  package Example::Plugin::Username;
 
   use Venus::Class;
 
@@ -45,7 +45,27 @@ $test->for('abstract');
   sub execute {
     my ($self, $example) = @_;
 
-    return Digest::SHA::sha1_hex($example->secret);
+    return Digest::SHA::sha1_hex($example->login);
+  }
+
+  package Example::Plugin::Password;
+
+  use Venus::Class;
+
+  use Digest::SHA ();
+
+  attr 'value';
+
+  sub construct {
+    my ($class, $example) = @_;
+
+    return $class->new(value => $example->secret);
+  }
+
+  sub execute {
+    my ($self) = @_;
+
+    return Digest::SHA::sha1_hex($self->value);
   }
 
   package Example;
@@ -55,12 +75,14 @@ $test->for('abstract');
   with 'Venus::Role::Proxyable';
   with 'Venus::Role::Pluggable';
 
+  attr 'login';
   attr 'secret';
 
   package main;
 
-  my $example = Example->new(secret => rand);
+  my $example = Example->new(login => 'admin', secret => 'p@ssw0rd');
 
+  # $example->username;
   # $example->password;
 
 =cut
@@ -70,6 +92,8 @@ $test->for('synopsis', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Example');
   ok $result->does('Venus::Role::Pluggable');
+  is $result->username, 'd033e22ae348aeb5660fc2140aec35850c4da997';
+  is $result->password, '57b2ad99044d337197c0c39fd3823568ff81e48a';
 
   $result
 });

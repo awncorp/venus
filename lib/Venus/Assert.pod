@@ -257,6 +257,60 @@ I<Since C<1.40>>
 
 =cut
 
+=head2 array
+
+  array(CodeRef $check) (Assert)
+
+The array method configures the object to accept array references and returns
+the invocant.
+
+I<Since C<1.40>>
+
+=over 4
+
+=item array example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->array;
+
+  # $assert->check([]);
+
+  # true
+
+=back
+
+=cut
+
+=head2 boolean
+
+  boolean(CodeRef $check) (Assert)
+
+The boolean method configures the object to accept boolean values and returns
+the invocant.
+
+I<Since C<1.40>>
+
+=over 4
+
+=item boolean example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->boolean;
+
+  # $assert->check(false);
+
+  # true
+
+=back
+
+=cut
+
 =head2 check
 
   check(Any $data) (Bool)
@@ -1001,7 +1055,7 @@ I<Since C<1.40>>
 
   $assert = $assert->package;
 
-  # $assert->check(false);
+  # $assert->check('Venus');
 
   # true
 

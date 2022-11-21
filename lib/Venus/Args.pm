@@ -47,9 +47,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('array', true);
+  $assert->clear->array;
 
   return $assert;
 }

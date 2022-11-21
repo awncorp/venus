@@ -9,6 +9,8 @@ use Venus::Class 'base';
 
 base 'Venus::Name';
 
+state $SERIAL = 0;
+
 # BUILDERS
 
 sub build_self {
@@ -46,11 +48,13 @@ sub append {
 }
 
 sub array {
-  my ($self, $name) = @_;
+  my ($self, $name, @data) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  @{"${class}::${name}"} = @data if @data;
 
   return [@{"${class}::${name}"}];
 }
@@ -280,11 +284,13 @@ sub explain {
 }
 
 sub hash {
-  my ($self, $name) = @_;
+  my ($self, $name, @data) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  %{"${class}::${name}"} = (@data) if @data;
 
   return {%{"${class}::${name}"}};
 }
@@ -405,6 +411,18 @@ sub meta {
   return Venus::Meta->new(name => $self->package);
 }
 
+sub mock {
+  my ($self) = @_;
+
+  my $name = sprintf '%s::Mock::%04d::%s', $self->class, ++$SERIAL, $self->package;
+
+  my $space = $self->class->new($name);
+
+  $space->do('init')->array('ISA', $self->package) if !$space->loaded;
+
+  return $space;
+}
+
 sub name {
   my ($self) = @_;
 
@@ -508,11 +526,13 @@ sub root {
 }
 
 sub routine {
-  my ($self, $name) = @_;
+  my ($self, $name, $code) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  *{"${class}::${name}"} = $code if $code;
 
   return *{"${class}::${name}"}{"CODE"};
 }
@@ -531,11 +551,13 @@ sub routines {
 }
 
 sub scalar {
-  my ($self, $name) = @_;
+  my ($self, $name, @data) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  ${"${class}::${name}"} = $data[0] if @data;
 
   return ${"${class}::${name}"};
 }

@@ -22,9 +22,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('scalar', true);
+  $assert->clear->scalar;
 
   return $assert;
 }

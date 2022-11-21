@@ -28,11 +28,7 @@ sub assertion {
 
   require Venus::Assert;
 
-  my $assert = Venus::Assert->new(ref $self || $self);
-
-  $assert->constraints->when(sub{true})->then(true);
-
-  return $assert;
+  return Venus::Assert->new(ref $self || $self)->any;
 }
 
 sub checksum {

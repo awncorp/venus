@@ -68,6 +68,7 @@ method: load
 method: loaded
 method: locate
 method: meta
+method: mock
 method: name
 method: parent
 method: parse
@@ -297,11 +298,11 @@ $test->for('example', 2, 'append', sub {
 
 =method array
 
-The array method returns the value for the given package array variable name.
+The array method gets or sets the value for the given package array variable name.
 
 =signature array
 
-  array(Str $name) (ArrayRef)
+  array(Str $name, Any @data) (ArrayRef)
 
 =metadata array
 
@@ -329,6 +330,30 @@ $test->for('example', 1, 'array', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ['start'];
+
+  $result
+});
+
+=example-2 array
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our @handler = 'start';
+
+  package main;
+
+  my $array = $space->array('handler', 'restart');
+
+  # ["restart"]
+
+=cut
+
+$test->for('example', 2, 'array', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['restart'];
 
   $result
 });
@@ -1210,11 +1235,11 @@ $test->for('example', 1, 'explain', sub {
 
 =method hash
 
-The hash method returns the value for the given package hash variable name.
+The hash method gets or sets the value for the given package hash variable name.
 
 =signature hash
 
-  hash(Str $name) (HashRef)
+  hash(Str $name, Any @data) (HashRef)
 
 =metadata hash
 
@@ -1244,6 +1269,32 @@ $test->for('example', 1, 'hash', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, { active => 1 };
+
+  $result
+});
+
+=example-2 hash
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our %settings = (
+    active => 1
+  );
+
+  package main;
+
+  my $hash = $space->hash('settings', inactive => 1);
+
+  # { inactive => 1 }
+
+=cut
+
+$test->for('example', 2, 'hash', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, { inactive => 1 };
 
   $result
 });
@@ -1842,6 +1893,45 @@ $test->for('example', 2, 'meta', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Meta');
   ok $result->{name} eq 'Venus::Space';
+
+  $result
+});
+
+=method mock
+
+The mock method returns a L<Venus::Space> object representing an anonymous
+package that derives from the invoking package.
+
+=signature mock
+
+  mock() (Space)
+
+=metadata mock
+
+{
+  since => '1.50',
+}
+
+=example-1 mock
+
+  # given: synopsis
+
+  package main;
+
+  my $mock = $space->mock;
+
+  # bless({'name' => 'Venus::Space::Mock::0001::Foo::Bar'}, 'Venus::Space')
+
+  # $mock->isa('Foo::Bar') # true
+
+=cut
+
+$test->for('example', 1, 'mock', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  ok $result->package->isa('Venus::Space::Mock::0001::Foo::Bar');
+  ok $result->package->isa('Foo::Bar');
 
   $result
 });
@@ -2449,12 +2539,12 @@ $test->for('example', 1, 'root', sub {
 
 =method routine
 
-The routine method returns the subroutine reference for the given subroutine
+The routine method gets or sets the subroutine reference for the given subroutine
 name.
 
 =signature routine
 
-  routine(Str $name) (CodeRef)
+  routine(Str $name, CodeRef $code) (CodeRef)
 
 =metadata routine
 
@@ -2490,6 +2580,39 @@ $test->for('example', 1, 'routine', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result->('begin'), ['begin'];
+
+  $result
+});
+
+=example-2 routine
+
+  package Foo;
+
+  sub cont {
+    [@_]
+  }
+
+  sub abort {
+    [@_]
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $routine = $space->routine('report', sub{[@_]});
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 2, 'routine', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result->('begin'), ['begin'];
+  is_deeply Foo::report('begin'), ['begin'];
 
   $result
 });
@@ -2543,11 +2666,11 @@ $test->for('example', 1, 'routines', sub {
 
 =method scalar
 
-The scalar method returns the value for the given package scalar variable name.
+The scalar method gets or sets the value for the given package scalar variable name.
 
 =signature scalar
 
-  scalar(Str $name) (Any)
+  scalar(Str $name, Any @data) (Any)
 
 =metadata scalar
 
@@ -2575,6 +2698,30 @@ $test->for('example', 1, 'scalar', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result eq "/path/to/file";
+
+  $result
+});
+
+=example-2 scalar
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our $root = '/path/to/file';
+
+  package main;
+
+  my $scalar = $space->scalar('root', '/tmp/path/to/file');
+
+  # "/tmp/path/to/file"
+
+=cut
+
+$test->for('example', 2, 'scalar', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result eq "/tmp/path/to/file";
 
   $result
 });

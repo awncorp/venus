@@ -1,5 +1,10 @@
 # Changelog
 
+## Version: 1.55
+
+- [feature] Implement Venus::Prototype
+- [feature] Support Venus::Role::Pluggable#construct
+
 ## Version: 1.50
 
 - [feature] Implement Venus::Assert#accept

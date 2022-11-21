@@ -21,9 +21,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('code', true);
+  $assert->clear->code;
 
   return $assert;
 }

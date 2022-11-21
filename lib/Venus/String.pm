@@ -37,12 +37,11 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('boolean', true);
-  $assert->constraint('float', true);
-  $assert->constraint('number', true);
-  $assert->constraint('string', true);
+  $assert->clear;
+  $assert->boolean;
+  $assert->float;
+  $assert->number;
+  $assert->string;
 
   return $assert;
 }

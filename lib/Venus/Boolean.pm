@@ -78,9 +78,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('boolean', true);
+  $assert->clear->boolean;
 
   return $assert;
 }

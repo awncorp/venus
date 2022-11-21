@@ -40,6 +40,8 @@ $test->for('abstract');
 
 method: any
 method: accept
+method: array
+method: boolean
 method: check
 method: clear
 method: code
@@ -1543,7 +1545,7 @@ loaded) and returns the invocant.
 
   $assert = $assert->package;
 
-  # $assert->check(false);
+  # $assert->check('Venus');
 
   # true
 

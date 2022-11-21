@@ -67,9 +67,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('hash', true);
+  $assert->clear->hash;
 
   return $assert;
 }

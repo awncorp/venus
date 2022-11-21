@@ -28,9 +28,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('undef', true);
+  $assert->clear->undef;
 
   return $assert;
 }

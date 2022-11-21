@@ -23,9 +23,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('regexp', true);
+  $assert->clear->regexp;
 
   return $assert;
 }

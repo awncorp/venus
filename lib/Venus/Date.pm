@@ -172,9 +172,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->constraints->clear;
-
-  $assert->constraint('number', true);
+  $assert->clear->number;
 
   return $assert;
 }
