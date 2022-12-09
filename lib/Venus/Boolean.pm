@@ -147,6 +147,12 @@ sub FROM_BOOL {
   elsif ($object && $scalar && defined($$value) && !ref($$value) && $$value == 0) {
     return $false;
   }
+  elsif ($object && $value->isa('Venus::True')) {
+    return $value->value;
+  }
+  elsif ($object && $value->isa('Venus::False')) {
+    return $value->value;
+  }
   elsif ($object && $value->isa('Venus::Boolean')) {
     return $value->get;
   }
@@ -160,10 +166,10 @@ sub TO_BOOL {
 
   my $isdual = Scalar::Util::isdual($value);
 
-  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
+  if ($isdual && ("$value" && "$value" == "1" && ($value + 0) == 1)) {
     return $true;
   }
-  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
+  elsif ($isdual && (("$value" eq "") || ("$value" == "0" && ($value + 0) == 0))) {
     return $false;
   }
   else {
@@ -176,10 +182,10 @@ sub TO_BOOL_REF {
 
   my $isdual = Scalar::Util::isdual($value);
 
-  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
+  if ($isdual && ("$value" && "$value" == "1" && ($value + 0) == 1)) {
     return $true_ref;
   }
-  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
+  elsif ($isdual && (("$value" eq "") || ("$value" == "0" && ($value + 0) == 0))) {
     return $false_ref;
   }
   else {
@@ -187,18 +193,34 @@ sub TO_BOOL_REF {
   }
 }
 
-sub TO_BOOL_OBJ {
+sub TO_BOOL_JPO {
   my ($value) = @_;
 
   require JSON::PP;
 
   my $isdual = Scalar::Util::isdual($value);
 
-  if ($isdual && ("$value" == "1" && ($value + 0) == 1)) {
+  if ($isdual && ("$value" && "$value" == "1" && ($value + 0) == 1)) {
     return JSON::PP::true();
   }
-  elsif ($isdual && ("$value" == "0" && ($value + 0) == 0)) {
+  elsif ($isdual && (("$value" eq "") || ("$value" == "0" && ($value + 0) == 0))) {
     return JSON::PP::false();
+  }
+  else {
+    return $value;
+  }
+}
+
+sub TO_BOOL_TFO {
+  my ($value) = @_;
+
+  my $isdual = Scalar::Util::isdual($value);
+
+  if ($isdual && ("$value" && "$value" == "1" && ($value + 0) == 1)) {
+    return Venus::True->new;
+  }
+  elsif ($isdual && (("$value" eq "") || ("$value" == "0" && ($value + 0) == 0))) {
+    return Venus::False->new;
   }
   else {
     return $value;

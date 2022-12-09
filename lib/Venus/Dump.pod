@@ -1,0 +1,129 @@
+
+=head1 NAME
+
+Venus::Dump - Dump Class
+
+=cut
+
+=head1 ABSTRACT
+
+Dump Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Dump;
+
+  my $dump = Venus::Dump->new(
+    value => { name => ['Ready', 'Robot'], version => 0.12, stable => !!1, }
+  );
+
+  # $dump->encode;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides methods for reading and writing dumped (i.e.
+stringified) Perl data.
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 decoder
+
+  decoder(CodeRef)
+
+This attribute is read-write, accepts C<(CodeRef)> values, and is optional.
+
+=cut
+
+=head2 encoder
+
+  encoder(CodeRef)
+
+This attribute is read-write, accepts C<(CodeRef)> values, and is optional.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Accessible>
+
+L<Venus::Role::Buildable>
+
+L<Venus::Role::Explainable>
+
+L<Venus::Role::Valuable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 decode
+
+  decode(Str $text) (Any)
+
+The decode method decodes the Perl string, sets the object value, and returns
+the decoded value.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item decode example 1
+
+  # given: synopsis;
+
+  my $decode = $dump->decode('{codename=>["Ready","Robot"],stable=>!!1}');
+
+  # { codename => ["Ready", "Robot"], stable => 1 }
+
+=back
+
+=cut
+
+=head2 encode
+
+  encode() (Str)
+
+The encode method encodes the objects value as a Perl string and returns the
+encoded string.
+
+I<Since C<0.01>>
+
+=over 4
+
+=item encode example 1
+
+  # given: synopsis;
+
+  my $encode = $dump->encode;
+
+  # '{name => ["Ready","Robot"], stable => !!1, version => "0.12"}'
+
+=back
+
+=cut

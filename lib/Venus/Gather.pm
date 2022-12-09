@@ -1,4 +1,4 @@
-package Venus::Match;
+package Venus::Gather;
 
 use 5.018;
 
@@ -62,7 +62,7 @@ sub expr {
   my ($self, $topic) = @_;
 
   $self->when(sub{
-    my $value = $self->value;
+    my $value = $_[0];
 
     if (!defined $value) {
       return false;
@@ -91,7 +91,7 @@ sub just {
   my ($self, $topic) = @_;
 
   $self->when(sub{
-    my $value = $self->value;
+    my $value = $_[0];
 
     if (!defined $value) {
       return false;
@@ -130,31 +130,52 @@ sub only {
 }
 
 sub result {
-  my ($self, @args) = @_;
+  my ($self, $data) = @_;
 
-  $self->value($args[0]) if @args;
+  $self->value(ref $data eq 'ARRAY' ? $data : [$data]) if $data;
 
-  my $result;
-  my $matched = 0;
   my $value = $self->value;
+  my $result = [];
+  my $matched = 0;
 
   local $_ = $value;
   return wantarray ? ($result, $matched) : $result if !$self->on_only->($value);
 
-  for (my $i = 0; $i < @{$self->on_when}; $i++) {
-    if ($self->on_when->[$i]->($value)) {
-      $result = $self->on_then->[$i]->($value);
-      $matched++;
-      last;
+  for my $item (@$value) {
+    local $_ = $item;
+    for (my $i = 0; $i < @{$self->on_when}; $i++) {
+      if ($self->on_when->[$i]->($item)) {
+        push @$result, $self->on_then->[$i]->($item);
+        $matched++;
+        last;
+      }
     }
   }
 
-  if (!$matched) {
+  if (!@$result) {
     local $_ = $value;
-    $result = $self->on_none->($value);
+    my @return = ($self->on_none->($value));
+    push @$result,
+      ((@return == 1 && ref($return[0]) eq 'ARRAY') ? @{$return[0]} : @return);
   }
 
   return wantarray ? ($result, $matched) : $result;
+}
+
+sub skip {
+  my ($self) = @_;
+
+  $self->then(sub{return ()});
+
+  return $self;
+}
+
+sub take {
+  my ($self) = @_;
+
+  $self->then(sub{return (@_)});
+
+  return $self;
 }
 
 sub test {
@@ -165,13 +186,15 @@ sub test {
   my $value = $self->value;
 
   local $_ = $value;
-
   return $matched if !$self->on_only->($value);
 
-  for (my $i = 0; $i < @{$self->on_when}; $i++) {
-    if ($self->on_when->[$i]->($value)) {
-      $matched++;
-      last;
+  for my $item (@$value) {
+    local $_ = $item;
+    for (my $i = 0; $i < @{$self->on_when}; $i++) {
+      if ($self->on_when->[$i]->($item)) {
+        $matched++;
+        last;
+      }
     }
   }
 
@@ -205,7 +228,7 @@ sub where {
 
   my $where = $self->new;
 
-  $self->then(sub{$where->result(@_)});
+  $self->then(sub{@{scalar($where->result(@_))}});
 
   return $where;
 }

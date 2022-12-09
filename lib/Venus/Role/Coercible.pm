@@ -23,12 +23,6 @@ sub BUILD {
 
 # METHODS
 
-sub coerce {
-  my ($self) = @_;
-
-  return {}; # deprecate coerce soon!
-}
-
 sub coercers {
   my ($self) = @_;
 

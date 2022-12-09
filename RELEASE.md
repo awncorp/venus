@@ -1,8 +1,9 @@
 # Release
 
-## Version: 1.55
+## Version: 1.65
 
-- [feature] Implement Venus::Prototype
-- [feature] Support Venus::Role::Pluggable#construct
+- [feature] Implement Venus::Gather
+- [feature] Implement Venus::Role::Optional
+- [update] Deprecate Venus::Role::Coercible#coerce
 
 

@@ -81,7 +81,8 @@ $test->for('synopsis', sub {
 =description
 
 This package provides an object-oriented interface for complex pattern matching
-operations.
+operations on scalar values. See L<Venus::Gather> for operating on collections
+of data, e.g. array references.
 
 =cut
 
@@ -161,8 +162,8 @@ $test->for('example', 1, 'clear', sub {
 
 =method data
 
-The data method takes a hashref (i.e. lookup table) and match conditions and
-actions based on the keys and values found.
+The data method takes a hashref (i.e. lookup table) and creates match
+conditions and actions based on the keys and values found.
 
 =signature data
 

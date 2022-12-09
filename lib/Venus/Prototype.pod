@@ -17,9 +17,19 @@ Prototype Class for Perl 5
 
   use Venus::Prototype;
 
-  my $prototype = Venus::Prototype->new;
+  my $prototype = Venus::Prototype->new(
+    '$counter' => 0,
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  );
 
-  # bless({value => {}}, 'Venus::Prototype')
+  # bless({value => {...}}, 'Venus::Prototype')
+
+  # $prototype->counter # 0
+  # $prototype->increment # 1
+  # $prototype->counter # 1
+  # $prototype->decrement # 0
+  # $prototype->counter # 0
 
 =cut
 
@@ -93,10 +103,10 @@ I<Since C<1.50>>
   });
 
   $person->apply({
-    '$name' => 'anonymous',
+    '$name' => 'Elliot Alderson',
   });
 
-  # bless({value => {'$name' => 'anonymous'}}, 'Venus::Prototype')
+  # bless({value => {'$name' => 'Elliot Alderson'}}, 'Venus::Prototype')
 
 =back
 
@@ -112,7 +122,7 @@ I<Since C<1.50>>
   });
 
   $person->apply({
-    '$name' => 'anonymous',
+    '$name' => 'Elliot Alderson',
   });
 
   # bless({value => {...}}, 'Venus::Prototype')
@@ -131,7 +141,9 @@ matches an object property of the same name with an ampersand prefix, denoting
 a method, then the dispatched method call acts as a method call providing the
 invocant as the first argument. If the method name provided matches an object
 property of the same name with a dollar sign prefix, denoting an attribute,
-then the dispatched method call acts as an attribute accessor call.
+then the dispatched method call acts as an attribute accessor call. This method
+is also useful for calling virtual methods when those virtual methods conflict
+with the L<Venus::Prototype> methods.
 
 I<Since C<1.50>>
 

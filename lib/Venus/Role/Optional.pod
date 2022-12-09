@@ -1,0 +1,1095 @@
+
+=head1 NAME
+
+Venus::Role::Optional - Optional Role
+
+=cut
+
+=head1 ABSTRACT
+
+Optional Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for automating
+object construction and attribute accessors.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 clear
+
+  clear(Str $name) (Any)
+
+The clear method deletes an attribute and returns the removed value.
+
+I<Since C<1.55>>
+
+=over 4
+
+=item clear example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $fname = $person->clear('fname');
+
+  # "Elliot"
+
+=back
+
+=over 4
+
+=item clear example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $lname = $person->clear('lname');
+
+  # "Alderson"
+
+  my $object = $person;
+
+  # bless({fname => "Elliot"}, "Person")
+
+=back
+
+=over 4
+
+=item clear example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $lname = $person->clear('lname');
+
+  # "Alderson"
+
+=back
+
+=cut
+
+=head2 has
+
+  has(Str $name) (Boolean)
+
+The has method returns truthy if the attribute specified exists, otherwise
+returns falsy.
+
+I<Since C<1.55>>
+
+=over 4
+
+=item has example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $has_fname = $person->has('fname');
+
+  # true
+
+=back
+
+=over 4
+
+=item has example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $has_mname = $person->has('mname');
+
+  # false
+
+=back
+
+=cut
+
+=head2 reset
+
+  reset(Str $name) (Any)
+
+The reset method rebuilds an attribute and returns the deleted value.
+
+I<Since C<1.55>>
+
+=over 4
+
+=item reset example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $fname = $person->reset('fname');
+
+  # "Elliot"
+
+=back
+
+=over 4
+
+=item reset example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $lname = $person->reset('lname');
+
+  # "Alderson"
+
+  my $object = $person;
+
+  # bless({fname => "Elliot"}, "Person")
+
+=back
+
+=over 4
+
+=item reset example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $lname = $person->reset('lname', 'Smith');
+
+  # "Alderson"
+
+  my $object = $person;
+
+  # bless({fname => "Elliot", lname => "Smith"}, "Person")
+
+=back
+
+=cut
+
+=head1 FEATURES
+
+This package provides the following features:
+
+=cut
+
+=over 4
+
+=item asserting
+
+This library provides a mechanism for automatically validating class attributes
+using L<Venus::Assert> based on the return value of the attribute callback. The
+callback should be in the form of C<assert_${name}>, and should return a
+L<Venus::Assert> object or the name of any of its predefined valildations.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub assert_fname {
+    return 'string';
+  }
+
+  sub assert_lname {
+    return 'string';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub assert_fname {
+    return 'string';
+  }
+
+  sub assert_lname {
+    return 'string';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 1234567890,
+  );
+
+  # Exception! (isa Venus::Assert::Error)
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub assert_fname {
+    return 'string';
+  }
+
+  sub assert_lname {
+    return 'string';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 1234567890,
+    lname => 'Alderson',
+  );
+
+  # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=over 4
+
+=item building
+
+This library provides a mechanism for automatically building class attributes
+during getting and setting its value, after any default values are processed,
+based on the return value of the attribute callback. The callback should be in
+the form of C<build_${name}>, and is passed any arguments provided.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub build_fname {
+    my ($self, $value) = @_;
+    return $value ? ucfirst $value : undef;
+  }
+
+  sub build_lname {
+    my ($self, $value) = @_;
+    return $value ? ucfirst $value : undef;
+  }
+
+  sub build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : undef;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'elliot',
+    lname => 'alderson',
+    email => 'E.ALDERSON@E-CORP.com',
+  );
+
+  # bless({fname => 'elliot', lname => 'alderson', ...}, 'Person')
+
+  # $person->fname;
+
+  # "Elliot"
+
+  # $person->lname;
+
+  # "Alderson"
+
+  # $person->email;
+
+  # "e.alderson@e-corp.com"
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub build_fname {
+    my ($self, $value) = @_;
+    return $value ? ucfirst $value : undef;
+  }
+
+  sub build_lname {
+    my ($self, $value) = @_;
+    return $value ? ucfirst $value : undef;
+  }
+
+  sub build_email {
+    my ($self, $value) = @_;
+    return $value ? lc $value : undef;
+  }
+
+  package Person;
+
+  sub build_email {
+    my ($self, $value) = @_;
+    return lc join '@', (join '.', substr($self->fname, 0, 1), $self->lname),
+      'e-corp.com';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # $person->email;
+
+  # "e.alderson@e-corp.com"
+
+=back
+
+=over 4
+
+=item checking
+
+This library provides a mechanism for automatically checking class attributes
+after getting or setting its value. The callback should be in the form of
+C<check_${name}>, and is passed any arguments provided.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub check_fname {
+    my ($self, $value) = @_;
+    if ($value) {
+      return true if lc($value) eq 'elliot';
+    }
+    return false;
+  }
+
+  sub check_lname {
+    my ($self, $value) = @_;
+    if ($value) {
+      return true if lc($value) eq 'alderson';
+    }
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub check_fname {
+    my ($self, $value) = @_;
+    if ($value) {
+      return true if lc($value) eq 'elliot';
+    }
+    return false;
+  }
+
+  sub check_lname {
+    my ($self, $value) = @_;
+    if ($value) {
+      return true if lc($value) eq 'alderson';
+    }
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # $person->lname('Alderson');
+
+  # "Alderson"
+
+  # $person->lname('');
+
+  # Exception! (isa Person::Error)
+
+=back
+
+=over 4
+
+=item coercing
+
+This library provides a mechanism for automatically coercing class attributes
+into class instances using L<Venus::Space> based on the return value of the
+attribute callback. The callback should be in the form of C<coerce_${name}>,
+and should return the name of the package to be constructed. That package will
+be instantiated via the customary C<new> method, passing the data recevied as
+its arguments.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub coerce_fname {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  sub coerce_lname {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  sub coerce_email {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({
+  #   'fname' => bless({'value' => 'Elliot'}, 'Venus::String'),
+  #   'lname' => bless({'value' => 'Alderson'}, 'Venus::String')
+  # }, 'Person')
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+  use Venus::String;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub coerce_fname {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  sub coerce_lname {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  sub coerce_email {
+    my ($self, $value) = @_;
+
+    return 'Venus::String';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    email => 'e.alderson@e-corp.com',
+  );
+
+  # bless({
+  #   'email' => bless({'value' => 'e.alderson@e-corp.com'}, 'Venus::String'),
+  # }, 'Person')
+
+=back
+
+=over 4
+
+=item defaulting
+
+This library provides a mechanism for automatically defaulting class attributes
+to predefined values, statically or dynamically based on the return value of
+the attribute callback. The callback should be in the form of
+C<default_${name}>, and should return the value to be used if no value exists
+or has been provided to the constructor.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub default_lname {
+    my ($self, $value) = @_;
+
+    return 'Alderson';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # $person->lname('Johnston');
+
+  # "Johnston"
+
+  # $person->reset('lname');
+
+  # "Johnston"
+
+  # $person->lname;
+
+  # "Alderson"
+
+=back
+
+=over 4
+
+=item initialing
+
+This library provides a mechanism for automatically setting class attributes to
+predefined values, statically or dynamically based on the return value of the
+attribute callback. The callback should be in the form of C<initial_${name}>,
+and should return the value to be used if no value has been provided to the
+constructor. This behavior is similar to the I<"defaulting"> mechanism but is
+only executed during object construction.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub initial_lname {
+    my ($self, $value) = @_;
+
+    return 'Alderson';
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  # $person->lname('Johnston');
+
+  # "Johnston"
+
+  # $person->reset('lname');
+
+  # "Johnston"
+
+  # $person->lname;
+
+  # undef
+
+=back
+
+=over 4
+
+=item reading
+
+This library provides a mechanism for hooking into the class attribute reader
+(accessor) for reading values via the the attribute reader callback. The
+callback should be in the form of C<read_${name}>, and should read and return
+the value for the attribute specified.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub read_fname {
+    my ($self, $value) = @_;
+
+    return ucfirst $self->{fname};
+  }
+
+  sub read_lname {
+    my ($self, $value) = @_;
+
+    return ucfirst $self->{lname};
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'elliot',
+    lname => 'alderson',
+  );
+
+  # bless({fname => 'elliot', lname => 'alderson'}, 'Person')
+
+  # $person->fname;
+
+  # "Elliot"
+
+  # $person->lname;
+
+  # "Alderson"
+
+=back
+
+=over 4
+
+=item writing
+
+This library provides a mechanism for hooking into the class attribute writer
+(accessor) for writing values via the the attribute writer callback. The
+callback should be in the form of C<write_${name}>, and should set and return
+the value for the attribute specified.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub write_fname {
+    my ($self, $value) = @_;
+
+    return $self->{fname} = ucfirst $value;
+  }
+
+  sub write_lname {
+    my ($self, $value) = @_;
+
+    return $self->{lname} = ucfirst $value;
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({}, 'Person')
+
+  # $person->fname('elliot');
+
+  # "Elliot"
+
+  # $person->lname('alderson');
+
+  # "Alderson"
+
+=back
+
+=over 4
+
+=item triggering
+
+This library provides a mechanism for automatically triggering routines after
+reading or writing class attributes via an attribute callback. The callback
+should be in the form of C<trigger_${name}>, and will be invoked after the
+related attribute is read or written.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub trigger_fname {
+    my ($self, $value) = @_;
+
+    if ($value) {
+      $self->{dirty}{fname} = $value;
+    }
+    return;
+  }
+
+  sub trigger_lname {
+    my ($self, $value) = @_;
+
+    if ($value) {
+      $self->{dirty}{lname} = $value;
+    }
+    return;
+  }
+
+  package main;
+
+  my $person = Person->new;
+
+  # bless({}, 'Person')
+
+  # $person->fname('Elliot');
+
+  # "Elliot"
+
+  # $person->lname('Alderson');
+
+  # "Alderson"
+
+  # my $object = $person;
+
+  # bless({..., dirty => {fname => 'Elliot', lname => 'Alderson'}}, 'Person')
+
+=back
+
+=over 4
+
+=item readonly
+
+This library provides a mechanism for marking class attributes as I<"readonly">
+(or not) based on the return value of the attribute callback. The callback
+should be in the form of C<readonly_${name}>, and should return truthy to
+automatically throw an exception if a change is attempted.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub readonly_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub readonly_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  $person->fname('Mister');
+
+  # Exception! (isa Person::Error)
+
+  # $person->lname('Johnston');
+
+  # Exception! (isa Person::Error)
+
+=back
+
+=over 4
+
+=item readwrite
+
+This library provides a mechanism for marking class attributes as I<"readwrite">
+(or not) based on the return value of the attribute callback. The callback
+should be in the form of C<readwrite_${name}>, and should return falsy to
+automatically throw an exception if a change is attempted.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub readwrite_fname {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  sub readwrite_lname {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  $person->fname('Mister');
+
+  # Exception! (isa Person::Error)
+
+  # $person->lname('Johnston');
+
+  # Exception! (isa Person::Error)
+
+=back
+
+=over 4
+
+=item requiring
+
+This library provides a mechanism for marking class attributes as I<"required">
+(i.e. to be provided to the constructor) based on the return value of the
+attribute callback. The callback should be in the form of C<require_${name}>,
+and should return truthy to automatically throw an exception if the related
+attribute is missing.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub require_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_email {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub require_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_email {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+  );
+
+  # Exception! (isa Person::Error)
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub require_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_email {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    lname => 'Alderson',
+  );
+
+  # Exception! (isa Person::Error)
+
+=back

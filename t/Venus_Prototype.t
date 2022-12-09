@@ -50,9 +50,19 @@ $test->for('includes');
 
   use Venus::Prototype;
 
-  my $prototype = Venus::Prototype->new;
+  my $prototype = Venus::Prototype->new(
+    '$counter' => 0,
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  );
 
-  # bless({value => {}}, 'Venus::Prototype')
+  # bless({value => {...}}, 'Venus::Prototype')
+
+  # $prototype->counter # 0
+  # $prototype->increment # 1
+  # $prototype->counter # 1
+  # $prototype->decrement # 0
+  # $prototype->counter # 0
 
 =cut
 
@@ -60,7 +70,14 @@ $test->for('synopsis', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Prototype');
-  is_deeply $result->value, {};
+  ok exists $result->value->{'$counter'};
+  ok exists $result->value->{'&decrement'};
+  ok exists $result->value->{'&increment'};
+  is $result->counter, 0;
+  is $result->increment, 1;
+  is $result->counter, 1;
+  is $result->decrement, 0;
+  is $result->counter, 0;
 
   $result
 });
@@ -140,10 +157,10 @@ $test->for('example', 1, 'apply', sub {
   });
 
   $person->apply({
-    '$name' => 'anonymous',
+    '$name' => 'Elliot Alderson',
   });
 
-  # bless({value => {'$name' => 'anonymous'}}, 'Venus::Prototype')
+  # bless({value => {'$name' => 'Elliot Alderson'}}, 'Venus::Prototype')
 
 =cut
 
@@ -151,7 +168,7 @@ $test->for('example', 2, 'apply', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Prototype');
-  is $result->name, 'anonymous';
+  is $result->name, 'Elliot Alderson';
 
   $result
 });
@@ -166,7 +183,7 @@ $test->for('example', 2, 'apply', sub {
   });
 
   $person->apply({
-    '$name' => 'anonymous',
+    '$name' => 'Elliot Alderson',
   });
 
   # bless({value => {...}}, 'Venus::Prototype')
@@ -177,7 +194,7 @@ $test->for('example', 3, 'apply', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Prototype');
-  is $result->name, 'anonymous';
+  is $result->name, 'Elliot Alderson';
   is $result->greet, 'hello';
 
   $result
@@ -191,7 +208,9 @@ matches an object property of the same name with an ampersand prefix, denoting
 a method, then the dispatched method call acts as a method call providing the
 invocant as the first argument. If the method name provided matches an object
 property of the same name with a dollar sign prefix, denoting an attribute,
-then the dispatched method call acts as an attribute accessor call.
+then the dispatched method call acts as an attribute accessor call. This method
+is also useful for calling virtual methods when those virtual methods conflict
+with the L<Venus::Prototype> methods.
 
 =signature call
 

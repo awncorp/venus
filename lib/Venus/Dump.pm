@@ -1,4 +1,4 @@
-package Venus::Yaml;
+package Venus::Dump;
 
 use 5.018;
 
@@ -57,7 +57,27 @@ sub build_nil {
 sub build_self {
   my ($self, $data) = @_;
 
-  return $self->config;
+  $self->encoder(sub {
+    my ($data) = @_;
+    require Data::Dumper;
+    no warnings 'once';
+    local $Data::Dumper::Indent = 0;
+    local $Data::Dumper::Purity = 0;
+    local $Data::Dumper::Quotekeys = 0;
+    local $Data::Dumper::Deepcopy = 1;
+    local $Data::Dumper::Deparse = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Useqq = 1;
+    Data::Dumper->Dump([$data]) =~ s/^"|"$//gr;
+  });
+
+  $self->decoder(sub {
+    my ($text) = @_;
+    eval $text;
+  });
+
+  return $self;
 }
 
 # METHODS
@@ -72,69 +92,17 @@ sub assertion {
   return $assert;
 }
 
-sub config {
-  my ($self, $package) = @_;
-
-  $package ||= $self->package or do {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.config');
-    $throw->message('No suitable YAML package');
-    $throw->error;
-  };
-
-  # YAML::XS
-  if ($package eq 'YAML::XS') {
-    $self->decoder(sub {
-      my ($text) = @_;
-      local $YAML::XS::Boolean = 'JSON::PP';
-      YAML::XS::Load($text);
-    });
-    $self->encoder(sub {
-      my ($data) = @_;
-      local $YAML::XS::Boolean = 'JSON::PP';
-      YAML::XS::Dump($data);
-    });
-  }
-
-  # YAML::PP::LibYAML
-  if ($package eq 'YAML::PP::LibYAML') {
-    $self->decoder(sub {
-      my ($text) = @_;
-      YAML::PP->new(boolean => 'JSON::PP')->load_string($text);
-    });
-    $self->encoder(sub {
-      my ($data) = @_;
-      YAML::PP->new(boolean => 'JSON::PP')->dump_string($data);
-    });
-  }
-
-  # YAML::PP
-  if ($package eq 'YAML::PP') {
-    $self->decoder(sub {
-      my ($text) = @_;
-      YAML::PP->new(boolean => 'JSON::PP')->load_string($text);
-    });
-    $self->encoder(sub {
-      my ($data) = @_;
-      YAML::PP->new(boolean => 'JSON::PP')->dump_string($data);
-    });
-  }
-
-  return $self;
-}
-
 sub decode {
   my ($self, $data) = @_;
 
-  # double-traversing the data structure due to lack of serialization hooks
+  # double-traversing the data structure due to lack of boolean support
   return $self->set(FROM_BOOL($self->decoder->($data)));
 }
 
 sub encode {
   my ($self) = @_;
 
-  # double-traversing the data structure due to lack of serialization hooks
+  # double-traversing the data structure due to lack of boolean support
   return $self->encoder->(TO_BOOL($self->get));
 }
 
@@ -142,37 +110,6 @@ sub explain {
   my ($self) = @_;
 
   return $self->encode;
-}
-
-sub package {
-  my ($self) = @_;
-
-  state $engine;
-
-  return $engine if defined $engine;
-
-  my %packages = (
-    'YAML::XS' => '0.67',
-    'YAML::PP::LibYAML' => '0.004',
-    'YAML::PP' => '0.023',
-  );
-  for my $package (
-    grep defined,
-    $ENV{VENUS_YAML_PACKAGE},
-    qw(YAML::XS YAML::PP::LibYAML YAML::PP)
-  )
-  {
-    my $criteria = "require $package; $package->VERSION($packages{$package})";
-    if (do {local $@; eval "$criteria"; $@}) {
-      next;
-    }
-    else {
-      $engine = $package;
-      last;
-    }
-  }
-
-  return $engine;
 }
 
 sub FROM_BOOL {
@@ -222,7 +159,7 @@ sub TO_BOOL {
     return $value;
   }
 
-  return Venus::Boolean::TO_BOOL_JPO($value);
+  return Venus::Boolean::TO_BOOL_TFO($value);
 }
 
 1;
