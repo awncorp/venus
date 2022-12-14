@@ -5,10 +5,6 @@ use 5.018;
 use strict;
 use warnings;
 
-# STATE
-
-state $cache = {};
-
 # METHODS
 
 sub ARGS {
@@ -33,6 +29,8 @@ sub ATTR {
   my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ATTR}})) + 1;
 
   $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$index, [$attr, @args]];
+
+  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
 
   return $self;
 }
@@ -60,16 +58,37 @@ sub BASE {
 
   $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$index, [$base, @args]];
 
+  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+
   return $self;
 }
 
 sub BLESS {
   my ($self, @args) = @_;
 
+  my $name = $self->NAME;
   my $data = $self->DATA($self->ARGS($self->BUILDARGS(@args)));
-  my $anew = bless($data, $self->NAME);
+  my $anew = bless($data, $name);
+
+  no strict 'refs';
 
   $anew->BUILD($data);
+
+  # FYI, every call to "new" calls "BUILD" which dispatches to each "BUILD"
+  # defined in each attached role.
+
+  # If one (or more) roles use reflection (i.e. calls "META") to introspect the
+  # package's configuration, that could cause a performance problem given that
+  # the Venus::Meta class uses recursion to introspect all superclasses and
+  # roles in order to determine and present aggregate lists of package members.
+
+  # The solution to this is to cache the associated Venus::Meta object which
+  # itself caches the results of its recursive lookups. The cache is stored on
+  # the subclass (i.e. on the calling package) the cache wil go away whenever
+  # the package does, e.g. Venus::Space#unload.
+
+  ${"${name}::@{[$self->METAOBJECT]}"} ||= Venus::Meta->new(name => $name)
+    if $name ne 'Venus::Meta';
 
   return $anew;
 }
@@ -147,7 +166,16 @@ sub META {
 
   require Venus::Meta;
 
-  return Venus::Meta->new(name => $self->NAME);
+  my $name = $self->NAME;
+
+  return ${"${name}::@{[$self->METAOBJECT]}"}
+    || Venus::Meta->new(name => $name);
+}
+
+sub METAOBJECT {
+  my ($self) = @_;
+
+  return 'METAOBJECT';
 }
 
 sub MIXIN {
@@ -168,6 +196,8 @@ sub MIXIN {
   my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{MIXIN}})) + 1;
 
   $${"@{[$self->NAME]}::META"}{MIXIN}{$mixin} = [$index, [$mixin, @args]];
+
+  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
 
   return $self;
 }
@@ -196,6 +226,8 @@ sub ROLE {
   my $index = int(keys(%{$${"@{[$self->NAME]}::META"}{ROLE}})) + 1;
 
   $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$index, [$role, @args]];
+
+  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
 
   return $self;
 }

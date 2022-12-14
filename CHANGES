@@ -1,3 +1,8 @@
+1.66 2022-12-14
+
+- [feature] Cache Venus::Meta for better performance
+- [update] Update Venus::Role::Optional
+
 1.65 2022-12-09
 
 - [feature] Implement Venus::Gather

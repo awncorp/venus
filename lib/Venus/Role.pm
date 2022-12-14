@@ -73,6 +73,8 @@ sub import {
 
   ${"${from}::META"} = {};
 
+  ${"${from}::@{[$from->METAOBJECT]}"} = undef;
+
   return $self;
 }
 

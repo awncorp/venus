@@ -1,9 +1,8 @@
 # Release
 
-## Version: 1.65
+## Version: 1.66
 
-- [feature] Implement Venus::Gather
-- [feature] Implement Venus::Role::Optional
-- [update] Deprecate Venus::Role::Coercible#coerce
+- [feature] Cache Venus::Meta for better performance
+- [update] Update Venus::Role::Optional
 
 

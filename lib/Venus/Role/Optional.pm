@@ -55,7 +55,7 @@ sub BUILD {
     option_require($self, $name, @data);
 
     # option: coerce
-    option_coerce($self, $name, @data) if exists $data->{$name};
+    @data = option_coerce($self, $name, @data) if exists $data->{$name};
 
     # option: check
     option_check($self, $name, @data);
@@ -63,7 +63,11 @@ sub BUILD {
     # option: assert
     option_assert($self, $name, @data);
   }
+
+  return $self;
 }
+
+# EXTENSIONS
 
 sub ITEM {
   my ($self, $name, @data) = @_;
@@ -135,19 +139,20 @@ sub option_assert {
   if (my $code = $self->can("assert_${name}")) {
     require Scalar::Util;
     require Venus::Assert;
-    my $label = join '#', ref $self, "assert_${name}";
+    my $label = join '.', ref $self, $name;
     my $assert = Venus::Assert->new($label);
-    my $return = $code->($self, $data[0], $assert);
+    my $value = @data ? $data[0] : $self->{$name};
+    my $return = $code->($self, $value, $assert);
     if (Scalar::Util::blessed($return)) {
       if ($return->isa('Venus::Assert')) {
-        $return->validate($data[0]);
+        $return->validate($value);
       }
       else {
         require Venus::Throw;
         my $throw = Venus::Throw->new(join('::', map ucfirst, ref($self), 'error'));
         $throw->name('on.assert');
         $throw->message("Invalid return value: \"assert_$name\" in $self");
-        $throw->stash(data => [@data]);
+        $throw->stash(data => $value);
         $throw->stash(name => $name);
         $throw->stash(self => $self);
         $throw->error;
@@ -155,14 +160,14 @@ sub option_assert {
     }
     elsif (length($return)) {
       $assert->name($label);
-      $assert->accept($return)->validate($data[0]);
+      $assert->accept($return)->validate($value);
     }
     else {
       require Venus::Throw;
       my $throw = Venus::Throw->new(join('::', map ucfirst, ref($self), 'error'));
       $throw->name('on.assert');
       $throw->message("Invalid return value: \"assert_$name\" in $self");
-      $throw->stash(data => $data[0]);
+      $throw->stash(data => $value);
       $throw->stash(name => $name);
       $throw->stash(self => $self);
       $throw->error;
@@ -202,12 +207,15 @@ sub option_check {
 sub option_coerce {
   my ($self, $name, @data) = @_;
 
-  if (my $code = $self->can("coerce_${name}")) {
+  if ((my $code = $self->can("coerce_${name}")) && (@data || exists $self->{$name})) {
     require Scalar::Util;
     require Venus::Space;
     my $value = @data ? $data[0] : $self->{$name};
     my $return = $code->($self, @data);
-    return $self->{$name} = Venus::Space->new($return)->load->new($value)
+    my $package = Venus::Space->new($return)->load;
+    my $method = $package->can('DOES')
+      && $package->DOES('Venus::Role::Assertable') ? 'make' : 'new';
+    return $self->{$name} = $package->$method($value)
       if !Scalar::Util::blessed($value)
       || (Scalar::Util::blessed($value) && !$value->isa($return));
   }

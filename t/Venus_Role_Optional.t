@@ -412,7 +412,7 @@ $test->for('example', 2, 'asserting', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->is('on.validate');
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /Person#assert_lname/i;
+  ok $error->message =~ /Person\.lname/i;
 
   $result
 });
@@ -456,7 +456,7 @@ $test->for('example', 3, 'asserting', sub {
   ok my $result = $tryable->error(\$error)->result;
   ok $error->is('on.validate');
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /Person#assert_fname/i;
+  ok $error->message =~ /Person\.fname/i;
 
   $result
 });

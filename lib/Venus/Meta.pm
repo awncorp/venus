@@ -109,7 +109,6 @@ sub data {
   return ${"${name}::META"};
 }
 
-
 sub find {
   my ($self, $type, $name) = @_;
 
