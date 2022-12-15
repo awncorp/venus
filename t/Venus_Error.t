@@ -70,7 +70,11 @@ $test->for('synopsis', sub {
 
 =description
 
-This package represents a context-aware error (exception object).
+This package represents a context-aware error (exception object). The default
+for error verbosity can be controlled via the C<VENUS_ERROR_VERBOSE>
+environment variable, e.g. a setting of C<0> disables stack traces. The default
+trace-offset can be controlled via the C<VENUS_ERROR_TRACE_OFFSET> environment
+variable, e.g. a setting of C<0> indicates no offset.
 
 =cut
 

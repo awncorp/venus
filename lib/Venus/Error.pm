@@ -44,8 +44,8 @@ sub build_self {
   $self->name($data->{name}) if $self->name;
   $self->context('(None)') if !$self->context;
   $self->message('Exception!') if !$self->message;
-  $self->verbose(1) if !exists $data->{verbose};
-  $self->trace(2) if !@{$self->frames};
+  $self->verbose($ENV{VENUS_ERROR_VERBOSE} // 1) if !exists $data->{verbose};
+  $self->trace($ENV{VENUS_ERROR_TRACE_OFFSET} // 2) if !@{$self->frames};
 
   return $self;
 }

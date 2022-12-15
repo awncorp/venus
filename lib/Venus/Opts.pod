@@ -75,6 +75,14 @@ This attribute is read-write, accepts C<(ArrayRef)> values, is optional, and def
 
 =cut
 
+=head2 unused
+
+  unused(ArrayRef)
+
+This attribute is read-write, accepts C<(ArrayRef)> values, is optional, and defaults to C<[]>.
+
+=cut
+
 =head1 INHERITS
 
 This package inherits behaviors from:

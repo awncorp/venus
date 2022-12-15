@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Venus",
   "PREREQ_PM" => {},
-  "VERSION" => "1.66",
+  "VERSION" => "1.67",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -112,6 +112,7 @@ named: rw, opt, HashRef, C<{}>
 parsed: rw, opt, HashRef, C<{}>
 specs: rw, opt, ArrayRef, C<[]>
 warns: rw, opt, ArrayRef, C<[]>
+unused: rw, opt, ArrayRef, C<[]>
 
 =cut
 

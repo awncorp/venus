@@ -1,8 +1,8 @@
 # Release
 
-## Version: 1.66
+## Version: 1.67
 
-- [feature] Cache Venus::Meta for better performance
-- [update] Update Venus::Role::Optional
+- [feature] Allow envvars to control tracing in Venus::Error
+- [feature] Add unused arguments to Venus::Opt
 
 

@@ -20,6 +20,7 @@ attr 'named';
 attr 'parsed';
 attr 'specs';
 attr 'warns';
+attr 'unused';
 
 # BUILDERS
 
@@ -38,6 +39,7 @@ sub build_self {
   $self->parsed({}) if !$self->parsed;
   $self->specs([]) if !$self->specs;
   $self->warns([]) if !$self->warns;
+  $self->unused([]) if !$self->unused;
 
   return $self->parse;
 }
@@ -109,6 +111,7 @@ sub parse {
   $extras = [] if !$extras;
 
   require Getopt::Long;
+  require Text::ParseWords;
 
   my $warns = [];
   local $SIG{__WARN__} = sub {
@@ -120,8 +123,13 @@ sub parse {
   Getopt::Long::Configure(Getopt::Long::Configure(@configs, @$extras));
 
   # parse args using spec
-  Getopt::Long::GetOptionsFromArray([@$value], $parsed, @$specs);
+  my ($returned, $unused) = Getopt::Long::GetOptionsFromString(
+    join(' ', Text::ParseWords::shellwords(map quotemeta, @$value)),
+    $parsed,
+    @$specs
+  );
 
+  $self->unused($unused);
   $self->parsed($parsed);
   $self->warns($warns);
 

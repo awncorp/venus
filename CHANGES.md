@@ -1,5 +1,10 @@
 # Changelog
 
+## Version: 1.67
+
+- [feature] Allow envvars to control tracing in Venus::Error
+- [feature] Add unused arguments to Venus::Opt
+
 ## Version: 1.66
 
 - [feature] Cache Venus::Meta for better performance
