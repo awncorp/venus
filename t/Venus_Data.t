@@ -41,6 +41,7 @@ method: data
 method: docs
 method: find
 method: search
+method: string
 method: text
 
 =cut
@@ -504,6 +505,111 @@ $test->for('example', 4, 'search', sub {
   is_deeply $result, [
     { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
   ];
+
+  $result
+});
+
+=method string
+
+The string method is a wrapper around L</find> as shorthand for searching by
+C<list> and C<name>, returning only the strings found.
+
+=signature string
+
+  string(Maybe[Str] $list, Maybe[Str] $name) (Str)
+
+=metadata string
+
+{
+  since => '1.67',
+}
+
+=example-1 string
+
+  # given: synopsis;
+
+  my $string = $data->docs->string(undef, 'name');
+
+  # "Example #1\nExample #2"
+
+=cut
+
+$test->for('example', 1, 'string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Example #1\nExample #2";
+
+  $result
+});
+
+=example-2 string
+
+  # given: synopsis;
+
+  my $string = $data->docs->string('head1', 'NAME');
+
+  # "Example #1\nExample #2"
+
+=cut
+
+$test->for('example', 2, 'string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Example #1\nExample #2";
+
+  $result
+});
+
+=example-3 string
+
+  # given: synopsis;
+
+  my $string = $data->text->string(undef, 'name');
+
+  # "Example Name"
+
+=cut
+
+$test->for('example', 3, 'string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Example Name";
+
+  $result
+});
+
+=example-4 string
+
+  # given: synopsis;
+
+  my $string = $data->text->string('titles', '#1');
+
+  # "Example Title #1"
+
+=cut
+
+$test->for('example', 4, 'string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "Example Title #1";
+
+  $result
+});
+
+=example-5 string
+
+  # given: synopsis;
+
+  my @string = $data->docs->string('head1', 'NAME');
+
+  # ("Example #1", "Example #2")
+
+=cut
+
+$test->for('example', 5, 'string', sub {
+  my ($tryable) = @_;
+  ok my $result = [$tryable->result];
+  is_deeply $result, ["Example #1", "Example #2"];
 
   $result
 });

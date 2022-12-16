@@ -1,3 +1,7 @@
+1.68 2022-12-16
+
+- [feature] Implement Venus::Data#string
+
 1.67 2022-12-15
 
 - [feature] Allow envvars to control tracing in Venus::Error

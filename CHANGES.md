@@ -1,5 +1,9 @@
 # Changelog
 
+## Version: 1.68
+
+- [feature] Implement Venus::Data#string
+
 ## Version: 1.67
 
 - [feature] Allow envvars to control tracing in Venus::Error

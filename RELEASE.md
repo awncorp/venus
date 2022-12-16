@@ -1,8 +1,7 @@
 # Release
 
-## Version: 1.67
+## Version: 1.68
 
-- [feature] Allow envvars to control tracing in Venus::Error
-- [feature] Add unused arguments to Venus::Opt
+- [feature] Implement Venus::Data#string
 
 

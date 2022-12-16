@@ -155,6 +155,18 @@ sub search {
   return wantarray ? (@result) : \@result;
 }
 
+sub string {
+  my ($self, $list, $name) = @_;
+
+  my @result;
+
+  for my $item ($self->find($list, $name)) {
+    push @result, join "\n\n", @{$item->{data}};
+  }
+
+  return wantarray ? (@result) : join "\n", @result;
+}
+
 sub text {
   my ($self) = @_;
 
