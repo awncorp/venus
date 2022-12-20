@@ -1,0 +1,643 @@
+
+=head1 NAME
+
+Venus::Cli - Cli Class
+
+=cut
+
+=head1 ABSTRACT
+
+Cli Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Cli;
+
+  @ARGV = ('example', '--help');
+
+  my $cli = Venus::Cli->new;
+
+  # $cli->program;
+
+  # "/path/to/executable"
+
+  # $cli->arg(0);
+
+  # "example"
+
+  # $cli->opt('help');
+
+  # 1
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a superclass and methods for providing simple yet robust
+command-line interfaces.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Optional>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 arg
+
+  arg(Str $pos) (Str)
+
+The arg method returns the element specified by the index in the unnamed
+arguments list, i.e. arguments not parsed as options.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item arg example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $arg = $cli->arg;
+
+  # undef
+
+=back
+
+=over 4
+
+=item arg example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $arg = $cli->arg(0);
+
+  # "example"
+
+=back
+
+=cut
+
+=head2 execute
+
+  execute() (Any)
+
+The execute method is the default entrypoint of the program and runs the
+application.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item execute example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  @ARGV = ();
+
+  my $cli = Venus::Cli->new;
+
+  # e.g.
+
+  # sub execute {
+  #   my ($self) = @_;
+  #
+  #   return $self->opt('help') ? $self->okay : $self->fail;
+  # }
+
+  # my $result = $cli->execute;
+
+  # ...
+
+=back
+
+=over 4
+
+=item execute example 2
+
+  package main;
+
+  use Venus::Cli;
+
+  @ARGV = ('--help');
+
+  my $cli = Venus::Cli->new;
+
+  # e.g.
+
+  # sub execute {
+  #   my ($self) = @_;
+  #
+  #   return $self->opt('help') ? $self->okay : $self->fail;
+  # }
+
+  # my $result = $cli->execute;
+
+  # ...
+
+=back
+
+=cut
+
+=head2 exit
+
+  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+
+The exit method exits the program using the exit code provided. The exit code
+defaults to C<0>. Optionally, you can dispatch before exiting by providing a
+method name or coderef, and arguments.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item exit example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $cli->exit;
+
+  # ()
+
+=back
+
+=over 4
+
+=item exit example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $cli->exit(0);
+
+  # ()
+
+=back
+
+=over 4
+
+=item exit example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $cli->exit(1);
+
+  # ()
+
+=back
+
+=over 4
+
+=item exit example 4
+
+  # given: synopsis
+
+  package main;
+
+  # my $exit = $cli->exit(1, 'log_info', 'Something failed!');
+
+  # ()
+
+=back
+
+=cut
+
+=head2 fail
+
+  fail(Str|CodeRef $code, Any @args) (Any)
+
+The fail method exits the program with the exit code C<1>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item fail example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $fail = $cli->fail;
+
+  # ()
+
+=back
+
+=over 4
+
+=item fail example 2
+
+  # given: synopsis
+
+  package main;
+
+  # my $fail = $cli->fail('log_info', 'Something failed!');
+
+  # ()
+
+=back
+
+=cut
+
+=head2 help
+
+  help(Str @data) (Str)
+
+The help method returns the POD found in the file specified by the L</podfile>
+method, defaulting to the C<=head1 OPTIONS> section.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item help example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $help = $cli->help;
+
+  # ""
+
+=back
+
+=over 4
+
+=item help example 2
+
+  # given: synopsis
+
+  package main;
+
+  # my $help = $cli->help('head1', 'NAME');
+
+  #  "Example"
+
+=back
+
+=cut
+
+=head2 init
+
+  init() (ArrayRef)
+
+The init method returns the raw arguments provided, defaulting to C<@ARGV>,
+used by L</args> and L</opts>.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item init example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $init = $cli->init;
+
+  # ["example", "--help"]
+
+=back
+
+=cut
+
+=head2 log_debug
+
+  log_debug(Str @data) (Log)
+
+The log_debug method logs C<debug> information.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item log_debug example 1
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_debug(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=back
+
+=cut
+
+=head2 log_error
+
+  log_error(Str @data) (Log)
+
+The log_error method logs C<error> information.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item log_error example 1
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_error(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=back
+
+=cut
+
+=head2 log_fatal
+
+  log_fatal(Str @data) (Log)
+
+The log_fatal method logs C<fatal> information.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item log_fatal example 1
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_fatal(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=back
+
+=cut
+
+=head2 log_info
+
+  log_info(Str @data) (Log)
+
+The log_info method logs C<info> information.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item log_info example 1
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_info(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=back
+
+=cut
+
+=head2 log_trace
+
+  log_trace(Str @data) (Log)
+
+The log_trace method logs C<trace> information.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item log_trace example 1
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_trace(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=back
+
+=cut
+
+=head2 log_warn
+
+  log_warn(Str @data) (Log)
+
+The log_warn method logs C<warn> information.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item log_warn example 1
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_warn(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=back
+
+=cut
+
+=head2 okay
+
+  okay(Str|CodeRef $code, Any @args) (Any)
+
+The okay method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item okay example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $okay = $cli->okay;
+
+  # ()
+
+=back
+
+=over 4
+
+=item okay example 2
+
+  # given: synopsis
+
+  package main;
+
+  # my $okay = $cli->okay('log_info', 'Something worked!');
+
+  # ()
+
+=back
+
+=cut
+
+=head2 opt
+
+  opt(Str $name) (Str)
+
+The opt method returns the named option specified by the L</options> method.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item opt example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $opt = $cli->opt;
+
+  # undef
+
+=back
+
+=over 4
+
+=item opt example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $opt = $cli->opt('help');
+
+  # 1
+
+=back
+
+=cut
+
+=head2 options
+
+  options() (ArrayRef)
+
+The options method returns the list of L<Getopt::Long> definitions.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item options example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $options = $cli->options;
+
+  # ['help|h']
+
+=back
+
+=cut
+
+=head2 podfile
+
+  podfile() (Str)
+
+The podfile method returns the full path to the file where the CLI POD is.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item podfile example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $podfile = $cli->podfile;
+
+  # "lib/Venus/Cli.pm"
+
+=back
+
+=cut
+
+=head2 program
+
+  program() (Str)
+
+The program method returns the full path to the CLI executable.
+
+I<Since C<1.68>>
+
+=over 4
+
+=item program example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $program = $cli->program;
+
+  # "lib/Venus/Cli.pm"
+
+=back
+
+=cut

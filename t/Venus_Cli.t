@@ -1,0 +1,991 @@
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+use Test::More;
+use Venus::Test;
+
+my $test = test(__FILE__);
+
+local @ARGV = ();
+
+our $CLI_EXIT_CODE;
+
+{
+  no strict 'refs'; no warnings 'redefine';
+
+  require Venus::Cli; *{"Venus::Cli::_exit"} = sub {$CLI_EXIT_CODE = $_[0]};
+}
+
+=name
+
+Venus::Cli
+
+=cut
+
+$test->for('name');
+
+=tagline
+
+Cli Class
+
+=cut
+
+$test->for('tagline');
+
+=abstract
+
+Cli Class for Perl 5
+
+=cut
+
+$test->for('abstract');
+
+=includes
+
+method: arg
+method: execute
+method: exit
+method: fail
+method: help
+method: init
+method: log_debug
+method: log_error
+method: log_fatal
+method: log_info
+method: log_trace
+method: log_warn
+method: okay
+method: opt
+method: options
+method: podfile
+method: program
+
+=cut
+
+$test->for('includes');
+
+=synopsis
+
+  package main;
+
+  use Venus::Cli;
+
+  @ARGV = ('example', '--help');
+
+  my $cli = Venus::Cli->new;
+
+  # $cli->program;
+
+  # "/path/to/executable"
+
+  # $cli->arg(0);
+
+  # "example"
+
+  # $cli->opt('help');
+
+  # 1
+
+=cut
+
+$test->for('synopsis', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  is_deeply $result->init, ['example', '--help'];
+
+  $result
+});
+
+=description
+
+This package provides a superclass and methods for providing simple yet robust
+command-line interfaces.
+
+=cut
+
+$test->for('description');
+
+=inherits
+
+Venus::Kind::Utility
+
+=cut
+
+$test->for('inherits');
+
+=integrates
+
+Venus::Role::Optional
+
+=cut
+
+$test->for('integrates');
+
+=method arg
+
+The arg method returns the element specified by the index in the unnamed
+arguments list, i.e. arguments not parsed as options.
+
+=signature arg
+
+  arg(Str $pos) (Str)
+
+=metadata arg
+
+{
+  since => '1.68',
+}
+
+=example-1 arg
+
+  # given: synopsis
+
+  package main;
+
+  my $arg = $cli->arg;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'arg', sub {
+  my ($tryable) = @_;
+  ok !defined(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-2 arg
+
+  # given: synopsis
+
+  package main;
+
+  my $arg = $cli->arg(0);
+
+  # "example"
+
+=cut
+
+$test->for('example', 2, 'arg', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, "example";
+
+  $result
+});
+
+=method execute
+
+The execute method is the default entrypoint of the program and runs the
+application.
+
+=signature execute
+
+  execute() (Any)
+
+=metadata execute
+
+{
+  since => '1.68',
+}
+
+=example-1 execute
+
+  package main;
+
+  use Venus::Cli;
+
+  @ARGV = ();
+
+  my $cli = Venus::Cli->new;
+
+  # e.g.
+
+  # sub execute {
+  #   my ($self) = @_;
+  #
+  #   return $self->opt('help') ? $self->okay : $self->fail;
+  # }
+
+  # my $result = $cli->execute;
+
+  # ...
+
+=cut
+
+$test->for('example', 1, 'execute', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  $result->execute;
+  is $CLI_EXIT_CODE, 1;
+
+  $result
+});
+
+=example-2 execute
+
+  package main;
+
+  use Venus::Cli;
+
+  @ARGV = ('--help');
+
+  my $cli = Venus::Cli->new;
+
+  # e.g.
+
+  # sub execute {
+  #   my ($self) = @_;
+  #
+  #   return $self->opt('help') ? $self->okay : $self->fail;
+  # }
+
+  # my $result = $cli->execute;
+
+  # ...
+
+=cut
+
+$test->for('example', 2, 'execute', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  $result->execute;
+  is $CLI_EXIT_CODE, 0;
+
+  $result
+});
+
+=method exit
+
+The exit method exits the program using the exit code provided. The exit code
+defaults to C<0>. Optionally, you can dispatch before exiting by providing a
+method name or coderef, and arguments.
+
+=signature exit
+
+  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+
+=metadata exit
+
+{
+  since => '1.68',
+}
+
+=example-1 exit
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $cli->exit;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'exit', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $CLI_EXIT_CODE, 0;
+
+  !$result
+});
+
+=example-2 exit
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $cli->exit(0);
+
+  # ()
+
+=cut
+
+$test->for('example', 2, 'exit', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $CLI_EXIT_CODE, 0;
+
+  !$result
+});
+
+=example-3 exit
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $cli->exit(1);
+
+  # ()
+
+=cut
+
+$test->for('example', 3, 'exit', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $CLI_EXIT_CODE, 1;
+
+  $result
+});
+
+=example-4 exit
+
+  # given: synopsis
+
+  package main;
+
+  # my $exit = $cli->exit(1, 'log_info', 'Something failed!');
+
+  # ()
+
+=cut
+
+$test->for('example', 4, 'exit', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  $result->exit(1, 'log_info', 'Something failed!');
+  is_deeply $logs, [['Something failed!']];
+
+  $result
+});
+
+=method fail
+
+The fail method exits the program with the exit code C<1>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+=signature fail
+
+  fail(Str|CodeRef $code, Any @args) (Any)
+
+=metadata fail
+
+{
+  since => '1.68',
+}
+
+=example-1 fail
+
+  # given: synopsis
+
+  package main;
+
+  my $fail = $cli->fail;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'fail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $CLI_EXIT_CODE, 1;
+
+  $result
+});
+
+=example-2 fail
+
+  # given: synopsis
+
+  package main;
+
+  # my $fail = $cli->fail('log_info', 'Something failed!');
+
+  # ()
+
+=cut
+
+$test->for('example', 2, 'fail', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  $result->fail('log_info', 'Something failed!');
+  is_deeply $logs, [['Something failed!']];
+  is $CLI_EXIT_CODE, 1;
+
+  $result
+});
+
+=method help
+
+The help method returns the POD found in the file specified by the L</podfile>
+method, defaulting to the C<=head1 OPTIONS> section.
+
+=signature help
+
+  help(Str @data) (Str)
+
+=metadata help
+
+{
+  since => '1.68',
+}
+
+=example-1 help
+
+  # given: synopsis
+
+  package main;
+
+  my $help = $cli->help;
+
+  # ""
+
+=cut
+
+$test->for('example', 1, 'help', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-2 help
+
+  # given: synopsis
+
+  package main;
+
+  # my $help = $cli->help('head1', 'NAME');
+
+  #  "Example"
+
+=cut
+
+$test->for('example', 2, 'help', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  $result->data->set('t/data/sections');
+  ok my $help = $result->help('head1', 'NAME');
+  is $help, "Example #1\nExample #2";
+
+  $result
+});
+
+=method init
+
+The init method returns the raw arguments provided, defaulting to C<@ARGV>,
+used by L</args> and L</opts>.
+
+=signature init
+
+  init() (ArrayRef)
+
+=metadata init
+
+{
+  since => '1.68',
+}
+
+=example-1 init
+
+  # given: synopsis
+
+  package main;
+
+  my $init = $cli->init;
+
+  # ["example", "--help"]
+
+=cut
+
+$test->for('example', 1, 'init', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['example', '--help'];
+
+  $result
+});
+
+=method log_debug
+
+The log_debug method logs C<debug> information.
+
+=signature log_debug
+
+  log_debug(Str @data) (Log)
+
+=metadata log_debug
+
+{
+  since => '1.68',
+}
+
+=example-1 log_debug
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_debug(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=cut
+
+$test->for('example', 1, 'log_debug', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  ok $result->log_debug(1, 'Something failed!');
+  is_deeply $logs, [['1 Something failed!']];
+
+  $result
+});
+
+=method log_error
+
+The log_error method logs C<error> information.
+
+=signature log_error
+
+  log_error(Str @data) (Log)
+
+=metadata log_error
+
+{
+  since => '1.68',
+}
+
+=example-1 log_error
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_error(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=cut
+
+$test->for('example', 1, 'log_error', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  ok $result->log_error(1, 'Something failed!');
+  is_deeply $logs, [['1 Something failed!']];
+
+  $result
+});
+
+=method log_fatal
+
+The log_fatal method logs C<fatal> information.
+
+=signature log_fatal
+
+  log_fatal(Str @data) (Log)
+
+=metadata log_fatal
+
+{
+  since => '1.68',
+}
+
+=example-1 log_fatal
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_fatal(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=cut
+
+$test->for('example', 1, 'log_fatal', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  ok $result->log_fatal(1, 'Something failed!');
+  is_deeply $logs, [['1 Something failed!']];
+
+  $result
+});
+
+=method log_info
+
+The log_info method logs C<info> information.
+
+=signature log_info
+
+  log_info(Str @data) (Log)
+
+=metadata log_info
+
+{
+  since => '1.68',
+}
+
+=example-1 log_info
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_info(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=cut
+
+$test->for('example', 1, 'log_info', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  ok $result->log_info(1, 'Something failed!');
+  is_deeply $logs, [['1 Something failed!']];
+
+  $result
+});
+
+=method log_trace
+
+The log_trace method logs C<trace> information.
+
+=signature log_trace
+
+  log_trace(Str @data) (Log)
+
+=metadata log_trace
+
+{
+  since => '1.68',
+}
+
+=example-1 log_trace
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_trace(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=cut
+
+$test->for('example', 1, 'log_trace', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  ok $result->log_trace(1, 'Something failed!');
+  is_deeply $logs, [['1 Something failed!']];
+
+  $result
+});
+
+=method log_warn
+
+The log_warn method logs C<warn> information.
+
+=signature log_warn
+
+  log_warn(Str @data) (Log)
+
+=metadata log_warn
+
+{
+  since => '1.68',
+}
+
+=example-1 log_warn
+
+  # given: synopsis
+
+  package main;
+
+  # $cli->logs->level('trace');
+
+  # my $log = $cli->log_warn(time, 'Something failed!');
+
+  # "0000000000 Something failed!"
+
+=cut
+
+$test->for('example', 1, 'log_warn', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Cli');
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  ok $result->log_warn(1, 'Something failed!');
+  is_deeply $logs, [['1 Something failed!']];
+
+  $result
+});
+
+=method okay
+
+The okay method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+=signature okay
+
+  okay(Str|CodeRef $code, Any @args) (Any)
+
+=metadata okay
+
+{
+  since => '1.68',
+}
+
+=example-1 okay
+
+  # given: synopsis
+
+  package main;
+
+  my $okay = $cli->okay;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'okay', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $CLI_EXIT_CODE, 0;
+
+  !$result
+});
+
+=example-2 okay
+
+  # given: synopsis
+
+  package main;
+
+  # my $okay = $cli->okay('log_info', 'Something worked!');
+
+  # ()
+
+=cut
+
+$test->for('example', 2, 'okay', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->logs->level('trace');
+  my $logs = [];
+  $result->logs->handler(sub{push @$logs, [@_]});
+  ok !@$logs;
+  $result->okay('log_info', 'Something worked!');
+  is_deeply $logs, [['Something worked!']];
+  is $CLI_EXIT_CODE, 0;
+
+  $result
+});
+
+=method opt
+
+The opt method returns the named option specified by the L</options> method.
+
+=signature opt
+
+  opt(Str $name) (Str)
+
+=metadata opt
+
+{
+  since => '1.68',
+}
+
+=example-1 opt
+
+  # given: synopsis
+
+  package main;
+
+  my $opt = $cli->opt;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'opt', sub {
+  my ($tryable) = @_;
+  ok !defined(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-2 opt
+
+  # given: synopsis
+
+  package main;
+
+  my $opt = $cli->opt('help');
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'opt', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=method options
+
+The options method returns the list of L<Getopt::Long> definitions.
+
+=signature options
+
+  options() (ArrayRef)
+
+=metadata options
+
+{
+  since => '1.68',
+}
+
+=example-1 options
+
+  # given: synopsis
+
+  package main;
+
+  my $options = $cli->options;
+
+  # ['help|h']
+
+=cut
+
+$test->for('example', 1, 'options', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['help|h'];
+
+  $result
+});
+
+=method podfile
+
+The podfile method returns the full path to the file where the CLI POD is.
+
+=signature podfile
+
+  podfile() (Str)
+
+=metadata podfile
+
+{
+  since => '1.68',
+}
+
+=example-1 podfile
+
+  # given: synopsis
+
+  package main;
+
+  my $podfile = $cli->podfile;
+
+  # "lib/Venus/Cli.pm"
+
+=cut
+
+$test->for('example', 1, 'podfile', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  like $result, qr/Venus\/Cli\.pm/;
+
+  $result
+});
+
+=method program
+
+The program method returns the full path to the CLI executable.
+
+=signature program
+
+  program() (Str)
+
+=metadata program
+
+{
+  since => '1.68',
+}
+
+=example-1 program
+
+  # given: synopsis
+
+  package main;
+
+  my $program = $cli->program;
+
+  # "lib/Venus/Cli.pm"
+
+=cut
+
+$test->for('example', 1, 'program', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  like $result, qr/Venus\/Cli\.pm/;
+
+  $result
+});
+
+# END
+
+$test->render('lib/Venus/Cli.pod') if $ENV{RENDER};
+
+ok 1 and done_testing;

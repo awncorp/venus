@@ -1,7 +1,8 @@
 # Release
 
-## Version: 1.68
+## Version: 1.70
 
-- [feature] Implement Venus::Data#string
+- [feature] Implement Venus::Log
+- [feature] Implement Venus::Cli
 
 
