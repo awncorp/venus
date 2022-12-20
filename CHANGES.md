@@ -1,6 +1,6 @@
 # Changelog
 
-## Version: 1.70
+## Version: 1.71
 
 - [feature] Implement Venus::Log
 - [feature] Implement Venus::Cli
