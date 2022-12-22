@@ -41,10 +41,12 @@ $test->for('abstract');
 method: any
 method: accept
 method: array
+method: arrayref
 method: boolean
 method: check
 method: clear
 method: code
+method: coderef
 method: coerce
 method: coercion
 method: coercions
@@ -53,9 +55,11 @@ method: constraint
 method: constraints
 method: defined
 method: enum
+method: expression
 method: format
 method: float
 method: hash
+method: hashref
 method: identity
 method: maybe
 method: number
@@ -65,6 +69,7 @@ method: reference
 method: regexp
 method: routines
 method: scalar
+method: scalarref
 method: string
 method: tuple
 method: undef
@@ -97,6 +102,7 @@ $test->for('synopsis', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Assert');
+  is $result->message, 'Type assertion (%s) failed: received (%s), expected (%s)';
 
   $result
 });
@@ -128,6 +134,7 @@ $test->for('integrates');
 
 =attributes
 
+expects: rw, opt, ArrayRef
 message: rw, opt, Str
 name: rw, opt, Str
 
@@ -407,6 +414,46 @@ $test->for('example', 1, 'array', sub {
   $result
 });
 
+=method arrayref
+
+The arrayref method configures the object to accept array references and
+returns the invocant.
+
+=signature arrayref
+
+  arrayref(CodeRef $check) (Assert)
+
+=metadata arrayref
+
+{
+  since => '1.71',
+}
+
+=example-1 arrayref
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->arrayref;
+
+  # $assert->check([]);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check([]);
+  ok !$result->check(0);
+  ok !$result->check({});
+  ok !$result->check(bless{});
+
+  $result
+});
+
 =method boolean
 
 The boolean method configures the object to accept boolean values and returns
@@ -635,6 +682,47 @@ the invocant.
 =cut
 
 $test->for('example', 1, 'code', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(sub{});
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method coderef
+
+The coderef method configures the object to accept code references and returns
+the invocant.
+
+=signature coderef
+
+  coderef(CodeRef $check) (Assert)
+
+=metadata coderef
+
+{
+  since => '1.71',
+}
+
+=example-1 coderef
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->coderef;
+
+  # $assert->check(sub{});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'coderef', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->check(sub{});
@@ -1094,6 +1182,164 @@ $test->for('example', 1, 'enum', sub {
   $result
 });
 
+=method expression
+
+The expression method parses a string representation of a method/function
+signature, registers the subexpressions using the L</accept> method, and
+returns the invocant.
+
+=signature expression
+
+  expression(Str $expr) (Assert)
+
+=metadata expression
+
+{
+  since => '1.71',
+}
+
+=example-1 expression
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('string');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'expression', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check('hello');
+  ok !$result->check(['goodbye']);
+
+  $result
+});
+
+=example-2 expression
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('string | coderef');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'expression', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check('hello');
+  ok $result->check(sub{'hello'});
+  ok !$result->check(['goodbye']);
+
+  $result
+});
+
+=example-3 expression
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('string | coderef | Venus::Assert');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # true
+
+  # $assert->check($assert);
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'expression', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check('hello');
+  ok $result->check(sub{'hello'});
+  ok $result->check($result);
+  ok !$result->check(['goodbye']);
+
+  $result
+});
+
+=example-4 expression
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('Venus::Assert | arrayref[Venus::Assert]');
+
+  # $assert->check('hello');
+
+  # false
+
+  # $assert->check(sub{'hello'});
+
+  # false
+
+  # $assert->check($assert);
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+  # $assert->check([$assert]);
+
+  # true
+
+=cut
+
+$test->for('example', 4, 'expression', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check('hello');
+  ok !$result->check(sub{'hello'});
+  ok $result->check($result);
+  ok !$result->check(['goodbye']);
+  ok $result->check([$result]);
+
+  $result
+});
+
 =method float
 
 The float method configures the object to accept floating-point values and
@@ -1343,6 +1589,46 @@ the invocant.
 =cut
 
 $test->for('example', 1, 'hash', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check({});
+  ok !$result->check(0);
+  ok !$result->check([]);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method hashref
+
+The hashref method configures the object to accept hash references and returns
+the invocant.
+
+=signature hashref
+
+  hashref(CodeRef $check) (Assert)
+
+=metadata hashref
+
+{
+  since => '1.71',
+}
+
+=example-1 hashref
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashref;
+
+  # $assert->check({});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'hashref', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->check({});
@@ -1721,6 +2007,47 @@ the invocant.
 =cut
 
 $test->for('example', 1, 'scalar', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(\1);
+  ok !$result->check(0);
+  ok !$result->check({});
+  ok !$result->check([]);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method scalarref
+
+The scalarref method configures the object to accept scalar references and returns
+the invocant.
+
+=signature scalarref
+
+  scalarref(CodeRef $check) (Assert)
+
+=metadata scalarref
+
+{
+  since => '1.71',
+}
+
+=example-1 scalarref
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->scalarref;
+
+  # $assert->check(\1);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'scalarref', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->check(\1);

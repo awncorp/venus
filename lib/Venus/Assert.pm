@@ -21,6 +21,7 @@ use overload (
 
 # ATTRIBUTES
 
+attr 'expects';
 attr 'message';
 attr 'name';
 
@@ -38,10 +39,11 @@ sub build_self {
   my ($self, $data) = @_;
 
   my $name = 'Unknown';
-  my $message = 'Type assertion (%s) failed: received (%s)';
+  my $message = 'Type assertion (%s) failed: received (%s), expected (%s)';
 
   $self->name($name) if !$self->name;
   $self->message($message) if !$self->message;
+  $self->expects([]) if !$self->expects;
   $self->conditions;
 
   return $self;
@@ -77,6 +79,12 @@ sub array {
   $self->constraint('array', @code ? @code : sub{true});
 
   return $self;
+}
+
+sub arrayref {
+  my ($self, @code) = @_;
+
+  return $self->array(@code);
 }
 
 sub assertion {
@@ -122,6 +130,12 @@ sub code {
   $self->constraint('code', @code ? @code : sub{true});
 
   return $self;
+}
+
+sub coderef {
+  my ($self, @code) = @_;
+
+  return $self->code(@code);
 }
 
 sub coerce {
@@ -205,6 +219,27 @@ sub enum {
   return $self;
 }
 
+sub expression {
+  my ($self, $data) = @_;
+
+  return $self if !$data;
+
+  my @data = split /\s*\|\s*(?![^\[]*\])/, $data;
+
+  push @{$self->expects}, @data;
+
+  for my $item (@data) {
+    if (my @nested = $item =~ /^((?:array|hash)(?:ref)?)\[([^\]]+)\]$/) {
+      $self->within($nested[0])->expression($nested[1]);
+    }
+    else {
+      $self->accept($item);
+    }
+  }
+
+  return $self;
+}
+
 sub float {
   my ($self, @code) = @_;
 
@@ -269,6 +304,12 @@ sub hash {
   return $self;
 }
 
+sub hashref {
+  my ($self, @code) = @_;
+
+  return $self->hash(@code);
+}
+
 sub identity {
   my ($self, $name) = @_;
 
@@ -316,6 +357,50 @@ sub package {
   return $self;
 }
 
+sub received {
+  my ($self, $data) = @_;
+
+  require Scalar::Util;
+
+  if (!defined $data) {
+    return '';
+  }
+
+  my $blessed = Scalar::Util::blessed($data);
+  my $isvenus = $blessed && $data->isa('Venus::Core') && $data->can('does');
+
+  if (!$blessed && !ref $data) {
+    return $data;
+  }
+  if ($blessed && ref($data) eq 'Regexp') {
+    return "$data";
+  }
+  if ($isvenus && $data->does('Venus::Role::Explainable')) {
+    return $self->dump(sub{$data->explain});
+  }
+  if ($isvenus && $data->does('Venus::Role::Valuable')) {
+    return $self->dump(sub{$data->value});
+  }
+  if ($isvenus && $data->does('Venus::Role::Dumpable')) {
+    return $data->dump;
+  }
+  if ($blessed && overload::Method($data, '""')) {
+    return "$data";
+  }
+  if ($blessed && $data->can('as_string')) {
+    return $data->as_string;
+  }
+  if ($blessed && $data->can('to_string')) {
+    return $data->to_string;
+  }
+  if ($blessed && $data->isa('Venus::Kind')) {
+    return $data->stringified;
+  }
+  else {
+    return $self->dump(sub{$data});
+  }
+}
+
 sub reference {
   my ($self, @code) = @_;
 
@@ -351,6 +436,12 @@ sub scalar {
   $self->constraint('scalar', @code ? @code : sub{true});
 
   return $self;
+}
+
+sub scalarref {
+  my ($self, @code) = @_;
+
+  return $self->scalar(@code);
 }
 
 sub string {
@@ -395,18 +486,15 @@ sub validate {
 
   require Scalar::Util;
 
-  my $received = defined $data
-    ? (
-    ref $data
-    ? "$data"
-    : (Scalar::Util::looks_like_number($data) ? $data : "'$data'"))
-    : "undef";
+  my $identity = lc(Venus::Type->new(value => $data)->identify);
+  my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
+  my $message = sprintf($self->message, $self->name, $identity, $expected);
 
   my $throw;
   $throw = $self->throw;
   $throw->name('on.validate');
-  $throw->message(sprintf($self->message, $self->name, $received));
-  $throw->stash(identity => lc(Venus::Type->new(value => $data)->identify));
+  $throw->message($message . "\n\nReceived:\n\n\"@{[$self->received($data)]}\"\n\n");
+  $throw->stash(identity => $identity);
   $throw->stash(variable => $data);
   $throw->error;
 
@@ -439,14 +527,14 @@ sub within {
 
   my $where = $self->new;
 
-  if (lc($type) eq 'hash') {
+  if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
     $self->defined(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'HASH')
         && CORE::values(%$value) == grep $where->check($_), CORE::values(%$value)
     });
   }
-  elsif (lc($type) eq 'array') {
+  elsif (lc($type) eq 'array' || lc($type) eq 'arrayref') {
     $self->defined(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'ARRAY')

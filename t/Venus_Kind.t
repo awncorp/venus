@@ -134,7 +134,8 @@ $test->for('example', 1, 'assertion', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Assert');
   ok $result->name eq 'Example';
-  ok $result->message eq 'Type assertion (%s) failed: received (%s)';
+  ok $result->message
+    eq 'Type assertion (%s) failed: received (%s), expected (%s)';
 
   $result
 });

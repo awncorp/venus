@@ -15,6 +15,8 @@ require POSIX;
 
 # ATTRIBUTES
 
+attr 'init';
+attr 'path';
 attr 'args';
 attr 'data';
 attr 'logs';
@@ -46,7 +48,13 @@ sub default_data {
 
   require Venus::Data;
 
-  return Venus::Data->new($self->podfile);
+  return Venus::Data->new($self->path);
+}
+
+sub default_init {
+  my ($self) = @_;
+
+  return [@ARGV];
 }
 
 sub default_logs {
@@ -65,6 +73,15 @@ sub default_opts {
   return Venus::Opts->new(value => $self->init, specs => $self->options);
 }
 
+sub default_path {
+  my ($self) = @_;
+
+  require Venus::Path;
+  require Venus::Space;
+
+  return Venus::Path->new(Venus::Space->new(ref $self)->included || $0);
+}
+
 sub default_vars {
   my ($self) = @_;
 
@@ -80,12 +97,6 @@ sub _exit {
 }
 
 # METHODS
-
-sub init {
-  my ($self) = @_;
-
-  return [@ARGV];
-}
 
 sub arg {
   my ($self, $item) = @_;
@@ -177,22 +188,6 @@ sub options {
   my ($self) = @_;
 
   return ['help|h'];
-}
-
-sub podfile {
-  my ($self) = @_;
-
-  require Venus::Space;
-
-  return Venus::Space->new(ref $self)->included;
-}
-
-sub program {
-  my ($self) = @_;
-
-  require Venus::Space;
-
-  return Venus::Space->new(ref $self)->included;
 }
 
 1;

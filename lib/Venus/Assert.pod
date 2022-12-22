@@ -40,6 +40,14 @@ This package has the following attributes:
 
 =cut
 
+=head2 expects
+
+  expects(ArrayRef)
+
+This attribute is read-write, accepts C<(ArrayRef)> values, and is optional.
+
+=cut
+
 =head2 message
 
   message(Str)
@@ -284,6 +292,33 @@ I<Since C<1.40>>
 
 =cut
 
+=head2 arrayref
+
+  arrayref(CodeRef $check) (Assert)
+
+The arrayref method configures the object to accept array references and
+returns the invocant.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item arrayref example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->arrayref;
+
+  # $assert->check([]);
+
+  # true
+
+=back
+
+=cut
+
 =head2 boolean
 
   boolean(CodeRef $check) (Assert)
@@ -429,6 +464,33 @@ I<Since C<1.40>>
   package main;
 
   $assert = $assert->code;
+
+  # $assert->check(sub{});
+
+  # true
+
+=back
+
+=cut
+
+=head2 coderef
+
+  coderef(CodeRef $check) (Assert)
+
+The coderef method configures the object to accept code references and returns
+the invocant.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item coderef example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->coderef;
 
   # $assert->check(sub{});
 
@@ -728,6 +790,122 @@ I<Since C<1.40>>
 
 =cut
 
+=head2 expression
+
+  expression(Str $expr) (Assert)
+
+The expression method parses a string representation of a method/function
+signature, registers the subexpressions using the L</accept> method, and
+returns the invocant.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item expression example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('string');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+=back
+
+=over 4
+
+=item expression example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('string | coderef');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+=back
+
+=over 4
+
+=item expression example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('string | coderef | Venus::Assert');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # true
+
+  # $assert->check($assert);
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+=back
+
+=over 4
+
+=item expression example 4
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('Venus::Assert | arrayref[Venus::Assert]');
+
+  # $assert->check('hello');
+
+  # false
+
+  # $assert->check(sub{'hello'});
+
+  # false
+
+  # $assert->check($assert);
+
+  # true
+
+  # $assert->check(['goodbye']);
+
+  # false
+
+  # $assert->check([$assert]);
+
+  # true
+
+=back
+
+=cut
+
 =head2 float
 
   float(CodeRef $check) (Assert)
@@ -915,6 +1093,33 @@ I<Since C<1.40>>
   package main;
 
   $assert = $assert->hash;
+
+  # $assert->check({});
+
+  # true
+
+=back
+
+=cut
+
+=head2 hashref
+
+  hashref(CodeRef $check) (Assert)
+
+The hashref method configures the object to accept hash references and returns
+the invocant.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item hashref example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashref;
 
   # $assert->check({});
 
@@ -1162,6 +1367,33 @@ I<Since C<1.40>>
   package main;
 
   $assert = $assert->scalar;
+
+  # $assert->check(\1);
+
+  # true
+
+=back
+
+=cut
+
+=head2 scalarref
+
+  scalarref(CodeRef $check) (Assert)
+
+The scalarref method configures the object to accept scalar references and returns
+the invocant.
+
+I<Since C<1.71>>
+
+=over 4
+
+=item scalarref example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->scalarref;
 
   # $assert->check(\1);
 

@@ -10,8 +10,6 @@ use Venus::Test;
 
 my $test = test(__FILE__);
 
-local @ARGV = ();
-
 our $CLI_EXIT_CODE;
 
 {
@@ -51,7 +49,6 @@ method: execute
 method: exit
 method: fail
 method: help
-method: init
 method: log_debug
 method: log_error
 method: log_fatal
@@ -61,8 +58,6 @@ method: log_warn
 method: okay
 method: opt
 method: options
-method: podfile
-method: program
 
 =cut
 
@@ -74,9 +69,7 @@ $test->for('includes');
 
   use Venus::Cli;
 
-  @ARGV = ('example', '--help');
-
-  my $cli = Venus::Cli->new;
+  my $cli = Venus::Cli->new(['example', '--help']);
 
   # $cli->program;
 
@@ -125,6 +118,234 @@ Venus::Role::Optional
 =cut
 
 $test->for('integrates');
+
+=attribute args
+
+The args attribute holds a L<Venus::Args> object.
+
+=signature args
+
+  args(Args $data) (Args)
+
+=metadata args
+
+{
+  since => '1.71',
+}
+
+=example-1 args
+
+  # given: synopsis
+
+  package main;
+
+  my $args = $cli->args;
+
+=cut
+
+$test->for('example', 1, 'args', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Args');
+
+  $result
+});
+
+=attribute data
+
+The data attribute holds a L<Venus::Data> object.
+
+=signature data
+
+  data(Data $data) (Data)
+
+=metadata data
+
+{
+  since => '1.71',
+}
+
+=example-1 data
+
+  # given: synopsis
+
+  package main;
+
+  my $data = $cli->data;
+
+=cut
+
+$test->for('example', 1, 'data', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Data');
+
+  $result
+});
+
+=attribute init
+
+The init attribute holds the "initial" raw arguments provided to the CLI,
+defaulting to C<[@ARGV]>, used by L</args> and L</opts>.
+
+=signature init
+
+  init(ArrayRef $data) (ArrayRef)
+
+=metadata init
+
+{
+  since => '1.68',
+}
+
+=example-1 init
+
+  # given: synopsis
+
+  package main;
+
+  my $init = $cli->init;
+
+  # ["example", "--help"]
+
+=cut
+
+$test->for('example', 1, 'init', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['example', '--help'];
+
+  $result
+});
+
+=attribute logs
+
+The logs attribute holds a L<Venus::Logs> object.
+
+=signature logs
+
+  logs(Logs $logs) (Logs)
+
+=metadata logs
+
+{
+  since => '1.71',
+}
+
+=example-1 logs
+
+  # given: synopsis
+
+  package main;
+
+  my $logs = $cli->logs;
+
+=cut
+
+$test->for('example', 1, 'logs', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Log');
+
+  $result
+});
+
+=attribute opts
+
+The opts attribute holds a L<Venus::Opts> object.
+
+=signature opts
+
+  opts(Opts $opts) (Opts)
+
+=metadata opts
+
+{
+  since => '1.71',
+}
+
+=example-1 opts
+
+  # given: synopsis
+
+  package main;
+
+  my $opts = $cli->opts;
+
+=cut
+
+$test->for('example', 1, 'opts', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Opts');
+
+  $result
+});
+
+=attribute path
+
+The path attribute holds a L<Venus::Path> object, meant to represent the path
+of the file where the CLI executable and POD is.
+
+=signature path
+
+  path(Path $data) (Path)
+
+=metadata path
+
+{
+  since => '1.71',
+}
+
+=example-1 path
+
+  # given: synopsis
+
+  package main;
+
+  my $path = $cli->path;
+
+=cut
+
+$test->for('example', 1, 'path', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
+
+  $result
+});
+
+=attribute vars
+
+The vars attribute holds a L<Venus::Vars> object.
+
+=signature vars
+
+  vars(Vars $vars) (Vars)
+
+=metadata vars
+
+{
+  since => '1.71',
+}
+
+=example-1 vars
+
+  # given: synopsis
+
+  package main;
+
+  my $vars = $cli->vars;
+
+=cut
+
+$test->for('example', 1, 'vars', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Vars');
+
+  $result
+});
 
 =method arg
 
@@ -201,9 +422,7 @@ application.
 
   use Venus::Cli;
 
-  @ARGV = ();
-
-  my $cli = Venus::Cli->new;
+  my $cli = Venus::Cli->new([]);
 
   # e.g.
 
@@ -235,9 +454,7 @@ $test->for('example', 1, 'execute', sub {
 
   use Venus::Cli;
 
-  @ARGV = ('--help');
-
-  my $cli = Venus::Cli->new;
+  my $cli = Venus::Cli->new(['--help']);
 
   # e.g.
 
@@ -477,41 +694,6 @@ $test->for('example', 2, 'help', sub {
   $result->data->set('t/data/sections');
   ok my $help = $result->help('head1', 'NAME');
   is $help, "Example #1\nExample #2";
-
-  $result
-});
-
-=method init
-
-The init method returns the raw arguments provided, defaulting to C<@ARGV>,
-used by L</args> and L</opts>.
-
-=signature init
-
-  init() (ArrayRef)
-
-=metadata init
-
-{
-  since => '1.68',
-}
-
-=example-1 init
-
-  # given: synopsis
-
-  package main;
-
-  my $init = $cli->init;
-
-  # ["example", "--help"]
-
-=cut
-
-$test->for('example', 1, 'init', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, ['example', '--help'];
 
   $result
 });
@@ -912,74 +1094,6 @@ $test->for('example', 1, 'options', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, ['help|h'];
-
-  $result
-});
-
-=method podfile
-
-The podfile method returns the full path to the file where the CLI POD is.
-
-=signature podfile
-
-  podfile() (Str)
-
-=metadata podfile
-
-{
-  since => '1.68',
-}
-
-=example-1 podfile
-
-  # given: synopsis
-
-  package main;
-
-  my $podfile = $cli->podfile;
-
-  # "lib/Venus/Cli.pm"
-
-=cut
-
-$test->for('example', 1, 'podfile', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  like $result, qr/Venus\/Cli\.pm/;
-
-  $result
-});
-
-=method program
-
-The program method returns the full path to the CLI executable.
-
-=signature program
-
-  program() (Str)
-
-=metadata program
-
-{
-  since => '1.68',
-}
-
-=example-1 program
-
-  # given: synopsis
-
-  package main;
-
-  my $program = $cli->program;
-
-  # "lib/Venus/Cli.pm"
-
-=cut
-
-$test->for('example', 1, 'program', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  like $result, qr/Venus\/Cli\.pm/;
 
   $result
 });

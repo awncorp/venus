@@ -1,8 +1,10 @@
 # Release
 
-## Version: 1.71
+## Version: 1.75
 
-- [feature] Implement Venus::Log
-- [feature] Implement Venus::Cli
+- [update] Replace Venus::Cli#{program,podfile} with "path" attribute
+- [update] Convert Venus::Cli#init method to attribute
+- [update] Implement Venus::Assert#expression, and add ref aliases
+- [update] Update Venus::Assert to raise exceptions with expectation(s)
 
 
