@@ -1,3 +1,8 @@
+1.80 2022-12-24
+
+- [feature] Implement Venus::Role::Serializable
+- [feature] Implement Venus::Role::Subscribable
+
 1.75 2022-12-22
 
 - [update] Replace Venus::Cli#{program,podfile} with "path" attribute

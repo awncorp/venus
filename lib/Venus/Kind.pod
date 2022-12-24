@@ -57,6 +57,8 @@ L<Venus::Role::Printable>
 
 L<Venus::Role::Reflectable>
 
+L<Venus::Role::Serializable>
+
 L<Venus::Role::Testable>
 
 L<Venus::Role::Throwable>

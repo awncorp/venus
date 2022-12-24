@@ -1,0 +1,323 @@
+
+=head1 NAME
+
+Venus::Role::Serializable - Serializable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Serializable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Serializable';
+
+  attr 'test';
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  # $example->serialize;
+
+  # {test => 123}
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for serializing objects or the return value
+of a dispatched method call.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 serialize
+
+  serialize(Str | CodeRef $code, Any @args) (Any)
+
+The serialize method serializes the invocant or the return value of a
+dispatched method call, and returns the result.
+
+I<Since C<1.75>>
+
+=over 4
+
+=item serialize example 1
+
+  package Example1;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Serializable';
+
+  sub ARGS {
+    (@_[1..$#_])
+  }
+
+  sub DATA {
+    [@_[1..$#_]]
+  }
+
+  package main;
+
+  my $example1 = Example1->new(1..4);
+
+  # bless([1..4], 'Example1')
+
+  # my $result = $example1->serialize;
+
+  # [1..4]
+
+=back
+
+=over 4
+
+=item serialize example 2
+
+  package Example2;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Serializable';
+
+  sub ARGS {
+    (@_[1..$#_])
+  }
+
+  sub DATA {
+    sub{[@_[1..$#_]]}
+  }
+
+  package main;
+
+  my $example2 = Example2->new(1..4);
+
+  # bless(sub{[1..4]}, 'Example2')
+
+  # my $result = $example2->serialize;
+
+  # sub{...}
+
+=back
+
+=over 4
+
+=item serialize example 3
+
+  package Example3;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Serializable';
+
+  sub ARGS {
+    (@_[1..$#_])
+  }
+
+  sub DATA {
+    qr{@{[join '', @_[1..$#_]]}};
+  }
+
+  package main;
+
+  my $example3 = Example3->new(1..4);
+
+  # bless(qr/1234/, 'Example3')
+
+  # my $result = $example3->serialize;
+
+  # qr/1234/u
+
+=back
+
+=over 4
+
+=item serialize example 4
+
+  package Example4;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Serializable';
+
+  sub ARGS {
+    (@_[1..$#_])
+  }
+
+  sub DATA {
+    \join '', @_[1..$#_]
+  }
+
+  package main;
+
+  my $example4 = Example4->new(1..4);
+
+  # bless(\'1234', 'Example4')
+
+  # my $result = $example4->serialize;
+
+  # "1234"
+
+=back
+
+=over 4
+
+=item serialize example 5
+
+  package Example5;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Serializable';
+
+  sub ARGS {
+    (@_[1..$#_])
+  }
+
+  sub DATA {
+    \(my $ref = \join '', @_[1..$#_])
+  }
+
+  package main;
+
+  my $example5 = Example5->new(1..4);
+
+  # bless(do{\(my $ref = \'1234')}, 'Example5')
+
+  # my $result = $example5->serialize;
+
+  # "1234"
+
+=back
+
+=over 4
+
+=item serialize example 6
+
+  package Example6;
+
+  use Venus::Class 'base';
+
+  base 'Venus::Array';
+
+  package main;
+
+  my $example6 = Example6->new([1..4]);
+
+  # bless(..., 'Example6')
+
+  # my $result = $example6->serialize;
+
+  # [1..4]
+
+=back
+
+=over 4
+
+=item serialize example 7
+
+  package Example7;
+
+  use Venus::Class 'base';
+
+  base 'Venus::Path';
+
+  package main;
+
+  my $example7 = Example7->new('/path/to/somewhere');
+
+  # bless(..., 'Example7')
+
+  # my $result = $example7->serialize;
+
+  # "/path/to/somewhere"
+
+=back
+
+=over 4
+
+=item serialize example 8
+
+  package Example8;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Serializable';
+  with 'Venus::Role::Valuable';
+
+  package main;
+
+  my $example8 = Example8->new(value => 123);
+
+  # bless(..., 'Example8')
+
+  # my $result = $example8->serialize;
+
+  # 123
+
+=back
+
+=over 4
+
+=item serialize example 9
+
+  package Example9;
+
+  use Venus::Class 'base', 'with';
+
+  base 'IO::Handle';
+
+  with 'Venus::Role::Serializable';
+
+  package main;
+
+  my $example9 = Example9->new;
+
+  # bless(..., 'Example9')
+
+  # my $result = $example9->serialize;
+
+  # Exception! (isa Venus::Error) is "on.serialize"
+
+=back
+
+=over 4
+
+=item serialize example 10
+
+  package Example10;
+
+  use Venus::Class 'attr', 'with';
+
+  with 'Venus::Role::Serializable';
+
+  attr 'test';
+
+  package main;
+
+  use IO::Handle;
+
+  my $example10 = Example10->new(test => IO::Handle->new);
+
+  # bless(..., 'Example10')
+
+  # my $result = $example10->serialize;
+
+  # Exception! (isa Venus::Error) is "on.serialize.deconstruct"
+
+=back
+
+=cut

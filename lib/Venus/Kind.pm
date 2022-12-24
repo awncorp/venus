@@ -20,6 +20,7 @@ with 'Venus::Role::Reflectable';
 with 'Venus::Role::Testable';
 with 'Venus::Role::Throwable';
 with 'Venus::Role::Assertable';
+with 'Venus::Role::Serializable';
 
 # METHODS
 

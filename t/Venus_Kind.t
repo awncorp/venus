@@ -95,6 +95,7 @@ Venus::Role::Dumpable
 Venus::Role::Matchable
 Venus::Role::Printable
 Venus::Role::Reflectable
+Venus::Role::Serializable
 Venus::Role::Testable
 Venus::Role::Throwable
 Venus::Role::Tryable
