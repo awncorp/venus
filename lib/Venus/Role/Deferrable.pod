@@ -1,0 +1,110 @@
+
+=head1 NAME
+
+Venus::Role::Deferrable - Deferrable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Deferrable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Deferrable';
+
+  sub test {
+    my ($self, @args) = @_;
+
+    return $self->okay(@args);
+  }
+
+  sub okay {
+    my ($self, @args) = @_;
+
+    return [@args];
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # my $code = $example->defer('test');
+
+  # sub {...}
+
+  # $code->();
+
+  # [...]
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for returning callbacks (i.e. closures) that
+dispatches method calls.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 defer
+
+  defer(Str $method, Any @args) (CodeRef)
+
+The defer method returns the named method as a callback (i.e. closure) which
+dispatches to the method call specified.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item defer example 1
+
+  # given: synopsis
+
+  package main;
+
+  $example = Example->new;
+
+  # bless({}, 'Example1')
+
+  # my $result = $example->defer('test', 1..4);
+
+  # $result->();
+
+  # [1..4]
+
+=back
+
+=over 4
+
+=item defer example 2
+
+  # given: synopsis
+
+  package main;
+
+  $example = Example->new;
+
+  # bless({}, 'Example1')
+
+  # my $result = $example->defer('test', 1..4);
+
+  # $result->(1..4);
+
+  # [1..4, 1..4]
+
+=back
+
+=cut

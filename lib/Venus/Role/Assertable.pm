@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Role 'with';
+use Venus::Role 'fault';
 
 # AUDIT
 
@@ -15,7 +15,7 @@ sub AUDIT {
   my $name = ref $self || $self;
 
   if (!$from->can('assertion')) {
-    die "${from} requires 'assertion' to consume ${name}";
+    fault "${from} requires 'assertion' to consume ${name}";
   }
 
   return $self;

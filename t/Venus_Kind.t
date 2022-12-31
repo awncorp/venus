@@ -89,6 +89,7 @@ Venus::Role::Assertable
 Venus::Role::Boxable
 Venus::Role::Catchable
 Venus::Role::Comparable
+Venus::Role::Deferrable
 Venus::Role::Digestable
 Venus::Role::Doable
 Venus::Role::Dumpable

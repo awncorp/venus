@@ -47,7 +47,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->array;
+  $assert->clear->expression('arrayref');
 
   return $assert;
 }

@@ -46,7 +46,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->string;
+  $assert->clear->expression('string');
 
   return $assert;
 }

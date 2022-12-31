@@ -47,7 +47,7 @@ sub BASE {
   no strict 'refs';
 
   if (!grep !/\A[^:]+::\z/, keys(%{"${base}::"})) {
-    local $@; eval "require $base"; die $@ if $@;
+    local $@; eval "require $base"; do{require Venus; Venus::fault($@)} if $@;
   }
 
   @{"@{[$self->NAME]}::ISA"} = (
@@ -184,7 +184,7 @@ sub MIXIN {
   no strict 'refs';
 
   if (!grep !/\A[^:]+::\z/, keys(%{"${mixin}::"})) {
-    local $@; eval "require $mixin"; die $@ if $@;
+    local $@; eval "require $mixin"; do{require Venus; Venus::fault($@)} if $@;
   }
 
   no warnings 'redefine';
@@ -214,7 +214,7 @@ sub ROLE {
   no strict 'refs';
 
   if (!grep !/\A[^:]+::\z/, keys(%{"${role}::"})) {
-    local $@; eval "require $role"; die $@ if $@;
+    local $@; eval "require $role"; do{require Venus; Venus::fault($@)} if $@;
   }
 
   no warnings 'redefine';

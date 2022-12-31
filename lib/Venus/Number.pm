@@ -68,9 +68,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear;
-  $assert->number;
-  $assert->float;
+  $assert->clear->expression('number | float');
 
   return $assert;
 }

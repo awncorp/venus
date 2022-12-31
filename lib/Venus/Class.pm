@@ -49,6 +49,9 @@ sub import {
   if (!*{"${from}::false"}{"CODE"}) {
     *{"${from}::false"} = sub {require Venus; Venus::false()};
   }
+  if ($exports{"fault"} && !*{"${from}::fault"}{"CODE"}) {
+    *{"${from}::fault"} = sub (;$) {require Venus; goto \&Venus::fault};
+  }
   if ($exports{"from"} && !*{"${from}::from"}{"CODE"}) {
     *{"${from}::from"} = sub {@_ = ($from, @_); goto \&from};
   }

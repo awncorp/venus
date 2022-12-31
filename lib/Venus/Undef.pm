@@ -28,7 +28,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->undef;
+  $assert->clear->expression('undef');
 
   return $assert;
 }

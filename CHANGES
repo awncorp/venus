@@ -1,3 +1,10 @@
+1.85 2022-12-31
+
+- [feature] Implement Venus::Fault
+- [feature] Implement Venus::Role::Comparable#{is,st}
+- [feature] Implement Venus::Role::Deferrable
+- [update] Update value class assertions to use "expression" syntax
+
 1.80 2022-12-24
 
 - [feature] Implement Venus::Role::Serializable

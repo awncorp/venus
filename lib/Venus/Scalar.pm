@@ -22,7 +22,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->scalar;
+  $assert->clear->expression('scalarref');
 
   return $assert;
 }

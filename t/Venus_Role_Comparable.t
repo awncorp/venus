@@ -41,9 +41,11 @@ method: ge
 method: gele
 method: gt
 method: gtlt
+method: is
 method: le
 method: lt
 method: ne
+method: st
 method: tv
 
 =cut
@@ -476,6 +478,83 @@ $test->for('example', 3, 'gtlt', sub {
   $result
 });
 
+=method is
+
+The is method performs an I<"is-exactly"> operation using the invocant and the
+argument provided. If the argument provided is blessed and exactly the same as
+the invocant (i.e. shares the same address space) the operation will return
+truthy.
+
+=signature is
+
+  is(Any $arg) (Bool)
+
+=metadata is
+
+{
+  since => '1.80',
+}
+
+=example-1 is
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->is($example);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'is', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->is([1,2]);
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'is', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-3 is
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->is(Example->new);
+
+  # 0
+
+=cut
+
+$test->for('example', 3, 'is', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
 =method le
 
 The le method performs a I<"lesser-than-or-equal-to"> operation using the
@@ -700,6 +779,112 @@ $test->for('example', 2, 'ne', sub {
 =cut
 
 $test->for('example', 3, 'ne', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=method st
+
+The st method performs a I<"same-type"> operation using the invocant and
+argument provided. If the argument provided is an instance of the invocant, or
+a subclass, the operation will return truthy.
+
+=signature st
+
+  st(Object $arg) (Bool)
+
+=metadata st
+
+{
+  since => '1.80',
+}
+
+=example-1 st
+
+  package main;
+
+  my $example = Example->new;
+
+  my $result = $example->st($example);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'st', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 st
+
+  package main;
+
+  use Venus::Number;
+
+  my $example = Example->new;
+
+  my $result = $example->st(Venus::Number->new(2));
+
+  # 0
+
+=cut
+
+$test->for('example', 2, 'st', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-3 st
+
+  package main;
+
+  use Venus::String;
+
+  my $example = Example->new;
+
+  my $result = $example->st(Venus::String->new('2'));
+
+  # 0
+
+=cut
+
+$test->for('example', 3, 'st', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  is $result, 0;
+
+  !$result
+});
+
+=example-4 st
+
+  package Example2;
+
+  use base 'Example';
+
+  package main;
+
+  use Venus::String;
+
+  my $example = Example2->new;
+
+  my $result = $example->st(Example2->new);
+
+  # 1
+
+=cut
+
+$test->for('example', 4, 'st', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is $result, 1;

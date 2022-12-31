@@ -57,7 +57,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->string;
+  $assert->clear->expression('string');
 
   return $assert;
 }
@@ -89,7 +89,7 @@ sub as {
 sub explain {
   my ($self) = @_;
 
-  $self->trace(1, 1) if !@{$self->{'$frames'}};
+  $self->trace(1, 1) if !@{$self->frames};
 
   my $frames = $self->{'$frames'};
 

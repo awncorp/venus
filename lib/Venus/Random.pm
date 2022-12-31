@@ -36,7 +36,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->number;
+  $assert->clear->expression('number');
 
   return $assert;
 }

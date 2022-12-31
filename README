@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    1.80
+    1.85
 
 SYNOPSIS
 
@@ -212,6 +212,35 @@ FUNCTIONS
         my $true = !false;
       
         # 1
+
+ fault
+
+      fault(Str $args) (Fault)
+
+    The fault function throws a Venus::Fault exception object and
+    represents a system failure, and isn't meant to be caught.
+
+    Since 1.80
+
+    fault example 1
+
+        package main;
+      
+        use Venus 'fault';
+      
+        my $fault = fault;
+      
+        # bless({message => 'Exception!'}, 'Venus::Fault')
+
+    fault example 2
+
+        package main;
+      
+        use Venus 'fault';
+      
+        my $fault = fault 'Something failed!';
+      
+        # bless({message => 'Something failed!'}, 'Venus::Fault')
 
  raise
 

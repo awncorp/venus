@@ -45,6 +45,8 @@ L<Venus::Role::Catchable>
 
 L<Venus::Role::Comparable>
 
+L<Venus::Role::Deferrable>
+
 L<Venus::Role::Digestable>
 
 L<Venus::Role::Doable>

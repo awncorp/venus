@@ -1,0 +1,244 @@
+
+=head1 NAME
+
+Venus::Fault - Fault Class
+
+=cut
+
+=head1 ABSTRACT
+
+Fault Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Fault;
+
+  my $fault = Venus::Fault->new;
+
+  # $fault->throw;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package represents a generic system error (exception object).
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 explain
+
+  explain() (Str)
+
+The explain method returns the error message and is used in stringification
+operations.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item explain example 1
+
+  # given: synopsis;
+
+  my $explain = $fault->explain;
+
+  # "Exception! in ...
+
+=back
+
+=cut
+
+=head2 frames
+
+  frames() (ArrayRef)
+
+The frames method returns the compiled and stashed stack trace data.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item frames example 1
+
+  # given: synopsis;
+
+  my $frames = $fault->frames;
+
+  # [
+  #   ...
+  #   [
+  #     "main",
+  #     "t/Venus_Fault.t",
+  #     ...
+  #   ],
+  # ]
+
+=back
+
+=cut
+
+=head2 throw
+
+  throw(Str $message) (Fault)
+
+The throw method throws an error if the invocant is an object, or creates an
+error object using the arguments provided and throws the created object.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item throw example 1
+
+  # given: synopsis;
+
+  my $throw = $fault->throw;
+
+  # bless({ ... }, 'Venus::Fault')
+
+=back
+
+=cut
+
+=head2 trace
+
+  trace(Int $offset, Int $limit) (Fault)
+
+The trace method compiles a stack trace and returns the object. By default it
+skips the first frame.
+
+I<Since C<1.80>>
+
+=over 4
+
+=item trace example 1
+
+  # given: synopsis;
+
+  my $trace = $fault->trace;
+
+  # bless({ ... }, 'Venus::Fault')
+
+=back
+
+=over 4
+
+=item trace example 2
+
+  # given: synopsis;
+
+  my $trace = $fault->trace(0, 1);
+
+  # bless({ ... }, 'Venus::Fault')
+
+=back
+
+=over 4
+
+=item trace example 3
+
+  # given: synopsis;
+
+  my $trace = $fault->trace(0, 2);
+
+  # bless({ ... }, 'Venus::Fault')
+
+=back
+
+=cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<(eq)>
+
+This package overloads the C<eq> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $fault eq 'Exception!';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(ne)>
+
+This package overloads the C<ne> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $fault ne 'exception!';
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<(qr)>
+
+This package overloads the C<qr> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $test = 'Exception!' =~ qr/$fault/;
+
+  # 1
+
+=back
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$fault";
+
+  # "Exception!"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $fault ~~ 'Exception!';
+
+  # 1
+
+=back

@@ -21,7 +21,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->code;
+  $assert->clear->expression('coderef');
 
   return $assert;
 }

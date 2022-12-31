@@ -95,6 +95,20 @@ sub gtlt {
   }
 }
 
+sub is {
+  my ($self, $data) = @_;
+
+  if (!ref $data) {
+    return false;
+  }
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 sub lt {
   my ($self, $data) = @_;
 
@@ -137,6 +151,23 @@ sub ne {
   return $self->eq($data) ? false : true;
 }
 
+sub st {
+  my ($self, $data) = @_;
+
+  if (!Scalar::Util::blessed($data)) {
+    return false;
+  }
+  if (Scalar::Util::refaddr($self) eq Scalar::Util::refaddr($data)) {
+    return true;
+  }
+  if ($data->isa($self->class)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 sub tv {
   my ($self, $data) = @_;
 
@@ -157,7 +188,7 @@ sub tv {
 # EXPORTS
 
 sub EXPORT {
-  ['eq', 'ge', 'gele', 'gt', 'gtlt', 'lt', 'le', 'ne', 'tv']
+  ['eq', 'ge', 'gele', 'gt', 'gtlt', 'is', 'lt', 'le', 'ne', 'st', 'tv']
 }
 
 1;

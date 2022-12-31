@@ -5,7 +5,7 @@ use 5.014;
 use strict;
 use warnings;
 
-use Venus::Role 'with';
+use Venus::Role 'fault';
 
 # AUDITS
 
@@ -13,7 +13,7 @@ sub AUDIT {
   my ($self, $from) = @_;
 
   if (!$from->does('Venus::Role::Dumpable')) {
-    die "${self} requires ${from} to consume Venus::Role::Dumpable";
+    fault "${self} requires ${from} to consume Venus::Role::Dumpable";
   }
 
   return $self;

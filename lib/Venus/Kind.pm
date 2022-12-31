@@ -11,6 +11,7 @@ with 'Venus::Role::Boxable';
 with 'Venus::Role::Tryable';
 with 'Venus::Role::Catchable';
 with 'Venus::Role::Comparable';
+with 'Venus::Role::Deferrable';
 with 'Venus::Role::Dumpable';
 with 'Venus::Role::Digestable';
 with 'Venus::Role::Doable';

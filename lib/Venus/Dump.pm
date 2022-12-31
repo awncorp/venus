@@ -87,7 +87,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->hash;
+  $assert->clear->expression('hashref');
 
   return $assert;
 }

@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.80';
+our $VERSION = '1.85';
 
 # AUTHORITY
 
@@ -27,6 +27,7 @@ sub import {
     catch => 1,
     error => 1,
     false => 1,
+    fault => 1,
     raise => 1,
     true => 1,
   );
@@ -80,6 +81,14 @@ sub false () {
   require Venus::False;
 
   return Venus::False->value;
+}
+
+sub fault (;$) {
+  my ($data) = @_;
+
+  require Venus::Fault;
+
+  return Venus::Fault->new($data)->throw;
 }
 
 sub raise ($;$) {

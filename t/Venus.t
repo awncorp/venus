@@ -40,6 +40,7 @@ function: cast
 function: catch
 function: error
 function: false
+function: fault
 function: raise
 function: true
 
@@ -394,6 +395,65 @@ $test->for('example', 1, 'false', sub {
 $test->for('example', 2, 'false', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
+
+  $result
+});
+
+=function fault
+
+The fault function throws a L<Venus::Fault> exception object and represents a
+system failure, and isn't meant to be caught.
+
+=signature fault
+
+  fault(Str $args) (Fault)
+
+=metadata fault
+
+{
+  since => '1.80',
+}
+
+=example-1 fault
+
+  package main;
+
+  use Venus 'fault';
+
+  my $fault = fault;
+
+  # bless({message => 'Exception!'}, 'Venus::Fault')
+
+=cut
+
+$test->for('example', 1, 'fault', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\(my $error))->result;
+  ok $error;
+  ok $error->isa('Venus::Fault');
+  ok $error->{message} eq 'Exception!';
+
+  $result
+});
+
+=example-2 fault
+
+  package main;
+
+  use Venus 'fault';
+
+  my $fault = fault 'Something failed!';
+
+  # bless({message => 'Something failed!'}, 'Venus::Fault')
+
+=cut
+
+$test->for('example', 2, 'fault', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\(my $error))->result;
+  ok $error;
+  ok $error->isa('Venus::Fault');
+  ok $error->{message} eq 'Something failed!';
 
   $result
 });

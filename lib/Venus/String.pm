@@ -37,11 +37,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear;
-  $assert->boolean;
-  $assert->float;
-  $assert->number;
-  $assert->string;
+  $assert->clear->expression('string | number | float | boolean');
 
   return $assert;
 }

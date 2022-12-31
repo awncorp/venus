@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Role 'with';
+use Venus::Role 'fault';
 
 # AUDITS
 
@@ -13,7 +13,7 @@ sub AUDIT {
   my ($self, $from) = @_;
 
   if (!$from->isa('Venus::Core')) {
-    die "${self} requires ${from} to derive from Venus::Core";
+    fault "${self} requires ${from} to derive from Venus::Core";
   }
 
   return $self;

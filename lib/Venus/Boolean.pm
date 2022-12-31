@@ -78,7 +78,7 @@ sub assertion {
 
   my $assert = $self->SUPER::assertion;
 
-  $assert->clear->boolean;
+  $assert->clear->expression('boolean');
 
   return $assert;
 }
