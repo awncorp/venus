@@ -18,7 +18,7 @@ sub BUILD {
 
   return $self if !$defaults;
 
-  for my $name ($self->META->attrs) {
+  for my $name (@{$self->META->attrs}) {
     if (exists $defaults->{$name} && !exists $self->{$name}) {
       $self->{$name} = $defaults->{$name};
     }

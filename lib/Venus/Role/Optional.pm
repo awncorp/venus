@@ -5,7 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Role 'with';
+use Venus::Role 'catch', 'error', 'with';
 
 # METHODS
 
@@ -42,7 +42,7 @@ sub reset {
 sub BUILD {
   my ($self, $data) = @_;
 
-  for my $name ($self->META->attrs) {
+  for my $name (@{$self->META->attrs}) {
     my @data = (exists $data->{$name} ? $data->{$name} : ());
 
     # option: default
@@ -54,11 +54,20 @@ sub BUILD {
     # option: require
     option_require($self, $name, @data);
 
+    # option: build
+    @data = option_builder($self, $name, @data) if exists $data->{$name};
+
     # option: coerce
     @data = option_coerce($self, $name, @data) if exists $data->{$name};
 
+    # option: self-coerce
+    @data = option_self_coerce($self, $name, @data) if exists $data->{$name};
+
     # option: check
     option_check($self, $name, @data);
+
+    # option: self-assert
+    option_self_assert($self, $name, @data);
 
     # option: assert
     option_assert($self, $name, @data);
@@ -81,6 +90,9 @@ sub ITEM {
  # option: check
   option_check($self, $name, @data);
 
+  # option: self-assert
+  option_self_assert($self, $name, @data);
+
   # option: assert
   option_assert($self, $name, @data);
 
@@ -99,8 +111,14 @@ sub READ {
   # option: builder
   option_builder($self, $name, @data);
 
+  # option: lazy-builder
+  option_lazy_builder($self, $name, @data);
+
   # option: coerce
   option_coerce($self, $name, @data);
+
+  # option: self-coerce
+  option_self_coerce($self, $name, @data);
 
   # option: reader
   return option_reader($self, $name, @data);
@@ -116,10 +134,16 @@ sub WRITE {
   option_readonly($self, $name, @data);
 
   # option: builder
-  option_builder($self, $name, @data);
+  @data = option_builder($self, $name, @data);
+
+  # option: lazy-builder
+  @data = option_lazy_builder($self, $name, @data);
 
   # option: coerce
   @data = option_coerce($self, $name, @data);
+
+  # option: self-coerce
+  @data = option_self_coerce($self, $name, @data);
 
   # option: writer
   return option_writer($self, $name, @data);
@@ -160,7 +184,7 @@ sub option_assert {
     }
     elsif (length($return)) {
       $assert->name($label);
-      $assert->accept($return)->validate($value);
+      $assert->expression($return)->validate($value);
     }
     else {
       require Venus::Throw;
@@ -183,7 +207,7 @@ sub option_builder {
     my @return = $code->($self, (@data ? @data : $self->{$name}));
     $self->{$name} = $return[0] if @return;
   }
-  return;
+  return @data ? $data[0] : ();
 }
 
 sub option_check {
@@ -219,7 +243,7 @@ sub option_coerce {
       if !Scalar::Util::blessed($value)
       || (Scalar::Util::blessed($value) && !$value->isa($return));
   }
-  return $data[0];
+  return @data ? $data[0] : ();
 }
 
 sub option_default {
@@ -238,6 +262,16 @@ sub option_initial {
     $self->{$name} = $code->($self, @data) if !exists $self->{$name};
   }
   return;
+}
+
+sub option_lazy_builder {
+  my ($self, $name, @data) = @_;
+
+  if (my $code = $self->can("lazy_build_${name}")) {
+    my @return = $code->($self, (@data ? @data : $self->{$name}));
+    $self->{$name} = $return[0] if @return;
+  }
+  return @data ? $data[0] : ();
 }
 
 sub option_reader {
@@ -303,6 +337,31 @@ sub option_require {
     }
   }
   return;
+}
+
+sub option_self_assert {
+  my ($self, $name, @data) = @_;
+
+  if (my $code = $self->can("self_assert_${name}")) {
+    if (my $error = catch {$code->($self, (@data ? $data[0] : $self->{$name}))}) {
+      if (do {require Scalar::Util; Scalar::Util::blessed($error)}) {
+        return $error->isa('Venus::Error') ? $error->throw : die $error;
+      }
+      else {
+        return error {message => $error};
+      }
+    }
+  }
+  return;
+}
+
+sub option_self_coerce {
+  my ($self, $name, @data) = @_;
+
+  if ((my $code = $self->can("self_coerce_${name}")) && (@data || exists $self->{$name})) {
+    return $self->{$name} = $code->($self, @data ? $data[0] : $self->{$name});
+  }
+  return @data ? $data[0] : ();
 }
 
 sub option_trigger {
