@@ -258,8 +258,8 @@ sub option_default {
 sub option_initial {
   my ($self, $name, @data) = @_;
 
-  if ((my $code = $self->can("initial_${name}")) && !@data) {
-    $self->{$name} = $code->($self, @data) if !exists $self->{$name};
+  if ((my $code = $self->can("initial_${name}"))) {
+    $self->{$name} = $code->($self, @data);
   }
   return;
 }

@@ -153,6 +153,15 @@ $test->for('example', 3, 'stash', sub {
   !$result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Stashable.pod') if $ENV{RENDER};

@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '1.90';
+our $VERSION = '2.00';
 
 # AUTHORITY
 
@@ -25,6 +25,7 @@ sub import {
   my %exports = (
     cast => 1,
     catch => 1,
+    caught => 1,
     error => 1,
     false => 1,
     fault => 1,
@@ -64,6 +65,30 @@ sub catch (&) {
   my @result = Venus::Try->new($data)->error(\$error)->result;
 
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
+}
+
+sub caught ($$;&) {
+  my ($data, $type, $code) = @_;
+
+  ($type, my($name)) = @$type if ref $type eq 'ARRAY';
+
+  my $is_true = $data
+    && UNIVERSAL::isa($data, $type)
+    && UNIVERSAL::isa($data, 'Venus::Error')
+    && (
+      $data->name
+        ? ($name ? $data->of($name) : true())
+        : (!$name ? true() : false())
+    );
+
+  if ($is_true) {
+    local $_ = $data;
+
+    return $code ? $code->($data) : $data;
+  }
+  else {
+    return undef;
+  }
 }
 
 sub error (;$) {

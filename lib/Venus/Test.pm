@@ -123,7 +123,7 @@ sub data_for_example {
 
   my $data = $self->search({
     list => "example-$number",
-    name => quotemeta($name),
+    name => $name,
   });
 
   $self->throw->error if !@$data;
@@ -243,6 +243,19 @@ sub data_for_metadata {
   return join "\n\n", @{$data->[0]{data}};
 }
 
+sub data_for_message {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'message',
+    name => $name,
+  });
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
 sub data_for_method {
   my ($self, $name) = @_;
 
@@ -271,8 +284,18 @@ sub data_for_operator {
 
   my $data = $self->search({
     list => 'operator',
-    name => quotemeta($name),
+    name => $name,
   });
+
+  $self->throw->error if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_partials {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'partials');
 
   $self->throw->error if !@$data;
 
@@ -758,6 +781,48 @@ sub pdml_for_license {
   return $text ? ($self->head1('license', $text)) : ();
 }
 
+sub pdml_for_message {
+  my ($self, $name) = @_;
+
+  my @output;
+
+  my $signature = $self->text('signature', $name);
+
+  push @output, ($signature, '') if $signature;
+
+  my $text = $self->text('message', $name);
+
+  return () if !$text;
+
+  my @results = $self->search({name => $name});
+
+  for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+    push @output, "B<example $i>", $self->text('example', $i, $name);
+  }
+
+  return ($self->over($self->item($name, join "\n\n", $text, @output)));
+}
+
+sub pdml_for_messages {
+  my ($self) = @_;
+
+  my @output;
+
+  for my $list ($self->search({list => 'message'})) {
+    push @output, $self->pdml('message', $list->{name});
+  }
+
+  if (@output) {
+    unshift @output, $self->head1('messages',
+      $self->safe('text', 'heading', 'message')
+      || $self->safe('text', 'heading', 'messages')
+      || 'This package provides the following messages:',
+    );
+  }
+
+  return join "\n", @output;
+}
+
 sub pdml_for_method {
   my ($self, $name) = @_;
 
@@ -834,7 +899,7 @@ sub pdml_for_operator {
 
   return () if !$text;
 
-  my @results = $self->search({name => quotemeta($name)});
+  my @results = $self->search({name => $name});
 
   for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
     push @output, "B<example $i>", $self->text('example', $i, $name);
@@ -861,6 +926,16 @@ sub pdml_for_operators {
   }
 
   return join "\n", @output;
+}
+
+sub pdml_for_partials {
+  my ($self) = @_;
+
+  my $output;
+
+  my $text = $self->text('partials');
+
+  return $text ? ($text) : ();
 }
 
 sub pdml_for_project {
@@ -925,8 +1000,10 @@ sub render {
     'libraries',
     'functions: function',
     'methods: method',
+    'messages: message',
     'features: feature',
     'operators: operator',
+    'partials',
     'authors',
     'license',
     'project',
@@ -954,7 +1031,9 @@ sub show {
 
   my $results = $self->search({$list ? (list => $list) : (name => $name)});
 
-  $self->throw->error if !@$results;
+  $self->throw->error if !@$results && !grep $name eq $_, qw(
+    messages
+  );
 
   my @output;
   my $textual = 1;
@@ -1082,7 +1161,7 @@ sub test_for_attribute {
 sub test_for_authors {
   my ($self, $code) = @_;
 
-  my $data = $self->data('author');
+  my $data = $self->data('authors');
 
   $code ||= sub {
     length($data) > 1;
@@ -1090,7 +1169,7 @@ sub test_for_authors {
 
   my $result = $code->();
 
-  ok($result, '=author');
+  ok($result, '=authors');
 
   return $result;
 }
@@ -1146,6 +1225,12 @@ sub test_for_example {
   $data =~ s/.*# given: .*\n\n*//g;
 
   $data = join "\n\n", @includes, $data;
+
+  for my $attest ($data =~ /#\s*attest:\s*\w+:\s*[^\s]+,\s*.*/gm) {
+    my ($method, $left, $right) = $attest =~ /attest:\s*(\w+):\s*([^\s]+),\s*(.*)/;
+    my $snippet = qq($left = do { ok($left->$method($right), "@{[quotemeta($&)]}"); $left };);
+    $data =~ s/@{[quotemeta($attest)]}/$snippet/;
+  }
 
   $code ||= sub{1};
 
@@ -1292,6 +1377,22 @@ sub test_for_license {
   return $result;
 }
 
+sub test_for_message {
+  my ($self, $name, $code) = @_;
+
+  my $data = $self->data('message', $name);
+
+  $code ||= sub {
+    length($data) > 1;
+  };
+
+  my $result = $code->();
+
+  ok($result, "=message $name");
+
+  return $result;
+}
+
 sub test_for_method {
   my ($self, $name, $code) = @_;
 
@@ -1345,6 +1446,37 @@ sub test_for_operator {
   return $result;
 }
 
+sub test_for_partial {
+  my ($self, $text) = @_;
+
+  my ($file, $method, @args) = @$text;
+
+  my $test = $self->class->new($file);
+
+  my $content;
+
+  ok -f $file && ($content = $test->$method(@args)), "$file: $method: @args";
+
+  return $content;
+}
+
+sub test_for_partials {
+  my ($self, $code) = @_;
+
+  my $data = $self->data('partials');
+
+  $code ||= $self->can('test_for_partial');
+
+  ok($data, '=partials');
+
+  my $results = [];
+
+  push @$results, $self->$code($_)
+    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $data;
+
+  return $results;
+}
+
 sub test_for_project {
   my ($self, $name, $code) = @_;
 
@@ -1376,6 +1508,12 @@ sub test_for_synopsis {
   $data =~ s/.*# given: .*\n\n*//g;
 
   $data = join "\n\n", @includes, $data;
+
+  for my $attest ($data =~ /#\s*attest:\s*\w+:\s*[^\s]+,\s*.*/gm) {
+    my ($method, $left, $right) = $attest =~ /attest:\s*(\w+):\s*([^\s]+),\s*(.*)/;
+    my $snippet = qq($left = do { ok($left->$method($right), "@{[quotemeta($&)]}"); $left };);
+    $data =~ s/@{[quotemeta($attest)]}/$snippet/;
+  }
 
   $code ||= sub{$_[0]->result};
 
@@ -1526,7 +1664,7 @@ sub text_for_example {
 
   my $data = $self->search({
     list => "example-$number",
-    name => quotemeta($name),
+    name => $name,
   });
 
   push @$output, join "\n\n", @{$data->[0]{data}} if @$data;
@@ -1688,6 +1826,20 @@ sub text_for_metadata {
   return $output;
 }
 
+sub text_for_message {
+  my ($self, $name) = @_;
+
+  my ($error, $result) = $self->catch('data', 'message', $name);
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
 sub text_for_method {
   my ($self, $name) = @_;
 
@@ -1725,6 +1877,31 @@ sub text_for_operator {
 
   if (!$error) {
     push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_partial {
+  my ($self, $text) = @_;
+
+  my ($file, $method, @args) = @$text;
+
+  my $test = $self->class->new($file);
+
+  return [$test->$method(@args)];
+}
+
+sub text_for_partials {
+  my ($self) = @_;
+
+  my ($error, $result) = $self->catch('data', 'partials');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $self->text('partial', $_)
+      for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $result;
   }
 
   return $output;

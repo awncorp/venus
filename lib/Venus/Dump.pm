@@ -74,7 +74,11 @@ sub build_self {
 
   $self->decoder(sub {
     my ($text) = @_;
-    eval $text;
+    require Symbol;
+    my $name = join '::', __PACKAGE__, join '_', 'Eval', rand =~ s/\D//gr;
+    my $data = eval "package $name; no warnings; return $text";
+    Symbol::delete_package($name);
+    return $data;
   });
 
   return $self;

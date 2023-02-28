@@ -310,6 +310,15 @@ $test->for('example', 2, 'type', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Reflectable.pod') if $ENV{RENDER};

@@ -1373,7 +1373,7 @@ $test->for('example', 1, 'float', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->check(1.23);
-  ok $result->check(rand);
+  ok $result->check(rand || '0.0');
   ok !$result->check(1);
   ok !$result->check('0');
   ok !$result->check('1');
@@ -2495,6 +2495,15 @@ $test->for('example', 2, 'within', sub {
 
   $result
 });
+
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
 
 # END
 

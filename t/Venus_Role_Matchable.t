@@ -167,6 +167,15 @@ $test->for('example', 3, 'match', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Matchable.pod') if $ENV{RENDER};

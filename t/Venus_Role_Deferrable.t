@@ -170,6 +170,15 @@ $test->for('example', 1, 'defer', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Deferrable.pod') if $ENV{RENDER};

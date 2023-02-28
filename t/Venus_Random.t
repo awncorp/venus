@@ -3356,6 +3356,15 @@ $test->for('example', 1, 'uppercased', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 SKIP:

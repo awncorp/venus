@@ -106,6 +106,15 @@ This package provides a mechanism for dispatching to plugin classes.
 
 $test->for('description');
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Pluggable.pod') if $ENV{RENDER};

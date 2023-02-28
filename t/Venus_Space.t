@@ -87,6 +87,7 @@ method: scalars
 method: sibling
 method: siblings
 method: splice
+method: swap
 method: tfile
 method: tryload
 method: use
@@ -2952,6 +2953,93 @@ $test->for('example', 4, 'splice', sub {
   $result
 });
 
+=method swap
+
+The swap method overwrites the named subroutine in the underlying package with
+the code reference provided and returns the original subroutine as a code
+reference. The code provided will be passed a reference to the original
+subroutine as its first argument.
+
+=signature swap
+
+  swap(Str $name, CodeRef $code) (CodeRef)
+
+=metadata swap
+
+{
+  since => '1.95',
+}
+
+=example-1 swap
+
+  package Foo::Swap;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/swap');
+
+  my $subroutine = $space->swap('new', sub {
+    my ($next, @args) = @_;
+    my $self = $next->(@args);
+    $self->{swapped} = 1;
+    return $self;
+  });
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'swap', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok ref $result eq 'CODE';
+  my $return = $result->('Foo::Swap');
+  ok $return->isa('Foo::Swap');
+  ok !exists $return->{swapped};
+  my $swap = Foo::Swap->new;
+  ok exists $swap->{swapped};
+  ok $swap->{swapped} == 1;
+
+  $result
+});
+
+=example-2 swap
+
+  package Foo::Swap;
+
+  use Venus::Class;
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/swap');
+
+  my $subroutine = $space->swap('something', sub {
+    my ($next, @args) = @_;
+    my $self = $next->(@args);
+    $self->{swapped} = 1;
+    return $self;
+  });
+
+  # Exception! (isa Venus::Error) is "on.swap"
+
+=cut
+
+$test->for('example', 2, 'swap', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Space::Error');
+  ok $error->isa('Venus::Error');
+  ok $error->is('on.swap');
+
+  $result
+});
+
 =method tfile
 
 The tfile method returns a C<.t> file path for the underlying package.
@@ -3496,6 +3584,15 @@ $test->for('example', 2, 'version', sub {
 
   $result
 });
+
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
 
 # END
 

@@ -38,6 +38,7 @@ $test->for('abstract');
 
 function: cast
 function: catch
+function: caught
 function: error
 function: false
 function: fault
@@ -280,6 +281,255 @@ $test->for('example', 3, 'catch', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=function caught
+
+The caught function evaluates the exception object provided and validates its
+identity and name (if provided) then executes the code block provided returning
+the result of the callback. If no callback is provided this function returns
+the exception object on success and C<undef> on failure.
+
+=signature caught
+
+  caught(Object $error, Str | Tuple[Str, Str] $identity, CodeRef $block) (Any)
+
+=metadata caught
+
+{
+  since => '1.95',
+}
+
+=example-1 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, 'Venus::Error';
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 1, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Error');
+  ok !$result->name;
+
+  $result
+});
+
+=example-2 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error' };
+
+  my $result = caught $error, 'Venus::Error';
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 2, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example::Error');
+  ok $result->isa('Venus::Error');
+  ok !$result->name;
+
+  $result
+});
+
+=example-3 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error' };
+
+  my $result = caught $error, 'Example::Error';
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 3, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example::Error');
+  ok $result->isa('Venus::Error');
+  ok !$result->name;
+
+  $result
+});
+
+=example-4 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error', { name => 'on.test' } };
+
+  my $result = caught $error, ['Example::Error', 'on.test'];
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 4, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example::Error');
+  ok $result->isa('Venus::Error');
+  ok $result->name;
+  is $result->name, 'on_test';
+
+  $result
+});
+
+=example-5 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'raise';
+
+  my $error = catch { raise 'Example::Error', { name => 'on.recv' } };
+
+  my $result = caught $error, ['Example::Error', 'on.send'];
+
+  # undef
+
+=cut
+
+$test->for('example', 5, 'caught', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-6 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, ['Example::Error', 'on.send'];
+
+  # undef
+
+=cut
+
+$test->for('example', 6, 'caught', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-7 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, ['Example::Error'];
+
+  # undef
+
+=cut
+
+$test->for('example', 7, 'caught', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-8 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error };
+
+  my $result = caught $error, 'Example::Error';
+
+  # undef
+
+=cut
+
+$test->for('example', 8, 'caught', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+
+  !$result
+});
+
+=example-9 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error { name => 'on.send' } };
+
+  my $result = caught $error, ['Venus::Error', 'on.send'];
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 9, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Error');
+  ok $result->name;
+  is $result->name, 'on_send';
+
+  $result
+});
+
+=example-10 caught
+
+  package main;
+
+  use Venus 'catch', 'caught', 'error';
+
+  my $error = catch { error { name => 'on.send.open' } };
+
+  my $result = caught $error, ['Venus::Error', 'on.send'], sub {
+    $error->stash('caught', true) if $error->is('on.send.open');
+    return $error;
+  };
+
+  # bless(..., 'Venus::Error')
+
+=cut
+
+$test->for('example', 10, 'caught', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Error');
+  ok $result->stash('caught');
+  ok $result->name;
+  is $result->name, 'on_send_open';
 
   $result
 });
@@ -1445,7 +1695,11 @@ $test->for('example', 1, 'template-system', sub {
 
 Awncorp, C<awncorp@cpan.org>
 
-+=head1 LICENSE
+=cut
+
+$test->for('authors');
+
+=license
 
 Copyright (C) 2000, Al Newkirk.
 
@@ -1453,6 +1707,8 @@ This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.
 
 =cut
+
+$test->for('license');
 
 # END
 

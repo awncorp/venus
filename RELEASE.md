@@ -1,13 +1,14 @@
 # Release
 
-## Version: 1.90
+## Version: 2.00
 
-- [feature] Allow option_build to set value on read/write
-- [feature] Allow option_build on object construction
-- [feature] Test permutations of option_build, option_default, and option_coerce
-- [feature] Implement lazy_build hook in Venus::Role::Optional
-- [feature] Implement self_coerce hook in Venus::Role::Optional
-- [feature] Implement self_assert hook in Venus::Role::Optional
-- [feature] Use Venus::Assert#expression when asserting with option_assert
+- [feature] Implement Venus::Test "partials" feature
+- [feature] Implement Venus::Config
+- [feature] Implement Venus#caught
+- [feature] Support documentation of messages and exceptions
+- [feature] Implement Venus::Space#swap
+- [feature] Support documentation and testing of magic "attest" comment
+- [update] Address CPAN report 9dabc3cc-a53c-11ed-8404-33246e8775ea
+- [update] Fix "initial" in Venus::Role::Optional
 
 

@@ -435,6 +435,15 @@ $test->for('example', 3, 'make', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Assertable.pod') if $ENV{RENDER};

@@ -635,6 +635,30 @@ sub splice {
   return $class->new(join '/', @$parts);
 }
 
+sub swap {
+  my ($self, $name, $code) = @_;
+
+  my $orig = $self->package->can($name);
+
+  return $orig if !$code;
+
+  unless ($orig) {
+    my $throw;
+    my $class = $self->package;
+    my $error = qq(Attempt to swap undefined subroutine in package "$class");
+    $throw = $self->throw;
+    $throw->name('on.swap');
+    $throw->message($error);
+    $throw->stash(package => $class);
+    $throw->stash(routine => $name);
+    $throw->error;
+  }
+
+  $self->routine($name, sub { $code->($orig, @_) });
+
+  return $orig;
+}
+
 sub tfile {
   my ($self) = @_;
 

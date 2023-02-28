@@ -489,6 +489,23 @@ $test->for('example', 4, 'text', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+
+=cut
+
+$test->for('partials');
+
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Test.pod') if $ENV{RENDER};

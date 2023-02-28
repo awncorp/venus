@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    1.90
+    2.00
 
 SYNOPSIS
 
@@ -151,6 +151,141 @@ FUNCTIONS
         $result;
       
         # 1
+
+ caught
+
+      caught(Object $error, Str | Tuple[Str, Str] $identity, CodeRef $block) (Any)
+
+    The caught function evaluates the exception object provided and
+    validates its identity and name (if provided) then executes the code
+    block provided returning the result of the callback. If no callback is
+    provided this function returns the exception object on success and
+    undef on failure.
+
+    Since 1.95
+
+    caught example 1
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'error';
+      
+        my $error = catch { error };
+      
+        my $result = caught $error, 'Venus::Error';
+      
+        # bless(..., 'Venus::Error')
+
+    caught example 2
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'raise';
+      
+        my $error = catch { raise 'Example::Error' };
+      
+        my $result = caught $error, 'Venus::Error';
+      
+        # bless(..., 'Venus::Error')
+
+    caught example 3
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'raise';
+      
+        my $error = catch { raise 'Example::Error' };
+      
+        my $result = caught $error, 'Example::Error';
+      
+        # bless(..., 'Venus::Error')
+
+    caught example 4
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'raise';
+      
+        my $error = catch { raise 'Example::Error', { name => 'on.test' } };
+      
+        my $result = caught $error, ['Example::Error', 'on.test'];
+      
+        # bless(..., 'Venus::Error')
+
+    caught example 5
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'raise';
+      
+        my $error = catch { raise 'Example::Error', { name => 'on.recv' } };
+      
+        my $result = caught $error, ['Example::Error', 'on.send'];
+      
+        # undef
+
+    caught example 6
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'error';
+      
+        my $error = catch { error };
+      
+        my $result = caught $error, ['Example::Error', 'on.send'];
+      
+        # undef
+
+    caught example 7
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'error';
+      
+        my $error = catch { error };
+      
+        my $result = caught $error, ['Example::Error'];
+      
+        # undef
+
+    caught example 8
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'error';
+      
+        my $error = catch { error };
+      
+        my $result = caught $error, 'Example::Error';
+      
+        # undef
+
+    caught example 9
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'error';
+      
+        my $error = catch { error { name => 'on.send' } };
+      
+        my $result = caught $error, ['Venus::Error', 'on.send'];
+      
+        # bless(..., 'Venus::Error')
+
+    caught example 10
+
+        package main;
+      
+        use Venus 'catch', 'caught', 'error';
+      
+        my $error = catch { error { name => 'on.send.open' } };
+      
+        my $result = caught $error, ['Venus::Error', 'on.send'], sub {
+          $error->stash('caught', true) if $error->is('on.send.open');
+          return $error;
+        };
+      
+        # bless(..., 'Venus::Error')
 
  error
 

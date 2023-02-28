@@ -343,3 +343,9 @@ I<Since C<0.09>>
 =back
 
 =cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut

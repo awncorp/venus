@@ -236,6 +236,15 @@ $test->for('example', 3, 'is_true', sub {
   !$result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Testable.pod') if $ENV{RENDER};

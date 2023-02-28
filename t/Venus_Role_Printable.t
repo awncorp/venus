@@ -414,6 +414,15 @@ $test->for('example', 1, 'say_string', sub {
   $result
 });
 
+=partials
+
+t/Venus.t: pdml: authors
+t/Venus.t: pdml: license
+
+=cut
+
+$test->for('partials');
+
 # END
 
 $test->render('lib/Venus/Role/Printable.pod') if $ENV{RENDER};
