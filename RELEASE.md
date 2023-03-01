@@ -1,6 +1,6 @@
 # Release
 
-## Version: 2.00
+## Version: 2.01
 
 - [feature] Implement Venus::Test "partials" feature
 - [feature] Implement Venus::Config

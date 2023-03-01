@@ -2077,8 +2077,8 @@ $test->for('example', 1, '#lifecycle', sub {
   ok $return_2->isa('Venus::Match');
   ok $return_2->result('a') eq 'b';
   require Scalar::Util;
-  ok Scalar::Util::refaddr($cached) eq Scalar::Util::refaddr($return_1) eq
-  Scalar::Util::refaddr($return_2);
+  ok Scalar::Util::refaddr($cached) eq Scalar::Util::refaddr($return_1)
+    && Scalar::Util::refaddr($return_1) eq Scalar::Util::refaddr($return_2);
 
   $result
 });
