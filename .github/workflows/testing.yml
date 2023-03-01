@@ -189,7 +189,7 @@ jobs:
     - name: Setup GitHub Token
       run: git config --global github.token ${{ secrets.REPO_USER_TOKEN }}
     - name: Setup Safe Directory
-      run: git config --global --add safe.directory ${{ github.workspace }}
+      run: git config --global --add safe.directory "*"
     - name: Advertise Perl Version
       run: perl -V
     - name: Install Dist::Zilla
