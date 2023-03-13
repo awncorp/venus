@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-2.01
+2.30
 
 =cut
 

@@ -225,6 +225,12 @@ sub kill {
   return _kill(uc($name), @pids);
 }
 
+sub ping {
+  my ($self, @pids) = @_;
+
+  return $self->kill(0, @pids);
+}
+
 sub setsid {
   my ($self) = @_;
 

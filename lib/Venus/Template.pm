@@ -242,7 +242,10 @@ sub render_foreach {
   }
 
   my @results = $self->mappable($mappable)->each(sub {
-    $self->render($context, $self->mappable($_));
+    my (@args) = @_;
+    $self->render($context, $self->mappable($args[1])->do(
+      'set', 'loop', {index => $args[0], place => $args[0]+1},
+    ));
   });
 
   return join "\n", grep !!$_, @results;

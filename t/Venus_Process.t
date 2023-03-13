@@ -164,6 +164,7 @@ method: exit
 method: fork
 method: forks
 method: kill
+method: ping
 method: setsid
 method: stderr
 method: stdin
@@ -865,6 +866,46 @@ doesn't necessarily mean all processes were successfully signalled.
 =cut
 
 $test->for('example', 1, 'kill', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_KILL = 1;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=method ping
+
+The ping method returns truthy if the process of the PID provided is active. If
+multiple PIDs are provided, this method will return the count of active PIDs.
+
+=signature ping
+
+  ping(Int @pids) (Int)
+
+=metadata ping
+
+{
+  since => '2.01',
+}
+
+=example-1 ping
+
+  # given: synopsis;
+
+  if ($process = $parent->fork) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $ping = $parent->ping(int$process);
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'ping', sub {
   my ($tryable) = @_;
   local $TEST_VENUS_PROCESS_FORK = 0;
   local $TEST_VENUS_PROCESS_KILL = 1;

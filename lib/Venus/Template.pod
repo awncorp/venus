@@ -88,7 +88,9 @@ This package provides the following methods:
 =head2 render
 
 The render method processes the template by replacing the tokens and control
-structurs with the appropriate replacements and returns the result.
+structurs with the appropriate replacements and returns the result. B<Note:>
+The rendering process expects variables to be hashrefs and sets (arrayrefs) of
+hashrefs.
 
 =over 4
 
@@ -234,6 +236,66 @@ structurs with the appropriate replacements and returns the result.
   # @user1: ready?
   # user2: ready!
   # @user1: lets begin!
+
+=back
+
+=over 4
+
+=item render example 7
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new(q(
+    {{ for chat.messages }}
+    [{{ loop.place }}] {{ user.name }}: {{ message }}
+    {{ end chat.messages }}
+  ));
+
+  $template->variables({
+    chat => { messages => [
+      { user => { name => 'user1' }, message => 'ready?' },
+      { user => { name => 'user2' }, message => 'ready!' },
+      { user => { name => 'user1' }, message => 'lets begin!' },
+    ]}
+  });
+
+  my $result = $template->render;
+
+  # [1] user1: ready?
+  # [2] user2: ready!
+  # [3] user1: lets begin!
+
+=back
+
+=over 4
+
+=item render example 8
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new(q(
+    {{ for chat.messages }}
+    [{{ loop.index }}] {{ user.name }}: {{ message }}
+    {{ end chat.messages }}
+  ));
+
+  $template->variables({
+    chat => { messages => [
+      { user => { name => 'user1' }, message => 'ready?' },
+      { user => { name => 'user2' }, message => 'ready!' },
+      { user => { name => 'user1' }, message => 'lets begin!' },
+    ]}
+  });
+
+  my $result = $template->render;
+
+  # [0] user1: ready?
+  # [1] user2: ready!
+  # [2] user1: lets begin!
 
 =back
 

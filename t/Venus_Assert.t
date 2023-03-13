@@ -42,6 +42,7 @@ method: any
 method: accept
 method: array
 method: arrayref
+method: attributes
 method: boolean
 method: check
 method: clear
@@ -54,17 +55,22 @@ method: conditions
 method: constraint
 method: constraints
 method: defined
+method: either
 method: enum
 method: expression
 method: format
 method: float
 method: hash
+method: hashkeys
 method: hashref
 method: identity
+method: inherits
+method: integrates
 method: maybe
 method: number
 method: object
 method: package
+method: parse
 method: reference
 method: regexp
 method: routines
@@ -77,6 +83,7 @@ method: validate
 method: validator
 method: value
 method: within
+method: yesno
 
 =cut
 
@@ -187,16 +194,18 @@ $test->for('example', 1, 'any', sub {
 =method accept
 
 The accept method registers a constraint based on the built-in type or package
-name provided. Optionally, you can provide a callback to further
-constrain/validate the provided value, returning truthy or falsy. The built-in
-types are I<"array">, I<"boolean">, I<"code">, I<"float">, I<"hash">,
-I<"number">, I<"object">, I<"regexp">, I<"scalar">, I<"string">, or I<"undef">.
-Any name given that is not a built-in type is assumed to be an I<"object"> of
-the name provided.
+name provided as the first argument. The built-in types are I<"array">,
+I<"boolean">, I<"code">, I<"float">, I<"hash">, I<"number">, I<"object">,
+I<"regexp">, I<"scalar">, I<"string">, or I<"undef">.  Any name given that is
+not a built-in type is assumed to be a method (i.e. a method call) or an
+I<"object"> of the name provided. Additional arguments are assumed to be
+arguments for the dispatched method call. Optionally, you can provide a
+callback to further constrain/validate the provided value, returning truthy or
+falsy, for methods that support it.
 
 =signature accept
 
-  accept(Str $name, CodeRef $callback) (Object)
+  accept(Str $name, Any @args) (Object)
 
 =metadata accept
 
@@ -450,6 +459,112 @@ $test->for('example', 1, 'arrayref', sub {
   ok !$result->check(0);
   ok !$result->check({});
   ok !$result->check(bless{});
+
+  $result
+});
+
+=method attributes
+
+The attributes method configures the object to accept objects containing
+attributes whose values' match the attribute names and types specified, and
+returns the invocant.
+
+=signature attributes
+
+  attributes(Str | ArrayRef[Str] @pairs) (Assert)
+
+=metadata attributes
+
+{
+  since => '2.01',
+}
+
+=example-1 attributes
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->attributes;
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'attributes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check(Venus::Assert->new);
+
+  $result
+});
+
+=example-2 attributes
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->attributes(name => 'string');
+
+  # $assert->check(bless{});
+
+  # false
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'attributes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check(bless{});
+  ok $result->check(Venus::Assert->new);
+
+  $result
+});
+
+=example-3 attributes
+
+  # given: synopsis
+
+  package Example3;
+
+  use Venus::Class;
+
+  attr 'name';
+
+  package main;
+
+  $assert = $assert->attributes(name => 'string', message => 'string');
+
+  # $assert->check(bless{});
+
+  # false
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+  # $assert->check(Example3->new);
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'attributes', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check(bless{});
+  ok $result->check(Venus::Assert->new);
+  ok !$result->check(Example3->new);
 
   $result
 });
@@ -1134,6 +1249,116 @@ $test->for('example', 1, 'defined', sub {
   $result
 });
 
+=method either
+
+The either method configures the object to accept "either" of the conditions
+provided, which may be a string or arrayref representing a method call, and
+returns the invocant.
+
+=signature either
+
+  either(Str | ArrayRef[Str|ArrayRef] $dispatch) (Assert)
+
+=metadata either
+
+{
+  since => '2.01',
+}
+
+=example-1 either
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->either('string');
+
+  # $assert->check('1');
+
+  # true
+
+  # $assert->check(1);
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'either', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check('1');
+  ok !$result->check(1);
+
+  $result
+});
+
+=example-2 either
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->either('string', 'number');
+
+  # $assert->check(true);
+
+  # false
+
+  # $assert->check('1');
+
+  # true
+
+  # $assert->check(1);
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'either', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check(true);
+  ok $result->check('1');
+  ok $result->check(1);
+
+  $result
+});
+
+=example-3 either
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->either('number', 'boolean');
+
+  # $assert->check(true);
+
+  # true
+
+  # $assert->check('1');
+
+  # false
+
+  # $assert->check(1);
+
+  # true
+
+=cut
+
+$test->for('example', 3, 'either', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check(true);
+  ok !$result->check('1');
+  ok $result->check(1);
+
+  $result
+});
+
 =method enum
 
 The enum method configures the object to accept any one of the provide options,
@@ -1184,9 +1409,9 @@ $test->for('example', 1, 'enum', sub {
 
 =method expression
 
-The expression method parses a string representation of a method/function
-signature, registers the subexpressions using the L</accept> method, and
-returns the invocant.
+The expression method parses a string representation of an type assertion
+signature, registers the subexpressions using the L</either> and L</accept>
+methods, and returns the invocant.
 
 =signature expression
 
@@ -1303,7 +1528,7 @@ $test->for('example', 3, 'expression', sub {
 
   package main;
 
-  $assert = $assert->expression('Venus::Assert | arrayref[Venus::Assert]');
+  $assert = $assert->expression('Venus::Assert | within[arrayref, Venus::Assert]');
 
   # $assert->check('hello');
 
@@ -1599,6 +1824,136 @@ $test->for('example', 1, 'hash', sub {
   $result
 });
 
+=method hashkeys
+
+The hashkeys method configures the object to accept hash based values
+containing the keys whose values' match the specified types, and returns the
+invocant.
+
+=signature hashkeys
+
+  hashkeys(Str | ArrayRef[Str] @pairs) (Assert)
+
+=metadata hashkeys
+
+{
+  since => '2.01',
+}
+
+=example-1 hashkeys
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashkeys;
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({random => rand});
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'hashkeys', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check({});
+  ok $result->check({random => rand});
+
+  $result
+});
+
+=example-2 hashkeys
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashkeys(random => 'float');
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({random => rand});
+
+  # true
+
+  # $assert->check({random => time});
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'hashkeys', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check({});
+  ok $result->check({random => rand});
+  ok !$result->check({random => time});
+
+  $result
+});
+
+=example-3 hashkeys
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->hashkeys(random => ['either', 'float', 'number']);
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({random => rand});
+
+  # true
+
+  # $assert->check({random => time});
+
+  # true
+
+  # $assert->check({random => 'okay'});
+
+  # false
+
+  # $assert->check(bless{random => rand});
+
+  # true
+
+  # $assert->check(bless{random => time});
+
+  # true
+
+  # $assert->check(bless{random => 'okay'});
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'hashkeys', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check({});
+  ok $result->check({random => rand});
+  ok $result->check({random => time});
+  ok !$result->check({random => 'okay'});
+  ok $result->check(bless{random => rand});
+  ok $result->check(bless{random => time});
+  ok !$result->check(bless{random => 'okay'});
+
+  $result
+});
+
 =method hashref
 
 The hashref method configures the object to accept hash references and returns
@@ -1669,6 +2024,90 @@ specified as the argument, and returns the invocant.
 =cut
 
 $test->for('example', 1, 'identity', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(Venus::Assert->new);
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method inherits
+
+The inherits method configures the object to accept objects of the type
+specified as the argument, and returns the invocant. This method is a proxy for
+the L</identity> method.
+
+=signature inherits
+
+  inherits(Str $name) (Assert)
+
+=metadata inherits
+
+{
+  since => '2.01',
+}
+
+=example-1 inherits
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->inherits('Venus::Assert');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'inherits', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->check(Venus::Assert->new);
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless{});
+
+  $result
+});
+
+=method integrates
+
+The integrates method configures the object to accept objects that support the
+C<"does"> behavior and consumes the "role" specified as the argument, and
+returns the invocant.
+
+=signature integrates
+
+  integrates(Str $name) (Assert)
+
+=metadata integrates
+
+{
+  since => '2.01',
+}
+
+=example-1 integrates
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->integrates('Venus::Role::Doable');
+
+  # $assert->check(Venus::Assert->new);
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'integrates', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->check(Venus::Assert->new);
@@ -1845,6 +2284,265 @@ $test->for('example', 1, 'package', sub {
   ok !$result->check('Example');
   ok !$result->check(1);
   ok !$result->check(bless{});
+
+  $result
+});
+
+=method parse
+
+The parse method accepts a string representation of a type assertion signature
+and returns a data structure representing one or more method calls to be used
+for validating the assertion signature.
+
+=signature parse
+
+  parse(Str $expr) (Any)
+
+=metadata parse
+
+{
+  since => '2.01',
+}
+
+=example-1 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('');
+
+  # ['']
+
+=cut
+
+$test->for('example', 1, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [''];
+
+  $result
+});
+
+=example-2 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('any');
+
+  # ['any']
+
+=cut
+
+$test->for('example', 2, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['any'];
+
+  $result
+});
+
+=example-3 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('string | number');
+
+  # ['either', 'string', 'number']
+
+=cut
+
+$test->for('example', 3, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['either', 'string', 'number'];
+
+  $result
+});
+
+=example-4 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('enum[up,down,left,right]');
+
+  # [['enum', 'up', 'down', 'left', 'right']]
+
+=cut
+
+$test->for('example', 4, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [['enum', 'up', 'down', 'left', 'right']];
+
+  $result
+});
+
+=example-5 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('number | float | boolean');
+
+  # ['either', 'number', 'float', 'boolean']
+
+=cut
+
+$test->for('example', 5, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['either', 'number', 'float', 'boolean'];
+
+  $result
+});
+
+=example-6 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('Example');
+
+  # ['Example']
+
+=cut
+
+$test->for('example', 6, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['Example'];
+
+  $result
+});
+
+=example-7 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('coderef | Venus::Code');
+
+  # ['either', 'coderef', 'Venus::Code']
+
+=cut
+
+$test->for('example', 7, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['either', 'coderef', 'Venus::Code'];
+
+  $result
+});
+
+=example-8 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('tuple[number, arrayref, coderef]');
+
+  # [['tuple', 'number', 'arrayref', 'coderef']]
+
+=cut
+
+$test->for('example', 8, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [['tuple', 'number', 'arrayref', 'coderef']];
+
+  $result
+});
+
+=example-9 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse('tuple[number, within[arrayref, hashref], coderef]');
+
+  # [['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef']]
+
+=cut
+
+$test->for('example', 9, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [
+    ['tuple', 'number', ['within', 'arrayref', 'hashref'], 'coderef']
+  ];
+
+  $result
+});
+
+=example-10 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse(
+    'tuple[number, within[arrayref, hashref] | arrayref, coderef]'
+  );
+
+  # [
+  #   ['tuple', 'number',
+  #     ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef']
+  # ]
+
+
+=cut
+
+$test->for('example', 10, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [
+    ['tuple', 'number',
+    ['either', ['within', 'arrayref', 'hashref'], 'arrayref'], 'coderef']
+  ];
+
+  $result
+});
+
+=example-11 parse
+
+  # given: synopsis
+
+  package main;
+
+  my $parsed = $assert->parse(
+    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]'
+  );
+
+  # [[
+  #   'hashkeys',
+  #   'id',
+  #     ['either', 'number', 'float'],
+  #   'upvotes',
+  #     ['within', 'arrayref', 'boolean']
+  # ]]
+
+=cut
+
+$test->for('example', 11, 'parse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [[
+    'hashkeys', 'id',
+    ['either', 'number', 'float'], 'upvotes',
+    ['within', 'arrayref', 'boolean']
+  ]];
 
   $result
 });
@@ -2105,7 +2803,8 @@ $test->for('example', 1, 'string', sub {
 =method tuple
 
 The tuple method configures the object to accept array references which conform
-to a tuple specification, and returns the invocant.
+to a tuple specification, and returns the invocant. The value being evaluated
+must contain at-least one element to match.
 
 =signature tuple
 
@@ -2391,8 +3090,10 @@ $test->for('example', 1, 'value', sub {
 =method within
 
 The within method configures the object, registering a constraint action as a
-sub-match operation, to accept array or hash based values, and returns the
-invocant.
+sub-match operation, to accept array or hash based values, and returns a
+L<Venus::Assert> instance for the sub-match operation (not the invocant).  This
+operation can traverse blessed array or hash based values. The value being
+evaluated must contain at-least one element to match.
 
 =signature within
 
@@ -2416,7 +3117,7 @@ invocant.
 
   # $assert->check([]);
 
-  # true
+  # false
 
   # $assert->check([sub{}]);
 
@@ -2428,6 +3129,10 @@ invocant.
 
   # $assert->check(bless[]);
 
+  # false
+
+  # $assert->check(bless[sub{}]);
+
   # true
 
 =cut
@@ -2435,7 +3140,7 @@ invocant.
 $test->for('example', 1, 'within', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->check([]);
+  ok !$result->check([]);
   ok $result->check([sub{}]);
   ok !$result->check([{}]);
   ok !$result->check([sub{}, 1]);
@@ -2443,7 +3148,7 @@ $test->for('example', 1, 'within', sub {
   ok !$result->check(0);
   ok !$result->check(1);
   ok !$result->check(bless{});
-  ok $result->check(bless[]);
+  ok !$result->check(bless[]);
   ok $result->check(bless[sub{}]);
   ok !$result->check(bless[{}]);
 
@@ -2462,7 +3167,7 @@ $test->for('example', 1, 'within', sub {
 
   # $assert->check({});
 
-  # true
+  # false
 
   # $assert->check({test => sub{}});
 
@@ -2474,14 +3179,18 @@ $test->for('example', 1, 'within', sub {
 
   # $assert->check({test => bless{}});
 
-  # true
+  # false
+
+  # $assert->check({test => bless sub{}});
+
+  # false
 
 =cut
 
 $test->for('example', 2, 'within', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->check({});
+  ok !$result->check({});
   ok $result->check({test => sub{}});
   ok !$result->check({test => {}});
   ok !$result->check({test => sub{}, name => 1});
@@ -2489,9 +3198,136 @@ $test->for('example', 2, 'within', sub {
   ok !$result->check(0);
   ok !$result->check(1);
   ok !$result->check(bless[]);
-  ok $result->check(bless{});
+  ok !$result->check(bless{});
   ok $result->check(bless{test => sub{}});
   ok !$result->check(bless{test => sub{}, name => 1});
+  ok !$result->check({test => bless{}});
+  ok !$result->check({test => bless sub{}});
+
+  $result
+});
+
+=example-3 within
+
+  # given: synopsis
+
+  package main;
+
+  my $within = $assert->within('hashref', 'code');
+
+  my $action = $assert;
+
+  # $assert->check({});
+
+  # false
+
+  # $assert->check({test => sub{}});
+
+  # true
+
+  # $assert->check({test => {}});
+
+  # false
+
+  # $assert->check({test => bless{}});
+
+  # false
+
+  # $assert->check({test => bless sub{}});
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'within', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok !$result->check({});
+  ok $result->check({test => sub{}});
+  ok !$result->check({test => {}});
+  ok !$result->check({test => sub{}, name => 1});
+  ok !$result->check(undef);
+  ok !$result->check(0);
+  ok !$result->check(1);
+  ok !$result->check(bless[]);
+  ok !$result->check(bless{});
+  ok $result->check(bless{test => sub{}});
+  ok !$result->check(bless{test => sub{}, name => 1});
+  ok !$result->check({test => bless{}});
+  ok !$result->check({test => bless sub{}});
+
+  $result
+});
+
+=method yesno
+
+The yesno method configures the object to accept a string value that's either
+C<"yes"> or C<1>, C<"no"> or C<0>, and returns the invocant.
+
+=signature yesno
+
+  yesno(CodeRef $check) (Assert)
+
+=metadata yesno
+
+{
+  since => '2.01',
+}
+
+=example-1 yesno
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->yesno;
+
+  # $assert->check(undef);
+
+  # false
+
+  # $assert->check(0);
+
+  # true
+
+  # $assert->check('No');
+
+  # true
+
+  # $assert->check('n');
+
+  # true
+
+  # $assert->check(1);
+
+  # true
+
+  # $assert->check('Yes');
+
+  # true
+
+  # $assert->check('y');
+
+  # true
+
+  # $assert->check('Okay');
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'yesno', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok !$result->check(undef);
+  ok $result->check(0);
+  ok $result->check('No');
+  ok $result->check('n');
+  ok $result->check(1);
+  ok $result->check('Yes');
+  ok $result->check('y');
+  ok !$result->check('Okay');
 
   $result
 });
@@ -2504,6 +3340,183 @@ t/Venus.t: pdml: license
 =cut
 
 $test->for('partials');
+
+subtest 'test_for_parser', sub {
+  my $assert = Venus::Assert->new;
+
+  my $string = 'string';
+  is_deeply scalar $assert->parse($string), [
+    'string',
+  ];
+
+  $string = 'string | number';
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    'string',
+    'number',
+  ];
+
+  $string = 'string | number | Venus::Code';
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    'string',
+    'number',
+    'Venus::Code',
+  ];
+
+  $string = join ' | ',
+    'number',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]',
+    'tuple[number | string]';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either', 'number',
+    [
+      'hashkeys', 'id',
+      ['either', 'number', 'float'], 'upvotes',
+      ['within', 'arrayref', 'boolean'],
+    ],
+    ['tuple', ['either', 'number', 'string'],],
+    ];
+
+  $string = join ' | ',
+    'number',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either', 'number',
+    [
+      'hashkeys', 'id',
+      ['either', 'number', 'float'], 'upvotes',
+      ['within', 'arrayref', 'boolean'],
+    ],
+    ];
+
+  $string = 'within[arrayref, hashref] | arrayref';
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    [
+      'within',
+      'arrayref',
+      'hashref',
+    ],
+    'arrayref',
+  ];
+
+  $string = join ' | ',
+    'number',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]',
+    'tuple[number | string]';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either', 'number',
+    [
+      'hashkeys', 'id',
+      ['either', 'number', 'float'], 'upvotes',
+      ['within', 'arrayref', 'boolean'],
+    ],
+    ['tuple', ['either', 'number', 'string'],],
+    ];
+
+  $string = 'string | number | tuple[string, number]';
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    'string',
+    'number',
+    [
+      'tuple',
+      'string',
+      'number',
+    ],
+  ];
+
+  $string = join ' | ',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean]]',
+    'string',
+    'number';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either',
+    [
+      'hashkeys', 'id', ['either', 'number', 'float'],
+      'upvotes', ['within', 'arrayref', ['either', 'number', 'boolean',],],
+    ],
+    'string', 'number',
+    ];
+
+  $string = join ' | ',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]',
+    'string',
+    'Example::Thing';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either',
+    [
+      'hashkeys', 'id',
+      ['either', 'number', 'float'], 'upvotes',
+      ['within', 'arrayref', 'boolean',],
+    ],
+    'string',
+    'Example::Thing',
+    ];
+
+  $string = join ' | ',
+    'Example::String',
+    'hashkeys["id", number', 'float, "upvotes", within[arrayref, boolean]]',
+    'Example::Thing',
+    'string',
+    'number';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either',
+    'Example::String',
+    [
+      'hashkeys', 'id',
+      ['either', 'number', 'float'], 'upvotes',
+      ['within', 'arrayref', 'boolean',],
+    ],
+    'Example::Thing',
+    'string', 'number',
+    ];
+
+  $string = join ' | ',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean | hashkeys["id", number | float]]]',
+    'hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean | hashkeys["id", number | float]]]',
+    'Example';
+  is_deeply scalar $assert->parse($string),
+    [
+    'either',
+    [
+      'hashkeys',
+      'id',
+      ['either', 'number', 'float'],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        [
+          'either', 'number',
+          'boolean', ['hashkeys', 'id', ['either', 'number', 'float',],],
+        ],
+      ],
+    ],
+    [
+      'hashkeys',
+      'id',
+      ['either', 'number', 'float'],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        [
+          'either', 'number',
+          'boolean', ['hashkeys', 'id', ['either', 'number', 'float',],],
+        ],
+      ],
+    ],
+    'Example',
+    ];
+};
 
 # END
 

@@ -517,7 +517,7 @@ $test->for('example', 4, 'asserting', sub {
   ok $error->is('on.validate');
   ok $error->isa('Venus::Assert::Error');
   ok $error->message =~ /Person\.progress/i;
-  ok $error->message =~ /received \(string\), expected \(number OR float\)/i;
+  ok $error->message =~ /received \(string\), expected \(number | float\)/i;
 
   $result
 });

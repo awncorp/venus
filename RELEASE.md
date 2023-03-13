@@ -1,14 +1,21 @@
 # Release
 
-## Version: 2.01
+## Version: 2.30
 
-- [feature] Implement Venus::Test "partials" feature
-- [feature] Implement Venus::Config
-- [feature] Implement Venus#caught
-- [feature] Support documentation of messages and exceptions
-- [feature] Implement Venus::Space#swap
-- [feature] Support documentation and testing of magic "attest" comment
-- [update] Address CPAN report 9dabc3cc-a53c-11ed-8404-33246e8775ea
-- [update] Fix "initial" in Venus::Role::Optional
+- [feature] Implement Venus::Assert#attributes
+- [feature] Implement Venus::Role::Unpackable
+- [feature] Implement Venus::Unpack
+- [feature] Implement Venus::Array#order
+- [feature] Implement Venus::Unpack#signature
+- [feature] Implement Venus::Assert#either
+- [feature] Implement Venus::Process#ping
+- [feature] Implement Venus::Assert#hashkeys
+- [feature] Implement Venus::Assert#parse, update Venus::Assert#expression
+- [feature] Implement Venus::Assert#{inherits,integrates}
+- [feature] Implement Venus::Assert#yesno
+- [update] Update Venus::Template
+- [update] Strengthen Venus::Assert#enum
+- [update] Enhance Venus::Assert#{tuple,within}
+- [update] Update Venus::Assert type expression parser
 
 

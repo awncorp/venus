@@ -339,6 +339,18 @@ sub one {
   return $found == 1 ? true : false;
 }
 
+sub order {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  my %seen = ();
+
+  @{$data} = (map $data->[$_], grep !$seen{$_}++, (@args), 0..$#{$data});
+
+  return $self;
+}
+
 sub pairs {
   my ($self) = @_;
 

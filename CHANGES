@@ -1,4 +1,22 @@
-2.01 2022-02-28
+2.30 2023-03-13
+
+- [feature] Implement Venus::Assert#attributes
+- [feature] Implement Venus::Role::Unpackable
+- [feature] Implement Venus::Unpack
+- [feature] Implement Venus::Array#order
+- [feature] Implement Venus::Unpack#signature
+- [feature] Implement Venus::Assert#either
+- [feature] Implement Venus::Process#ping
+- [feature] Implement Venus::Assert#hashkeys
+- [feature] Implement Venus::Assert#parse, update Venus::Assert#expression
+- [feature] Implement Venus::Assert#{inherits,integrates}
+- [feature] Implement Venus::Assert#yesno
+- [update] Update Venus::Template
+- [update] Strengthen Venus::Assert#enum
+- [update] Enhance Venus::Assert#{tuple,within}
+- [update] Update Venus::Assert type expression parser
+
+2.01 2023-02-28
 
 - [feature] Implement Venus::Test "partials" feature
 - [feature] Implement Venus::Config
@@ -9,7 +27,7 @@
 - [update] Address CPAN report 9dabc3cc-a53c-11ed-8404-33246e8775ea
 - [update] Fix "initial" in Venus::Role::Optional
 
-1.90 2022-01-28
+1.90 2023-01-28
 
 - [feature] Allow option_build to set value on read/write
 - [feature] Allow option_build on object construction

@@ -87,6 +87,25 @@ sub arrayref {
   return $self->array(@code);
 }
 
+sub attributes {
+  my ($self, @pairs) = @_;
+
+  $self->object(sub{
+    my $check = 0;
+    my $value = $_->value;
+    return false if @pairs % 2;
+    for (my $i = 0; $i < @pairs;) {
+      my ($key, $data) = (map $pairs[$_], $i++, $i++);
+      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
+      $check++ if $value->can($key)
+        && $self->new->do($match, @args)->check($value->$key);
+    }
+    ((@pairs / 2) == $check) ? true : false
+  });
+
+  return $self;
+}
+
 sub assertion {
   my ($self) = @_;
 
@@ -209,11 +228,23 @@ sub defined {
   return $self;
 }
 
+sub either {
+  my ($self, @data) = @_;
+
+  for (my $i = 0; $i < @data; $i++) {
+    my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
+    $self->accept($match, @args);
+  }
+
+  return $self;
+}
+
 sub enum {
   my ($self, @data) = @_;
 
   for my $item (@data) {
-    $self->constraints->when(sub{$_->value eq $item})->then(sub{true});
+    $self->constraints->when(sub{CORE::defined($_->value) && $_->value eq $item})
+      ->then(sub{true});
   }
 
   return $self;
@@ -224,18 +255,11 @@ sub expression {
 
   return $self if !$data;
 
-  my @data = split /\s*\|\s*(?![^\[]*\])/, $data;
+  $self->expects([$data]);
 
-  push @{$self->expects}, @data;
+  my @parsed = $self->parse($data);
 
-  for my $item (@data) {
-    if (my @nested = $item =~ /^((?:array|hash)(?:ref)?)\[([^\]]+)\]$/) {
-      $self->within($nested[0])->expression($nested[1]);
-    }
-    else {
-      $self->accept($item);
-    }
-  }
+  $self->either(@parsed);
 
   return $self;
 }
@@ -304,6 +328,27 @@ sub hash {
   return $self;
 }
 
+sub hashkeys {
+  my ($self, @pairs) = @_;
+
+  $self->constraints->when(sub{
+    CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
+      && %{$_->value} > 0
+  })->then(sub{
+    my $check = 0;
+    my $value = $_->value;
+    return false if @pairs % 2;
+    for (my $i = 0; $i < @pairs;) {
+      my ($key, $data) = (map $pairs[$_], $i++, $i++);
+      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
+      $check++ if $self->new->do($match, @args)->check($value->{$key});
+    }
+    ((@pairs / 2) == $check) ? true : false
+  });
+
+  return $self;
+}
+
 sub hashref {
   my ($self, @code) = @_;
 
@@ -314,6 +359,24 @@ sub identity {
   my ($self, $name) = @_;
 
   $self->constraint('object', sub {$_->value->isa($name) ? true : false});
+
+  return $self;
+}
+
+sub inherits {
+  my ($self, $name) = @_;
+
+  $self->constraint('object', sub {$_->value->isa($name) ? true : false});
+
+  return $self;
+}
+
+sub integrates {
+  my ($self, $name) = @_;
+
+  $self->constraint('object', sub {
+    $_->value->can('does') ? ($_->value->does($name) ? true : false) : false
+  });
 
   return $self;
 }
@@ -355,6 +418,14 @@ sub package {
   });
 
   return $self;
+}
+
+sub parse {
+  my ($self, $expr) = @_;
+
+  $expr ||= '';
+
+  return _type_parse($expr);
 }
 
 sub received {
@@ -455,13 +526,16 @@ sub string {
 sub tuple {
   my ($self, @data) = @_;
 
-  $self->array->constraints->then(sub{
+  $self->constraints->when(sub{
+    CORE::defined($_->value) && CORE::ref($_->value) eq 'ARRAY'
+      && @data == @{$_->value}
+  })->then(sub{
     my $check = 0;
     my $value = $_->value;
     return false if @data != @$value;
     for (my $i = 0; $i < @data; $i++) {
       my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
-      $check++ if $self->new->$match(@args)->check($value->[$i]);
+      $check++ if $self->new->do($match, @args)->check($value->[$i]);
     }
     (@data == $check) ? true : false
   });
@@ -519,7 +593,7 @@ sub value {
 }
 
 sub within {
-  my ($self, $type) = @_;
+  my ($self, $type, @next) = @_;
 
   if (!$type) {
     return $self;
@@ -528,14 +602,20 @@ sub within {
   my $where = $self->new;
 
   if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
-    $self->defined(sub{
+    $self->constraints->when(sub{
+      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
+        && %{$_->value} > 0
+    })->then(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'HASH')
         && CORE::values(%$value) == grep $where->check($_), CORE::values(%$value)
     });
   }
   elsif (lc($type) eq 'array' || lc($type) eq 'arrayref') {
-    $self->defined(sub{
+    $self->constraints->when(sub{
+      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'ARRAY')
+        && @{$_->value} > 0
+    })->then(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'ARRAY')
         && @$value == grep $where->check($_), @$value
@@ -550,7 +630,240 @@ sub within {
     $throw->error;
   }
 
+  $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
+
   return $where;
+}
+
+sub yesno {
+  my ($self, @code) = @_;
+
+  $self->constraints->when(sub{
+    CORE::defined($_->value) && $_->value =~ /^(?:1|y(?:es)?|0|n(?:o)?)$/i
+  })->then(@code ? @code : sub{true});
+
+  return $self;
+}
+
+sub _type_parse {
+  my @items = _type_parse_pipes(@_);
+
+  my $either = @items > 1;
+
+  @items = map _type_parse_nested($_), @items;
+
+  return wantarray && !$either ? @items : [$either ? ("either") : (), @items];
+}
+
+sub _type_parse_lists {
+  my @items = @_;
+
+  my $r0 = '[\"\'\[\]]';
+  my $r1 = '[^\"\'\[\]]';
+  my $r2 = _type_subexpr_type_2();
+  my $r3 = _type_subexpr_delimiter();
+
+  return (
+    grep length,
+      map {split/,\s*(?=(?:$r1*$r0$r1*$r0)*$r1*$)(${r2}(?:${r3}[^,]*)?)?/}
+        @items
+  );
+}
+
+sub _type_parse_nested {
+  my ($expr) = @_;
+
+  return ($expr) if $expr !~ _type_regexp(_type_subexpr_type_2());
+
+  my @items = ($expr);
+
+  @items = ($expr =~ /^(\w+)\s*\[(.*)\]+$/g);
+
+  @items = map _type_parse_lists($_), @items;
+
+  @items = map {s/^["']+|["']+$//gr} @items;
+
+  @items = map _type_parse($_), @items;
+
+  return (@items > 1 ? [@items] : @items);
+}
+
+sub _type_parse_pipes {
+  my ($expr) = @_;
+
+  my @items;
+
+  # i.e. tuple[number, string] | tuple[string, number]
+  if
+  (
+    _type_regexp_eval(
+      $expr, _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_2())
+    )
+  )
+  {
+    @items = map _type_parse_tuples($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_2(), _type_subexpr_type_2()));
+  }
+  # i.e. string | tuple[number, string]
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_1(), _type_subexpr_type_2()))
+  )
+  {
+    @items = map _type_parse_tuples($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_1(), _type_subexpr_type_2()));
+  }
+  # i.e. tuple[number, string] | string
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_1()))
+  )
+  {
+    @items = map _type_parse_tuples($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_2(), _type_subexpr_type_1()));
+  }
+  # special condition: i.e. tuple[number, string]
+  elsif
+  (
+    _type_regexp_eval($expr, _type_regexp(_type_subexpr_type_2()))
+  )
+  {
+    @items = ($expr);
+  }
+  # i.e. "..." | tuple[number, string]
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_2()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_2()));
+    @items = (_type_parse_pipes($items[0]), _type_parse_tuples($items[1]));
+  }
+  # i.e. tuple[number, string] | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_3()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_2(), _type_subexpr_type_3()));
+    @items = (_type_parse_tuples($items[0]), _type_parse_pipes($items[1]));
+  }
+  # i.e. Package::Name | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_4(), _type_subexpr_type_3()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_4(), _type_subexpr_type_3()));
+    @items = ($items[0], _type_parse_pipes($items[1]));
+  }
+  # i.e. "..." | Package::Name
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_4()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_4()));
+    @items = (_type_parse_pipes($items[0]), $items[1]);
+  }
+  # i.e. string | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_1(), _type_subexpr_type_3()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_1(), _type_subexpr_type_3()));
+    @items = ($items[0], _type_parse_pipes($items[1]));
+  }
+  # i.e. "..." | string
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_1()))
+  )
+  {
+    @items = _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_1()));
+    @items = (_type_parse_pipes($items[0]), $items[1]);
+  }
+  # i.e. "..." | "..."
+  elsif
+  (
+    _type_regexp_eval($expr,
+      _type_regexp(_type_subexpr_type_3(), _type_subexpr_type_3()))
+  )
+  {
+    @items = map _type_parse_pipes($_),
+      _type_regexp_eval($expr,
+      _type_regexp_groups(_type_subexpr_type_3(), _type_subexpr_type_3()));
+  }
+  else {
+    @items = ($expr);
+  }
+
+  return (@items);
+}
+
+sub _type_parse_tuples {
+  map +(scalar(_type_regexp_eval($_,
+    _type_regexp(_type_subexpr_type_2(), _type_subexpr_type_2())))
+      ? (_type_parse_pipes($_))
+      : ($_)), @_
+}
+
+sub _type_regexp {
+  qr/^@{[_type_regexp_joined(@_)]}$/
+}
+
+sub _type_regexp_eval {
+  map {s/^\s+|\s+$//gr} ($_[0] =~ $_[1])
+}
+
+sub _type_regexp_groups {
+  qr/^@{[_type_regexp_joined(_type_subexpr_groups(@_))]}$/
+}
+
+sub _type_regexp_joined {
+  join(_type_subexpr_delimiter(), @_)
+}
+
+sub _type_subexpr_delimiter {
+  '\s*\|\s*'
+}
+
+sub _type_subexpr_groups {
+  map "($_)", @_
+}
+
+sub _type_subexpr_type_1 {
+  '\w+'
+}
+
+sub _type_subexpr_type_2 {
+  '\w+\s*\[.*\]+'
+}
+
+sub _type_subexpr_type_3 {
+  '.*'
+}
+
+sub _type_subexpr_type_4 {
+  '[A-Za-z][:\^\w]+\w*'
 }
 
 1;

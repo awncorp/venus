@@ -67,6 +67,7 @@ method: map
 method: ne
 method: none
 method: one
+method: order
 method: pairs
 method: part
 method: path
@@ -3405,6 +3406,75 @@ $test->for('example', 2, 'one', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method order
+
+The order method reorders the array items based on the indices provided and
+returns the invocant.
+
+=signature order
+
+  order(Int @indices) (Array)
+
+=metadata order
+
+{
+  since => '2.01',
+}
+
+=example-1 order
+
+  # given: synopsis;
+
+  my $order = $array->order;
+
+  # bless({ value => [1..9] }, "Venus::Array")
+
+=cut
+
+$test->for('example', 1, 'order', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result->get, [1..9];
+
+  $result
+});
+
+=example-2 order
+
+  # given: synopsis;
+
+  my $order = $array->order(8,7,6);
+
+  # bless({ value => [9,8,7,1,2,3,4,5,6] }, "Venus::Array")
+
+=cut
+
+$test->for('example', 2, 'order', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result->get, [9,8,7,1,2,3,4,5,6];
+
+  $result
+});
+
+=example-3 order
+
+  # given: synopsis;
+
+  my $order = $array->order(0,2,1);
+
+  # bless({ value => [1,3,2,4,5,6,7,8,9] }, "Venus::Array")
+
+=cut
+
+$test->for('example', 3, 'order', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result->get, [1,3,2,4,5,6,7,8,9];
 
   $result
 });

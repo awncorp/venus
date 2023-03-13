@@ -117,7 +117,9 @@ $test->for('attributes');
 =method render
 
 The render method processes the template by replacing the tokens and control
-structurs with the appropriate replacements and returns the result.
+structurs with the appropriate replacements and returns the result. B<Note:>
+The rendering process expects variables to be hashrefs and sets (arrayrefs) of
+hashrefs.
 
 =signature add
 
@@ -320,6 +322,86 @@ $test->for('example', 6, 'render', sub {
     '@user1: ready?',
     'user2: ready!',
     '@user1: lets begin!',
+  ];
+
+  $result
+});
+
+=example-7 render
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new(q(
+    {{ for chat.messages }}
+    [{{ loop.place }}] {{ user.name }}: {{ message }}
+    {{ end chat.messages }}
+  ));
+
+  $template->variables({
+    chat => { messages => [
+      { user => { name => 'user1' }, message => 'ready?' },
+      { user => { name => 'user2' }, message => 'ready!' },
+      { user => { name => 'user1' }, message => 'lets begin!' },
+    ]}
+  });
+
+  my $result = $template->render;
+
+  # [1] user1: ready?
+  # [2] user2: ready!
+  # [3] user1: lets begin!
+
+=cut
+
+$test->for('example', 7, 'render', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply [map {s/^[\n\s]*|[\n\s]*$//gr} split /\n/, $result], [
+    '[1] user1: ready?',
+    '[2] user2: ready!',
+    '[3] user1: lets begin!',
+  ];
+
+  $result
+});
+
+=example-8 render
+
+  package main;
+
+  use Venus::Template;
+
+  my $template = Venus::Template->new(q(
+    {{ for chat.messages }}
+    [{{ loop.index }}] {{ user.name }}: {{ message }}
+    {{ end chat.messages }}
+  ));
+
+  $template->variables({
+    chat => { messages => [
+      { user => { name => 'user1' }, message => 'ready?' },
+      { user => { name => 'user2' }, message => 'ready!' },
+      { user => { name => 'user1' }, message => 'lets begin!' },
+    ]}
+  });
+
+  my $result = $template->render;
+
+  # [0] user1: ready?
+  # [1] user2: ready!
+  # [2] user1: lets begin!
+
+=cut
+
+$test->for('example', 8, 'render', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply [map {s/^[\n\s]*|[\n\s]*$//gr} split /\n/, $result], [
+    '[0] user1: ready?',
+    '[1] user2: ready!',
+    '[2] user1: lets begin!',
   ];
 
   $result
