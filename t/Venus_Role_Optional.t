@@ -413,7 +413,7 @@ $test->for('example', 2, 'asserting', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->is('on.validate');
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /Person\.lname/i;
+  ok $error->message =~ /attribute "lname" in Person/i;
 
   $result
 });
@@ -457,7 +457,7 @@ $test->for('example', 3, 'asserting', sub {
   ok my $result = $tryable->error(\$error)->result;
   ok $error->is('on.validate');
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /Person\.fname/i;
+  ok $error->message =~ /attribute "fname" in Person/i;
 
   $result
 });
@@ -516,7 +516,7 @@ $test->for('example', 4, 'asserting', sub {
   ok $error;
   ok $error->is('on.validate');
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /Person\.progress/i;
+  ok $error->message =~ /attribute "progress" in Person/i;
   ok $error->message =~ /received \(string\), expected \(number | float\)/i;
 
   $result

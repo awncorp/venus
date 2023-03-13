@@ -160,10 +160,11 @@ sub EXPORT {
 sub option_assert {
   my ($self, $name, @data) = @_;
 
-  if (my $code = $self->can("assert_${name}")) {
+  if ((my $code = $self->can("assert_${name}")) && @data) {
     require Scalar::Util;
     require Venus::Assert;
-    my $label = join '.', ref $self, $name;
+    my $from = ref $self;
+    my $label = qq(attribute "$name" in $from);
     my $assert = Venus::Assert->new($label);
     my $value = @data ? $data[0] : $self->{$name};
     my $return = $code->($self, $value, $assert);
@@ -213,7 +214,7 @@ sub option_builder {
 sub option_check {
   my ($self, $name, @data) = @_;
 
-  if (my $code = $self->can("check_${name}")) {
+  if ((my $code = $self->can("check_${name}")) && @data) {
     require Venus::Throw;
     my $throw = Venus::Throw->new(join('::', map ucfirst, ref($self), 'error'));
     $throw->name('on.check');
@@ -342,7 +343,7 @@ sub option_require {
 sub option_self_assert {
   my ($self, $name, @data) = @_;
 
-  if (my $code = $self->can("self_assert_${name}")) {
+  if ((my $code = $self->can("self_assert_${name}")) && @data) {
     if (my $error = catch {$code->($self, (@data ? $data[0] : $self->{$name}))}) {
       if (do {require Scalar::Util; Scalar::Util::blessed($error)}) {
         return $error->isa('Venus::Error') ? $error->throw : die $error;
