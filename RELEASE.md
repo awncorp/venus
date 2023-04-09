@@ -1,8 +1,17 @@
 # Release
 
-## Version: 2.32
+## Version: 2.40
 
-- [update] Update attribute assert failure message in Venus::Role::Optional
-- [update] Ignore attribute assertion in Venus::Role::Optional if not required
+- [feature] Implement Venus::Role::Mockable
+- [feature] Implement Venus::Assert#validator
+- [feature] Implement Venus::Assert#checker
+- [feature] Implement Venus::Path#{root,seek}
+- [feature] Implement exportable utility functions in Venus
+- [feature] Implement Venus#chain
+- [update] Refactor Venus::Test
+- [update] Update Venus::Unpack#signature naming
+- [update] Update Venus::Unpack with {build_arg,build_args}
+- [update] Update Venus::Try exception trapping
+- [update] Update README.md, include testing
 
 

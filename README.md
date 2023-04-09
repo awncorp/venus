@@ -1,11 +1,11 @@
 ## Venus - Object-Oriented Standard Library for Perl 5
 
 Venus is an object-orientation framework and extendible standard library for
-Perl 5, built on top of Mars architecture with classes which wrap most native
-[Perl](https://www.perl.org/) data types. Venus has a simple modular
-architecture, robust library of classes and methods, supports pure-Perl
-autoboxing, advanced exception handling, "true" and "false" keywords, package
-introspection, command-line options parsing, and more.
+Perl 5 with classes which wrap most native [Perl](https://www.perl.org/) data
+types. Venus has a simple modular architecture, robust library of classes and
+methods, supports pure-Perl autoboxing, advanced exception handling, "true" and
+"false" keywords, package introspection, command-line options parsing, and
+more.
 
 ## Installation
 
@@ -38,29 +38,21 @@ curl -ssL https://cpanmin.us | perl - -qn git://github.com/awncorp/venus.git
 - Perl 5.18.0+
 - Zero Dependencies
 - Fast Object-Orientation
-- Boolean Values
-- Standard Library
-- Value Classes
+- Robust Standard Library
+- Intuitive Value Classes
 - Pure Perl Autoboxing
-- Utility Classes
-- Package Reflection
-- Exception Handling
+- Convenient Utility Classes
+- Simple Package Reflection
+- Flexible Exception Handling
 - Composable Standards
-- Pluggable Library
-- Intuitive APIs
-- Type Assertions/Coercions
-- Value Casting
+- Pluggable (no monkeypatching)
 - Proxyable Methods
+- Type Assertions
+- Type Coercions
+- Value Casting
+- Boolean Values
 - Complete Documentation
-- Robust Test Coverage
-
-## Resources
-
-- [Information](https://github.com/awncorp/venus/wiki/info) - Information
-- [Values](https://github.com/awncorp/venus/wiki/values) - Value classes
-- [Utilities](https://github.com/awncorp/venus/wiki/utilities) - Utilities classes
-- [Roles/Traits](https://github.com/awncorp/venus/wiki/roles) - Abstract behaviors
-- [System](https://github.com/awncorp/venus/wiki/system) - Framework and object-system
+- Complete Test Coverage
 
 ## Founder
 

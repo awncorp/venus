@@ -70,6 +70,8 @@ method: relative
 method: rmdir
 method: rmdirs
 method: rmfiles
+method: root
+method: seek
 method: sibling
 method: siblings
 method: test
@@ -1900,6 +1902,118 @@ $test->for('example', 1, 'rmfiles', sub {
 
   rmdir 't/data/stars';
   $result
+});
+
+=method root
+
+The root method performs a search up the file system heirarchy returns the
+first path (i.e. absolute path) matching the file test specification and base
+path expression provided. The file test specification is the same passed to
+L</test>. If no path matches are found this method returns underfined.
+
+=signature root
+
+  root(Str $spec, Str $base) (Maybe[Path])
+
+=metadata root
+
+{
+  since => '2.32',
+}
+
+=example-1 root
+
+  # given: synopsis;
+
+  my $root = $path->root('d', 't');
+
+  # bless({ value => "/path/to/t/../" }, "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'root', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
+  ok $result->child('t')->test('d');
+
+  $result
+});
+
+=example-2 root
+
+  # given: synopsis;
+
+  my $root = $path->root('f', 't');
+
+  # undef
+
+=cut
+
+$test->for('example', 2, 'root', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok !defined $result;
+
+  !$result
+});
+
+=method seek
+
+The seek method performs a search down the file system heirarchy returns the
+first path (i.e. absolute path) matching the file test specification and base
+path expression provided. The file test specification is the same passed to
+L</test>. If no path matches are found this method returns underfined.
+
+=signature seek
+
+  seek(Str $spec, Str $base) (Maybe[Path])
+
+=metadata seek
+
+{
+  since => '2.32',
+}
+
+=example-1 seek
+
+  # given: synopsis;
+
+  my $path = Venus::Path->new('t');
+
+  my $seek = $path->seek('f', 'earth');
+
+  # bless({ value => "/path/to/t/data/planets/earth" }, "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'seek', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
+  ok $result =~ m{t${fsds}data${fsds}planets${fsds}earth};
+
+  $result
+});
+
+=example-2 seek
+
+  # given: synopsis;
+
+  my $path = Venus::Path->new('t');
+
+  my $seek = $path->seek('f', 'europa');
+
+  # undef
+
+=cut
+
+$test->for('example', 2, 'seek', sub {
+  my ($tryable) = @_;
+  ok !(my $result = $tryable->result);
+  ok !defined $result;
+
+  !$result
 });
 
 =method sibling

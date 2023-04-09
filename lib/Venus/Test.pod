@@ -35,7 +35,7 @@ documentation generation.
 
 This package inherits behaviors from:
 
-L<Venus::Data>
+L<Venus::Kind>
 
 =cut
 
@@ -44,6 +44,12 @@ L<Venus::Data>
 This package integrates behaviors from:
 
 L<Venus::Role::Buildable>
+
+L<Venus::Role::Catchable>
+
+L<Venus::Role::Throwable>
+
+L<Venus::Role::Tryable>
 
 =cut
 
@@ -347,5 +353,14 @@ I<Since C<0.09>>
 =head1 AUTHORS
 
 Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
 
 =cut

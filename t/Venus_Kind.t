@@ -94,6 +94,7 @@ Venus::Role::Digestable
 Venus::Role::Doable
 Venus::Role::Dumpable
 Venus::Role::Matchable
+Venus::Role::Mockable
 Venus::Role::Printable
 Venus::Role::Reflectable
 Venus::Role::Serializable

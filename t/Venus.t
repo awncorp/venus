@@ -36,14 +36,26 @@ $test->for('abstract');
 
 =includes
 
+function: args
+function: box
+function: call
 function: cast
 function: catch
 function: caught
+function: chain
+function: cop
 function: error
 function: false
 function: fault
+function: load
+function: make
+function: merge
 function: raise
+function: roll
+function: space
+function: then
 function: true
+function: wrap
 
 =cut
 
@@ -89,19 +101,356 @@ $test->for('synopsis', sub {
 =description
 
 This library provides an object-orientation framework and extendible standard
-library for Perl 5, built on top of the L<Mars> architecture with classes which
-wrap most native Perl data types. Venus has a simple modular architecture,
-robust library of classes, methods, and roles, supports pure-Perl autoboxing,
-advanced exception handling, "true" and "false" functions, package
-introspection, command-line options parsing, and more. This package will always
-automatically exports C<true> and C<false> keyword functions (unless existing
-routines of the same name already exist in the calling package or its parents),
-otherwise exports keyword functions as requested at import. This library
-requires Perl C<5.18+>.
+library for Perl 5 with classes which wrap most native Perl data types. Venus
+has a simple modular architecture, robust library of classes, methods, and
+roles, supports pure-Perl autoboxing, advanced exception handling, "true" and
+"false" functions, package introspection, command-line options parsing, and
+more. This package will always automatically exports C<true> and C<false>
+keyword functions (unless existing routines of the same name already exist in
+the calling package or its parents), otherwise exports keyword functions as
+requested at import. This library requires Perl C<5.18+>.
+
++=head1 CAPABILITIES
+
+The following is a short list of capabilities:
+
++=over 4
+
++=item *
+
+Perl 5.18.0+
+
++=item *
+
+Zero Dependencies
+
++=item *
+
+Fast Object-Orientation
+
++=item *
+
+Robust Standard Library
+
++=item *
+
+Intuitive Value Classes
+
++=item *
+
+Pure Perl Autoboxing
+
++=item *
+
+Convenient Utility Classes
+
++=item *
+
+Simple Package Reflection
+
++=item *
+
+Flexible Exception Handling
+
++=item *
+
+Composable Standards
+
++=item *
+
+Pluggable (no monkeypatching)
+
++=item *
+
+Proxyable Methods
+
++=item *
+
+Type Assertions
+
++=item *
+
+Type Coercions
+
++=item *
+
+Value Casting
+
++=item *
+
+Boolean Values
+
++=item *
+
+Complete Documentation
+
++=item *
+
+Complete Test Coverage
+
++=back
 
 =cut
 
 $test->for('description');
+
+=function args
+
+The args function takes a list of arguments and returns a hashref.
+
+=signature args
+
+  args(Any @args) (HashRef)
+
+=metadata args
+
+{
+  since => '2.32',
+}
+
+=example-1 args
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args(content => 'example');
+
+  # {content => "example"}
+
+=cut
+
+$test->for('example', 1, 'args', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example"};
+
+  $result
+});
+
+=example-2 args
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args({content => 'example'});
+
+  # {content => "example"}
+
+=cut
+
+$test->for('example', 2, 'args', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example"};
+
+  $result
+});
+
+=example-3 args
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args('content');
+
+  # {content => undef}
+
+=cut
+
+$test->for('example', 3, 'args', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => undef};
+
+  $result
+});
+
+=example-4 args
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args('content', 'example', 'algorithm');
+
+  # {content => "example", algorithm => undef}
+
+=cut
+
+$test->for('example', 4, 'args', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example", algorithm => undef};
+
+  $result
+});
+
+=function box
+
+The box function returns a L<Venus::Box> object for the argument provided.
+
+=signature box
+
+  box(Any $data) (Box)
+
+=metadata box
+
+{
+  since => '2.32',
+}
+
+=example-1 box
+
+  package main;
+
+  use Venus 'box';
+
+  my $box = box({});
+
+  # bless({value => bless({value => {}}, 'Venus::Hash')}, 'Venus::Box')
+
+=cut
+
+$test->for('example', 1, 'box', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Box');
+  ok $result->unbox->isa('Venus::Hash');
+  is_deeply $result->unbox->value, {};
+
+  $result
+});
+
+=example-2 box
+
+  package main;
+
+  use Venus 'box';
+
+  my $box = box([]);
+
+  # bless({value => bless({value => []}, 'Venus::Array')}, 'Venus::Box')
+
+=cut
+
+$test->for('example', 2, 'box', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Box');
+  ok $result->unbox->isa('Venus::Array');
+  is_deeply $result->unbox->value, [];
+
+  $result
+});
+
+=function call
+
+The call function dispatches function and method calls to a package and returns
+the result.
+
+=signature call
+
+  call(Str | Object | CodeRef $data, Any @args) (Any)
+
+=metadata call
+
+{
+  since => '2.32',
+}
+
+=example-1 call
+
+  package main;
+
+  use Venus 'call';
+
+  require Digest::SHA;
+
+  my $result = call(\'Digest::SHA', 'new');
+
+  # bless(do{\(my $o = '...')}, 'digest::sha')
+
+=cut
+
+$test->for('example', 1, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Digest::SHA');
+
+  $result
+});
+
+=example-2 call
+
+  package main;
+
+  use Venus 'call';
+
+  require Digest::SHA;
+
+  my $result = call('Digest::SHA', 'sha1_hex');
+
+  # "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+
+=cut
+
+$test->for('example', 2, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+
+  $result
+});
+
+=example-3 call
+
+  package main;
+
+  use Venus 'call';
+
+  require Venus::Hash;
+
+  my $result = call(sub{'Venus::Hash'->new(@_)}, {1..4});
+
+  # bless({value => {1..4}}, 'Venus::Hash')
+
+=cut
+
+$test->for('example', 3, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Hash');
+  is_deeply $result->value, {1..4};
+
+  $result
+});
+
+=example-4 call
+
+  package main;
+
+  use Venus 'call';
+
+  require Venus::Box;
+
+  my $result = call(Venus::Box->new(value => {}), 'merge', {1..4});
+
+  # bless({value => bless({value => {1..4}}, 'Venus::Hash')}, 'Venus::Box')
+
+=cut
+
+$test->for('example', 4, 'call', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Box');
+  ok $result->unbox->isa('Venus::Hash');
+  is_deeply $result->unbox->value, {1..4};
+
+  $result
+});
 
 =function cast
 
@@ -534,6 +883,118 @@ $test->for('example', 10, 'caught', sub {
   $result
 });
 
+=function chain
+
+The chain function chains function and method calls to a package (and return
+values) and returns the result.
+
+=signature chain
+
+  chain(Str | Object | CodeRef $self, Str | ArrayRef[Str] @args) (Any)
+
+=metadata chain
+
+{
+  since => '2.32',
+}
+
+=example-1 chain
+
+  package main;
+
+  use Venus 'chain';
+
+  my $result = chain('Venus::Path', ['new', 't'], 'exists');
+
+  # 1
+
+=cut
+
+$test->for('example', 1, 'chain', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 chain
+
+  package main;
+
+  use Venus 'chain';
+
+  my $result = chain('Venus::Path', ['new', 't'], ['test', 'd']);
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'chain', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=function cop
+
+The cop function attempts to curry the given subroutine on the object or class
+and if successful returns a closure.
+
+=signature cop
+
+  cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
+
+=metadata cop
+
+{
+  since => '2.32',
+}
+
+=example-1 cop
+
+  package main;
+
+  use Venus 'cop';
+
+  my $coderef = cop('Digest::SHA', 'sha1_hex');
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 1, 'cop', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is ref($result), 'CODE';
+
+  $result
+});
+
+=example-2 cop
+
+  package main;
+
+  use Venus 'cop';
+
+  require Digest::SHA;
+
+  my $coderef = cop(Digest::SHA->new, 'digest');
+
+  # sub { ... }
+
+=cut
+
+$test->for('example', 2, 'cop', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is ref($result), 'CODE';
+
+  $result
+});
+
 =function error
 
 The error function throws a L<Venus::Error> exception object using the
@@ -708,6 +1169,151 @@ $test->for('example', 2, 'fault', sub {
   $result
 });
 
+=function load
+
+The load function loads the package provided and returns a L<Venus::Space> object.
+
+=signature load
+
+  load(Any $name) (Space)
+
+=metadata load
+
+{
+  since => '2.32',
+}
+
+=example-1 load
+
+  package main;
+
+  use Venus 'load';
+
+  my $space = load 'Venus::Scalar';
+
+  # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+=cut
+
+$test->for('example', 1, 'load', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  is $result->value, 'Venus::Scalar';
+
+  $result
+});
+
+=function make
+
+The make function L<"calls"|Venus/call> the C<new> routine on the invocant and
+returns the result which should be a package string or an object.
+
+=signature make
+
+  make(Str $package, Any @args) (Any)
+
+=metadata make
+
+{
+  since => '2.32',
+}
+
+=example-1 make
+
+  package main;
+
+  use Venus 'make';
+
+  my $made = make('Digest::SHA');
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=cut
+
+$test->for('example', 1, 'make', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Digest::SHA');
+
+  $result
+});
+
+=example-2 make
+
+  package main;
+
+  use Venus 'make';
+
+  my $made = make('Digest', 'SHA');
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=cut
+
+$test->for('example', 2, 'make', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Digest::SHA');
+
+  $result
+});
+
+=function merge
+
+The merge function returns a hash reference which is a merger of all of the
+hashref arguments provided.
+
+=signature merge
+
+  merge(HashRef @args) (HashRef)
+
+=metadata merge
+
+{
+  since => '2.32',
+}
+
+=example-1 merge
+
+  package main;
+
+  use Venus 'merge';
+
+  my $merged = merge({1..4}, {5, 6});
+
+  # {1..6}
+
+=cut
+
+$test->for('example', 1, 'merge', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {1..6};
+
+  $result
+});
+
+=example-2 merge
+
+  package main;
+
+  use Venus 'merge';
+
+  my $merged = merge({1..4}, {5, 6}, {7, 8, 9, 0});
+
+  # {1..9, 0}
+
+=cut
+
+$test->for('example', 2, 'merge', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {1..9,0};
+
+  $result
+});
+
 =function raise
 
 The raise function generates and throws a named exception object derived from
@@ -795,6 +1401,134 @@ $test->for('example', 3, 'raise', sub {
   $result
 });
 
+=function roll
+
+The roll function takes a list of arguments, assuming the first argument is
+invokable, and reorders the list such that the routine name provided comes
+after the invocant (i.e. the 1st argument), creating a list acceptable to the
+L</call> function.
+
+=signature roll
+
+  roll(Str $name, Any @args) (Any)
+
+=metadata roll
+
+{
+  since => '2.32',
+}
+
+=example-1 roll
+
+  package main;
+
+  use Venus 'roll';
+
+  my @list = roll('sha1_hex', 'Digest::SHA');
+
+  # ('Digest::SHA', 'sha1_hex');
+
+=cut
+
+$test->for('example', 1, 'roll', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  is_deeply [@result], ['Digest::SHA', 'sha1_hex'];
+
+  @result
+});
+
+=example-2 roll
+
+  package main;
+
+  use Venus 'roll';
+
+  my @list = roll('sha1_hex', call(\'Digest::SHA', 'new'));
+
+  # (bless(do{\(my $o = '...')}, 'Digest::SHA'), 'sha1_hex');
+
+=cut
+
+$test->for('example', 2, 'roll', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  ok $result[0]->isa('Digest::SHA');
+  is $result[1], 'sha1_hex';
+
+  @result
+});
+
+=function space
+
+The space function returns a L<Venus::Space> object for the package provided.
+
+=signature space
+
+  space(Any $name) (Space)
+
+=metadata space
+
+{
+  since => '2.32',
+}
+
+=example-1 space
+
+  package main;
+
+  use Venus 'space';
+
+  my $space = space 'Venus::Scalar';
+
+  # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+=cut
+
+$test->for('example', 1, 'space', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Space');
+  is $result->value, 'Venus::Scalar';
+
+  $result
+});
+
+=function then
+
+The then function proxies the call request to the L</call> function and returns
+the result as a list, prepended with the invocant.
+
+=signature then
+
+  then(Str | Object | CodeRef $self, Any @args) (Any)
+
+=metadata then
+
+{
+  since => '2.32',
+}
+
+=example-1 then
+
+  package main;
+
+  use Venus 'then';
+
+  my @list = then('Digest::SHA', 'sha1_hex');
+
+  # ("Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709")
+
+=cut
+
+$test->for('example', 1, 'then', sub {
+  my ($tryable) = @_;
+  ok my @result = $tryable->result;
+  is_deeply [@result], ["Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709"];
+
+  @result
+});
+
 =function true
 
 The true function returns a truthy boolean value which is designed to be
@@ -849,847 +1583,496 @@ $test->for('example', 2, 'true', sub {
   !$result
 });
 
-=feature standard-library
+=function wrap
 
-This library provides a Perl object-oriented standard library with value
-classes and consistently named methods.
+The wrap function installs a wrapper function in the calling package which when
+called either returns the package string if no arguments are provided, or calls
+L</make> on the package with whatever arguments are provided and returns the
+result. Unless an alias is provided as a second argument, special characters
+are stripped from the package to create the function name.
 
-=cut
+=signature wrap
 
-$test->for('feature', 'standard-library');
+  wrap(Str $data, Str $name) (CodeRef)
 
-=example-1 standard-library
+=metadata wrap
+
+{
+  since => '2.32',
+}
+
+=example-1 wrap
 
   package main;
 
-  use Venus::Array;
+  use Venus 'wrap';
 
-  my $array = Venus::Array->new([1..4]);
+  my $coderef = wrap('Digest::SHA');
 
-  # $array->all(sub{ $_ > 0 });
-  # $array->any(sub{ $_ > 0 });
-  # $array->each(sub{ $_ > 0 });
-  # $array->grep(sub{ $_ > 0 });
-  # $array->map(sub{ $_ > 0 });
-  # $array->none(sub{ $_ < 0 });
-  # $array->one(sub{ $_ == 0 });
-  # $array->random;
+  # sub { ... }
 
-  use Venus::Hash;
+  # my $digest = DigestSHA();
 
-  my $hash = Venus::Hash->new({1..8});
+  # "Digest::SHA"
 
-  # $hash->all(sub{ $_ > 0 });
-  # $hash->any(sub{ $_ > 0 });
-  # $hash->each(sub{ $_ > 0 });
-  # $hash->grep(sub{ $_ > 0 });
-  # $hash->map(sub{ $_ > 0 });
-  # $hash->none(sub{ $_ < 0 });
-  # $hash->one(sub{ $_ == 0 });
-  # $hash->random;
+  # my $digest = DigestSHA(1);
 
-  $array->count == $hash->count;
-
-  # 1
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
 =cut
 
-$test->for('example', 1, 'standard-library', sub {
+$test->for('example', 1, 'wrap', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
+  is $result, '*main::DigestSHA';
+  is DigestSHA(), "Digest::SHA";
+  ok DigestSHA(1)->isa("Digest::SHA");
 
   $result
 });
 
-=feature value-classes
-
-This library provides value classes which wrap native Perl data types and
-provides methods for operating their values.
-
-=cut
-
-$test->for('feature', 'value-classes');
-
-=example-1 value-classes
+=example-2 wrap
 
   package main;
 
-  use Venus::Array;
+  use Venus 'wrap';
 
-  my $array = Venus::Array->new;
+  my $coderef = wrap('Digest::SHA', 'SHA');
 
-  # bless({...}, 'Venus::Array')
+  # sub { ... }
+
+  # my $digest = SHA();
+
+  # "Digest::SHA"
+
+  # my $digest = SHA(1);
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
 
 =cut
 
-$test->for('example', 1, 'value-classes', sub {
+$test->for('example', 2, 'wrap', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
+  is $result, '*main::SHA';
+  is SHA(), "Digest::SHA";
+  ok SHA(1)->isa("Digest::SHA");
 
   $result
 });
 
-=example-2 value-classes
+=feature venus-args
 
-  package main;
-
-  use Venus::Boolean;
-
-  my $boolean = Venus::Boolean->new;
-
-  # bless({...}, 'Venus::Boolean')
+This library contains a L<Venus::Args> class which provides methods for
+accessing C<@ARGS> items.
 
 =cut
 
-$test->for('example', 2, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+$test->for('feature', 'venus-args');
 
-  !$result
-});
+=feature venus-array
 
-=example-3 value-classes
-
-  package main;
-
-  use Venus::Code;
-
-  my $code = Venus::Code->new;
-
-  # bless({...}, 'Venus::Code')
+This library contains a L<Venus::Array> class which provides methods for
+manipulating array data.
 
 =cut
 
-$test->for('example', 3, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-array');
 
-  $result
-});
+=feature venus-assert
 
-=example-4 value-classes
-
-  package main;
-
-  use Venus::Float;
-
-  my $float = Venus::Float->new;
-
-  # bless({...}, 'Venus::Float')
+This library contains a L<Venus::Assert> class which provides a mechanism for
+asserting type constraints and coercion.
 
 =cut
 
-$test->for('example', 4, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok !!(my $result = $tryable->result);
+$test->for('feature', 'venus-assert');
 
-  !!$result
-});
+=feature venus-boolean
 
-=example-5 value-classes
-
-  package main;
-
-  use Venus::Hash;
-
-  my $hash = Venus::Hash->new;
-
-  # bless({...}, 'Venus::Hash')
+This library contains a L<Venus::Boolean> class which provides a representation
+for boolean values.
 
 =cut
 
-$test->for('example', 5, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-boolean');
 
-  $result
-});
+=feature venus-box
 
-=example-6 value-classes
-
-  package main;
-
-  use Venus::Number;
-
-  my $number = Venus::Number->new;
-
-  # bless({...}, 'Venus::Number')
+This library contains a L<Venus::Box> class which provides a pure Perl boxing
+mechanism.
 
 =cut
 
-$test->for('example', 6, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+$test->for('feature', 'venus-box');
 
-  !$result
-});
+=feature venus-class
 
-=example-7 value-classes
-
-  package main;
-
-  use Venus::Regexp;
-
-  my $regexp = Venus::Regexp->new;
-
-  # bless({...}, 'Venus::Regexp')
+This library contains a L<Venus::Class> class which provides a class builder.
 
 =cut
 
-$test->for('example', 7, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-class');
 
-  $result
-});
+=feature venus-cli
 
-=example-8 value-classes
-
-  package main;
-
-  use Venus::Scalar;
-
-  my $scalar = Venus::Scalar->new;
-
-  # bless({...}, 'Venus::Scalar')
+This library contains a L<Venus::Cli> class which provides a superclass for
+creating CLIs.
 
 =cut
 
-$test->for('example', 8, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-cli');
 
-  $result
-});
+=feature venus-code
 
-=example-9 value-classes
-
-  package main;
-
-  use Venus::String;
-
-  my $string = Venus::String->new;
-
-  # bless({...}, 'Venus::String')
+This library contains a L<Venus::Code> class which provides methods for
+manipulating subroutines.
 
 =cut
 
-$test->for('example', 9, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+$test->for('feature', 'venus-code');
 
-  !$result
-});
+=feature venus-config
 
-=example-10 value-classes
-
-  package main;
-
-  use Venus::Undef;
-
-  my $undef = Venus::Undef->new;
-
-  # bless({...}, 'Venus::Undef')
+This library contains a L<Venus::Config> class which provides methods for
+loading Perl, YAML, and JSON configuration data.
 
 =cut
 
-$test->for('example', 10, 'value-classes', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+$test->for('feature', 'venus-config');
 
-  !$result
-});
+=feature venus-data
 
-=feature builtin-autoboxing
-
-This library provides opt-in pure Perl autoboxing allowing you to chain methods
-calls across objects and values.
+This library contains a L<Venus::Data> class which provides methods for
+extracting C<DATA> sections and POD block.
 
 =cut
 
-$test->for('feature', 'builtin-autoboxing');
+$test->for('feature', 'venus-data');
 
-=example-1 builtin-autoboxing
+=feature venus-date
 
-  package main;
-
-  use Venus::String;
-
-  my $string = Venus::String->new('hello, world');
-
-  $string->box->split(', ')->join(' ')->titlecase->unbox->get;
-
-  # Hello World
+This library contains a L<Venus::Date> class which provides methods for
+formatting, parsing, and manipulating dates.
 
 =cut
 
-$test->for('example', 1, 'builtin-autoboxing', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-date');
 
-  $result
-});
+=feature venus-dump
 
-=feature utility-classes
-
-This library provides serveral essential utility classes for performing common
-programming tasks.
+This library contains a L<Venus::Dump> class which provides methods for reading
+and writing dumped Perl data.
 
 =cut
 
-$test->for('feature', 'utility-classes');
+$test->for('feature', 'venus-dump');
 
-=example-1 utility-classes
+=feature venus-error
 
-  package main;
-
-  use Venus::Args;
-
-  my $args = Venus::Args->new;
-
-  # bless({...}, 'Venus::Args')
+This library contains a L<Venus::Error> class which represents a context-aware
+error (exception object).
 
 =cut
 
-$test->for('example', 1, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-error');
 
-  $result
-});
+=feature venus-false
 
-=example-2 utility-classes
-
-  package main;
-
-  use Venus::Box;
-
-  my $box = Venus::Box->new;
-
-  # bless({...}, 'Venus::Box')
+This library contains a L<Venus::False> class which provides the global
+C<false> value.
 
 =cut
 
-$test->for('example', 2, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-false');
 
-  $result
-});
+=feature venus-fault
 
-=example-3 utility-classes
-
-  package main;
-
-  use Venus::Data;
-
-  my $docs = Venus::Data->new->docs;
-
-  # bless({...}, 'Venus::Data')
+This library contains a L<Venus::Fault> class which represents a generic system
+error (exception object).
 
 =cut
 
-$test->for('example', 3, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-fault');
 
-  $result
-});
+=feature venus-float
 
-=example-4 utility-classes
-
-  package main;
-
-  use Venus::Date;
-
-  my $date = Venus::Date->new;
-
-  # bless({...}, 'Venus::Date')
+This library contains a L<Venus::Float> class which provides methods for
+manipulating float data.
 
 =cut
 
-$test->for('example', 4, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-float');
 
-  $result
-});
+=feature venus-gather
 
-=example-5 utility-classes
-
-  package main;
-
-  use Venus::Error;
-
-  my $error = Venus::Error->new;
-
-  # bless({...}, 'Venus::Error')
+This library contains a L<Venus::Gather> class which provides an
+object-oriented interface for complex pattern matching operations on
+collections of data, e.g. array references.
 
 =cut
 
-$test->for('example', 5, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-gather');
 
-  $result
-});
+=feature venus-hash
 
-=example-6 utility-classes
-
-  package main;
-
-  use Venus::Json;
-
-  my $json = Venus::Json->new;
-
-  # bless({...}, 'Venus::Json')
+This library contains a L<Venus::Hash> class which provides methods for
+manipulating hash data.
 
 =cut
 
-$test->for('example', 6, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-hash');
 
-  $result
-});
+=feature venus-json
 
-=example-7 utility-classes
-
-  package main;
-
-  use Venus::Name;
-
-  my $name = Venus::Name->new;
-
-  # bless({...}, 'Venus::Name')
+This library contains a L<Venus::Json> class which provides methods for reading
+and writing JSON data.
 
 =cut
 
-$test->for('example', 7, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-json');
 
-  $result
-});
+=feature venus-log
 
-=example-8 utility-classes
-
-  package main;
-
-  use Venus::Opts;
-
-  my $opts = Venus::Opts->new;
-
-  # bless({...}, 'Venus::Opts')
+This library contains a L<Venus::Log> class which provides methods for logging
+information using various log levels.
 
 =cut
 
-$test->for('example', 8, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-log');
 
-  $result
-});
+=feature venus-match
 
-=example-9 utility-classes
-
-  package main;
-
-  use Venus::Path;
-
-  my $path = Venus::Path->new;
-
-  # bless({...}, 'Venus::Path')
+This library contains a L<Venus::Match> class which provides an object-oriented
+interface for complex pattern matching operations on scalar values.
 
 =cut
 
-$test->for('example', 9, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-match');
 
-  $result
-});
+=feature venus-meta
 
-=example-10 utility-classes
-
-  package main;
-
-  use Venus::Data;
-
-  my $text = Venus::Data->new->text;
-
-  # bless({...}, 'Venus::Data')
+This library contains a L<Venus::Meta> class which provides configuration
+information for L<Venus> derived classes.
 
 =cut
 
-$test->for('example', 10, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-meta');
 
-  $result
-});
+=feature venus-mixin
 
-=example-11 utility-classes
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new;
-
-  # bless({...}, 'Venus::Space')
+This library contains a L<Venus::Mixin> class which provides a mixin builder.
 
 =cut
 
-$test->for('example', 11, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-mixin');
 
-  $result
-});
+=feature venus-name
 
-=example-12 utility-classes
-
-  package main;
-
-  use Venus::Throw;
-
-  my $throw = Venus::Throw->new;
-
-  # bless({...}, 'Venus::Throw')
+This library contains a L<Venus::Name> class which provides methods for parsing
+and formatting package namespaces.
 
 =cut
 
-$test->for('example', 12, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-name');
 
-  $result
-});
+=feature venus-number
 
-=example-13 utility-classes
-
-  package main;
-
-  use Venus::Try;
-
-  my $try = Venus::Try->new;
-
-  # bless({...}, 'Venus::Try')
+This library contains a L<Venus::Number> class which provides methods for
+manipulating number data.
 
 =cut
 
-$test->for('example', 13, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-number');
 
-  $result
-});
+=feature venus-opts
 
-=example-14 utility-classes
-
-  package main;
-
-  use Venus::Type;
-
-  my $type = Venus::Type->new;
-
-  # bless({...}, 'Venus::Type')
+This library contains a L<Venus::Opts> class which provides methods for
+handling command-line arguments.
 
 =cut
 
-$test->for('example', 14, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-opts');
 
-  $result
-});
+=feature venus-path
 
-=example-15 utility-classes
-
-  package main;
-
-  use Venus::Vars;
-
-  my $vars = Venus::Vars->new;
-
-  # bless({...}, 'Venus::Vars')
+This library contains a L<Venus::Path> class which provides methods for working
+with file system paths.
 
 =cut
 
-$test->for('example', 15, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-path');
 
-  $result
-});
+=feature venus-process
 
-=example-16 utility-classes
-
-  package main;
-
-  use Venus::Match;
-
-  my $match = Venus::Match->new;
-
-  # bless({...}, 'Venus::Match')
+This library contains a L<Venus::Process> class which provides methods for
+handling and forking processes.
 
 =cut
 
-$test->for('example', 16, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-process');
 
-  $result
-});
+=feature venus-prototype
 
-=example-17 utility-classes
-
-  package main;
-
-  use Venus::Process;
-
-  my $process = Venus::Process->new;
-
-  # bless({...}, 'Venus::Process')
+This library contains a L<Venus::Prototype> class which provides a simple
+construct for enabling prototype-base programming.
 
 =cut
 
-$test->for('example', 17, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-prototype');
 
-  $result
-});
+=feature venus-random
 
-=example-18 utility-classes
-
-  package main;
-
-  use Venus::Template;
-
-  my $template = Venus::Template->new;
-
-  # bless({...}, 'Venus::Template')
+This library contains a L<Venus::Random> class which provides an
+object-oriented interface for Perl's pseudo-random number generator.
 
 =cut
 
-$test->for('example', 18, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  ok $result->isa('Venus::Template');
+$test->for('feature', 'venus-random');
 
-  !$result
-});
+=feature venus-regexp
 
-=example-19 utility-classes
-
-  package main;
-
-  use Venus::Yaml;
-
-  my $yaml = Venus::Yaml->new;
-
-  # bless({...}, 'Venus::Yaml')
+This library contains a L<Venus::Regexp> class which provides methods for
+manipulating regexp data.
 
 =cut
 
-$test->for('example', 19, 'utility-classes', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-regexp');
 
-  $result
-})
-if require Venus::Yaml && Venus::Yaml->package;
+=feature venus-replace
 
-=feature package-reflection
-
-This library provides a package reflection class, L<Venus::Space>, which can be
-used to perform meta-programming on package spaces.
+This library contains a L<Venus::Replace> class which provides methods for
+manipulating regexp replacement data.
 
 =cut
 
-$test->for('feature', 'package-reflection');
+$test->for('feature', 'venus-replace');
 
-=example-1 package-reflection
+=feature venus-scalar
 
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('Venus');
-
-  $space->do('tryload')->routines;
-
-  # [...]
+This library contains a L<Venus::Scalar> class which provides methods for
+manipulating scalar data.
 
 =cut
 
-$test->for('example', 1, 'package-reflection', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-scalar');
 
-  $result
-});
+=feature venus-search
 
-=feature exception-handling
-
-This library provides a framework for raising, i.e. generating and throwing,
-exception objects and catching them.
+This library contains a L<Venus::Search> class which provides methods for
+manipulating regexp search data.
 
 =cut
 
-$test->for('feature', 'exception-handling');
+$test->for('feature', 'venus-search');
 
-=example-1 exception-handling
+=feature venus-space
 
-  package MyApp;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Tryable';
-  with 'Venus::Role::Throwable';
-  with 'Venus::Role::Catchable';
-
-  sub execute {
-    my ($self) = @_;
-
-    $self->throw->error;
-  }
-
-  package main;
-
-  my $myapp = MyApp->new;
-
-  my $error = $myapp->catch('execute');
-
-  # bless({...}, 'MyApp::Error');
+This library contains a L<Venus::Space> class which provides methods for
+parsing and manipulating package namespaces.
 
 =cut
 
-$test->for('example', 1, 'exception-handling', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-space');
 
-  $result
-});
+=feature venus-string
 
-=feature composable-standards
-
-This library provides a library of composable roles which can be used to extend
-core behaviors to custom objects.
+This library contains a L<Venus::String> class which provides methods for
+manipulating string data.
 
 =cut
 
-$test->for('feature', 'composable-standards');
+$test->for('feature', 'venus-string');
 
-=example-1 composable-standards
+=feature venus-template
 
-  package MyApp;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Dumpable';
-  with 'Venus::Role::Stashable';
-
-  package main;
-
-  my $myapp = MyApp->new;
-
-  $myapp->stash(greeting => 'hello world');
-
-  $myapp->dump('stash');
-
-  # '{"greeting" => "hello world"}'
+This library contains a L<Venus::Template> class which provides a templating
+system, and methods for rendering template.
 
 =cut
 
-$test->for('example', 1, 'composable-standards', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-template');
 
-  $result
-});
+=feature venus-test
 
-=feature pluggable-library
-
-This library provides a mechanism for extending the standard library, i.e.
-value classes, using plugins which can be automatically discovered and invoked.
-(no monkey-patching necessary)
+This library contains a L<Venus::Test> class which aims to provide a standard
+for documenting L<Venus> derived software projects.
 
 =cut
 
-$test->for('feature', 'pluggable-library');
+$test->for('feature', 'venus-test');
 
-=example-1 pluggable-library
+=feature venus-throw
 
-  package Venus::String::Plugin::Base64;
-
-  sub new {
-    return bless {};
-  }
-
-  sub execute {
-    my ($self, $string, @args) = @_;
-
-    require MIME::Base64;
-
-    return MIME::Base64::encode_base64($string->value);
-  }
-
-  package main;
-
-  use Venus::String;
-
-  my $string = Venus::String->new('hello, world');
-
-  $string->base64;
-
-  # "aGVsbG8sIHdvcmxk\n"
+This library contains a L<Venus::Throw> class which provides a mechanism for
+generating and raising error objects.
 
 =cut
 
-$test->for('example', 1, 'pluggable-library', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-throw');
 
-  $result
-});
+=feature venus-true
 
-=feature template-system
-
-This library provides a minimalistic templating system.
+This library contains a L<Venus::True> class which provides the global C<true>
+value.
 
 =cut
 
-$test->for('feature', 'template-system');
+$test->for('feature', 'venus-true');
 
-=example-1 template-system
+=feature venus-try
 
-  package main;
-
-  use Venus::Template;
-
-  my $template = Venus::Template->new(q(
-    {{ if user.name }}
-    Welcome, {{ user.name }}!
-    {{ else user.name }}
-    Welcome, friend!
-    {{ end user.name }}
-  ));
-
-  $template->render;
-
-  # "Welcome, friend!"
+This library contains a L<Venus::Try> class which provides an object-oriented
+interface for performing complex try/catch operations.
 
 =cut
 
-$test->for('example', 1, 'template-system', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
+$test->for('feature', 'venus-try');
 
-  $result
-});
+=feature venus-type
+
+This library contains a L<Venus::Type> class which provides methods for casting
+native data types to objects.
+
+=cut
+
+$test->for('feature', 'venus-type');
+
+=feature venus-undef
+
+This library contains a L<Venus::Undef> class which provides methods for
+manipulating undef data.
+
+=cut
+
+$test->for('feature', 'venus-undef');
+
+=feature venus-unpack
+
+This library contains a L<Venus::Unpack> class which provides methods for
+validating, coercing, and otherwise operating on lists of arguments.
+
+=cut
+
+$test->for('feature', 'venus-unpack');
+
+=feature venus-vars
+
+This library contains a L<Venus::Vars> class which provides methods for
+accessing C<%ENV> items.
+
+=cut
+
+$test->for('feature', 'venus-vars');
+
+=feature venus-yaml
+
+This library contains a L<Venus::Yaml> class which provides methods for reading
+and writing YAML data.
+
+=cut
+
+$test->for('feature', 'venus-yaml');
 
 =authors
 

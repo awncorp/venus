@@ -44,11 +44,13 @@ method: cast
 method: checks
 method: copy
 method: first
+method: from
 method: get
 method: into
 method: last
 method: list
 method: move
+method: name
 method: one
 method: reset
 method: set
@@ -88,7 +90,7 @@ $test->for('synopsis', sub {
 
 =description
 
-This package provides methods for validating, coercing, and otherwise operting
+This package provides methods for validating, coercing, and otherwise operating
 on lists of arguments.
 
 =cut
@@ -615,6 +617,64 @@ $test->for('example', 1, 'first', sub {
   $result
 });
 
+=method from
+
+The from method names the source of the unpacking operation and is used in
+exception messages whenever the L<Venus::Unpack/signature> operation fails.
+This method returns the invocant.
+
+=signature from
+
+  from(Str $data) (Unpack)
+
+=metadata from
+
+{
+  since => '2.23',
+}
+
+=example-1 from
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->from;
+
+  # bless(..., 'Venus::Unpack')
+
+=cut
+
+$test->for('example', 1, 'from', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Unpack');
+  ok !exists $result->{from};
+
+  $result
+});
+
+=example-2 from
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->from('Example');
+
+  # bless(..., 'Venus::Unpack')
+
+=cut
+
+$test->for('example', 2, 'from', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Unpack');
+  ok $result->{from} eq 'Example';
+
+  $result
+});
+
 =method get
 
 The get method returns the argument at the index specified.
@@ -1076,6 +1136,64 @@ $test->for('example', 3, 'move', sub {
   $result
 });
 
+=method name
+
+The name method names the unpacking operation and is used in exception messages
+whenever the L<Venus::Unpack/signature> operation fails. This method returns
+the invocant.
+
+=signature name
+
+  name(Str $data) (Unpack)
+
+=metadata name
+
+{
+  since => '2.23',
+}
+
+=example-1 name
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->name;
+
+  # bless(..., 'Venus::Unpack')
+
+=cut
+
+$test->for('example', 1, 'name', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Unpack');
+  ok !exists $result->{name};
+
+  $result
+});
+
+=example-2 name
+
+  # given: synopsis
+
+  package main;
+
+  $unpack = $unpack->name('example');
+
+  # bless(..., 'Venus::Unpack')
+
+=cut
+
+$test->for('example', 2, 'name', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Unpack');
+  ok $result->{name} eq 'example';
+
+  $result
+});
+
 =method one
 
 The one method returns the first result of the dispatched method call.
@@ -1333,8 +1451,7 @@ or as a list in list context.
 
   package main;
 
-  my ($string, $number, $float) = $unpack->all->signature(
-    'example-1',
+  my ($string, $number, $float) = $unpack->all->name('example-1')->signature(
     'string | number | float',
   );
 
@@ -1356,8 +1473,7 @@ $test->for('example', 1, 'signature', sub {
 
   package main;
 
-  my ($string, $number, $float) = $unpack->all->signature(
-    'example-2',
+  my ($string, $number, $float) = $unpack->all->name('example-2')->signature(
     'string', 'number', 'float',
  );
 
@@ -1379,8 +1495,7 @@ $test->for('example', 2, 'signature', sub {
 
   package main;
 
-  my $results = $unpack->all->signature(
-    'example-3',
+  my $results = $unpack->all->name('example-3')->signature(
     'string', 'number',
   );
 
@@ -1393,7 +1508,7 @@ $test->for('example', 3, 'signature', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Assert::Error');
   ok $error->message =~
-    'assertion \(argument #3\ for signature "example-3" in Venus::Unpack\) failed';
+    'assertion \(argument #3\ for signature "example-3" in Venus::Test\) failed';
 
   $result
 });
@@ -1404,8 +1519,7 @@ $test->for('example', 3, 'signature', sub {
 
   package main;
 
-  my $results = $unpack->all->signature(
-    'example-4',
+  my $results = $unpack->all->name('example-4')->signature(
     'string',
   );
 
@@ -1418,7 +1532,31 @@ $test->for('example', 4, 'signature', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Assert::Error');
   ok $error->message =~
-    'assertion \(argument #2\ for signature "example-4" in Venus::Unpack\) failed';
+    'assertion \(argument #2\ for signature "example-4" in Venus::Test\) failed';
+
+  $result
+});
+
+=example-5 signature
+
+  # given: synopsis
+
+  package main;
+
+  my $results = $unpack->all->name('example-5')->from('t/Venus_Unpack.t')->signature(
+    'object',
+  );
+
+  # Exception! (isa Venus::Assert::Error)
+
+=cut
+
+$test->for('example', 5, 'signature', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->error(\my $error)->result;
+  ok $error->isa('Venus::Assert::Error');
+  ok $error->message =~
+    'assertion \(argument #1\ for signature "example-5" in t/Venus_Unpack.t\) failed';
 
   $result
 });

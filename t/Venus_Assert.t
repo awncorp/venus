@@ -45,6 +45,7 @@ method: arrayref
 method: attributes
 method: boolean
 method: check
+method: checker
 method: clear
 method: code
 method: coderef
@@ -707,6 +708,51 @@ $test->for('example', 4, 'check', sub {
   ok !(my $result = $tryable->result);
 
   !$result
+});
+
+=method checker
+
+The checker method calls L</expression> with the type assertion signature
+provided and returns a coderef which calls the L</check> method when called.
+
+=signature checker
+
+  checker(Str $expr) (CodeRef)
+
+=metadata checker
+
+{
+  since => '2.32',
+}
+
+=example-1 checker
+
+  # given: synopsis
+
+  package main;
+
+  my $checker = $assert->checker('string');
+
+  # sub { ... }
+
+  # $checker->('hello');
+
+  # true
+
+  # $checker->(['goodbye']);
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'checker', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is ref $result, 'CODE';
+  ok $result->('hello');
+  ok !$result->(['goodbye']);
+
+  $result
 });
 
 =method clear
@@ -3009,7 +3055,7 @@ constraints, or throws an exception.
 
 =signature validator
 
-  validator() (CodeRef)
+  validator(Str $expr) (CodeRef)
 
 =metadata validator
 
@@ -3023,11 +3069,17 @@ constraints, or throws an exception.
 
   package main;
 
-  $assert->constraint(float => sub { $_->value > 1 });
+  my $validator = $assert->validator('string');
 
-  my $result = $assert->validator;
+  # sub { ... }
 
-  # sub {...}
+  # $validator->('hello');
+
+  # "hello"
+
+  # $validator->(['goodbye']);
+
+  # Exception! (isa Venus::Error)
 
 =cut
 
@@ -3035,11 +3087,11 @@ $test->for('example', 1, 'validator', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok ref $result eq 'CODE';
-  ok $result->(1.23);
-  my ($return, $error) = catch {$result->()};
+  is $result->('hello'), 'hello';
+  my ($return, $error) = catch {$result->(['goodbye'])};
   ok $return->isa('Venus::Error');
   ok $return->is('on.validate');
-  ok $return->stash('identity') eq 'undef';
+  ok $return->stash('identity') eq 'array';
 
   $result
 });

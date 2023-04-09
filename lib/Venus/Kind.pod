@@ -55,6 +55,8 @@ L<Venus::Role::Dumpable>
 
 L<Venus::Role::Matchable>
 
+L<Venus::Role::Mockable>
+
 L<Venus::Role::Printable>
 
 L<Venus::Role::Reflectable>

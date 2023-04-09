@@ -134,6 +134,14 @@ sub check {
   return $self->constraints->renew(@args)->result;
 }
 
+sub checker {
+  my ($self, $data) = @_;
+
+  $self->expression($data) if $data;
+
+  return $self->defer('check');
+}
+
 sub clear {
   my ($self) = @_;
 
@@ -576,10 +584,11 @@ sub validate {
 }
 
 sub validator {
-  my ($self) = @_;
-  return sub {
-    $self->validate(@_)
-  }
+  my ($self, $data) = @_;
+
+  $self->expression($data) if $data;
+
+  return $self->defer('validate');
 }
 
 sub value {

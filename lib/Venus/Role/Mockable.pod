@@ -1,0 +1,108 @@
+
+=head1 NAME
+
+Venus::Role::Mockable - Mockable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Mockable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class 'with';
+
+  with 'Venus::Role::Mockable';
+
+  sub execute {
+    [1..4];
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  # my $mock = $example->mock(execute => sub {
+  #   my ($next) = @_;
+  #
+  #   return sub {
+  #     [@{$next->()}, @_]
+  #   }
+  # });
+
+  # sub { ... }
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for mocking subroutines.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 mock
+
+  mock(Str $name, CodeRef $code) (CodeRef)
+
+The mock method mocks the subroutine specified using the callback given. The
+coderef provided will be passed the original subroutine coderef as its first
+argument. The coderef provided should always return a coderef that will serve
+as the subroutine mock.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item mock example 1
+
+  package main;
+
+  my $example = Example->new;
+
+  my $mock = $example->mock(execute => sub {
+    my ($next) = @_;
+
+    return sub {
+      [@{$next->()}, @_]
+    }
+  });
+
+  # sub { ... }
+
+  # $example->execute;
+
+  # [1..4]
+
+  # $example->execute(5, 6);
+
+  # [1..6]
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

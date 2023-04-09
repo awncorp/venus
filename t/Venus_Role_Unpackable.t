@@ -59,7 +59,7 @@ $test->for('includes');
   my $example = Example->new;
 
   # $example->unpack("hello", 123, 1.23)->signature(
-  #   'example', 'string', 'number', 'float',
+  #   'string', 'number', 'float',
   # );
 
 =cut
@@ -104,7 +104,6 @@ unpacking and validating arbitrary argument lists.
   my $example = Example->new;
 
   my $results = $example->unpack("hello", 123, 1.23)->signature(
-    'example-1',
     'any',
   );
 
@@ -127,7 +126,6 @@ $test->for('example', 1, 'unpack', sub {
   my $example = Example->new;
 
   my $results = $example->unpack("hello", 123, 1.23)->signature(
-    'example-2',
     'string',
     'number | float',
   );
@@ -151,7 +149,6 @@ $test->for('example', 2, 'unpack', sub {
   my $example = Example->new;
 
   my $results = $example->unpack("hello", 123, 1.23)->signature(
-    'example-3',
     'string',
     'number',
     'float',

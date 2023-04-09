@@ -61,8 +61,8 @@ $test->for('includes');
 
 $test->for('synopsis', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Test');
+  my $result = $tryable->result;
+  $test->okay($result->isa('Venus::Test'));
 
   $result
 });
@@ -79,7 +79,7 @@ $test->for('description');
 
 =inherits
 
-Venus::Data
+Venus::Kind
 
 =cut
 
@@ -88,6 +88,9 @@ $test->for('inherits');
 =integrates
 
 Venus::Role::Buildable
+Venus::Role::Catchable
+Venus::Role::Throwable
+Venus::Role::Tryable
 
 =cut
 
@@ -122,8 +125,8 @@ for the test file given.
 
 $test->for('example', 1, 'test', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Test');
+  my $result = $tryable->result;
+  $test->okay($result->isa('Venus::Test'));
 
   $result
 });
@@ -155,8 +158,8 @@ provided. If the content cannot be found an exception is raised.
 
 $test->for('example', 1, 'data', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq 'Venus::Test';
+  my $result = $tryable->result;
+  $test->same($result, 'Venus::Test');
 
   $result
 });
@@ -173,9 +176,8 @@ $test->for('example', 1, 'data', sub {
 
 $test->for('example', 2, 'data', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->error(\my $error)->result;
-  ok $error;
-  ok $error->isa('Venus::Test::Error');
+  my $result = $tryable->error->result;
+  $test->pass($result->isa('Venus::Test::Error'));
 
   $result
 });
@@ -237,8 +239,8 @@ prevent warnings when redeclaring packages in examples.
 
 $test->for('example', 3, 'for', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq "Venus::Test";
+  my $result = $tryable->result;
+  $test->same($result, 'Venus::Test');
 
   $result
 });
@@ -274,10 +276,10 @@ return a POD string for use in documentation.
 
 $test->for('example', 1, 'pdml', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result =~ '=head1 NAME';
-  ok $result =~ 'Venus::Test - Test Automation';
-  ok $result =~ '=cut';
+  my $result = $tryable->result;
+  $test->like($result, '=head1 NAME');
+  $test->like($result, 'Venus::Test - Test Automation');
+  $test->like($result, '=cut');
 
   $result
 });
@@ -304,13 +306,13 @@ $test->for('example', 1, 'pdml', sub {
 
 $test->for('example', 2, 'pdml', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result =~ '=head1 SYNOPSIS';
-  ok $result =~ 'package main;';
-  ok $result =~ 'use Venus::Test;';
-  ok $result =~ 'my \$test = test \'t/Venus_Test.t\';';
-  ok $result =~ '# \$test\->for\(\'name\'\);';
-  ok $result =~ '=cut';
+  my $result = $tryable->result;
+  $test->like($result, '=head1 SYNOPSIS');
+  $test->like($result, 'package main;');
+  $test->like($result, 'use Venus::Test;');
+  $test->like($result, 'my \$test = test \'t/Venus_Test.t\';');
+  $test->like($result, '# \$test\->for\(\'name\'\);');
+  $test->like($result, '=cut');
 
   $result
 });
@@ -337,13 +339,13 @@ $test->for('example', 2, 'pdml', sub {
 
 $test->for('example', 3, 'pdml', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result =~ '=over 4';
-  ok $result =~ '=item data example 1';
-  ok $result =~ '# given: synopsis';
-  ok $result =~ 'my \$data = \$test\->data\(\'name\'\);';
-  ok $result =~ '# Venus::Test';
-  ok $result =~ '=back';
+  my $result = $tryable->result;
+  $test->like($result, '=over 4');
+  $test->like($result, '=item data example 1');
+  $test->like($result, '# given: synopsis');
+  $test->like($result, 'my \$data = \$test\->data\(\'name\'\);');
+  $test->like($result, '# Venus::Test');
+  $test->like($result, '=back');
 
   $result
 });
@@ -384,8 +386,8 @@ The render method returns a string representation of a valid POD document.
 
 $test->for('example', 1, 'render', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Path');
+  my $result = $tryable->result;
+  $test->pass($result->isa('Venus::Path'));
   $result->unlink;
 
   $result
@@ -419,8 +421,8 @@ POD block is not recognized, an exception is raised.
 
 $test->for('example', 1, 'text', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result eq 'Venus::Test';
+  my $result = $tryable->result;
+  $test->same($result, 'Venus::Test');
 
   $result
 });
@@ -442,13 +444,13 @@ $test->for('example', 1, 'text', sub {
 
 $test->for('example', 2, 'text', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result =~ 'function: test';
-  ok $result =~ 'method: data';
-  ok $result =~ 'method: for';
-  ok $result =~ 'method: pdml';
-  ok $result =~ 'method: render';
-  ok $result =~ 'method: text';
+  my $result = $tryable->result;
+  $test->like($result, 'function: test');
+  $test->like($result, 'method: data');
+  $test->like($result, 'method: for');
+  $test->like($result, 'method: pdml');
+  $test->like($result, 'method: render');
+  $test->like($result, 'method: text');
 
   $result
 });
@@ -465,7 +467,9 @@ $test->for('example', 2, 'text', sub {
 
 $test->for('example', 3, 'text', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+  my $result = $tryable->result;
+
+  $test->fail($result);
 
   !$result
 });
@@ -482,20 +486,11 @@ $test->for('example', 3, 'text', sub {
 
 $test->for('example', 4, 'text', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->error(\my $error)->result;
-  ok $error;
-  ok $error->isa('Venus::Test::Error');
+  my $result = $tryable->error->result;
+  $test->pass($result->isa('Venus::Test::Error'));
 
   $result
 });
-
-=partials
-
-t/Venus.t: pdml: authors
-
-=cut
-
-$test->for('partials');
 
 =partials
 
@@ -510,4 +505,4 @@ $test->for('partials');
 
 $test->render('lib/Venus/Test.pod') if $ENV{RENDER};
 
-ok 1 and done_testing;
+$test->done;

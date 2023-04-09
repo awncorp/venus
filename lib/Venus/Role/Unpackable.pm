@@ -14,7 +14,9 @@ sub unpack {
 
   require Venus::Unpack;
 
-  return Venus::Unpack->from($self)->do('args', @args)->all;
+  my $name = (caller(1))[3] =~ s/.*::(\w+)$/$1/gr;
+
+  return Venus::Unpack->from($self)->name($name)->do('args', @args)->all;
 }
 
 # EXPORTS

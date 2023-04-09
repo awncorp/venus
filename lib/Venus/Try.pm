@@ -40,6 +40,14 @@ sub build_self {
 
 # METHODS
 
+sub any {
+  my ($self) = @_;
+
+  $self->on_default(sub{(@_)});
+
+  return $self;
+}
+
 sub call {
   my ($self, $callback) = @_;
 
@@ -81,6 +89,8 @@ sub callback {
 sub catch {
   my ($self, $package, $callback) = @_;
 
+  $callback ||= sub{(@_)};
+
   push @{$self->on_catch}, [$package, $self->callback($callback)];
 
   return $self;
@@ -97,7 +107,12 @@ sub default {
 sub error {
   my ($self, $variable) = @_;
 
-  $self->on_default(sub{($$variable) = @_}) if $variable;
+  if ($variable) {
+    $self->on_default(sub{($$variable) = @_})
+  }
+  else {
+    $self->catch('Venus::Error');
+  }
 
   return $self;
 }
@@ -125,7 +140,7 @@ sub finally {
 sub maybe {
   my ($self) = @_;
 
-  $self->on_default(sub{''});
+  $self->on_default(sub{(undef)});
 
   return $self;
 }

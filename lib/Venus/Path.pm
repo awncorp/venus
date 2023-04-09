@@ -463,6 +463,36 @@ sub rmfiles {
   return wantarray ? (@paths) : \@paths;
 }
 
+sub root {
+  my ($self, $spec, $base) = @_;
+
+  my @paths;
+
+  for my $path ($self->absolute->lineage) {
+    if ($path->child($base)->test($spec)) {
+      push @paths, $path;
+      last;
+    }
+  }
+
+  return @paths ? (-f $paths[0] ? $paths[0]->parent : $paths[0]) : undef;
+}
+
+sub seek {
+  my ($self, $spec, $base) = @_;
+
+  if ((my $path = $self->child($base))->test($spec)) {
+    return $path;
+  }
+  else {
+    for my $path ($self->directories) {
+      my $sought = $path->seek($spec, $base);
+      return $sought if $sought;
+    }
+    return undef;
+  }
+}
+
 sub sibling {
   my ($self, $path) = @_;
 

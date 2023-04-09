@@ -86,7 +86,7 @@ $test->for('synopsis', sub {
 
 =description
 
-This package provides methods for manipulating code data.
+This package provides methods for manipulating subroutines.
 
 =cut
 

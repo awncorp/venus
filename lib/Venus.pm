@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.32';
+our $VERSION = '2.40';
 
 # AUTHORITY
 
@@ -23,14 +23,26 @@ sub import {
   no strict 'refs';
 
   my %exports = (
+    args => 1,
+    box => 1,
+    call => 1,
     cast => 1,
     catch => 1,
     caught => 1,
+    chain => 1,
+    cop => 1,
     error => 1,
     false => 1,
     fault => 1,
+    load => 1,
+    make => 1,
+    merge => 1,
     raise => 1,
+    roll => 1,
+    space => 1,
+    then => 1,
     true => 1,
+    wrap => 1,
   );
 
   @args = grep defined && !ref && /^[A-Za-z]/ && $exports{$_}, @args;
@@ -44,6 +56,54 @@ sub import {
 }
 
 # FUNCTIONS
+
+sub args (@) {
+  my (@args) = @_;
+
+  return (!@args)
+    ? ({})
+    : ((@args == 1 && ref($args[0]) eq 'HASH')
+    ? (!%{$args[0]} ? {} : {%{$args[0]}})
+    : (@args % 2 ? {@args, undef} : {@args}));
+}
+
+sub box ($) {
+  my ($data) = @_;
+
+  require Venus::Box;
+
+  my $box = Venus::Box->new($data);
+
+  return $box;
+}
+
+sub call (@) {
+  my ($data, @args) = @_;
+  my $next = @args;
+  if ($next && UNIVERSAL::isa($data, 'CODE')) {
+    return $data->(@args);
+  }
+  my $code = shift(@args);
+  if ($next && Scalar::Util::blessed($data)) {
+    return $data->$code(@args) if UNIVERSAL::can($data, $code)
+      || UNIVERSAL::can($data, 'AUTOLOAD');
+    $next = 0;
+  }
+  if ($next && ref($data) eq 'SCALAR') {
+    return $$data->$code(@args) if UNIVERSAL::can($$data, $code);
+    $next = 0;
+  }
+  if ($next && UNIVERSAL::can(load($data)->package, $code)) {
+    no strict 'refs';
+    return *{"${data}::${code}"}{"CODE"} ?
+      &{"${data}::${code}"}(@args) : $data->$code(@args[1..$#args]);
+  }
+  if ($next && UNIVERSAL::can($data, 'AUTOLOAD')) {
+    no strict 'refs';
+    return &{"${data}::${code}"}(@args);
+  }
+  fault("Exception! call(@{[join(', ', map qq('$_'), @_)]}) failed.");
+}
 
 sub cast (;$$) {
   my ($data, $into) = (@_ ? (@_) : ($_));
@@ -91,6 +151,30 @@ sub caught ($$;&) {
   }
 }
 
+sub chain {
+  my ($data, @args) = @_;
+
+  return if !$data;
+
+  for my $next (map +(ref($_) eq 'ARRAY' ? $_ : [$_]), @args) {
+    $data = call($data, @$next);
+  }
+
+  return $data;
+}
+
+sub cop (@) {
+  my ($data, @args) = @_;
+
+  require Scalar::Util;
+
+  ($data, $args[0]) = map {
+    ref eq 'SCALAR' ? $$_ : Scalar::Util::blessed($_) ? ref($_) : $_
+  } ($data, $args[0]);
+
+  return space("$data")->cop(@args);
+}
+
 sub error (;$) {
   my ($data) = @_;
 
@@ -103,6 +187,7 @@ sub error (;$) {
 }
 
 sub false () {
+
   require Venus::False;
 
   return Venus::False->value;
@@ -114,6 +199,27 @@ sub fault (;$) {
   require Venus::Fault;
 
   return Venus::Fault->new($data)->throw;
+}
+
+sub load ($) {
+  my ($data) = @_;
+
+  return space($data)->do('load');
+}
+
+sub make (@) {
+
+  return if !@_;
+
+  return call($_[0], 'new', @_);
+}
+
+sub merge (@) {
+  my (@args) = @_;
+
+  require Venus::Hash;
+
+  return Venus::Hash->new({})->merge(@args);
 }
 
 sub raise ($;$) {
@@ -131,10 +237,43 @@ sub raise ($;$) {
   return Venus::Throw->new(package => $self, parent => $parent)->error($data);
 }
 
+sub roll (@) {
+
+  return (@_[1,0,2..$#_]);
+}
+
+sub space ($) {
+  my ($data) = @_;
+
+  require Venus::Space;
+
+  return Venus::Space->new($data);
+}
+
+sub then (@) {
+
+  return ($_[0], call(@_));
+}
+
 sub true () {
+
   require Venus::True;
 
   return Venus::True->value;
+}
+
+sub wrap ($;$) {
+  my ($data, $name) = @_;
+
+  return if !@_;
+
+  my $moniker = $name // $data =~ s/\W//gr;
+  my $caller = caller(0);
+
+  no strict 'refs';
+  no warnings 'redefine';
+
+  return *{"${caller}::${moniker}"} = sub {@_ ? make($data, @_) : $data};
 }
 
 1;

@@ -3508,23 +3508,6 @@ $test->for('example', 2, 'stringified', sub {
   $result
 });
 
-=example-3 stringified
-
-  # given: synopsis;
-
-  my $stringified = $self->stringified;
-
-  # ...
-
-=cut
-
-$test->for('example', 3, 'stringified', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-
-  $result
-});
-
 =method strip
 
 The strip method returns the string replacing occurences of 2 or more

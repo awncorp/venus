@@ -9,6 +9,16 @@ use Venus::Class 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
+# BUILDERS
+
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    args => ref $data eq 'ARRAY' ? $data : [$data],
+  };
+}
+
 # METHODS
 
 sub all {
@@ -113,9 +123,9 @@ sub foreach {
 sub from {
   my ($self, $data) = @_;
 
-  $self = $self->class->new;
+  $self = $self->new if !ref $self;
 
-  $self->{from} = ref $data || $data;
+  $self->{from} = ref $data || $data if $data;
 
   return $self;
 }
@@ -177,6 +187,14 @@ sub move {
   return $self;
 }
 
+sub name {
+  my ($self, $data) = @_;
+
+  $self->{name} = $data if $data;
+
+  return $self;
+}
+
 sub one {
   my ($self, $code, @args) = @_;
 
@@ -203,15 +221,29 @@ sub set {
 }
 
 sub signature {
-  my ($self, $name, @args) = @_;
+  my ($self, @args) = @_;
 
   require Venus::Assert;
+
+  my ($from, $name) = ((caller(1))[0,3]);
+  my ($file, $line) = ((caller(0))[1,2]);
+
+  $from = $self->{from} if defined $self->{from};
+  $name = $self->{name} if defined $self->{name};
+
+  if (!$name) {
+    $from = "$file at line $line";
+    $name = "signature";
+  }
+  else {
+    $name = (split /::/, $name)[-1];
+    $name = "signature \"$name\"";
+  }
 
   my $code = sub {
     my ($self, $data, $expr, $index) = @_;
 
-    my $from = $self->{from} || ref $self;
-    my $name = qq(argument #@{[$index + 1]} for signature "$name" in $from);
+    my $name = qq(argument #@{[$index + 1]} for $name in $from);
     return scalar Venus::Assert->new($name)->expression($expr)->validate($data);
   };
 

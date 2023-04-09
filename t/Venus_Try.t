@@ -36,6 +36,7 @@ $test->for('abstract');
 
 =includes
 
+method: any
 method: call
 method: callback
 method: catch
@@ -136,6 +137,77 @@ on_finally: rw, opt, CodeRef
 =cut
 
 $test->for('attributes');
+
+=method any
+
+The any method registers a default C<catch> condition that returns whatever
+value was encoutered on error and returns it as a result.
+
+=signature any
+
+  any() (Try)
+
+=metadata any
+
+{
+  since => '2.32',
+}
+
+=example-1 any
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    die 'Oops!';
+  });
+
+  my $any = $try->any;
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=cut
+
+$test->for('example', 1, 'any', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+  my $returned = scalar $result->result;
+  like $returned, qr/Oops!/;
+
+  $result
+});
+
+=example-2 any
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    die $try;
+  });
+
+  my $any = $try->any;
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=cut
+
+$test->for('example', 2, 'any', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+  my $returned = scalar $result->result;
+  ok $returned->isa('Venus::Try');
+
+  $result
+});
 
 =method call
 
@@ -289,7 +361,8 @@ $test->for('example', 3, 'callback', sub {
 
 The catch method takes a package or ref name, and when triggered checks whether
 the captured exception is of the type specified and if so executes the given
-callback.
+callback. If no callback is provided the exception is captured in a L</default>
+operation and returned as a result.
 
 =signature catch
 
@@ -330,6 +403,66 @@ $test->for('example', 1, 'catch', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Try');
   is_deeply $result->result, [$result];
+
+  $result
+});
+
+=example-2 catch
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    my (@args) = @_;
+
+    $try->throw->error;
+  });
+
+  my $catch = $try->catch('Venus::Try::Error', sub {
+
+    return (@_);
+  });
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=cut
+
+$test->for('example', 2, 'catch', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+  ok $result->result->isa('Venus::Try::Error');
+
+  $result
+});
+
+=example-3 catch
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+
+    $try->throw->error;
+  });
+
+  my $catch = $try->catch('Venus::Try::Error');
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=cut
+
+$test->for('example', 3, 'catch', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+  ok $result->result->isa('Venus::Try::Error');
 
   $result
 });
@@ -385,7 +518,8 @@ $test->for('example', 1, 'default', sub {
 =method error
 
 The error method takes a scalar reference and assigns any uncaught exceptions
-to it during execution.
+to it during execution. If no variable is provided a L</catch> operation will
+be registered to capture all L<Venus::Error> exceptions.
 
 =signature error
 
@@ -421,6 +555,36 @@ $test->for('example', 1, 'error', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Try');
+
+  $result
+});
+
+=example-2 error
+
+  package main;
+
+  use Venus::Try;
+
+  my $try = Venus::Try->new;
+
+  $try->call(sub {
+    my (@args) = @_;
+
+    $try->throw->error;
+  });
+
+  my $error = $try->error;
+
+  # bless({ on_catch => ... }, "Venus::Try")
+
+=cut
+
+$test->for('example', 2, 'error', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+  my $returned = $result->result;
+  ok $returned->isa('Venus::Try::Error');
 
   $result
 });
@@ -550,7 +714,7 @@ $test->for('example', 1, 'finally', sub {
 =method maybe
 
 The maybe method registers a default C<catch> condition that returns falsy,
-i.e. an empty string, if an exception is encountered.
+i.e. an undefined value, if an exception is encountered.
 
 =signature maybe
 
@@ -586,7 +750,7 @@ $test->for('example', 1, 'maybe', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Try');
-  is $result->result, '';
+  is scalar $result->result, undef;
 
   $result
 });

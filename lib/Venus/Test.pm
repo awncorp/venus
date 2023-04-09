@@ -5,13 +5,16 @@ use 5.018;
 use strict;
 use warnings;
 
-use Venus::Class 'base', 'with';
+use Venus::Class 'attr', 'base', 'with';
 
-base 'Venus::Data';
+base 'Venus::Kind';
 
 with 'Venus::Role::Buildable';
+with 'Venus::Role::Throwable';
+with 'Venus::Role::Tryable';
+with 'Venus::Role::Catchable';
 
-use Test::More;
+use Test::More ();
 
 use Exporter 'import';
 
@@ -20,24 +23,28 @@ our @EXPORT = 'test';
 # EXPORTS
 
 sub test {
-  __PACKAGE__->new($_[0]);
+  Venus::Test->new($_[0]);
 }
 
+# ATTRIBUTES
+
+attr 'file';
+
 # BUILDERS
+
+sub build_arg {
+  my ($self, $data) = @_;
+
+  return {
+    file => $data,
+  };
+}
 
 sub build_self {
   my ($self, $data) = @_;
 
-  $self->SUPER::build_self($data);
   for my $item (qw(name abstract tagline synopsis description)) {
-    if (!@{$self->find(undef, $item)}) {
-      my $throw;
-      $throw = $self->throw;
-      $throw->name('on.build');
-      $throw->message("Test missing pod section =$item");
-      $throw->stash(section => $item);
-      $throw->error;
-    }
+    $self->error("on.build_self.$item") if !@{$self->find(undef, $item)};
   }
 
   return $self;
@@ -45,326 +52,43 @@ sub build_self {
 
 # METHODS
 
-sub data {
-  my ($self, $name, @args) = @_;
+sub desc {
+  my ($self, @args) = @_;
 
-  my $method = "data_for_$name";
-
-  $self->throw->error if !$self->can($method);
-
-  wantarray ? ($self->$method(@args)) : $self->$method(@args);
+  return join ' ',
+    map {s/^\s+|\s+$//gr} map {Test::More->can('explain')->($_)} @args;
 }
 
-sub data_for_abstract {
+sub done {
   my ($self) = @_;
 
-  my $data = $self->find(undef, 'abstract');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
+  return Test::More->can('done_testing')->();
 }
 
-sub data_for_attributes {
-  my ($self) = @_;
+sub dump {
+  my ($self, @args) = @_;
 
-  my $data = $self->find(undef, 'attributes');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_attribute {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'attribute',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_authors {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'authors');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_description {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'description');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_encoding {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'encoding');
-
-  $self->throw->error if !@$data;
-
-  return (map {map uc, split /\n+/} @{$data->[0]{data}})[0];
-}
-
-sub data_for_example {
-  my ($self, $number, $name) = @_;
-
-  my $data = $self->search({
-    list => "example-$number",
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_feature {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'feature',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_function {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'function',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_heading {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'heading',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_includes {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'includes');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_inherits {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'inherits');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_integrates {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'integrates');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_layout {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'layout');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_libraries {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'libraries');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_license {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'license');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_metadata {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'metadata',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_message {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'message',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_method {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'method',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_name {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'name');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_operator {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'operator',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_partials {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'partials');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_project {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'project');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_signature {
-  my ($self, $name) = @_;
-
-  my $data = $self->search({
-    list => 'signature',
-    name => $name,
-  });
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_synopsis {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'synopsis');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_tagline {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'tagline');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub data_for_version {
-  my ($self) = @_;
-
-  my $data = $self->find(undef, 'version');
-
-  $self->throw->error if !@$data;
-
-  return join "\n\n", @{$data->[0]{data}};
-}
-
-sub default {
-  my ($self) = @_;
-
-  return '';
+  return Test::More->can('diag')->(Test::More->can('explain')->(@args));
 }
 
 sub encoding {
   my ($self, $name) = @_;
 
   return join("\n", "", "=encoding \U$name", "", "=cut");
+}
+
+sub error {
+  my ($self, $name, $text, @args) = @_;
+
+  my $throw;
+
+  $throw = $self->throw;
+  $throw->name($name);
+  $throw->message($text) if $text;
+  $throw->stash(@args) if @args;
+  $throw->error;
+
+  return;
 }
 
 sub eval {
@@ -381,6 +105,18 @@ sub eval {
   return wantarray ? (@result) : $result[0];
 }
 
+sub fail {
+  my ($self, $data, $desc) = @_;
+
+  return $self->proxy('ok', !!!$data, $desc) || $self->dump($data);
+}
+
+sub find {
+  my ($self, @args) = @_;
+
+  return $self->spec->find(@args);
+}
+
 sub for {
   my ($self, $name, @args) = @_;
 
@@ -388,9 +124,9 @@ sub for {
 
   my $method = "test_for_$name";
 
-  $self->throw->error if !$self->can($method);
+  $self->error("on.for.$name") if !$self->can($method);
 
-  subtest(join(' ', $method, grep !ref, @args), sub {
+  $self->proxy('subtest', $method, sub {
     $result = $self->$method(@args);
   });
 
@@ -415,10 +151,24 @@ sub item {
   return ("=item $name\n", "$data\n");
 }
 
+sub like {
+  my ($self, $this, $that, $desc) = @_;
+
+  $that = qr/$that/ if ref $that ne 'Regexp';
+
+  return $self->proxy('like', $this, $that, $desc);
+}
+
 sub link {
   my ($self, @data) = @_;
 
   return ("L<@{[join('|', @data)]}>");
+}
+
+sub okay {
+  my ($self, $data, $desc) = @_;
+
+  return $self->proxy('ok', !!$data, $desc);
 }
 
 sub over {
@@ -427,12 +177,484 @@ sub over {
   return join("\n", "", "=over 4", "", grep(defined, @data), "=back");
 }
 
+sub pass {
+  my ($self, $data, $desc) = @_;
+
+  return $self->proxy('ok', !!$data, $desc) || $self->dump($data);
+}
+
+sub proxy {
+  my ($self, $name, @args) = @_;
+
+  my $level = 1;
+  my $regexp = qr{@{[quotemeta($self->file)]}$};
+
+  for (my $i = 0; my @caller = caller($i); $i++) {
+    $level += $i; last if $caller[1] =~ $regexp;
+  }
+
+  local $Test::Builder::Level = $Test::Builder::Level + $level;
+
+  return Test::More->can($name)->(@args);
+}
+
+sub render {
+  my ($self, $file) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($file);
+
+  $path->parent->mkdirs;
+
+  my @layout = (
+    'encoding',
+    'name',
+    'abstract',
+    'version',
+    'synopsis',
+    'description',
+    'attributes: attribute',
+    'inherits',
+    'integrates',
+    'libraries',
+    'functions: function',
+    'methods: method',
+    'messages: message',
+    'features: feature',
+    'operators: operator',
+    'partials',
+    'authors',
+    'license',
+    'project',
+  );
+
+  if (@{$self->find(undef, 'layout')}) {
+    @layout = (split /\n/, $self->text('layout'));
+  }
+
+  $path->write(join "\n", grep !!$_, map $self->show($_), @layout);
+
+  return $path;
+}
+
+sub same {
+  my ($self, $this, $that, $desc) = @_;
+
+  return $self->proxy('is_deeply', $this, $that, $desc);
+}
+
+sub search {
+  my ($self, @args) = @_;
+
+  return $self->spec->search(@args);
+}
+
+sub show {
+  my ($self, $spec) = @_;
+
+  my ($name, $list) = split /:\s*/, $spec;
+
+  my $method = "pdml_for_$name";
+
+  if ($self->can($method)) {
+    return $self->pdml($name);
+  }
+
+  my $results = $self->search({$list ? (list => $list) : (name => $name)});
+
+  $self->error("on.show.$name") if !@$results && !grep $name eq $_, qw(
+    messages
+  );
+
+  my @output;
+  my $textual = 1;
+
+  for my $result (@$results) {
+    my @block;
+
+    my $examples = 0;
+    my $metadata = $self->text('metadata', $result->{name});
+    my $signature = $self->text('signature', $result->{name});
+
+    push @block, ($signature, '') if $signature;
+
+    my $text = join "\n\n", @{$result->{data}};
+
+    if (!$text) {
+      next;
+    }
+    else {
+      push @block, $text;
+    }
+
+    if ($metadata) {
+      local $@;
+      if ($metadata = eval $metadata) {
+        if (my $since = $metadata->{since}) {
+          push @block, "", "I<Since C<$since>>";
+        }
+      }
+    }
+
+    my @results = $self->search({name => $result->{name}});
+
+    for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+      push @block, $self->pdml('example', $i, $result->{name});
+      $examples++;
+    }
+
+    if ($signature || $metadata || $examples) {
+      push @output, ($self->head2($result->{name}, @block));
+      $textual = 0;
+    }
+    else {
+      push @output, @block;
+    }
+  }
+
+  if (@output) {
+    if ($textual) {
+      @output = $self->head1($name, join "\n\n", @output);
+    }
+    else {
+      unshift @output, $self->head1($name,
+        ($self->count({list => 'heading'})
+          ? ($self->text('heading', $name) || $self->text('heading', $list))
+          : "This package provides the following $name:"),
+      );
+    }
+  }
+
+  return join "\n", @output;
+}
+
+sub spec {
+  my ($self) = @_;
+
+  require Venus::Data;
+
+  $self->{data} ||= Venus::Data->new($self->file);
+
+  return $self->{data};
+}
+
+sub data {
+  my ($self, $name, @args) = @_;
+
+  my $method = "data_for_$name";
+
+  $self->error("on.data.$name") if !$self->can($method);
+
+  wantarray ? ($self->$method(@args)) : $self->$method(@args);
+}
+
+sub data_for_abstract {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'abstract');
+
+  $self->error('on.data.for.abstract') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_attribute {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'attribute',
+    name => $name,
+  });
+
+  $self->error('on.data.for.attribute') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_attributes {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'attributes');
+
+  $self->error('on.data.for.attributes') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_authors {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'authors');
+
+  $self->error('on.data.for.authors') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_description {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'description');
+
+  $self->error('on.data.for.description') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_encoding {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'encoding');
+
+  $self->error('on.data.for.encoding') if !@$data;
+
+  return (map {map uc, split /\n+/} @{$data->[0]{data}})[0];
+}
+
+sub data_for_example {
+  my ($self, $number, $name) = @_;
+
+  my $data = $self->search({
+    list => "example-$number",
+    name => $name,
+  });
+
+  $self->error('on.data.for.example') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_feature {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'feature',
+    name => $name,
+  });
+
+  $self->error('on.data.for.feature') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_function {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'function',
+    name => $name,
+  });
+
+  $self->error('on.data.for.function') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_heading {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'heading',
+    name => $name,
+  });
+
+  $self->error('on.data.for.heading') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_includes {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'includes');
+
+  $self->error('on.data.for.includes') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_inherits {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'inherits');
+
+  $self->error('on.data.for.inherits') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_integrates {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'integrates');
+
+  $self->error('on.data.for.integrates') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_layout {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'layout');
+
+  $self->error('on.data.for.layout') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_libraries {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'libraries');
+
+  $self->error('on.data.for.libraries') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_license {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'license');
+
+  $self->error('on.data.for.license') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_message {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'message',
+    name => $name,
+  });
+
+  $self->error('on.data.for.message') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_metadata {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'metadata',
+    name => $name,
+  });
+
+  $self->error('on.data.for.metadata') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_method {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'method',
+    name => $name,
+  });
+
+  $self->error('on.data.for.method') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_name {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'name');
+
+  $self->error('on.data.for.name') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_operator {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'operator',
+    name => $name,
+  });
+
+  $self->error('on.data.for.operator') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_partials {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'partials');
+
+  $self->error('on.data.for.partials') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_project {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'project');
+
+  $self->error('on.data.for.project') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_signature {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'signature',
+    name => $name,
+  });
+
+  $self->error('on.data.for.signature') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_synopsis {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'synopsis');
+
+  $self->error('on.data.for.synopsis') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_tagline {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'tagline');
+
+  $self->error('on.data.for.tagline') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
+sub data_for_version {
+  my ($self) = @_;
+
+  my $data = $self->find(undef, 'version');
+
+  $self->error('on.data.for.version') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
+}
+
 sub pdml {
   my ($self, $name, @args) = @_;
 
   my $method = "pdml_for_$name";
 
-  $self->throw->error if !$self->can($method);
+  $self->error('on.pdml') if !$self->can($method);
 
   wantarray ? ($self->$method(@args)) : $self->$method(@args);
 }
@@ -978,125 +1200,6 @@ sub pdml_for_version {
   return $text ? ($self->head1('version', $text)) : ();
 }
 
-sub render {
-  my ($self, $file) = @_;
-
-  require Venus::Path;
-
-  my $path = Venus::Path->new($file);
-
-  $path->parent->mkdirs;
-
-  my @layout = (
-    'encoding',
-    'name',
-    'abstract',
-    'version',
-    'synopsis',
-    'description',
-    'attributes: attribute',
-    'inherits',
-    'integrates',
-    'libraries',
-    'functions: function',
-    'methods: method',
-    'messages: message',
-    'features: feature',
-    'operators: operator',
-    'partials',
-    'authors',
-    'license',
-    'project',
-  );
-
-  if (@{$self->find(undef, 'layout')}) {
-    @layout = (split /\n/, $self->text('layout'));
-  }
-
-  $path->write(join "\n", grep !!$_, map $self->show($_), @layout);
-
-  return $path;
-}
-
-sub show {
-  my ($self, $spec) = @_;
-
-  my ($name, $list) = split /:\s*/, $spec;
-
-  my $method = "pdml_for_$name";
-
-  if ($self->can($method)) {
-    return $self->pdml($name);
-  }
-
-  my $results = $self->search({$list ? (list => $list) : (name => $name)});
-
-  $self->throw->error if !@$results && !grep $name eq $_, qw(
-    messages
-  );
-
-  my @output;
-  my $textual = 1;
-
-  for my $result (@$results) {
-    my @block;
-
-    my $examples = 0;
-    my $metadata = $self->text('metadata', $result->{name});
-    my $signature = $self->text('signature', $result->{name});
-
-    push @block, ($signature, '') if $signature;
-
-    my $text = join "\n\n", @{$result->{data}};
-
-    if (!$text) {
-      next;
-    }
-    else {
-      push @block, $text;
-    }
-
-    if ($metadata) {
-      local $@;
-      if ($metadata = eval $metadata) {
-        if (my $since = $metadata->{since}) {
-          push @block, "", "I<Since C<$since>>";
-        }
-      }
-    }
-
-    my @results = $self->search({name => $result->{name}});
-
-    for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
-      push @block, $self->pdml('example', $i, $result->{name});
-      $examples++;
-    }
-
-    if ($signature || $metadata || $examples) {
-      push @output, ($self->head2($result->{name}, @block));
-      $textual = 0;
-    }
-    else {
-      push @output, @block;
-    }
-  }
-
-  if (@output) {
-    if ($textual) {
-      @output = $self->head1($name, join "\n\n", @output);
-    }
-    else {
-      unshift @output, $self->head1($name,
-        ($self->count({list => 'heading'})
-          ? ($self->text('heading', $name) || $self->text('heading', $list))
-          : "This package provides the following $name:"),
-      );
-    }
-  }
-
-  return join "\n", @output;
-}
-
 sub test_for_abstract {
   my ($self, $code) = @_;
 
@@ -1108,32 +1211,7 @@ sub test_for_abstract {
 
   my $result = $code->();
 
-  ok($result, '=abstract');
-
-  return $result;
-}
-
-sub test_for_attributes {
-  my ($self, $code) = @_;
-
-  my $data = $self->data('attributes');
-  my $package = $self->data('name');
-
-  $code ||= sub {
-    for my $line (split /\n/, $data) {
-      my ($name, $is, $pre, $isa, $def) = map { split /,\s*/ } split /:\s*/,
-        $line, 2;
-      ok($package->can($name), "$package has $name");
-      ok((($is eq 'ro' || $is eq 'rw')
-      && ($pre eq 'opt' || $pre eq 'req')
-      && $isa), $line);
-    }
-    $data
-  };
-
-  my $result = $code->();
-
-  ok($result, "=attributes");
+  $self->pass($result, '=abstract');
 
   return $result;
 }
@@ -1149,11 +1227,36 @@ sub test_for_attribute {
 
   my $result = $code->();
 
-  ok($result, "=attribute $name");
+  $self->pass($result, "=attribute $name");
 
   my $package = $self->data('name');
 
-  ok($package->can($name), "$package has $name");
+  $self->pass($package->can($name), "$package has $name");
+
+  return $result;
+}
+
+sub test_for_attributes {
+  my ($self, $code) = @_;
+
+  my $data = $self->data('attributes');
+  my $package = $self->data('name');
+
+  $code ||= sub {
+    for my $line (split /\n/, $data) {
+      my ($name, $is, $pre, $isa, $def) = map { split /,\s*/ } split /:\s*/,
+        $line, 2;
+      $self->pass($package->can($name), "$package has $name");
+      $self->pass((($is eq 'ro' || $is eq 'rw')
+      && ($pre eq 'opt' || $pre eq 'req')
+      && $isa), $line);
+    }
+    $data
+  };
+
+  my $result = $code->();
+
+  $self->pass($result, "=attributes");
 
   return $result;
 }
@@ -1169,7 +1272,7 @@ sub test_for_authors {
 
   my $result = $code->();
 
-  ok($result, '=authors');
+  $self->pass($result, '=authors');
 
   return $result;
 }
@@ -1185,7 +1288,7 @@ sub test_for_description {
 
   my $result = $code->();
 
-  ok($result, '=description');
+  $self->pass($result, '=description');
 
   return $result;
 }
@@ -1201,7 +1304,7 @@ sub test_for_encoding {
 
   my $result = $code->();
 
-  ok($result, "=encoding");
+  $self->pass($result, "=encoding");
 
   return $result;
 }
@@ -1228,7 +1331,7 @@ sub test_for_example {
 
   for my $attest ($data =~ /#\s*attest:\s*\w+:\s*[^\s]+,\s*.*/gm) {
     my ($method, $left, $right) = $attest =~ /attest:\s*(\w+):\s*([^\s]+),\s*(.*)/;
-    my $snippet = qq($left = do { ok($left->$method($right), "@{[quotemeta($&)]}"); $left };);
+    my $snippet = qq($left = do { $self->pass($left->$method($right), "@{[quotemeta($&)]}"); $left };);
     $data =~ s/@{[quotemeta($attest)]}/$snippet/;
   }
 
@@ -1236,8 +1339,8 @@ sub test_for_example {
 
   my $result = $code->($self->try('eval', $data));
 
-  ok($data, "=example-$number $name");
-  ok($result, "=example-$number $name returns ok");
+  $self->pass($data, "=example-$number $name");
+  $self->pass($result, "=example-$number $name returns ok");
 
   return $result;
 }
@@ -1253,7 +1356,7 @@ sub test_for_feature {
 
   my $result = $code->();
 
-  ok($result, "=feature $name");
+  $self->pass($result, "=feature $name");
 
   return $result;
 }
@@ -1269,7 +1372,7 @@ sub test_for_function {
 
   my $result = $code->();
 
-  ok($result, "=function $name");
+  $self->pass($result, "=function $name");
 
   return $result;
 }
@@ -1281,7 +1384,7 @@ sub test_for_include {
 
   my $blocks = [$self->search({ list => $type, name => $name })];
 
-  ok(@$blocks, "=$type $name");
+  $self->pass(scalar(@$blocks), "=$type $name");
 
   return $blocks;
 }
@@ -1293,7 +1396,7 @@ sub test_for_includes {
 
   $code ||= $self->can('test_for_include');
 
-  ok($data, '=includes');
+  $self->pass($data, "=includes");
 
   my $results = [];
 
@@ -1314,11 +1417,11 @@ sub test_for_inherits {
 
   my $result = $code->();
 
-  ok($result, "=inherits");
+  $self->pass($result, "=inherits");
 
   my $package = $self->data('name');
 
-  ok($package->isa($_), "$package isa $_") for split /\n/, $data;
+  $self->pass($package->isa($_), "$package isa $_") for split /\n/, $data;
 
   return $result;
 }
@@ -1334,12 +1437,12 @@ sub test_for_integrates {
 
   my $result = $code->();
 
-  ok($result, "=integrates");
+  $self->pass($result, "=integrates");
 
   my $package = $self->data('name');
 
-  ok($package->can('does'), "$package has does");
-  ok($package->does($_), "$package does $_") for split /\n/, $data;
+  $self->pass($package->can('does'), "$package has does");
+  $self->pass($package->does($_), "$package does $_") for split /\n/, $data;
 
   return $result;
 }
@@ -1355,8 +1458,8 @@ sub test_for_libraries {
 
   my $result = $code->();
 
-  ok($result, "=libraries");
-  ok(eval("require $_"), "$_ ok") for split /\n/, $data;
+  $self->pass($result, "=libraries");
+  $self->pass(scalar(eval("require $_")), "$_ ok") for split /\n/, $data;
 
   return $result;
 }
@@ -1372,7 +1475,7 @@ sub test_for_license {
 
   my $result = $code->();
 
-  ok($result, "=license");
+  $self->pass($result, "=license");
 
   return $result;
 }
@@ -1388,7 +1491,7 @@ sub test_for_message {
 
   my $result = $code->();
 
-  ok($result, "=message $name");
+  $self->pass($result, "=message $name");
 
   return $result;
 }
@@ -1404,11 +1507,11 @@ sub test_for_method {
 
   my $result = $code->();
 
-  ok($result, "=method $name");
+  $self->pass($result, "=method $name");
 
   my $package = $self->data('name');
 
-  ok($package->can($name), "$package has $name");
+  $self->pass($package->can($name), "$package has $name");
 
   return $result;
 }
@@ -1424,8 +1527,8 @@ sub test_for_name {
 
   my $result = $code->();
 
-  ok($result, '=name');
-  ok(eval("require $data"), $data);
+  $self->pass($result, $self->desc('=name'));
+  $self->pass(scalar(eval("require $data")), $self->desc('require', $data));
 
   return $result;
 }
@@ -1441,7 +1544,7 @@ sub test_for_operator {
 
   my $result = $code->();
 
-  ok($result, "=operator $name");
+  $self->pass($result, "=operator $name");
 
   return $result;
 }
@@ -1455,7 +1558,8 @@ sub test_for_partial {
 
   my $content;
 
-  ok -f $file && ($content = $test->$method(@args)), "$file: $method: @args";
+  $self->pass((-f $file && ($content = $test->$method(@args))),
+    "$file: $method: @args");
 
   return $content;
 }
@@ -1467,7 +1571,7 @@ sub test_for_partials {
 
   $code ||= $self->can('test_for_partial');
 
-  ok($data, '=partials');
+  $self->pass($data, '=partials');
 
   my $results = [];
 
@@ -1488,7 +1592,7 @@ sub test_for_project {
 
   my $result = $code->();
 
-  ok($result, "=project");
+  $self->pass($result, "=project");
 
   return $result;
 }
@@ -1511,7 +1615,7 @@ sub test_for_synopsis {
 
   for my $attest ($data =~ /#\s*attest:\s*\w+:\s*[^\s]+,\s*.*/gm) {
     my ($method, $left, $right) = $attest =~ /attest:\s*(\w+):\s*([^\s]+),\s*(.*)/;
-    my $snippet = qq($left = do { ok($left->$method($right), "@{[quotemeta($&)]}"); $left };);
+    my $snippet = qq($left = do { $self->pass($left->$method($right), "@{[quotemeta($&)]}"); $left };);
     $data =~ s/@{[quotemeta($attest)]}/$snippet/;
   }
 
@@ -1519,8 +1623,8 @@ sub test_for_synopsis {
 
   my $result = $code->($self->try('eval', $data));
 
-  ok($data, '=synopsis');
-  ok($result, '=synopsis returns ok');
+  $self->pass($data, "=synopsis");
+  $self->pass($result, "=synopsis returns ok");
 
   return $result;
 }
@@ -1536,7 +1640,7 @@ sub test_for_tagline {
 
   my $result = $code->();
 
-  ok($result, "=tagline");
+  $self->pass($result, "=tagline");
 
   return $result;
 }
@@ -1552,11 +1656,11 @@ sub test_for_version {
 
   my $result = $code->();
 
-  ok($result, "=version");
+  $self->pass($result, "=version");
 
   my $package = $self->data('name');
 
-  ok(($package->VERSION // '') eq $data, "$data matched");
+  $self->pass(($package->VERSION // '') eq $data, "$data matched");
 
   return $result;
 }
@@ -1566,7 +1670,7 @@ sub text {
 
   my $method = "text_for_$name";
 
-  $self->throw->error if !$self->can($method);
+  $self->error("on.text.$name") if !$self->can($method);
 
   my $result = $self->$method(@args);
 
@@ -1587,10 +1691,10 @@ sub text_for_abstract {
   return $output;
 }
 
-sub text_for_attributes {
-  my ($self) = @_;
+sub text_for_attribute {
+  my ($self, $name) = @_;
 
-  my ($error, $result) = $self->catch('data', 'attributes');
+  my ($error, $result) = $self->catch('data', 'attribute', $name);
 
   my $output = [];
 
@@ -1601,10 +1705,10 @@ sub text_for_attributes {
   return $output;
 }
 
-sub text_for_attribute {
-  my ($self, $name) = @_;
+sub text_for_attributes {
+  my ($self) = @_;
 
-  my ($error, $result) = $self->catch('data', 'attribute', $name);
+  my ($error, $result) = $self->catch('data', 'attributes');
 
   my $output = [];
 
@@ -1812,10 +1916,10 @@ sub text_for_license {
   return $output;
 }
 
-sub text_for_metadata {
+sub text_for_message {
   my ($self, $name) = @_;
 
-  my ($error, $result) = $self->catch('data', 'metadata', $name);
+  my ($error, $result) = $self->catch('data', 'message', $name);
 
   my $output = [];
 
@@ -1826,10 +1930,10 @@ sub text_for_metadata {
   return $output;
 }
 
-sub text_for_message {
+sub text_for_metadata {
   my ($self, $name) = @_;
 
-  my ($error, $result) = $self->catch('data', 'message', $name);
+  my ($error, $result) = $self->catch('data', 'metadata', $name);
 
   my $output = [];
 

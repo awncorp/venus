@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-2.32
+2.40
 
 =cut
 
@@ -50,21 +50,279 @@ OO Standard Library for Perl 5
 =head1 DESCRIPTION
 
 This library provides an object-orientation framework and extendible standard
-library for Perl 5, built on top of the L<Mars> architecture with classes which
-wrap most native Perl data types. Venus has a simple modular architecture,
-robust library of classes, methods, and roles, supports pure-Perl autoboxing,
-advanced exception handling, "true" and "false" functions, package
-introspection, command-line options parsing, and more. This package will always
-automatically exports C<true> and C<false> keyword functions (unless existing
-routines of the same name already exist in the calling package or its parents),
-otherwise exports keyword functions as requested at import. This library
-requires Perl C<5.18+>.
+library for Perl 5 with classes which wrap most native Perl data types. Venus
+has a simple modular architecture, robust library of classes, methods, and
+roles, supports pure-Perl autoboxing, advanced exception handling, "true" and
+"false" functions, package introspection, command-line options parsing, and
+more. This package will always automatically exports C<true> and C<false>
+keyword functions (unless existing routines of the same name already exist in
+the calling package or its parents), otherwise exports keyword functions as
+requested at import. This library requires Perl C<5.18+>.
+
+=head1 CAPABILITIES
+
+The following is a short list of capabilities:
+
+=over 4
+
+=item *
+
+Perl 5.18.0+
+
+=item *
+
+Zero Dependencies
+
+=item *
+
+Fast Object-Orientation
+
+=item *
+
+Robust Standard Library
+
+=item *
+
+Intuitive Value Classes
+
+=item *
+
+Pure Perl Autoboxing
+
+=item *
+
+Convenient Utility Classes
+
+=item *
+
+Simple Package Reflection
+
+=item *
+
+Flexible Exception Handling
+
+=item *
+
+Composable Standards
+
+=item *
+
+Pluggable (no monkeypatching)
+
+=item *
+
+Proxyable Methods
+
+=item *
+
+Type Assertions
+
+=item *
+
+Type Coercions
+
+=item *
+
+Value Casting
+
+=item *
+
+Boolean Values
+
+=item *
+
+Complete Documentation
+
+=item *
+
+Complete Test Coverage
+
+=back
 
 =cut
 
 =head1 FUNCTIONS
 
 This package provides the following functions:
+
+=cut
+
+=head2 args
+
+  args(Any @args) (HashRef)
+
+The args function takes a list of arguments and returns a hashref.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item args example 1
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args(content => 'example');
+
+  # {content => "example"}
+
+=back
+
+=over 4
+
+=item args example 2
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args({content => 'example'});
+
+  # {content => "example"}
+
+=back
+
+=over 4
+
+=item args example 3
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args('content');
+
+  # {content => undef}
+
+=back
+
+=over 4
+
+=item args example 4
+
+  package main;
+
+  use Venus 'args';
+
+  my $args = args('content', 'example', 'algorithm');
+
+  # {content => "example", algorithm => undef}
+
+=back
+
+=cut
+
+=head2 box
+
+  box(Any $data) (Box)
+
+The box function returns a L<Venus::Box> object for the argument provided.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item box example 1
+
+  package main;
+
+  use Venus 'box';
+
+  my $box = box({});
+
+  # bless({value => bless({value => {}}, 'Venus::Hash')}, 'Venus::Box')
+
+=back
+
+=over 4
+
+=item box example 2
+
+  package main;
+
+  use Venus 'box';
+
+  my $box = box([]);
+
+  # bless({value => bless({value => []}, 'Venus::Array')}, 'Venus::Box')
+
+=back
+
+=cut
+
+=head2 call
+
+  call(Str | Object | CodeRef $data, Any @args) (Any)
+
+The call function dispatches function and method calls to a package and returns
+the result.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item call example 1
+
+  package main;
+
+  use Venus 'call';
+
+  require Digest::SHA;
+
+  my $result = call(\'Digest::SHA', 'new');
+
+  # bless(do{\(my $o = '...')}, 'digest::sha')
+
+=back
+
+=over 4
+
+=item call example 2
+
+  package main;
+
+  use Venus 'call';
+
+  require Digest::SHA;
+
+  my $result = call('Digest::SHA', 'sha1_hex');
+
+  # "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+
+=back
+
+=over 4
+
+=item call example 3
+
+  package main;
+
+  use Venus 'call';
+
+  require Venus::Hash;
+
+  my $result = call(sub{'Venus::Hash'->new(@_)}, {1..4});
+
+  # bless({value => {1..4}}, 'Venus::Hash')
+
+=back
+
+=over 4
+
+=item call example 4
+
+  package main;
+
+  use Venus 'call';
+
+  require Venus::Box;
+
+  my $result = call(Venus::Box->new(value => {}), 'merge', {1..4});
+
+  # bless({value => bless({value => {1..4}}, 'Venus::Hash')}, 'Venus::Box')
+
+=back
 
 =cut
 
@@ -372,6 +630,86 @@ I<Since C<1.95>>
 
 =cut
 
+=head2 chain
+
+  chain(Str | Object | CodeRef $self, Str | ArrayRef[Str] @args) (Any)
+
+The chain function chains function and method calls to a package (and return
+values) and returns the result.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item chain example 1
+
+  package main;
+
+  use Venus 'chain';
+
+  my $result = chain('Venus::Path', ['new', 't'], 'exists');
+
+  # 1
+
+=back
+
+=over 4
+
+=item chain example 2
+
+  package main;
+
+  use Venus 'chain';
+
+  my $result = chain('Venus::Path', ['new', 't'], ['test', 'd']);
+
+  # 1
+
+=back
+
+=cut
+
+=head2 cop
+
+  cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
+
+The cop function attempts to curry the given subroutine on the object or class
+and if successful returns a closure.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item cop example 1
+
+  package main;
+
+  use Venus 'cop';
+
+  my $coderef = cop('Digest::SHA', 'sha1_hex');
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item cop example 2
+
+  package main;
+
+  use Venus 'cop';
+
+  require Digest::SHA;
+
+  my $coderef = cop(Digest::SHA->new, 'digest');
+
+  # sub { ... }
+
+=back
+
+=cut
+
 =head2 error
 
   error(Maybe[HashRef] $args) (Error)
@@ -491,6 +829,108 @@ I<Since C<1.80>>
 
 =cut
 
+=head2 load
+
+  load(Any $name) (Space)
+
+The load function loads the package provided and returns a L<Venus::Space> object.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item load example 1
+
+  package main;
+
+  use Venus 'load';
+
+  my $space = load 'Venus::Scalar';
+
+  # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+=back
+
+=cut
+
+=head2 make
+
+  make(Str $package, Any @args) (Any)
+
+The make function L<"calls"|Venus/call> the C<new> routine on the invocant and
+returns the result which should be a package string or an object.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item make example 1
+
+  package main;
+
+  use Venus 'make';
+
+  my $made = make('Digest::SHA');
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=back
+
+=over 4
+
+=item make example 2
+
+  package main;
+
+  use Venus 'make';
+
+  my $made = make('Digest', 'SHA');
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=back
+
+=cut
+
+=head2 merge
+
+  merge(HashRef @args) (HashRef)
+
+The merge function returns a hash reference which is a merger of all of the
+hashref arguments provided.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item merge example 1
+
+  package main;
+
+  use Venus 'merge';
+
+  my $merged = merge({1..4}, {5, 6});
+
+  # {1..6}
+
+=back
+
+=over 4
+
+=item merge example 2
+
+  package main;
+
+  use Venus 'merge';
+
+  my $merged = merge({1..4}, {5, 6}, {7, 8, 9, 0});
+
+  # {1..9, 0}
+
+=back
+
+=cut
+
 =head2 raise
 
   raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -547,6 +987,96 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 roll
+
+  roll(Str $name, Any @args) (Any)
+
+The roll function takes a list of arguments, assuming the first argument is
+invokable, and reorders the list such that the routine name provided comes
+after the invocant (i.e. the 1st argument), creating a list acceptable to the
+L</call> function.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item roll example 1
+
+  package main;
+
+  use Venus 'roll';
+
+  my @list = roll('sha1_hex', 'Digest::SHA');
+
+  # ('Digest::SHA', 'sha1_hex');
+
+=back
+
+=over 4
+
+=item roll example 2
+
+  package main;
+
+  use Venus 'roll';
+
+  my @list = roll('sha1_hex', call(\'Digest::SHA', 'new'));
+
+  # (bless(do{\(my $o = '...')}, 'Digest::SHA'), 'sha1_hex');
+
+=back
+
+=cut
+
+=head2 space
+
+  space(Any $name) (Space)
+
+The space function returns a L<Venus::Space> object for the package provided.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item space example 1
+
+  package main;
+
+  use Venus 'space';
+
+  my $space = space 'Venus::Scalar';
+
+  # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+=back
+
+=cut
+
+=head2 then
+
+  then(Str | Object | CodeRef $self, Any @args) (Any)
+
+The then function proxies the call request to the L</call> function and returns
+the result as a list, prepended with the invocant.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item then example 1
+
+  package main;
+
+  use Venus 'then';
+
+  my @list = then('Digest::SHA', 'sha1_hex');
+
+  # ("Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709")
+
+=back
+
+=cut
+
 =head2 true
 
   true() (Bool)
@@ -586,6 +1116,64 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 wrap
+
+  wrap(Str $data, Str $name) (CodeRef)
+
+The wrap function installs a wrapper function in the calling package which when
+called either returns the package string if no arguments are provided, or calls
+L</make> on the package with whatever arguments are provided and returns the
+result. Unless an alias is provided as a second argument, special characters
+are stripped from the package to create the function name.
+
+I<Since C<2.32>>
+
+=over 4
+
+=item wrap example 1
+
+  package main;
+
+  use Venus 'wrap';
+
+  my $coderef = wrap('Digest::SHA');
+
+  # sub { ... }
+
+  # my $digest = DigestSHA();
+
+  # "Digest::SHA"
+
+  # my $digest = DigestSHA(1);
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=back
+
+=over 4
+
+=item wrap example 2
+
+  package main;
+
+  use Venus 'wrap';
+
+  my $coderef = wrap('Digest::SHA', 'SHA');
+
+  # sub { ... }
+
+  # my $digest = SHA();
+
+  # "Digest::SHA"
+
+  # my $digest = SHA(1);
+
+  # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+=back
+
+=cut
+
 =head1 FEATURES
 
 This package provides the following features:
@@ -594,517 +1182,414 @@ This package provides the following features:
 
 =over 4
 
-=item standard-library
+=item venus-args
 
-This library provides a Perl object-oriented standard library with value
-classes and consistently named methods.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Array;
-
-  my $array = Venus::Array->new([1..4]);
-
-  # $array->all(sub{ $_ > 0 });
-  # $array->any(sub{ $_ > 0 });
-  # $array->each(sub{ $_ > 0 });
-  # $array->grep(sub{ $_ > 0 });
-  # $array->map(sub{ $_ > 0 });
-  # $array->none(sub{ $_ < 0 });
-  # $array->one(sub{ $_ == 0 });
-  # $array->random;
-
-  use Venus::Hash;
-
-  my $hash = Venus::Hash->new({1..8});
-
-  # $hash->all(sub{ $_ > 0 });
-  # $hash->any(sub{ $_ > 0 });
-  # $hash->each(sub{ $_ > 0 });
-  # $hash->grep(sub{ $_ > 0 });
-  # $hash->map(sub{ $_ > 0 });
-  # $hash->none(sub{ $_ < 0 });
-  # $hash->one(sub{ $_ == 0 });
-  # $hash->random;
-
-  $array->count == $hash->count;
-
-  # 1
+This library contains a L<Venus::Args> class which provides methods for
+accessing C<@ARGS> items.
 
 =back
 
 =over 4
 
-=item value-classes
+=item venus-array
 
-This library provides value classes which wrap native Perl data types and
-provides methods for operating their values.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Array;
-
-  my $array = Venus::Array->new;
-
-  # bless({...}, 'Venus::Array')
-
-B<example 2>
-
-  package main;
-
-  use Venus::Boolean;
-
-  my $boolean = Venus::Boolean->new;
-
-  # bless({...}, 'Venus::Boolean')
-
-B<example 3>
-
-  package main;
-
-  use Venus::Code;
-
-  my $code = Venus::Code->new;
-
-  # bless({...}, 'Venus::Code')
-
-B<example 4>
-
-  package main;
-
-  use Venus::Float;
-
-  my $float = Venus::Float->new;
-
-  # bless({...}, 'Venus::Float')
-
-B<example 5>
-
-  package main;
-
-  use Venus::Hash;
-
-  my $hash = Venus::Hash->new;
-
-  # bless({...}, 'Venus::Hash')
-
-B<example 6>
-
-  package main;
-
-  use Venus::Number;
-
-  my $number = Venus::Number->new;
-
-  # bless({...}, 'Venus::Number')
-
-B<example 7>
-
-  package main;
-
-  use Venus::Regexp;
-
-  my $regexp = Venus::Regexp->new;
-
-  # bless({...}, 'Venus::Regexp')
-
-B<example 8>
-
-  package main;
-
-  use Venus::Scalar;
-
-  my $scalar = Venus::Scalar->new;
-
-  # bless({...}, 'Venus::Scalar')
-
-B<example 9>
-
-  package main;
-
-  use Venus::String;
-
-  my $string = Venus::String->new;
-
-  # bless({...}, 'Venus::String')
-
-B<example 10>
-
-  package main;
-
-  use Venus::Undef;
-
-  my $undef = Venus::Undef->new;
-
-  # bless({...}, 'Venus::Undef')
+This library contains a L<Venus::Array> class which provides methods for
+manipulating array data.
 
 =back
 
 =over 4
 
-=item builtin-autoboxing
+=item venus-assert
 
-This library provides opt-in pure Perl autoboxing allowing you to chain methods
-calls across objects and values.
-
-B<example 1>
-
-  package main;
-
-  use Venus::String;
-
-  my $string = Venus::String->new('hello, world');
-
-  $string->box->split(', ')->join(' ')->titlecase->unbox->get;
-
-  # Hello World
+This library contains a L<Venus::Assert> class which provides a mechanism for
+asserting type constraints and coercion.
 
 =back
 
 =over 4
 
-=item utility-classes
+=item venus-boolean
 
-This library provides serveral essential utility classes for performing common
-programming tasks.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Args;
-
-  my $args = Venus::Args->new;
-
-  # bless({...}, 'Venus::Args')
-
-B<example 2>
-
-  package main;
-
-  use Venus::Box;
-
-  my $box = Venus::Box->new;
-
-  # bless({...}, 'Venus::Box')
-
-B<example 3>
-
-  package main;
-
-  use Venus::Data;
-
-  my $docs = Venus::Data->new->docs;
-
-  # bless({...}, 'Venus::Data')
-
-B<example 4>
-
-  package main;
-
-  use Venus::Date;
-
-  my $date = Venus::Date->new;
-
-  # bless({...}, 'Venus::Date')
-
-B<example 5>
-
-  package main;
-
-  use Venus::Error;
-
-  my $error = Venus::Error->new;
-
-  # bless({...}, 'Venus::Error')
-
-B<example 6>
-
-  package main;
-
-  use Venus::Json;
-
-  my $json = Venus::Json->new;
-
-  # bless({...}, 'Venus::Json')
-
-B<example 7>
-
-  package main;
-
-  use Venus::Name;
-
-  my $name = Venus::Name->new;
-
-  # bless({...}, 'Venus::Name')
-
-B<example 8>
-
-  package main;
-
-  use Venus::Opts;
-
-  my $opts = Venus::Opts->new;
-
-  # bless({...}, 'Venus::Opts')
-
-B<example 9>
-
-  package main;
-
-  use Venus::Path;
-
-  my $path = Venus::Path->new;
-
-  # bless({...}, 'Venus::Path')
-
-B<example 10>
-
-  package main;
-
-  use Venus::Data;
-
-  my $text = Venus::Data->new->text;
-
-  # bless({...}, 'Venus::Data')
-
-B<example 11>
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new;
-
-  # bless({...}, 'Venus::Space')
-
-B<example 12>
-
-  package main;
-
-  use Venus::Throw;
-
-  my $throw = Venus::Throw->new;
-
-  # bless({...}, 'Venus::Throw')
-
-B<example 13>
-
-  package main;
-
-  use Venus::Try;
-
-  my $try = Venus::Try->new;
-
-  # bless({...}, 'Venus::Try')
-
-B<example 14>
-
-  package main;
-
-  use Venus::Type;
-
-  my $type = Venus::Type->new;
-
-  # bless({...}, 'Venus::Type')
-
-B<example 15>
-
-  package main;
-
-  use Venus::Vars;
-
-  my $vars = Venus::Vars->new;
-
-  # bless({...}, 'Venus::Vars')
-
-B<example 16>
-
-  package main;
-
-  use Venus::Match;
-
-  my $match = Venus::Match->new;
-
-  # bless({...}, 'Venus::Match')
-
-B<example 17>
-
-  package main;
-
-  use Venus::Process;
-
-  my $process = Venus::Process->new;
-
-  # bless({...}, 'Venus::Process')
-
-B<example 18>
-
-  package main;
-
-  use Venus::Template;
-
-  my $template = Venus::Template->new;
-
-  # bless({...}, 'Venus::Template')
-
-B<example 19>
-
-  package main;
-
-  use Venus::Yaml;
-
-  my $yaml = Venus::Yaml->new;
-
-  # bless({...}, 'Venus::Yaml')
+This library contains a L<Venus::Boolean> class which provides a representation
+for boolean values.
 
 =back
 
 =over 4
 
-=item package-reflection
+=item venus-box
 
-This library provides a package reflection class, L<Venus::Space>, which can be
-used to perform meta-programming on package spaces.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Space;
-
-  my $space = Venus::Space->new('Venus');
-
-  $space->do('tryload')->routines;
-
-  # [...]
+This library contains a L<Venus::Box> class which provides a pure Perl boxing
+mechanism.
 
 =back
 
 =over 4
 
-=item exception-handling
+=item venus-class
 
-This library provides a framework for raising, i.e. generating and throwing,
-exception objects and catching them.
-
-B<example 1>
-
-  package MyApp;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Tryable';
-  with 'Venus::Role::Throwable';
-  with 'Venus::Role::Catchable';
-
-  sub execute {
-    my ($self) = @_;
-
-    $self->throw->error;
-  }
-
-  package main;
-
-  my $myapp = MyApp->new;
-
-  my $error = $myapp->catch('execute');
-
-  # bless({...}, 'MyApp::Error');
+This library contains a L<Venus::Class> class which provides a class builder.
 
 =back
 
 =over 4
 
-=item composable-standards
+=item venus-cli
 
-This library provides a library of composable roles which can be used to extend
-core behaviors to custom objects.
-
-B<example 1>
-
-  package MyApp;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Dumpable';
-  with 'Venus::Role::Stashable';
-
-  package main;
-
-  my $myapp = MyApp->new;
-
-  $myapp->stash(greeting => 'hello world');
-
-  $myapp->dump('stash');
-
-  # '{"greeting" => "hello world"}'
+This library contains a L<Venus::Cli> class which provides a superclass for
+creating CLIs.
 
 =back
 
 =over 4
 
-=item pluggable-library
+=item venus-code
 
-This library provides a mechanism for extending the standard library, i.e.
-value classes, using plugins which can be automatically discovered and invoked.
-(no monkey-patching necessary)
-
-B<example 1>
-
-  package Venus::String::Plugin::Base64;
-
-  sub new {
-    return bless {};
-  }
-
-  sub execute {
-    my ($self, $string, @args) = @_;
-
-    require MIME::Base64;
-
-    return MIME::Base64::encode_base64($string->value);
-  }
-
-  package main;
-
-  use Venus::String;
-
-  my $string = Venus::String->new('hello, world');
-
-  $string->base64;
-
-  # "aGVsbG8sIHdvcmxk\n"
+This library contains a L<Venus::Code> class which provides methods for
+manipulating subroutines.
 
 =back
 
 =over 4
 
-=item template-system
+=item venus-config
 
-This library provides a minimalistic templating system.
+This library contains a L<Venus::Config> class which provides methods for
+loading Perl, YAML, and JSON configuration data.
 
-B<example 1>
+=back
 
-  package main;
+=over 4
 
-  use Venus::Template;
+=item venus-data
 
-  my $template = Venus::Template->new(q(
-    {{ if user.name }}
-    Welcome, {{ user.name }}!
-    {{ else user.name }}
-    Welcome, friend!
-    {{ end user.name }}
-  ));
+This library contains a L<Venus::Data> class which provides methods for
+extracting C<DATA> sections and POD block.
 
-  $template->render;
+=back
 
-  # "Welcome, friend!"
+=over 4
+
+=item venus-date
+
+This library contains a L<Venus::Date> class which provides methods for
+formatting, parsing, and manipulating dates.
+
+=back
+
+=over 4
+
+=item venus-dump
+
+This library contains a L<Venus::Dump> class which provides methods for reading
+and writing dumped Perl data.
+
+=back
+
+=over 4
+
+=item venus-error
+
+This library contains a L<Venus::Error> class which represents a context-aware
+error (exception object).
+
+=back
+
+=over 4
+
+=item venus-false
+
+This library contains a L<Venus::False> class which provides the global
+C<false> value.
+
+=back
+
+=over 4
+
+=item venus-fault
+
+This library contains a L<Venus::Fault> class which represents a generic system
+error (exception object).
+
+=back
+
+=over 4
+
+=item venus-float
+
+This library contains a L<Venus::Float> class which provides methods for
+manipulating float data.
+
+=back
+
+=over 4
+
+=item venus-gather
+
+This library contains a L<Venus::Gather> class which provides an
+object-oriented interface for complex pattern matching operations on
+collections of data, e.g. array references.
+
+=back
+
+=over 4
+
+=item venus-hash
+
+This library contains a L<Venus::Hash> class which provides methods for
+manipulating hash data.
+
+=back
+
+=over 4
+
+=item venus-json
+
+This library contains a L<Venus::Json> class which provides methods for reading
+and writing JSON data.
+
+=back
+
+=over 4
+
+=item venus-log
+
+This library contains a L<Venus::Log> class which provides methods for logging
+information using various log levels.
+
+=back
+
+=over 4
+
+=item venus-match
+
+This library contains a L<Venus::Match> class which provides an object-oriented
+interface for complex pattern matching operations on scalar values.
+
+=back
+
+=over 4
+
+=item venus-meta
+
+This library contains a L<Venus::Meta> class which provides configuration
+information for L<Venus> derived classes.
+
+=back
+
+=over 4
+
+=item venus-mixin
+
+This library contains a L<Venus::Mixin> class which provides a mixin builder.
+
+=back
+
+=over 4
+
+=item venus-name
+
+This library contains a L<Venus::Name> class which provides methods for parsing
+and formatting package namespaces.
+
+=back
+
+=over 4
+
+=item venus-number
+
+This library contains a L<Venus::Number> class which provides methods for
+manipulating number data.
+
+=back
+
+=over 4
+
+=item venus-opts
+
+This library contains a L<Venus::Opts> class which provides methods for
+handling command-line arguments.
+
+=back
+
+=over 4
+
+=item venus-path
+
+This library contains a L<Venus::Path> class which provides methods for working
+with file system paths.
+
+=back
+
+=over 4
+
+=item venus-process
+
+This library contains a L<Venus::Process> class which provides methods for
+handling and forking processes.
+
+=back
+
+=over 4
+
+=item venus-prototype
+
+This library contains a L<Venus::Prototype> class which provides a simple
+construct for enabling prototype-base programming.
+
+=back
+
+=over 4
+
+=item venus-random
+
+This library contains a L<Venus::Random> class which provides an
+object-oriented interface for Perl's pseudo-random number generator.
+
+=back
+
+=over 4
+
+=item venus-regexp
+
+This library contains a L<Venus::Regexp> class which provides methods for
+manipulating regexp data.
+
+=back
+
+=over 4
+
+=item venus-replace
+
+This library contains a L<Venus::Replace> class which provides methods for
+manipulating regexp replacement data.
+
+=back
+
+=over 4
+
+=item venus-scalar
+
+This library contains a L<Venus::Scalar> class which provides methods for
+manipulating scalar data.
+
+=back
+
+=over 4
+
+=item venus-search
+
+This library contains a L<Venus::Search> class which provides methods for
+manipulating regexp search data.
+
+=back
+
+=over 4
+
+=item venus-space
+
+This library contains a L<Venus::Space> class which provides methods for
+parsing and manipulating package namespaces.
+
+=back
+
+=over 4
+
+=item venus-string
+
+This library contains a L<Venus::String> class which provides methods for
+manipulating string data.
+
+=back
+
+=over 4
+
+=item venus-template
+
+This library contains a L<Venus::Template> class which provides a templating
+system, and methods for rendering template.
+
+=back
+
+=over 4
+
+=item venus-test
+
+This library contains a L<Venus::Test> class which aims to provide a standard
+for documenting L<Venus> derived software projects.
+
+=back
+
+=over 4
+
+=item venus-throw
+
+This library contains a L<Venus::Throw> class which provides a mechanism for
+generating and raising error objects.
+
+=back
+
+=over 4
+
+=item venus-true
+
+This library contains a L<Venus::True> class which provides the global C<true>
+value.
+
+=back
+
+=over 4
+
+=item venus-try
+
+This library contains a L<Venus::Try> class which provides an object-oriented
+interface for performing complex try/catch operations.
+
+=back
+
+=over 4
+
+=item venus-type
+
+This library contains a L<Venus::Type> class which provides methods for casting
+native data types to objects.
+
+=back
+
+=over 4
+
+=item venus-undef
+
+This library contains a L<Venus::Undef> class which provides methods for
+manipulating undef data.
+
+=back
+
+=over 4
+
+=item venus-unpack
+
+This library contains a L<Venus::Unpack> class which provides methods for
+validating, coercing, and otherwise operating on lists of arguments.
+
+=back
+
+=over 4
+
+=item venus-vars
+
+This library contains a L<Venus::Vars> class which provides methods for
+accessing C<%ENV> items.
+
+=back
+
+=over 4
+
+=item venus-yaml
+
+This library contains a L<Venus::Yaml> class which provides methods for reading
+and writing YAML data.
 
 =back
 
