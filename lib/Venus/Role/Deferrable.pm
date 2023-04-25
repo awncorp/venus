@@ -17,7 +17,7 @@ sub defer {
   my $code = $self->can($name)
     or fault "Unable to defer $name: can't find $name in @{[ref $self]}";
 
-  return sub { local @_ = ($self, @args, @_); goto $code; };
+  return sub {@_ = ($self, @args, @_); goto $code};
 }
 
 # EXPORTS

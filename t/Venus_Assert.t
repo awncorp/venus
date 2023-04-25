@@ -1611,6 +1611,62 @@ $test->for('example', 4, 'expression', sub {
   $result
 });
 
+=example-5 expression
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('
+    string
+    | within[
+        arrayref, within[
+          hashref, string
+        ]
+      ]
+  ');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # false
+
+  # $assert->check($assert);
+
+  # false
+
+  # $assert->check([]);
+
+  # false
+
+  # $assert->check([{'test' => ['okay']}]);
+
+  # false
+
+  # $assert->check([{'test' => 'okay'}]);
+
+  # true
+
+=cut
+
+$test->for('example', 5, 'expression', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Assert');
+  ok $result->check('hello');
+  ok !$result->check(sub{'hello'});
+  ok !$result->check($result);
+  ok !$result->check([]);
+  ok !$result->check($result);
+  ok !$result->check([{'test' => ['okay']}]);
+  ok $result->check([{'test' => 'okay'}]);
+
+  $result
+});
+
 =method float
 
 The float method configures the object to accept floating-point values and

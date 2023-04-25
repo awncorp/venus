@@ -263,6 +263,9 @@ sub expression {
 
   return $self if !$data;
 
+  $data =
+  $data =~ s/\s*\n+\s*/ /gr =~ s/^\s+|\s+$//gr =~ s/\[\s+/[/gr =~ s/\s+\]/]/gr;
+
   $self->expects([$data]);
 
   my @parsed = $self->parse($data);
@@ -432,6 +435,9 @@ sub parse {
   my ($self, $expr) = @_;
 
   $expr ||= '';
+
+  $expr =
+  $expr =~ s/\s*\n+\s*/ /gr =~ s/^\s+|\s+$//gr =~ s/\[\s+/[/gr =~ s/\s+\]/]/gr;
 
   return _type_parse($expr);
 }
@@ -686,7 +692,7 @@ sub _type_parse_nested {
 
   my @items = ($expr);
 
-  @items = ($expr =~ /^(\w+)\s*\[(.*)\]+$/g);
+  @items = ($expr =~ /^(\w+)\s*\[\s*(.*)\s*\]+$/g);
 
   @items = map _type_parse_lists($_), @items;
 

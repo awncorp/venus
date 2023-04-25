@@ -5,6 +5,7 @@ use 5.018;
 use strict;
 use warnings;
 
+use Config;
 use Test::More;
 use Venus::Test;
 
@@ -37,25 +38,34 @@ $test->for('abstract');
 =includes
 
 function: args
+function: assert
 function: box
 function: call
 function: cast
 function: catch
 function: caught
 function: chain
+function: check
 function: cop
 function: error
 function: false
 function: fault
+function: json
 function: load
+function: log
 function: make
 function: merge
+function: perl
 function: raise
 function: roll
 function: space
 function: then
 function: true
+function: unpack
+function: venus
+function: work
 function: wrap
+function: yaml
 
 =cut
 
@@ -284,6 +294,64 @@ $test->for('example', 4, 'args', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, {content => "example", algorithm => undef};
+
+  $result
+});
+
+=function assert
+
+The assert function builds a L<Venus::Assert> object and returns the result of
+a L<Venus::Assert/validate> operation.
+
+=signature assert
+
+  assert(Any $data, Str $expr) (Any)
+
+=metadata assert
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 assert
+
+  package main;
+
+  use Venus 'assert';
+
+  my $assert = assert(1234567890, 'number');
+
+  # 1234567890
+
+=cut
+
+$test->for('example', 1, 'assert', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1234567890;
+
+  $result
+});
+
+=example-2 assert
+
+  package main;
+
+  use Venus 'assert';
+
+  my $assert = assert(1234567890, 'float');
+
+  # Exception! (isa Venus::Assert::Error)
+
+=cut
+
+$test->for('example', 2, 'assert', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  ok defined $result;
+  isa_ok $result, 'Venus::Assert::Error';
 
   $result
 });
@@ -938,6 +1006,63 @@ $test->for('example', 2, 'chain', sub {
   $result
 });
 
+=function check
+
+The check function builds a L<Venus::Assert> object and returns the result of
+a L<Venus::Assert/check> operation.
+
+=signature check
+
+  check(Any $data, Str $expr) (Bool)
+
+=metadata check
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 check
+
+  package main;
+
+  use Venus 'check';
+
+  my $check = check(rand, 'float');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'check', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 check
+
+  package main;
+
+  use Venus 'check';
+
+  my $check = check(rand, 'string');
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'check', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 0;
+
+  !$result
+});
+
 =function cop
 
 The cop function attempts to curry the given subroutine on the object or class
@@ -1169,6 +1294,71 @@ $test->for('example', 2, 'fault', sub {
   $result
 });
 
+=function json
+
+The json function builds a L<Venus::Json> object and will either
+L<Venus::Json/decode> or L<Venus::Json/encode> based on the argument provided
+and returns the result.
+
+=signature json
+
+  json(Str $call, Any $data) (Any)
+
+=metadata json
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 json
+
+  package main;
+
+  use Venus 'json';
+
+  my $decode = json 'decode', '{"codename":["Ready","Robot"],"stable":true}';
+
+  # { codename => ["Ready", "Robot"], stable => 1 }
+
+=cut
+
+$test->for('example', 1, 'json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, { codename => ["Ready", "Robot"], stable => 1 };
+
+  $result
+});
+
+=example-2 json
+
+  package main;
+
+  use Venus 'json';
+
+  my $encode = json 'encode', { codename => ["Ready", "Robot"], stable => true };
+
+  # '{"codename":["Ready","Robot"],"stable":true}'
+
+=cut
+
+$test->for('example', 2, 'json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  $result =~ s/[\s\n]+//g;
+  is $result, '{"codename":["Ready","Robot"],"stable":true}';
+
+  $result
+});
+
 =function load
 
 The load function loads the package provided and returns a L<Venus::Space> object.
@@ -1200,6 +1390,47 @@ $test->for('example', 1, 'load', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   is $result->value, 'Venus::Scalar';
+
+  $result
+});
+
+=function log
+
+The log function prints the arguments provided to STDOUT, stringifying complex
+values, and returns a L<Venus::Log> object.
+
+=signature log
+
+  log(Any @args) (Log)
+
+=metadata log
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 log
+
+  package main;
+
+  use Venus 'log';
+
+  my $log = log;
+
+  # bless({...}, 'Venus::Log')
+
+  # log time, rand, 1..9;
+
+  # 00000000 0.000000, 1..9
+
+=cut
+
+$test->for('example', 1, 'log', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Log';
 
   $result
 });
@@ -1310,6 +1541,65 @@ $test->for('example', 2, 'merge', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, {1..9,0};
+
+  $result
+});
+
+=function perl
+
+The perl function builds a L<Venus::Dump> object and will either
+L<Venus::Dump/decode> or L<Venus::Dump/encode> based on the argument provided
+and returns the result.
+
+=signature perl
+
+  perl(Str $call, Any $data) (Any)
+
+=metadata perl
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 perl
+
+  package main;
+
+  use Venus 'perl';
+
+  my $decode = perl 'decode', '{stable=>bless({},\'Venus::True\')}';
+
+  # { stable => 1 }
+
+=cut
+
+$test->for('example', 1, 'perl', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, { stable => 1 };
+
+  $result
+});
+
+=example-2 perl
+
+  package main;
+
+  use Venus 'perl';
+
+  my $encode = perl 'encode', { stable => true };
+
+  # '{stable=>bless({},\'Venus::True\')}'
+
+=cut
+
+$test->for('example', 2, 'perl', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  $result =~ s/[\s\n]+//g;
+  is $result, '{stable=>bless({},\'Venus::True\')}';
 
   $result
 });
@@ -1583,6 +1873,331 @@ $test->for('example', 2, 'true', sub {
   !$result
 });
 
+=function unpack
+
+The unpack function builds and returns a L<Venus::Unpack> object.
+
+=signature unpack
+
+  unpack(Any @args) (Unpack)
+
+=metadata unpack
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 unpack
+
+  package main;
+
+  use Venus 'unpack';
+
+  my $unpack = unpack;
+
+  # bless({...}, 'Venus::Unpack')
+
+  # $unpack->checks('string');
+
+  # false
+
+  # $unpack->checks('undef');
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'unpack', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Unpack';
+  is_deeply scalar $result->args, [];
+  is_deeply scalar $result->checks('string'), [];
+  is_deeply scalar $result->checks('undef'), [];
+
+  $result
+});
+
+=example-2 unpack
+
+  package main;
+
+  use Venus 'unpack';
+
+  my $unpack = unpack rand;
+
+  # bless({...}, 'Venus::Unpack')
+
+  # $unpack->check('number');
+
+  # false
+
+  # $unpack->check('float');
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'unpack', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Unpack';
+  ok scalar @{$result->args};
+  is_deeply scalar $result->checks('number'), [0];
+  is_deeply scalar $result->checks('float'), [1];
+
+  $result
+});
+
+=function venus
+
+The venus function build a L<Venus> package via the L</chain> function based on
+the name provided and returns an instance of that package.
+
+=signature venus
+
+  venus(Str $name, Any @args) (Any)
+
+=metadata venus
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 venus
+
+  package main;
+
+  use Venus 'venus';
+
+  my $space = venus 'space';
+
+  # bless({value => 'Venus'}, 'Venus::Space')
+
+=cut
+
+$test->for('example', 1, 'venus', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Space';
+  is $result->value, 'Venus';
+
+  $result
+});
+
+=example-2 venus
+
+  package main;
+
+  use Venus 'venus';
+
+  my $space = venus 'space', ['new', 'venus/string'];
+
+  # bless({value => 'Venus::String'}, 'Venus::Space')
+
+=cut
+
+$test->for('example', 2, 'venus', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Space';
+  is $result->value, 'Venus::String';
+
+  $result
+});
+
+=example-3 venus
+
+  package main;
+
+  use Venus 'venus';
+
+  my $space = venus 'code';
+
+  # bless({value => sub{...}}, 'Venus::Code')
+
+=cut
+
+$test->for('example', 3, 'venus', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Code';
+
+  $result
+});
+
+=function work
+
+The work function builds a L<Venus::Process> object, forks the current process
+using the callback provided via the L<Venus::Process/work> operation, and
+returns an instance of L<Venus::Process> representing the current process.
+
+=signature work
+
+  work(CodeRef $callback) (Process)
+
+=metadata work
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 work
+
+  package main;
+
+  use Venus 'work';
+
+  my $parent = work sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  };
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+our $TEST_VENUS_PROCESS_ALARM = 0;
+our $TEST_VENUS_PROCESS_CHDIR = 1;
+our $TEST_VENUS_PROCESS_EXIT = 0;
+our $TEST_VENUS_PROCESS_EXITCODE = 0;
+our $TEST_VENUS_PROCESS_FORK = undef;
+our $TEST_VENUS_PROCESS_FORKABLE = 1;
+our $TEST_VENUS_PROCESS_KILL = 0;
+our $TEST_VENUS_PROCESS_OPEN = 1;
+our $TEST_VENUS_PROCESS_PID = 12345;
+our $TEST_VENUS_PROCESS_SETSID = 1;
+our $TEST_VENUS_PROCESS_WAITPID = undef;
+
+# _alarm
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_alarm"} = sub {
+    $TEST_VENUS_PROCESS_ALARM = $_[0]
+  };
+}
+
+# _chdir
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_chdir"} = sub {
+    $TEST_VENUS_PROCESS_CHDIR
+  };
+}
+
+# _exit
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_exit"} = sub {
+    $TEST_VENUS_PROCESS_EXIT
+  };
+}
+
+# _exitcode
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_exitcode"} = sub {
+    $TEST_VENUS_PROCESS_EXITCODE
+  };
+}
+
+# _fork
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_fork"} = sub {
+    if (defined $TEST_VENUS_PROCESS_FORK) {
+      return $TEST_VENUS_PROCESS_FORK;
+    }
+    else {
+      return $TEST_VENUS_PROCESS_PID++;
+    }
+  };
+}
+
+# _forkable
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_forkable"} = sub {
+    return $TEST_VENUS_PROCESS_FORKABLE;
+  };
+}
+
+# _kill
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_kill"} = sub {
+    $TEST_VENUS_PROCESS_KILL;
+  };
+}
+
+# _open
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_open"} = sub {
+    $TEST_VENUS_PROCESS_OPEN
+  };
+}
+
+# _pid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_pid"} = sub {
+    $TEST_VENUS_PROCESS_PID
+  };
+}
+
+# _setsid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_setsid"} = sub {
+    $TEST_VENUS_PROCESS_SETSID
+  };
+}
+
+# _waitpid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_waitpid"} = sub {
+    if (defined $TEST_VENUS_PROCESS_WAITPID) {
+      return $TEST_VENUS_PROCESS_WAITPID;
+    }
+    else {
+      return --$TEST_VENUS_PROCESS_PID;
+    }
+  };
+}
+
+$test->for('example', 1, 'work', sub {
+  if ($Config{d_pseudofork}) {
+    plan skip_all => 'Fork emulation not supported';
+  }
+  return 1;
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  ok my $result = $tryable->result;
+  is $result, $TEST_VENUS_PROCESS_PID;
+
+  $result
+});
+
 =function wrap
 
 The wrap function installs a wrapper function in the calling package which when
@@ -1657,6 +2272,71 @@ $test->for('example', 2, 'wrap', sub {
   is $result, '*main::SHA';
   is SHA(), "Digest::SHA";
   ok SHA(1)->isa("Digest::SHA");
+
+  $result
+});
+
+=function yaml
+
+The yaml function builds a L<Venus::Yaml> object and will either
+L<Venus::Yaml/decode> or L<Venus::Yaml/encode> based on the argument provided
+and returns the result.
+
+=signature yaml
+
+  yaml(Str $call, Any $data) (Any)
+
+=metadata yaml
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 yaml
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $decode = yaml 'decode', "---\nname:\n- Ready\n- Robot\nstable: true\n";
+
+  # { name => ["Ready", "Robot"], stable => 1 }
+
+=cut
+
+$test->for('example', 1, 'yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, { name => ["Ready", "Robot"], stable => 1 };
+
+  $result
+});
+
+=example-2 yaml
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $encode = yaml 'encode', { name => ["Ready", "Robot"], stable => true };
+
+  # '---\nname:\n- Ready\n- Robot\nstable: true\n'
+
+=cut
+
+$test->for('example', 2, 'yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  $result =~ s/\n/\\n/g;
+  is $result, '---\nname:\n- Ready\n- Robot\nstable: true\n';
 
   $result
 });

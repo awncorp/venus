@@ -2284,7 +2284,7 @@ arguments are provided, the range is from C<0> to C<2147483647>.
 
 =signature range
 
-  range(Str $name) (ArrayRef)
+  range(Str $from, Str $to) (Int)
 
 =metadata range
 

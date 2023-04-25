@@ -1097,6 +1097,49 @@ I<Since C<1.71>>
 
 =back
 
+=over 4
+
+=item expression example 5
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->expression('
+    string
+    | within[
+        arrayref, within[
+          hashref, string
+        ]
+      ]
+  ');
+
+  # $assert->check('hello');
+
+  # true
+
+  # $assert->check(sub{'hello'});
+
+  # false
+
+  # $assert->check($assert);
+
+  # false
+
+  # $assert->check([]);
+
+  # false
+
+  # $assert->check([{'test' => ['okay']}]);
+
+  # false
+
+  # $assert->check([{'test' => 'okay'}]);
+
+  # true
+
+=back
+
 =cut
 
 =head2 float

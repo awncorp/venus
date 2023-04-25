@@ -664,7 +664,7 @@ I<Since C<1.23>>
 
 =head2 range
 
-  range(Str $name) (ArrayRef)
+  range(Str $from, Str $to) (Int)
 
 The range method returns a random number within the range provided. If no
 arguments are provided, the range is from C<0> to C<2147483647>.

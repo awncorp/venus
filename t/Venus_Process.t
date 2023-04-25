@@ -16,6 +16,7 @@ if ($Config{d_pseudofork}) {
   goto SKIP;
 }
 
+our $TEST_VENUS_PROCESS_ALARM = 0;
 our $TEST_VENUS_PROCESS_CHDIR = 1;
 our $TEST_VENUS_PROCESS_EXIT = 0;
 our $TEST_VENUS_PROCESS_EXITCODE = 0;
@@ -26,6 +27,15 @@ our $TEST_VENUS_PROCESS_OPEN = 1;
 our $TEST_VENUS_PROCESS_PID = 12345;
 our $TEST_VENUS_PROCESS_SETSID = 1;
 our $TEST_VENUS_PROCESS_WAITPID = undef;
+
+# _alarm
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_alarm"} = sub {
+    $TEST_VENUS_PROCESS_ALARM = $_[0]
+  };
+}
 
 # _chdir
 {
@@ -157,6 +167,7 @@ $test->for('abstract');
 
 method: chdir
 method: check
+method: count
 method: daemon
 method: disengage
 method: engage
@@ -164,15 +175,28 @@ method: exit
 method: fork
 method: forks
 method: kill
+method: killall
+method: pid
+method: pids
 method: ping
+method: prune
+method: restart
 method: setsid
+method: started
+method: status
 method: stderr
 method: stdin
 method: stdout
+method: stopped
 method: trap
 method: wait
+method: waitall
+method: watch
+method: watchlist
 method: work
+method: works
 method: untrap
+method: unwatch
 
 =cut
 
@@ -235,6 +259,61 @@ Venus::Role::Valuable
 =cut
 
 $test->for('inherits');
+
+=attribute alarm
+
+The alarm attribute is used in calls to L<alarm> when the process is forked,
+installing an alarm in the forked process if set.
+
+=signature alarm
+
+  alarm(Int $seconds) (Int)
+
+=metadata alarm
+
+{
+  since => '2.40',
+}
+
+=example-1 alarm
+
+  # given: synopsis
+
+  package main;
+
+  my $alarm = $parent->alarm;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'alarm', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 alarm
+
+  # given: synopsis
+
+  package main;
+
+  my $alarm = $parent->alarm(10);
+
+  # 10
+
+=cut
+
+$test->for('example', 2, 'alarm', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, 10;
+
+  $result
+});
 
 =method chdir
 
@@ -415,6 +494,94 @@ $test->for('example', 3, 'check', sub {
   is_deeply \@result, [$TEST_VENUS_PROCESS_PID, 1];
 
   $result[0]
+});
+
+=method count
+
+The count method dispatches to the method specified (or the L</watchlist> if
+not specified) and returns a count of the items returned from the dispatched
+call.
+
+=signature count
+
+  count(Str | CodeRef $code, Any @args) (Int)
+
+=metadata count
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 count
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $count = $parent->count;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'count', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 count
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my ($pid) = $parent->watch(1001);
+
+  my $count = $parent->count;
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'count', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-3 count
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my ($pid) = $parent->watch(1001);
+
+  my $count = $parent->count('watchlist');
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'count', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
 });
 
 =method daemon
@@ -715,6 +882,38 @@ $test->for('example', 4, 'fork', sub {
   $result
 });
 
+=example-5 fork
+
+  # given: synopsis
+
+  $process = $parent->do('alarm', 10)->fork;
+
+  # if ($process) {
+  #   # in forked process with alarm installed ...
+  #   $process->exit;
+  # }
+  # else {
+  #   # in parent process ...
+  #   $parent->wait(-1);
+  # }
+
+  # in child process
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 5, 'fork', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_ALARM = 0;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Process');
+  is $TEST_VENUS_PROCESS_ALARM, 10;
+
+  $result
+});
+
 =method forks
 
 The forks method creates multiple forks by calling the L</fork> method C<n>
@@ -859,7 +1058,7 @@ doesn't necessarily mean all processes were successfully signalled.
     $process->exit;
   }
 
-  my $kill = $parent->kill('term', int$process);
+  my $kill = $parent->kill('term', int $process);
 
   # 1
 
@@ -871,6 +1070,179 @@ $test->for('example', 1, 'kill', sub {
   local $TEST_VENUS_PROCESS_KILL = 1;
   ok my $result = $tryable->result;
   is $result, 1;
+
+  $result
+});
+
+=method killall
+
+The killall method accepts a list of PIDs (or uses the L</watchlist> if not
+provided) and returns the result of calling the L</kill> method for each PID.
+Returns a list in list context.
+
+=signature killall
+
+  killall(Str $name, Int @pids) (ArrayRef)
+
+=metadata killall
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 killall
+
+  # given: synopsis
+
+  package main;
+
+  if ($process = $parent->fork) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $killall = $parent->killall('term');
+
+  # [1]
+
+=cut
+
+$test->for('example', 1, 'killall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 1;
+  local $TEST_VENUS_PROCESS_KILL = 1;
+  my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-2 killall
+
+  # given: synopsis
+
+  package main;
+
+  if ($process = $parent->fork) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $killall = $parent->killall('term', 1001..1004);
+
+  # [1, 1, 1, 1]
+
+=cut
+
+$test->for('example', 2, 'killall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 1;
+  local $TEST_VENUS_PROCESS_KILL = 1;
+  my $result = $tryable->result;
+  is_deeply $result, [1, 1, 1, 1];
+
+  $result
+});
+
+=method pid
+
+The pid method returns the PID of the current process.
+
+=signature pid
+
+  pid() (Int)
+
+=metadata pid
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 pid
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $pid = $parent->pid;
+
+  # 00000
+
+=cut
+
+$test->for('example', 1, 'pid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 12345;
+
+  $result
+});
+
+=method pids
+
+The pids method returns the PID of the current process, and the PIDs of any
+child processes.
+
+=signature pids
+
+  pids() (ArrayRef)
+
+=metadata pids
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 pids
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $pids = $parent->pids;
+
+  # [00000]
+
+=cut
+
+$test->for('example', 1, 'pids', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [12345];
+
+  $result
+});
+
+=example-2 pids
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $pids = $parent->pids;
+
+  # [00000, 1001..1004]
+
+=cut
+
+$test->for('example', 2, 'pids', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [12345, 1001..1004];
 
   $result
 });
@@ -899,7 +1271,7 @@ multiple PIDs are provided, this method will return the count of active PIDs.
     $process->exit;
   }
 
-  my $ping = $parent->ping(int$process);
+  my $ping = $parent->ping(int $process);
 
   # 1
 
@@ -911,6 +1283,164 @@ $test->for('example', 1, 'ping', sub {
   local $TEST_VENUS_PROCESS_KILL = 1;
   ok my $result = $tryable->result;
   is $result, 1;
+
+  $result
+});
+
+=method prune
+
+The prune method removes all stopped processes and returns the invocant.
+
+=signature prune
+
+  prune() (Process)
+
+=metadata prune
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 prune
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001);
+
+  $parent = $parent->prune;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'prune', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->{watchlist}, [];
+
+  $result
+});
+
+=example-2 prune
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $process = $parent->fork;
+
+  if ($process) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  $parent = $parent->prune;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 2, 'prune', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 1;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->{watchlist}, [];
+
+  $result
+});
+
+=example-3 prune
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->work(sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  $parent = $parent->prune;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 3, 'prune', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 1;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->{watchlist}, [];
+
+  $result
+});
+
+=method restart
+
+The restart method executes the callback provided for each PID returned by the
+L</stopped> method, passing the pid and the results of L</check> to the
+callback as arguments, and returns the result of each call as an arrayref. In
+list context, this method returns a list.
+
+=signature restart
+
+  restart(CodeRef $callback) (ArrayRef)
+
+=metadata restart
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 restart
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my $restart = $parent->restart(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # redeploy stopped process
+
+    return [$pid, $check, $exit];
+  });
+
+  # [[1001, 1001, 255]]
+
+=cut
+
+$test->for('example', 1, 'restart', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PID = 1001;
+  local $TEST_VENUS_PROCESS_WAITPID = 1001;
+  local $TEST_VENUS_PROCESS_EXITCODE = 255;
+  my $result = $tryable->result;
+  is_deeply $result, [[1001, 1001, 255]];
 
   $result
 });
@@ -965,6 +1495,180 @@ $test->for('example', 2, 'setsid', sub {
   ok $error->isa('Venus::Error');
 
   $result
+});
+
+=method started
+
+The started method returns a list of PIDs whose processes have been started and
+which have not terminated. Returns a list in list context.
+
+=signature started
+
+  started() (ArrayRef)
+
+=metadata started
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 started
+
+  # given: synopsis
+
+  package main;
+
+  my $started = $parent->started;
+
+  # child not terminated
+
+  # [...]
+
+=cut
+
+$test->for('example', 1, 'started', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [12345];
+
+  $result
+});
+
+=example-2 started
+
+  # given: synopsis
+
+  package main;
+
+  my $started = $parent->started;
+
+  # child terminated
+
+  # []
+
+=cut
+
+$test->for('example', 2, 'started', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=method status
+
+The status method executes the callback provided for each PID in the
+L</watchlist>, passing the pid and the results of L</check> to the callback as
+arguments, and returns the result of each call as an arrayref. In list context,
+this method returns a list.
+
+=signature status
+
+  status(CodeRef $callback) (ArrayRef)
+
+=metadata status
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 status
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my $status = $parent->status(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # assuming process 1001 is still running (not terminated)
+
+    return [$pid, $check, $exit];
+  });
+
+  # [[1001, 0, -1]]
+
+=cut
+
+$test->for('example', 1, 'status', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PID = 1001;
+  local $TEST_VENUS_PROCESS_WAITPID = 0;
+  local $TEST_VENUS_PROCESS_EXITCODE = -1;
+  my $result = $tryable->result;
+  is_deeply $result, [[1001, 0, -1]];
+
+  $result
+});
+
+=example-2 status
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my $status = $parent->status(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # assuming process 1001 terminated with exit code 255
+
+    return [$pid, $check, $exit];
+  });
+
+  # [[1001, 1001, 255]]
+
+=cut
+
+$test->for('example', 2, 'status', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PID = 1001;
+  local $TEST_VENUS_PROCESS_WAITPID = 1001;
+  local $TEST_VENUS_PROCESS_EXITCODE = 255;
+  my $result = $tryable->result;
+  is_deeply $result, [[1001, 1001, 255]];
+
+  $result
+});
+
+=example-3 status
+
+  # given: synopsis
+
+  package main;
+
+  $parent->watch(1001);
+
+  my @status = $parent->status(sub {
+    my ($pid, $check, $exit) = @_;
+
+    # assuming process 1001 terminated with exit code 255
+
+    return [$pid, $check, $exit];
+  });
+
+  # ([1001, 1001, 255])
+
+=cut
+
+$test->for('example', 3, 'status', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PID = 1001;
+  local $TEST_VENUS_PROCESS_WAITPID = 1001;
+  local $TEST_VENUS_PROCESS_EXITCODE = 255;
+  my @result = $tryable->result;
+  is_deeply [@result], [[1001, 1001, 255]];
+
+  [@result]
 });
 
 =method stderr
@@ -1129,6 +1833,69 @@ $test->for('example', 2, 'stdout', sub {
   $result
 });
 
+=method stopped
+
+The stopped method returns a list of PIDs whose processes have terminated.
+Returns a list in list context.
+
+=signature stopped
+
+  stopped() (ArrayRef)
+
+=metadata stopped
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 stopped
+
+  # given: synopsis
+
+  package main;
+
+  my $stopped = $parent->stopped;
+
+  # child terminated
+
+  # [...]
+
+=cut
+
+$test->for('example', 1, 'stopped', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  is_deeply $result, [12345];
+
+  $result
+});
+
+=example-2 stopped
+
+  # given: synopsis
+
+  package main;
+
+  my $stopped = $parent->stopped;
+
+  # child not terminated
+
+  # []
+
+=cut
+
+$test->for('example', 2, 'stopped', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_WAITPID = 0;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
 =method trap
 
 The trap method registers a process signal trap (or callback) which will be
@@ -1278,6 +2045,294 @@ $test->for('example', 3, 'wait', sub {
   $result[0]
 });
 
+=method waitall
+
+The waitall method does a blocking L</wait> call for all processes based on the
+PIDs provided (or the PIDs returned by L</watchlist> if not provided) and
+returns an arrayref of results from calling L</wait> on each PID. Returns a
+list in list context.
+
+=signature waitall
+
+  waitall(Int @pids) (ArrayRef)
+
+=metadata waitall
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 waitall
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $waitall = $parent->waitall;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'waitall', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 waitall
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $waitall = $parent->waitall(1001);
+
+  # [[1001, 0]]
+
+=cut
+
+$test->for('example', 2, 'waitall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PID = 1001;
+  local $TEST_VENUS_PROCESS_WAITPID = 1001;
+  my $result = $tryable->result;
+  is_deeply $result, [[1001, 0]];
+
+  $result
+});
+
+=example-3 waitall
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my ($process, $pid) = $parent->fork;
+
+  if ($process) {
+    # in forked process ...
+    $process->exit;
+  }
+
+  my $waitall = $parent->waitall;
+
+  # [[$pid, 0]]
+
+=cut
+
+$test->for('example', 3, 'waitall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 1;
+  local $TEST_VENUS_PROCESS_PID = 12345;
+  local $TEST_VENUS_PROCESS_WAITPID = 12345;
+  my $result = $tryable->result;
+  is_deeply $result, [[12345, 0]];
+
+  $result
+});
+
+=method watch
+
+The watch method records PIDs to be watched, e.g. using the L</status> method
+and returns all PIDs being watched. Returns a list in list context.
+
+=signature watch
+
+  watch(Int @pids) (ArrayRef)
+
+=metadata watch
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 watch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watch = $parent->watch;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'watch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 watch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watch = $parent->watch(1001..1004);
+
+  # [1001..1004]
+
+=cut
+
+$test->for('example', 2, 'watch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1001..1004];
+
+  $result
+});
+
+=example-3 watch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watch = $parent->watch(1001..1004, 1001..1004);
+
+  # [1001..1004]
+
+=cut
+
+$test->for('example', 3, 'watch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1001..1004];
+
+  $result
+});
+
+=example-4 watch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $watch = $parent->watch;
+
+  # [1001..1004]
+
+=cut
+
+$test->for('example', 4, 'watch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1001..1004];
+
+  $result
+});
+
+=example-5 watch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my @watch = $parent->watch(1001..1004);
+
+  # (1001..1004)
+
+=cut
+
+$test->for('example', 5, 'watch', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1001..1004];
+
+  [@result]
+});
+
+=method watchlist
+
+The watchlist method returns the recorded PIDs. Returns a list in list context.
+
+=signature watchlist
+
+  watchlist() (ArrayRef)
+
+=metadata watchlist
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 watchlist
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $watchlist = $parent->watchlist;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'watchlist', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 watchlist
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $watchlist = $parent->watchlist;
+
+  # [1001..1004]
+
+=cut
+
+$test->for('example', 2, 'watchlist', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1001..1004];
+
+  $result
+});
+
 =method work
 
 The work method forks the current process, runs the callback provided in the
@@ -1315,6 +2370,57 @@ $test->for('example', 1, 'work', sub {
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
   is $result, $TEST_VENUS_PROCESS_PID;
+
+  $result
+});
+
+=method works
+
+The works method creates multiple forks by calling the L</work> method C<n>
+times, based on the count specified. The works method runs the callback
+provided in the child process, and immediately exits after with an exit code of
+C<0> by default. This method returns the I<PIDs> of the child processes. It is
+recommended to install an L<perlfunc/alarm> in the child process (i.e.
+callback) to avoid creating zombie processes in situations where the parent
+process might exit before the child process is done working.
+
+=signature works
+
+  works(Int $count, CodeRef $callback, Any @args) (ArrayRef)
+
+=metadata works
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 works
+
+  # given: synopsis;
+
+  my $pids = $parent->works(5, sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # $pids
+
+=cut
+
+$test->for('example', 1, 'works', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  ok my $result = $tryable->result;
+  is_deeply $result, [
+    $TEST_VENUS_PROCESS_PID,
+    $TEST_VENUS_PROCESS_PID,
+    $TEST_VENUS_PROCESS_PID,
+    $TEST_VENUS_PROCESS_PID,
+    $TEST_VENUS_PROCESS_PID
+  ];
 
   $result
 });
@@ -1379,6 +2485,93 @@ $test->for('example', 2, 'untrap', sub {
   ok $result->isa('Venus::Process');
   is $SIG{CHLD}, undef;
   is $SIG{TERM}, undef;
+
+  $result
+});
+
+=method unwatch
+
+The unwatch method removes the PIDs provided from the watchlist and returns the
+list of PIDs remaining to be watched. In list context returns a list.
+
+=signature unwatch
+
+  unwatch(Int @pids) (ArrayRef)
+
+=metadata unwatch
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 unwatch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  my $unwatch = $parent->unwatch;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'unwatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 unwatch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $unwatch = $parent->unwatch(1001);
+
+  # [1002..1004]
+
+=cut
+
+$test->for('example', 2, 'unwatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1002..1004];
+
+  $result
+});
+
+=example-3 unwatch
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(1001..1004);
+
+  my $unwatch = $parent->unwatch(1002, 1004);
+
+  # [1001, 1003]
+
+=cut
+
+$test->for('example', 3, 'unwatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1001, 1003];
 
   $result
 });

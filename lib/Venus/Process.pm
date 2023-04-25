@@ -11,7 +11,7 @@ use overload (
   fallback => 1,
 );
 
-use Venus::Class 'base', 'with';
+use Venus::Class 'attr', 'base', 'with';
 
 base 'Venus::Kind::Utility';
 
@@ -28,7 +28,15 @@ require POSIX;
 state $GETCWD = Cwd->getcwd;
 state $MAPSIG = {%SIG};
 
+# ATTRIBUTES
+
+attr 'alarm';
+
 # HOOKS
+
+sub _alarm {
+  CORE::alarm(shift);
+}
 
 sub _chdir {
   CORE::chdir(shift);
@@ -39,7 +47,7 @@ sub _exit {
 }
 
 sub _exitcode {
-  $?;
+  $? >> 8;
 }
 
 sub _fork {
@@ -109,6 +117,18 @@ sub check {
   return wantarray ? ($result, _exitcode) : $result;
 }
 
+sub count {
+  my ($self, $code, @args) = @_;
+
+  $code ||= 'watchlist';
+
+  my @result = $self->$code(@args);
+
+  my $count = (@result == 1 && ref $result[0] eq 'ARRAY') ? @{$result[0]} : @result;
+
+  return $count;
+}
+
 sub daemon {
   my ($self) = @_;
 
@@ -172,6 +192,7 @@ sub fork {
     my $process;
 
     if ($pid) {
+      $self->watch($pid);
       return wantarray ? (undef, $pid) : undef;
     }
 
@@ -180,6 +201,8 @@ sub fork {
     my $orig_seed = srand;
     my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
     srand $self_seed;
+
+    _alarm($self->alarm) if defined $self->alarm;
 
     if ($code) {
       local $_ = $process;
@@ -225,10 +248,54 @@ sub kill {
   return _kill(uc($name), @pids);
 }
 
+sub killall {
+  my ($self, $name, @pids) = @_;
+
+  $name ||= 'INT';
+
+  my $result = [map $self->kill($name, $_), (@pids ? @pids : $self->watchlist)];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub pid {
+  my ($self) = @_;
+
+  return $self->value;
+}
+
+sub pids {
+  my ($self) = @_;
+
+  my $result = [$self->pid, $self->watchlist];
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub ping {
   my ($self, @pids) = @_;
 
   return $self->kill(0, @pids);
+}
+
+sub prune {
+  my ($self) = @_;
+
+  $self->unwatch($self->stopped);
+
+  return $self;
+}
+
+sub restart {
+  my ($self, $code) = @_;
+
+  my $result = [];
+
+  $self->status(sub {
+    push @{$result}, $code->(@_) if ($_[1] == -1) || ($_[1] == $_[0])
+  });
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub setsid {
@@ -243,6 +310,32 @@ sub setsid {
     $throw->stash(pid => _pid());
     $throw->error;
   };
+}
+
+sub started {
+  my ($self) = @_;
+
+  my $result = [];
+
+  $self->status(sub {
+    push @{$result}, $_[0] if $_[1] > -1 && $_[1] != $_[0]
+  });
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub status {
+  my ($self, $code) = @_;
+
+  my $result = [];
+  my $watchlist = $self->watchlist;
+
+  for my $pid (@{$watchlist}) {
+    local $_ = $pid;
+    push @{$result}, $code->($pid, $self->check($pid));
+  }
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub stderr {
@@ -326,6 +419,18 @@ sub stdout {
   return $self;
 }
 
+sub stopped {
+  my ($self) = @_;
+
+  my $result = [];
+
+  $self->status(sub {
+    push @{$result}, $_[0] if ($_[1] == -1) || ($_[1] == $_[0])
+  });
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub trap {
   my ($self, $name, $expr) = @_;
 
@@ -345,6 +450,32 @@ sub wait {
   return wantarray ? ($result, _exitcode) : $result;
 }
 
+sub waitall {
+  my ($self, @pids) = @_;
+
+  my $result = [map [$self->wait($_)], @pids ? @pids : $self->watchlist];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub watch {
+  my ($self, @args) = @_;
+
+  my $watchlist = $self->watchlist;
+
+  my %seen; @{$watchlist} = grep !$seen{$_}++, @{$watchlist}, @args;
+
+  return wantarray ? @{$watchlist} : $watchlist;
+}
+
+sub watchlist {
+  my ($self) = @_;
+
+  my $watchlist = $self->{watchlist} ||= [];
+
+  return wantarray ? @{$watchlist} : $watchlist;
+}
+
 sub work {
   my ($self, $code, @args) = @_;
 
@@ -358,6 +489,18 @@ sub work {
   return $returned[-1];
 }
 
+sub works {
+  my ($self, $count, $code, @args) = @_;
+
+  my $result = [];
+
+  for (my $i = 1; $i <= ($count || 0); $i++) {
+    push @{$result}, scalar($self->work($code, @args));
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub untrap {
   my ($self, $name) = @_;
 
@@ -369,6 +512,18 @@ sub untrap {
   }
 
   return $self;
+}
+
+sub unwatch {
+  my ($self, @args) = @_;
+
+  my $watchlist = $self->watchlist;
+
+  my %seen = map +($_, 1), @args;
+
+  @{$watchlist} = grep !$seen{$_}++, @{$watchlist}, @args;
+
+  return wantarray ? @{$watchlist} : $watchlist;
 }
 
 1;

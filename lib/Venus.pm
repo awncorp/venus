@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.40';
+our $VERSION = '2.50';
 
 # AUTHORITY
 
@@ -24,25 +24,34 @@ sub import {
 
   my %exports = (
     args => 1,
+    assert => 1,
     box => 1,
     call => 1,
     cast => 1,
     catch => 1,
     caught => 1,
     chain => 1,
+    check => 1,
     cop => 1,
     error => 1,
     false => 1,
     fault => 1,
+    json => 1,
     load => 1,
+    log => 1,
     make => 1,
     merge => 1,
+    perl => 1,
     raise => 1,
     roll => 1,
     space => 1,
     then => 1,
     true => 1,
+    unpack => 1,
+    venus => 1,
+    work => 1,
     wrap => 1,
+    yaml => 1,
   );
 
   @args = grep defined && !ref && /^[A-Za-z]/ && $exports{$_}, @args;
@@ -65,6 +74,16 @@ sub args (@) {
     : ((@args == 1 && ref($args[0]) eq 'HASH')
     ? (!%{$args[0]} ? {} : {%{$args[0]}})
     : (@args % 2 ? {@args, undef} : {@args}));
+}
+
+sub assert ($$) {
+  my ($data, $expr) = @_;
+
+  require Venus::Assert;
+
+  my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
+
+  return $assert->validate($data);
 }
 
 sub box ($) {
@@ -90,7 +109,7 @@ sub call (@) {
     $next = 0;
   }
   if ($next && ref($data) eq 'SCALAR') {
-    return $$data->$code(@args) if UNIVERSAL::can($$data, $code);
+    return $$data->$code(@args) if UNIVERSAL::can(load($$data)->package, $code);
     $next = 0;
   }
   if ($next && UNIVERSAL::can(load($data)->package, $code)) {
@@ -163,6 +182,14 @@ sub chain {
   return $data;
 }
 
+sub check ($$) {
+  my ($data, $expr) = @_;
+
+  require Venus::Assert;
+
+  return Venus::Assert->new->expression($expr)->check($data);
+}
+
 sub cop (@) {
   my ($data, @args) = @_;
 
@@ -201,10 +228,34 @@ sub fault (;$) {
   return Venus::Fault->new($data)->throw;
 }
 
+sub json ($;$) {
+  my ($code, $data) = @_;
+
+  require Venus::Json;
+
+  if (lc($code) eq 'decode') {
+    return Venus::Json->new->decode($data);
+  }
+
+  if (lc($code) eq 'encode') {
+    return Venus::Json->new($data)->encode;
+  }
+
+  return undef;
+}
+
 sub load ($) {
   my ($data) = @_;
 
   return space($data)->do('load');
+}
+
+sub log (@) {
+  my (@args) = @_;
+
+  require Venus::Log;
+
+  return Venus::Log->new->debug(@args);
 }
 
 sub make (@) {
@@ -220,6 +271,22 @@ sub merge (@) {
   require Venus::Hash;
 
   return Venus::Hash->new({})->merge(@args);
+}
+
+sub perl ($;$) {
+  my ($code, $data) = @_;
+
+  require Venus::Dump;
+
+  if (lc($code) eq 'decode') {
+    return Venus::Dump->new->decode($data);
+  }
+
+  if (lc($code) eq 'encode') {
+    return Venus::Dump->new($data)->encode;
+  }
+
+  return undef;
 }
 
 sub raise ($;$) {
@@ -262,6 +329,30 @@ sub true () {
   return Venus::True->value;
 }
 
+sub unpack (@) {
+  my (@args) = @_;
+
+  require Venus::Unpack;
+
+  return Venus::Unpack->new->do('args', @args)->all;
+}
+
+sub venus ($;@) {
+  my ($name, @args) = @_;
+
+  @args = ('new') if !@args;
+
+  return chain(\space(join('/', 'Venus', $name))->package, @args);
+}
+
+sub work ($) {
+  my ($data) = @_;
+
+  require Venus::Process;
+
+  return Venus::Process->new->do('work', $data);
+}
+
 sub wrap ($;$) {
   my ($data, $name) = @_;
 
@@ -274,6 +365,22 @@ sub wrap ($;$) {
   no warnings 'redefine';
 
   return *{"${caller}::${moniker}"} = sub {@_ ? make($data, @_) : $data};
+}
+
+sub yaml ($;$) {
+  my ($code, $data) = @_;
+
+  require Venus::Yaml;
+
+  if (lc($code) eq 'decode') {
+    return Venus::Yaml->new->decode($data);
+  }
+
+  if (lc($code) eq 'encode') {
+    return Venus::Yaml->new($data)->encode;
+  }
+
+  return undef;
 }
 
 1;

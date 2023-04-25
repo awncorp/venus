@@ -1979,7 +1979,7 @@ L</test>. If no path matches are found this method returns underfined.
 
   # given: synopsis;
 
-  my $path = Venus::Path->new('t');
+  $path = Venus::Path->new('t');
 
   my $seek = $path->seek('f', 'earth');
 
@@ -2000,7 +2000,7 @@ $test->for('example', 1, 'seek', sub {
 
   # given: synopsis;
 
-  my $path = Venus::Path->new('t');
+  $path = Venus::Path->new('t');
 
   my $seek = $path->seek('f', 'europa');
 

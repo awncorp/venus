@@ -126,7 +126,7 @@ sub for {
 
   $self->error("on.for.$name") if !$self->can($method);
 
-  $self->proxy('subtest', $method, sub {
+  $self->proxy('subtest', join(' ', map {ref($_) ? () : $_} $method, @args), sub {
     $result = $self->$method(@args);
   });
 

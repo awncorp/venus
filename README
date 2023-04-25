@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    2.40
+    2.50
 
 SYNOPSIS
 
@@ -142,6 +142,35 @@ FUNCTIONS
         my $args = args('content', 'example', 'algorithm');
       
         # {content => "example", algorithm => undef}
+
+ assert
+
+      assert(Any $data, Str $expr) (Any)
+
+    The assert function builds a Venus::Assert object and returns the
+    result of a "validate" in Venus::Assert operation.
+
+    Since 2.40
+
+    assert example 1
+
+        package main;
+      
+        use Venus 'assert';
+      
+        my $assert = assert(1234567890, 'number');
+      
+        # 1234567890
+
+    assert example 2
+
+        package main;
+      
+        use Venus 'assert';
+      
+        my $assert = assert(1234567890, 'float');
+      
+        # Exception! (isa Venus::Assert::Error)
 
  box
 
@@ -489,6 +518,35 @@ FUNCTIONS
       
         # 1
 
+ check
+
+      check(Any $data, Str $expr) (Bool)
+
+    The check function builds a Venus::Assert object and returns the result
+    of a "check" in Venus::Assert operation.
+
+    Since 2.40
+
+    check example 1
+
+        package main;
+      
+        use Venus 'check';
+      
+        my $check = check(rand, 'float');
+      
+        # true
+
+    check example 2
+
+        package main;
+      
+        use Venus 'check';
+      
+        my $check = check(rand, 'string');
+      
+        # false
+
  cop
 
       cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
@@ -610,6 +668,36 @@ FUNCTIONS
       
         # bless({message => 'Something failed!'}, 'Venus::Fault')
 
+ json
+
+      json(Str $call, Any $data) (Any)
+
+    The json function builds a Venus::Json object and will either "decode"
+    in Venus::Json or "encode" in Venus::Json based on the argument
+    provided and returns the result.
+
+    Since 2.40
+
+    json example 1
+
+        package main;
+      
+        use Venus 'json';
+      
+        my $decode = json 'decode', '{"codename":["Ready","Robot"],"stable":true}';
+      
+        # { codename => ["Ready", "Robot"], stable => 1 }
+
+    json example 2
+
+        package main;
+      
+        use Venus 'json';
+      
+        my $encode = json 'encode', { codename => ["Ready", "Robot"], stable => true };
+      
+        # '{"codename":["Ready","Robot"],"stable":true}'
+
  load
 
       load(Any $name) (Space)
@@ -628,6 +716,29 @@ FUNCTIONS
         my $space = load 'Venus::Scalar';
       
         # bless({value => 'Venus::Scalar'}, 'Venus::Space')
+
+ log
+
+      log(Any @args) (Log)
+
+    The log function prints the arguments provided to STDOUT, stringifying
+    complex values, and returns a Venus::Log object.
+
+    Since 2.40
+
+    log example 1
+
+        package main;
+      
+        use Venus 'log';
+      
+        my $log = log;
+      
+        # bless({...}, 'Venus::Log')
+      
+        # log time, rand, 1..9;
+      
+        # 00000000 0.000000, 1..9
 
  make
 
@@ -686,6 +797,36 @@ FUNCTIONS
         my $merged = merge({1..4}, {5, 6}, {7, 8, 9, 0});
       
         # {1..9, 0}
+
+ perl
+
+      perl(Str $call, Any $data) (Any)
+
+    The perl function builds a Venus::Dump object and will either "decode"
+    in Venus::Dump or "encode" in Venus::Dump based on the argument
+    provided and returns the result.
+
+    Since 2.40
+
+    perl example 1
+
+        package main;
+      
+        use Venus 'perl';
+      
+        my $decode = perl 'decode', '{stable=>bless({},\'Venus::True\')}';
+      
+        # { stable => 1 }
+
+    perl example 2
+
+        package main;
+      
+        use Venus 'perl';
+      
+        my $encode = perl 'encode', { stable => true };
+      
+        # '{stable=>bless({},\'Venus::True\')}'
 
  raise
 
@@ -828,6 +969,114 @@ FUNCTIONS
       
         # 0
 
+ unpack
+
+      unpack(Any @args) (Unpack)
+
+    The unpack function builds and returns a Venus::Unpack object.
+
+    Since 2.40
+
+    unpack example 1
+
+        package main;
+      
+        use Venus 'unpack';
+      
+        my $unpack = unpack;
+      
+        # bless({...}, 'Venus::Unpack')
+      
+        # $unpack->checks('string');
+      
+        # false
+      
+        # $unpack->checks('undef');
+      
+        # false
+
+    unpack example 2
+
+        package main;
+      
+        use Venus 'unpack';
+      
+        my $unpack = unpack rand;
+      
+        # bless({...}, 'Venus::Unpack')
+      
+        # $unpack->check('number');
+      
+        # false
+      
+        # $unpack->check('float');
+      
+        # true
+
+ venus
+
+      venus(Str $name, Any @args) (Any)
+
+    The venus function build a Venus package via the "chain" function based
+    on the name provided and returns an instance of that package.
+
+    Since 2.40
+
+    venus example 1
+
+        package main;
+      
+        use Venus 'venus';
+      
+        my $space = venus 'space';
+      
+        # bless({value => 'Venus'}, 'Venus::Space')
+
+    venus example 2
+
+        package main;
+      
+        use Venus 'venus';
+      
+        my $space = venus 'space', ['new', 'venus/string'];
+      
+        # bless({value => 'Venus::String'}, 'Venus::Space')
+
+    venus example 3
+
+        package main;
+      
+        use Venus 'venus';
+      
+        my $space = venus 'code';
+      
+        # bless({value => sub{...}}, 'Venus::Code')
+
+ work
+
+      work(CodeRef $callback) (Process)
+
+    The work function builds a Venus::Process object, forks the current
+    process using the callback provided via the "work" in Venus::Process
+    operation, and returns an instance of Venus::Process representing the
+    current process.
+
+    Since 2.40
+
+    work example 1
+
+        package main;
+      
+        use Venus 'work';
+      
+        my $parent = work sub {
+          my ($process) = @_;
+          # in forked process ...
+          $process->exit;
+        };
+      
+        # bless({...}, 'Venus::Process')
+
  wrap
 
       wrap(Str $data, Str $name) (CodeRef)
@@ -876,6 +1125,36 @@ FUNCTIONS
         # my $digest = SHA(1);
       
         # bless(do{\(my $o = '...')}, 'Digest::SHA')
+
+ yaml
+
+      yaml(Str $call, Any $data) (Any)
+
+    The yaml function builds a Venus::Yaml object and will either "decode"
+    in Venus::Yaml or "encode" in Venus::Yaml based on the argument
+    provided and returns the result.
+
+    Since 2.40
+
+    yaml example 1
+
+        package main;
+      
+        use Venus 'yaml';
+      
+        my $decode = yaml 'decode', "---\nname:\n- Ready\n- Robot\nstable: true\n";
+      
+        # { name => ["Ready", "Robot"], stable => 1 }
+
+    yaml example 2
+
+        package main;
+      
+        use Venus 'yaml';
+      
+        my $encode = yaml 'encode', { name => ["Ready", "Robot"], stable => true };
+      
+        # '---\nname:\n- Ready\n- Robot\nstable: true\n'
 
 FEATURES
 
