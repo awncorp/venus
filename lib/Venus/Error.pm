@@ -92,15 +92,9 @@ sub explain {
   $self->trace(1, 1) if !@{$self->frames};
 
   my $frames = $self->{'$frames'};
-
-  my $file = $frames->[0][1];
-  my $line = $frames->[0][2];
-  my $pack = $frames->[0][0];
-  my $subr = $frames->[0][3];
-
   my $message = $self->message;
 
-  my @stacktrace = ("$message in $file at line $line");
+  my @stacktrace = "$message" =~ s/^\s+|\s+$//gr;
 
   return join "\n", @stacktrace, "" if !$self->verbose;
 

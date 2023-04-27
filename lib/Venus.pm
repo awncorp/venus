@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.50';
+our $VERSION = '2.55';
 
 # AUTHORITY
 
@@ -33,13 +33,16 @@ sub import {
     chain => 1,
     check => 1,
     cop => 1,
+    date => 1,
     error => 1,
     false => 1,
     fault => 1,
+    gather => 1,
     json => 1,
     load => 1,
     log => 1,
     make => 1,
+    match => 1,
     merge => 1,
     perl => 1,
     raise => 1,
@@ -202,6 +205,18 @@ sub cop (@) {
   return space("$data")->cop(@args);
 }
 
+sub date (;$@) {
+  my ($code, @args) = @_;
+
+  require Venus::Date;
+
+  if (!$code) {
+    return Venus::Date->new;
+  }
+
+  return Venus::Date->new->$code(@args);
+}
+
 sub error (;$) {
   my ($data) = @_;
 
@@ -228,20 +243,42 @@ sub fault (;$) {
   return Venus::Fault->new($data)->throw;
 }
 
-sub json ($;$) {
+sub gather ($;&) {
+  my ($data, $code) = @_;
+
+  require Venus::Gather;
+
+  my $match = Venus::Gather->new($data);
+
+  return $match if !$code;
+
+  local $_ = $match;
+
+  my $returned = $code->($match, $data);
+
+  $match->data($returned) if ref $returned eq 'HASH';
+
+  return $match->result;
+}
+
+sub json (;$$) {
   my ($code, $data) = @_;
 
   require Venus::Json;
+
+  if (!$code) {
+    return Venus::Json->new;
+  }
 
   if (lc($code) eq 'decode') {
     return Venus::Json->new->decode($data);
   }
 
   if (lc($code) eq 'encode') {
-    return Venus::Json->new($data)->encode;
+    return Venus::Json->new(value => $data)->encode;
   }
 
-  return undef;
+  return fault(qq(Invalid "json" action "$code"));
 }
 
 sub load ($) {
@@ -265,6 +302,24 @@ sub make (@) {
   return call($_[0], 'new', @_);
 }
 
+sub match ($;&) {
+  my ($data, $code) = @_;
+
+  require Venus::Match;
+
+  my $match = Venus::Match->new($data);
+
+  return $match if !$code;
+
+  local $_ = $match;
+
+  my $returned = $code->($match, $data);
+
+  $match->data($returned) if ref $returned eq 'HASH';
+
+  return $match->result;
+}
+
 sub merge (@) {
   my (@args) = @_;
 
@@ -273,20 +328,24 @@ sub merge (@) {
   return Venus::Hash->new({})->merge(@args);
 }
 
-sub perl ($;$) {
+sub perl (;$$) {
   my ($code, $data) = @_;
 
   require Venus::Dump;
+
+  if (!$code) {
+    return Venus::Dump->new;
+  }
 
   if (lc($code) eq 'decode') {
     return Venus::Dump->new->decode($data);
   }
 
   if (lc($code) eq 'encode') {
-    return Venus::Dump->new($data)->encode;
+    return Venus::Dump->new(value => $data)->encode;
   }
 
-  return undef;
+  return fault(qq(Invalid "perl" action "$code"));
 }
 
 sub raise ($;$) {
@@ -367,20 +426,24 @@ sub wrap ($;$) {
   return *{"${caller}::${moniker}"} = sub {@_ ? make($data, @_) : $data};
 }
 
-sub yaml ($;$) {
+sub yaml (;$$) {
   my ($code, $data) = @_;
 
   require Venus::Yaml;
+
+  if (!$code) {
+    return Venus::Yaml->new;
+  }
 
   if (lc($code) eq 'decode') {
     return Venus::Yaml->new->decode($data);
   }
 
   if (lc($code) eq 'encode') {
-    return Venus::Yaml->new($data)->encode;
+    return Venus::Yaml->new(value => $data)->encode;
   }
 
-  return undef;
+  return fault(qq(Invalid "yaml" action "$code"));
 }
 
 1;

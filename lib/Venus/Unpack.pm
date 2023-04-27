@@ -64,7 +64,7 @@ sub cast {
     return $into ? $type->cast($into) : $type->deduce;
   };
 
-  return $self->foreach($code, @args);
+  return $self->list('foreach', $code, @args);
 }
 
 sub checks {
@@ -79,7 +79,7 @@ sub checks {
     return scalar Venus::Assert->new($name)->expression($expr)->check($data);
   };
 
-  return $self->foreach($code, @args);
+  return $self->list('foreach', $code, @args);
 }
 
 sub copy {
@@ -150,7 +150,7 @@ sub into {
     return Venus::Space->new($name)->load->new($data);
   };
 
-  return $self->foreach($code, @args);
+  return $self->list('foreach', $code, @args);
 }
 
 sub last {
@@ -225,26 +225,33 @@ sub signature {
 
   require Venus::Assert;
 
-  my ($from, $name) = ((caller(1))[0,3]);
-  my ($file, $line) = ((caller(0))[1,2]);
+  my (@frame_0) = ((caller(0))[0..3]);
+  my (@frame_1) = ((caller(1))[0..3]);
 
-  $from = $self->{from} if defined $self->{from};
-  $name = $self->{name} if defined $self->{name};
+  my $file = $frame_0[1];
+  my $line = $frame_0[2];
+  my $package = $self->{from} || $frame_0[0];
+  my $routine = $self->{name} || $frame_1[3];
+  my $from = $self->{from};
+  my $name = $self->{name};
 
-  if (!$name) {
-    $from = "$file at line $line";
-    $name = "signature";
-  }
-  else {
-    $name = (split /::/, $name)[-1];
-    $name = "signature \"$name\"";
-  }
+  $routine = $routine ? qq{"@{[(split /::/, $routine)[-1]]}"} : '(undefined)';
 
   my $code = sub {
     my ($self, $data, $expr, $index) = @_;
 
-    my $name = qq(argument #@{[$index + 1]} for $name in $from);
-    return scalar Venus::Assert->new($name)->expression($expr)->validate($data);
+    my @name;
+    my $number = $index + 1;
+
+    push @name, "argument #$number for signature";
+    push @name, $name ? "\"$name\"" : $routine;
+    push @name, $from ? "from \"$from\"" : "in package \"$package\"";
+    push @name, $file =~ /\(eval\s*\d*\)/
+      ? "in (eval)" : "in file \"$file\" at line $line";
+
+    return scalar Venus::Assert->new(join ' ', @name)->expression($expr)->validate(
+      $data
+    );
   };
 
   return $self->list('foreach', $code, @args);
@@ -278,7 +285,7 @@ sub validate {
     return scalar Venus::Assert->new($name)->expression($expr)->validate($data);
   };
 
-  return $self->foreach($code, @args);
+  return $self->list('foreach', $code, @args);
 }
 
 1;

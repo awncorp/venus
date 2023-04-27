@@ -1507,8 +1507,7 @@ $test->for('example', 3, 'signature', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~
-    'assertion \(argument #3\ for signature "example-3" in Venus::Test\) failed';
+  ok $error->message =~ 'argument #3\ for signature "example-3" in package "main"';
 
   $result
 });
@@ -1531,8 +1530,7 @@ $test->for('example', 4, 'signature', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~
-    'assertion \(argument #2\ for signature "example-4" in Venus::Test\) failed';
+  ok $error->message =~ 'argument #2\ for signature "example-4" in package "main"';
 
   $result
 });
@@ -1555,8 +1553,7 @@ $test->for('example', 5, 'signature', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~
-    'assertion \(argument #1\ for signature "example-5" in t/Venus_Unpack.t\) failed';
+  ok $error->message =~ 'argument #1\ for signature "example-5" from "t/Venus_Unpack.t"';
 
   $result
 });

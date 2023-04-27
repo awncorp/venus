@@ -743,7 +743,7 @@ sub from_string_to_number {
 
   require Scalar::Util;
 
-  return $self->into_float(Scalar::Util::looks_like_number($data) ? 0+$data : 0);
+  return $self->into_number(Scalar::Util::looks_like_number($data) ? 0+$data : 0);
 }
 
 sub from_string_to_regexp {

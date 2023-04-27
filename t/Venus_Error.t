@@ -317,7 +317,7 @@ operations.
 $test->for('example', 1, 'explain', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result =~ /^Exception! /;
+  ok $result =~ /^Exception!\n/;
 
   $result
 });

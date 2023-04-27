@@ -1,16 +1,13 @@
 # Release
 
-## Version: 2.50
+## Version: 2.55
 
-- [feature] Implement Venus#work
-- [feature] Implement Venus#{check,assert}
-- [feature] Implement Venus#unpack
-- [feature] Implement Venus#venus
-- [feature] Implement Venus::Process#alarm
-- [feature] Export {json,yaml,perl} utility functions
-- [feature] Implement "watching" in Venus::Process
-- [update] Fix Venus::Random#range documentation
-- [update] Support multiline type expressions
-- [update] Fix Venus::Test subtest descriptions
+- [feature] Implement Venus#date
+- [feature] Implement Venus#match
+- [feature] Implement Venus#gather
+- [update] Make Venus::Unpack#{checks,validate} list context aware
+- [update] Resolve Venus#unpack signature/caller issue
+- [update] Update arguments passing in Venus#{json,perl,yaml}
+- [update] Update {json,perl,yaml} behaviors and error conditions
 
 

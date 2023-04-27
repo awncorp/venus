@@ -1,4 +1,14 @@
-2.50 2022-04-25
+2.55 2023-04-27
+
+- [feature] Implement Venus#date
+- [feature] Implement Venus#match
+- [feature] Implement Venus#gather
+- [update] Make Venus::Unpack#{checks,validate} list context aware
+- [update] Resolve Venus#unpack signature/caller issue
+- [update] Update arguments passing in Venus#{json,perl,yaml}
+- [update] Update {json,perl,yaml} behaviors and error conditions
+
+2.50 2023-04-25
 
 - [feature] Implement Venus#work
 - [feature] Implement Venus#{check,assert}

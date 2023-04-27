@@ -47,13 +47,16 @@ function: caught
 function: chain
 function: check
 function: cop
+function: date
 function: error
 function: false
 function: fault
+function: gather
 function: json
 function: load
 function: log
 function: make
+function: match
 function: merge
 function: perl
 function: raise
@@ -1120,6 +1123,87 @@ $test->for('example', 2, 'cop', sub {
   $result
 });
 
+=function date
+
+The date function builds and returns a L<Venus::Date> object, or dispatches to
+the coderef or method provided.
+
+=signature date
+
+  date(Str | CodeRef $code, Any @args) (Date)
+
+=metadata date
+
+{
+  since => '2.40',
+}
+
+=cut
+
+=example-1 date
+
+  package main;
+
+  use Venus 'date';
+
+  my $date = date 'string';
+
+  # '0000-00-00T00:00:00Z'
+
+=cut
+
+$test->for('example', 1, 'date', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  like $result, qr/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d/;
+
+  $result
+});
+
+=example-2 date
+
+  package main;
+
+  use Venus 'date';
+
+  my $date = date 'reset', 570672000;
+
+  # bless({...}, 'Venus::Date')
+
+  # $date->string;
+
+  # '1988-02-01T00:00:00Z'
+
+=cut
+
+$test->for('example', 2, 'date', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result->string, '1988-02-01T00:00:00Z';
+
+  $result
+});
+
+=example-3 date
+
+  package main;
+
+  use Venus 'date';
+
+  my $date = date;
+
+  # bless({...}, 'Venus::Date')
+
+=cut
+
+$test->for('example', 3, 'date', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Date';
+
+  $result
+});
+
 =function error
 
 The error function throws a L<Venus::Error> exception object using the
@@ -1294,6 +1378,145 @@ $test->for('example', 2, 'fault', sub {
   $result
 });
 
+=function gather
+
+The gather function builds a L<Venus::Gather> object, passing it and the value
+provided to the callback provided, and returns the return value from
+L<Venus::Gather/result>.
+
+=signature gather
+
+  gather(Any $value, CodeRef $callback) (Any)
+
+=metadata gather
+
+{
+  since => '2.50',
+}
+
+=cut
+
+=example-1 gather
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'];
+
+  # bless({...}, 'Venus::Gather')
+
+  # $gather->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'gather', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Gather';
+
+  $result
+});
+
+=example-2 gather
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'], sub {{
+    a => 1,
+    b => 2,
+    c => 3,
+  }};
+
+  # [1..3]
+
+=cut
+
+$test->for('example', 2, 'gather', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..3];
+
+  $result
+});
+
+=example-3 gather
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['e'..'h'], sub {{
+    a => 1,
+    b => 2,
+    c => 3,
+  }};
+
+  # []
+
+=cut
+
+$test->for('example', 3, 'gather', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-4 gather
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'], sub {
+    my ($case) = @_;
+
+    $case->when(sub{lc($_) eq 'a'})->then('a -> A');
+    $case->when(sub{lc($_) eq 'b'})->then('b -> B');
+  };
+
+  # ['a -> A', 'b -> B']
+
+=cut
+
+$test->for('example', 4, 'gather', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['a -> A', 'b -> B'];
+
+  $result
+});
+
+=example-5 gather
+
+  package main;
+
+  use Venus 'gather';
+
+  my $gather = gather ['a'..'d'], sub {
+
+    $_->when(sub{lc($_) eq 'a'})->then('a -> A');
+    $_->when(sub{lc($_) eq 'b'})->then('b -> B');
+  };
+
+  # ['a -> A', 'b -> B']
+
+=cut
+
+$test->for('example', 5, 'gather', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['a -> A', 'b -> B'];
+
+  $result
+});
+
 =function json
 
 The json function builds a L<Venus::Json> object and will either
@@ -1355,6 +1578,53 @@ $test->for('example', 2, 'json', sub {
   my $result = $tryable->result;
   $result =~ s/[\s\n]+//g;
   is $result, '{"codename":["Ready","Robot"],"stable":true}';
+
+  $result
+});
+
+=example-3 json
+
+  package main;
+
+  use Venus 'json';
+
+  my $json = json;
+
+  # bless({...}, 'Venus::Json')
+
+=cut
+
+$test->for('example', 3, 'json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Json';
+
+  $result
+});
+
+=example-4 json
+
+  package main;
+
+  use Venus 'json';
+
+  my $json = json 'class', {data => "..."};
+
+  # Exception! (isa Venus::Fault)
+
+=cut
+
+$test->for('example', 4, 'json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->catch('Venus::Fault')->result;
+  isa_ok $result, 'Venus::Fault';
+  like $result, qr/Invalid "json" action "class"/;
 
   $result
 });
@@ -1490,6 +1760,170 @@ $test->for('example', 2, 'make', sub {
   $result
 });
 
+=function match
+
+The match function builds a L<Venus::Match> object, passing it and the value
+provided to the callback provided, and returns the return value from
+L<Venus::Match/result>.
+
+=signature match
+
+  match(Any $value, CodeRef $callback) (Any)
+
+=metadata match
+
+{
+  since => '2.50',
+}
+
+=cut
+
+=example-1 match
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5;
+
+  # bless({...}, 'Venus::Match')
+
+  # $match->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'match', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Match';
+
+  $result
+});
+
+=example-2 match
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5, sub {{
+    1 => 'one',
+    2 => 'two',
+    5 => 'five',
+  }};
+
+  # 'five'
+
+=cut
+
+$test->for('example', 2, 'match', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'five';
+
+  $result
+});
+
+=example-3 match
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5, sub {{
+    1 => 'one',
+    2 => 'two',
+    3 => 'three',
+  }};
+
+  # undef
+
+=cut
+
+$test->for('example', 3, 'match', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-4 match
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 5, sub {
+    my ($case) = @_;
+
+    $case->when(sub{$_ < 5})->then('< 5');
+    $case->when(sub{$_ > 5})->then('> 5');
+  };
+
+  # undef
+
+=cut
+
+$test->for('example', 4, 'match', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-5 match
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 6, sub {
+    my ($case, $data) = @_;
+
+    $case->when(sub{$_ < 5})->then("$data < 5");
+    $case->when(sub{$_ > 5})->then("$data > 5");
+  };
+
+  # '6 > 5'
+
+=cut
+
+$test->for('example', 5, 'match', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, '6 > 5';
+
+  $result
+});
+
+=example-6 match
+
+  package main;
+
+  use Venus 'match';
+
+  my $match = match 4, sub {
+
+    $_->when(sub{$_ < 5})->then("$_[1] < 5");
+    $_->when(sub{$_ > 5})->then("$_[1] > 5");
+  };
+
+  # '4 < 5'
+
+=cut
+
+$test->for('example', 6, 'match', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, '4 < 5';
+
+  $result
+});
+
 =function merge
 
 The merge function returns a hash reference which is a merger of all of the
@@ -1600,6 +2034,47 @@ $test->for('example', 2, 'perl', sub {
   my $result = $tryable->result;
   $result =~ s/[\s\n]+//g;
   is $result, '{stable=>bless({},\'Venus::True\')}';
+
+  $result
+});
+
+=example-3 perl
+
+  package main;
+
+  use Venus 'perl';
+
+  my $perl = perl;
+
+  # bless({...}, 'Venus::Dump')
+
+=cut
+
+$test->for('example', 3, 'perl', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Dump';
+
+  $result
+});
+
+=example-4 perl
+
+  package main;
+
+  use Venus 'perl';
+
+  my $perl = perl 'class', {data => "..."};
+
+  # Exception! (isa Venus::Fault)
+
+=cut
+
+$test->for('example', 4, 'perl', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->catch('Venus::Fault')->result;
+  isa_ok $result, 'Venus::Fault';
+  like $result, qr/Invalid "perl" action "class"/;
 
   $result
 });
@@ -2337,6 +2812,53 @@ $test->for('example', 2, 'yaml', sub {
   my $result = $tryable->result;
   $result =~ s/\n/\\n/g;
   is $result, '---\nname:\n- Ready\n- Robot\nstable: true\n';
+
+  $result
+});
+
+=example-3 yaml
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $yaml = yaml;
+
+  # bless({...}, 'Venus::Yaml')
+
+=cut
+
+$test->for('example', 3, 'yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Yaml';
+
+  $result
+});
+
+=example-4 yaml
+
+  package main;
+
+  use Venus 'yaml';
+
+  my $yaml = yaml 'class', {data => "..."};
+
+  # Exception! (isa Venus::Fault)
+
+=cut
+
+$test->for('example', 4, 'yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->catch('Venus::Fault')->result;
+  isa_ok $result, 'Venus::Fault';
+  like $result, qr/Invalid "yaml" action "class"/;
 
   $result
 });
