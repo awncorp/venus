@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.55';
+our $VERSION = '2.80';
 
 # AUTHORITY
 
@@ -24,7 +24,9 @@ sub import {
 
   my %exports = (
     args => 1,
+    array => 1,
     assert => 1,
+    bool => 1,
     box => 1,
     call => 1,
     cast => 1,
@@ -32,25 +34,50 @@ sub import {
     caught => 1,
     chain => 1,
     check => 1,
+    cli => 1,
+    code => 1,
+    config => 1,
     cop => 1,
+    data => 1,
     date => 1,
     error => 1,
     false => 1,
     fault => 1,
+    float => 1,
     gather => 1,
+    hash => 1,
     json => 1,
     load => 1,
     log => 1,
     make => 1,
     match => 1,
     merge => 1,
+    meta => 1,
+    name => 1,
+    number => 1,
+    opts => 1,
+    path => 1,
     perl => 1,
+    process => 1,
+    proto => 1,
     raise => 1,
+    random => 1,
+    regexp => 1,
+    replace => 1,
     roll => 1,
+    search => 1,
     space => 1,
+    schema => 1,
+    string => 1,
+    template => 1,
+    test => 1,
     then => 1,
+    throw => 1,
     true => 1,
+    try => 1,
+    type => 1,
     unpack => 1,
+    vars => 1,
     venus => 1,
     work => 1,
     wrap => 1,
@@ -79,6 +106,18 @@ sub args (@) {
     : (@args % 2 ? {@args, undef} : {@args}));
 }
 
+sub array ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Array;
+
+  if (!$code) {
+    return Venus::Array->new($data);
+  }
+
+  return Venus::Array->new($data)->$code(@args);
+}
+
 sub assert ($$) {
   my ($data, $expr) = @_;
 
@@ -87,6 +126,14 @@ sub assert ($$) {
   my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
 
   return $assert->validate($data);
+}
+
+sub bool (;$) {
+  my ($data) = @_;
+
+  require Venus::Boolean;
+
+  return Venus::Boolean->new($data);
 }
 
 sub box ($) {
@@ -193,6 +240,40 @@ sub check ($$) {
   return Venus::Assert->new->expression($expr)->check($data);
 }
 
+sub cli (;$) {
+  my ($data) = @_;
+
+  require Venus::Cli;
+
+  my $cli = Venus::Cli->new($data || [@ARGV]);
+
+  return $cli;
+}
+
+sub code ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Code;
+
+  if (!$code) {
+    return Venus::Code->new($data);
+  }
+
+  return Venus::Code->new($data)->$code(@args);
+}
+
+sub config ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Config;
+
+  if (!$code) {
+    return Venus::Config->new($data);
+  }
+
+  return Venus::Config->new($data)->$code(@args);
+}
+
 sub cop (@) {
   my ($data, @args) = @_;
 
@@ -205,16 +286,28 @@ sub cop (@) {
   return space("$data")->cop(@args);
 }
 
-sub date (;$@) {
-  my ($code, @args) = @_;
+sub data ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Data;
+
+  if (!$code) {
+    return Venus::Data->new($data);
+  }
+
+  return Venus::Data->new($data)->$code(@args);
+}
+
+sub date ($;$@) {
+  my ($data, $code, @args) = @_;
 
   require Venus::Date;
 
   if (!$code) {
-    return Venus::Date->new;
+    return Venus::Date->new($data);
   }
 
-  return Venus::Date->new->$code(@args);
+  return Venus::Date->new($data)->$code(@args);
 }
 
 sub error (;$) {
@@ -243,6 +336,18 @@ sub fault (;$) {
   return Venus::Fault->new($data)->throw;
 }
 
+sub float ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Float;
+
+  if (!$code) {
+    return Venus::Float->new($data);
+  }
+
+  return Venus::Float->new($data)->$code(@args);
+}
+
 sub gather ($;&) {
   my ($data, $code) = @_;
 
@@ -259,6 +364,18 @@ sub gather ($;&) {
   $match->data($returned) if ref $returned eq 'HASH';
 
   return $match->result;
+}
+
+sub hash ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Hash;
+
+  if (!$code) {
+    return Venus::Hash->new($data);
+  }
+
+  return Venus::Hash->new($data)->$code(@args);
 }
 
 sub json (;$$) {
@@ -328,6 +445,66 @@ sub merge (@) {
   return Venus::Hash->new({})->merge(@args);
 }
 
+sub meta ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Meta;
+
+  if (!$code) {
+    return Venus::Meta->new(name => $data);
+  }
+
+  return Venus::Meta->new(name => $data)->$code(@args);
+}
+
+sub name ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Name;
+
+  if (!$code) {
+    return Venus::Name->new($data);
+  }
+
+  return Venus::Name->new($data)->$code(@args);
+}
+
+sub number ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Number;
+
+  if (!$code) {
+    return Venus::Number->new($data);
+  }
+
+  return Venus::Number->new($data)->$code(@args);
+}
+
+sub opts ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Opts;
+
+  if (!$code) {
+    return Venus::Opts->new($data);
+  }
+
+  return Venus::Opts->new($data)->$code(@args);
+}
+
+sub path ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Path;
+
+  if (!$code) {
+    return Venus::Path->new($data);
+  }
+
+  return Venus::Path->new($data)->$code(@args);
+}
+
 sub perl (;$$) {
   my ($code, $data) = @_;
 
@@ -348,6 +525,30 @@ sub perl (;$$) {
   return fault(qq(Invalid "perl" action "$code"));
 }
 
+sub process (;$@) {
+  my ($code, @args) = @_;
+
+  require Venus::Process;
+
+  if (!$code) {
+    return Venus::Process->new;
+  }
+
+  return Venus::Process->new->$code(@args);
+}
+
+sub proto ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Prototype;
+
+  if (!$code) {
+    return Venus::Prototype->new($data);
+  }
+
+  return Venus::Prototype->new($data)->$code(@args);
+}
+
 sub raise ($;$) {
   my ($self, $data) = @_;
 
@@ -363,22 +564,192 @@ sub raise ($;$) {
   return Venus::Throw->new(package => $self, parent => $parent)->error($data);
 }
 
+sub random (;$@) {
+  my ($code, @args) = @_;
+
+  require Venus::Random;
+
+  state $random = Venus::Random->new;
+
+  if (!$code) {
+    return $random;
+  }
+
+  return $random->$code(@args);
+}
+
+sub regexp ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Regexp;
+
+  if (!$code) {
+    return Venus::Regexp->new($data);
+  }
+
+  return Venus::Regexp->new($data)->$code(@args);
+}
+
+sub replace ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  my @keys = qw(
+    string
+    regexp
+    substr
+  );
+
+  my @data = (ref $data eq 'ARRAY' ? (map +(shift(@keys), $_), @{$data}) : $data);
+
+  require Venus::Replace;
+
+  if (!$code) {
+    return Venus::Replace->new(@data);
+  }
+
+  return Venus::Replace->new(@data)->$code(@args);
+}
+
 sub roll (@) {
 
   return (@_[1,0,2..$#_]);
 }
 
-sub space ($) {
-  my ($data) = @_;
+sub schema ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Schema;
+
+  if (!$code) {
+    return Venus::Schema->new($data);
+  }
+
+  return Venus::Schema->new($data)->$code(@args);
+}
+
+sub search ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  my @keys = qw(
+    string
+    regexp
+  );
+
+  my @data = (ref $data eq 'ARRAY' ? (map +(shift(@keys), $_), @{$data}) : $data);
+
+  require Venus::Search;
+
+  if (!$code) {
+    return Venus::Search->new(@data);
+  }
+
+  return Venus::Search->new(@data)->$code(@args);
+}
+
+sub space ($;$@) {
+  my ($data, $code, @args) = @_;
 
   require Venus::Space;
 
-  return Venus::Space->new($data);
+  if (!$code) {
+    return Venus::Space->new($data);
+  }
+
+  return Venus::Space->new($data)->$code(@args);
+}
+
+sub string ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::String;
+
+  if (!$code) {
+    return Venus::String->new($data);
+  }
+
+  return Venus::String->new($data)->$code(@args);
+}
+
+sub template ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Template;
+
+  if (!$code) {
+    return Venus::Template->new($data);
+  }
+
+  return Venus::Template->new($data)->$code(@args);
+}
+
+sub test ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Test;
+
+  if (!$code) {
+    return Venus::Test->new($data);
+  }
+
+  return Venus::Test->new($data)->$code(@args);
 }
 
 sub then (@) {
 
   return ($_[0], call(@_));
+}
+
+sub throw ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Throw;
+
+  my $throw = Venus::Throw->new(context => (caller(1))[3])->do(
+    frame => 1,
+  );
+
+  if (ref $data ne 'HASH') {
+    $throw->package($data) if $data;
+  }
+  else {
+    if (exists $data->{as}) {
+      $throw->as($data->{as});
+    }
+    if (exists $data->{capture}) {
+      $throw->capture(@{$data->{capture}});
+    }
+    if (exists $data->{context}) {
+      $throw->context($data->{context});
+    }
+    if (exists $data->{error}) {
+      $throw->error($data->{error});
+    }
+    if (exists $data->{frame}) {
+      $throw->frame($data->{frame});
+    }
+    if (exists $data->{message}) {
+      $throw->message($data->{message});
+    }
+    if (exists $data->{name}) {
+      $throw->name($data->{name});
+    }
+    if (exists $data->{package}) {
+      $throw->package($data->{package});
+    }
+    if (exists $data->{parent}) {
+      $throw->parent($data->{parent});
+    }
+    if (exists $data->{stash}) {
+      $throw->stash($_, $data->{stash}->{$_}) for keys %{$data->{stash}};
+    }
+    if (exists $data->{on}) {
+      $throw->on($data->{on});
+    }
+  }
+
+  return $throw if !$code;
+
+  return $throw->$code(@args);
 }
 
 sub true () {
@@ -388,12 +759,48 @@ sub true () {
   return Venus::True->value;
 }
 
+sub try ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Try;
+
+  if (!$code) {
+    return Venus::Try->new($data);
+  }
+
+  return Venus::Try->new($data)->$code(@args);
+}
+
+sub type ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Type;
+
+  if (!$code) {
+    return Venus::Type->new($data);
+  }
+
+  return Venus::Type->new($data)->$code(@args);
+}
+
 sub unpack (@) {
   my (@args) = @_;
 
   require Venus::Unpack;
 
   return Venus::Unpack->new->do('args', @args)->all;
+}
+
+sub vars ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Vars;
+
+  if (!$code) {
+    return Venus::Vars->new($data);
+  }
+
+  return Venus::Vars->new($data)->$code(@args);
 }
 
 sub venus ($;@) {

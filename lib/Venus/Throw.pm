@@ -11,8 +11,15 @@ base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Stashable';
 
+use overload (
+  '""' => sub{$_[0]->catch('error')->explain},
+  '~~' => sub{$_[0]->catch('error')->explain},
+  fallback => 1,
+);
+
 # ATTRIBUTES
 
+attr 'frame';
 attr 'name';
 attr 'message';
 attr 'package';
@@ -39,6 +46,14 @@ sub build_self {
 
 # METHODS
 
+sub as {
+  my ($self, $name) = @_;
+
+  $self->name($name);
+
+  return $self;
+}
+
 sub assertion {
   my ($self) = @_;
 
@@ -49,13 +64,27 @@ sub assertion {
   return $assert;
 }
 
+sub capture {
+  my ($self, @args) = @_;
+
+  my $frame = $self->frame;
+
+  $self->stash(captured => {
+    callframe => [caller($frame // 1)],
+    arguments => [@args],
+  });
+
+  return $self;
+}
+
 sub error {
   my ($self, $data) = @_;
 
   require Venus::Error;
 
+  my $frame = $self->frame;
   my $name = $self->name;
-  my $context = $self->context || (caller(1))[3];
+  my $context = $self->context || (caller($frame // 1))[3];
   my $package = $self->package || join('::', map ucfirst, (caller(0))[0], 'error');
   my $parent = $self->parent;
   my $message = $self->message;
@@ -95,6 +124,20 @@ sub error {
   @_ = ($package->new($data ? $data : ()));
 
   goto $package->can('throw');
+}
+
+sub on {
+  my ($self, $name) = @_;
+
+  my $frame = $self->frame;
+
+  my $routine = (split(/::/, (caller($frame // 1))[3]))[-1];
+
+  undef $routine if $routine eq '__ANON__' || $routine eq '(eval)';
+
+  $self->name(join('.', 'on', grep defined, $routine, $name)) if $routine || $name;
+
+  return $self;
 }
 
 1;

@@ -291,7 +291,7 @@ I<Since C<0.01>>
 
   my $parse = $opts->parse;
 
-  # { help => 1, resource => "users" }
+  # bless({...}, 'Venus::Opts')
 
 =back
 
@@ -303,7 +303,42 @@ I<Since C<0.01>>
 
   my $parse = $opts->parse(['bundling']);
 
-  # { help => 1, resource => "users" }
+  # bless({...}, 'Venus::Opts')
+
+=back
+
+=cut
+
+=head2 reparse
+
+  reparse(ArrayRef $specs, ArrayRef $args) (Opts)
+
+The reparse method resets the parser, calls the L</parse> method and returns
+the result.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item reparse example 1
+
+  # given: synopsis;
+
+  my $reparse = $opts->reparse(['resource|r=s']);
+
+  # bless({...}, 'Venus::Opts')
+
+=back
+
+=over 4
+
+=item reparse example 2
+
+  # given: synopsis;
+
+  my $reparse = $opts->reparse(['resource|r=s'], ['bundling']);
+
+  # bless({...}, 'Venus::Opts')
 
 =back
 

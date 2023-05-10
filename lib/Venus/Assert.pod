@@ -1892,6 +1892,92 @@ I<Since C<1.40>>
 
 =cut
 
+=head2 render
+
+  render(Str $into, Str $expression) (Str)
+
+The render method builds and returns a type expressions suitable for providing
+to L</expression> based on the data provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item render example 1
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render;
+
+  # undef
+
+=back
+
+=over 4
+
+=item render example 2
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render(undef, 'string');
+
+  # "string"
+
+=back
+
+=over 4
+
+=item render example 3
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('routines', ['say', 'say_pretty']);
+
+  # 'routines["say", "say_pretty"]'
+
+=back
+
+=over 4
+
+=item render example 4
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('hashkeys', {id => 'number', name => 'string'});
+
+  # 'hashkeys["id", number, "name", string]'
+
+=back
+
+=over 4
+
+=item render example 5
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('hashkeys', {
+    id => 'number',
+    profile => {
+      level => 'string',
+    },
+  });
+
+  # 'hashkeys["id", number, "profile", hashkeys["level", string]]'
+
+=back
+
+=cut
+
 =head2 routines
 
   routines(Str @names) (Assert)

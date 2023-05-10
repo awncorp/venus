@@ -416,6 +416,27 @@ sub random {
   return @$data[rand($#{$data}+1)];
 }
 
+sub range {
+  my ($self, @args) = @_;
+
+  return $self->slice(@args) if @args > 1;
+
+  my ($note) = @args;
+
+  return $self->slice if !defined $note;
+
+  my ($f, $l) = split /:/, $note, 2;
+
+  $l = $f if !defined $l;
+
+  my $data = $self->get;
+
+  $f = 0 if !defined $f || $f eq '';
+  $l = $#$data if !defined $l || $l eq '';
+
+  return $self->slice((0+$f)..(0+$l));
+}
+
 sub reverse {
   my ($self) = @_;
 

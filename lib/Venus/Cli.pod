@@ -17,25 +17,25 @@ Cli Class for Perl 5
 
   use Venus::Cli;
 
-  my $cli = Venus::Cli->new(['example', '--help']);
+  my $cli = Venus::Cli->new(['--help']);
 
-  # $cli->program;
-
-  # "/path/to/executable"
-
-  # $cli->arg(0);
-
-  # "example"
+  $cli->set('opt', 'help', {
+    help => 'Show help information',
+  });
 
   # $cli->opt('help');
 
-  # 1
+  # [1]
+
+  # $cli->data;
+
+  # {help => 1}
 
 =cut
 
 =head1 DESCRIPTION
 
-This package provides a superclass and methods for providing simple yet robust
+This package provides a superclass and methods for creating simple yet robust
 command-line interfaces.
 
 =cut
@@ -46,35 +46,14 @@ This package has the following attributes:
 
 =cut
 
-=head2 args
-
-  args(Args $data) (Args)
-
-The args attribute holds a L<Venus::Args> object.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item args example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $args = $cli->args;
-
-=back
-
-=cut
-
 =head2 data
 
-  data(Data $data) (Data)
+  data(ArrayRef $data) (ArrayRef)
 
-The data attribute holds a L<Venus::Data> object.
+The data attribute holds an arrayref of command-line arguments and defaults to
+C<@ARGV>.
 
-I<Since C<1.71>>
+I<Since C<2.55>>
 
 =over 4
 
@@ -84,121 +63,9 @@ I<Since C<1.71>>
 
   package main;
 
-  my $data = $cli->data;
+  my $data = $cli->data([]);
 
-=back
-
-=cut
-
-=head2 init
-
-  init(ArrayRef $data) (ArrayRef)
-
-The init attribute holds the "initial" raw arguments provided to the CLI,
-defaulting to C<[@ARGV]>, used by L</args> and L</opts>.
-
-I<Since C<1.68>>
-
-=over 4
-
-=item init example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $init = $cli->init;
-
-  # ["example", "--help"]
-
-=back
-
-=cut
-
-=head2 logs
-
-  logs(Logs $logs) (Logs)
-
-The logs attribute holds a L<Venus::Logs> object.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item logs example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $logs = $cli->logs;
-
-=back
-
-=cut
-
-=head2 opts
-
-  opts(Opts $opts) (Opts)
-
-The opts attribute holds a L<Venus::Opts> object.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item opts example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $opts = $cli->opts;
-
-=back
-
-=cut
-
-=head2 path
-
-  path(Path $data) (Path)
-
-The path attribute holds a L<Venus::Path> object, meant to represent the path
-of the file where the CLI executable and POD is.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item path example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $path = $cli->path;
-
-=back
-
-=cut
-
-=head2 vars
-
-  vars(Vars $vars) (Vars)
-
-The vars attribute holds a L<Venus::Vars> object.
-
-I<Since C<1.71>>
-
-=over 4
-
-=item vars example 1
-
-  # given: synopsis
-
-  package main;
-
-  my $vars = $cli->vars;
+  # []
 
 =back
 
@@ -216,7 +83,7 @@ L<Venus::Kind::Utility>
 
 This package integrates behaviors from:
 
-L<Venus::Role::Optional>
+L<Venus::Role::Stashable>
 
 =cut
 
@@ -228,22 +95,24 @@ This package provides the following methods:
 
 =head2 arg
 
-  arg(Str $pos) (Str)
+  arg(Str $name) (Any)
 
-The arg method returns the element specified by the index in the unnamed
-arguments list, i.e. arguments not parsed as options.
+The arg method returns the value passed to the CLI that corresponds to the
+registered argument using the name provided.
 
-I<Since C<1.68>>
+I<Since C<2.55>>
 
 =over 4
 
 =item arg example 1
 
-  # given: synopsis
-
   package main;
 
-  my $arg = $cli->arg;
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  my $name = $cli->arg('name');
 
   # undef
 
@@ -253,54 +122,45 @@ I<Since C<1.68>>
 
 =item arg example 2
 
-  # given: synopsis
-
   package main;
 
-  my $arg = $cli->arg(0);
+  use Venus::Cli;
 
-  # "example"
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('arg', 'name', {
+    range => '0',
+  });
+
+  my $name = $cli->arg('name');
+
+  # ["example"]
 
 =back
 
-=cut
-
-=head2 execute
-
-  execute() (Any)
-
-The execute method is the default entrypoint of the program and runs the
-application.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item execute example 1
+=item arg example 3
 
   package main;
 
   use Venus::Cli;
 
-  my $cli = Venus::Cli->new([]);
+  my $cli = Venus::Cli->new(['example', '--help']);
 
-  # e.g.
+  $cli->set('arg', 'name', {
+    range => '0',
+  });
 
-  # sub execute {
-  #   my ($self) = @_;
-  #
-  #   return $self->opt('help') ? $self->okay : $self->fail;
-  # }
+  my ($name) = $cli->arg('name');
 
-  # my $result = $cli->execute;
-
-  # ...
+  # "example"
 
 =back
 
 =over 4
 
-=item execute example 2
+=item arg example 4
 
   package main;
 
@@ -308,17 +168,267 @@ I<Since C<1.68>>
 
   my $cli = Venus::Cli->new(['--help']);
 
-  # e.g.
+  $cli->set('arg', 'name', {
+    prompt => 'Enter a name',
+    range => '0',
+  });
 
-  # sub execute {
-  #   my ($self) = @_;
-  #
-  #   return $self->opt('help') ? $self->okay : $self->fail;
-  # }
+  my ($name) = $cli->arg('name');
 
-  # my $result = $cli->execute;
+  # prompts for name, e.g.
 
-  # ...
+  # > name: Enter a name
+  # > example
+
+  # "example"
+
+=back
+
+=over 4
+
+=item arg example 5
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    default => 'example',
+    range => '0',
+  });
+
+  my ($name) = $cli->arg('name');
+
+  # "example"
+
+=back
+
+=over 4
+
+=item arg example 6
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->arg('name');
+
+  # "example"
+
+=back
+
+=over 4
+
+=item arg example 7
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->arg('name');
+
+  # Exception! (isa Venus::Cli::Error)
+
+  # Invalid option: name: received (undef), expected (string)
+
+=back
+
+=cut
+
+=head2 cmd
+
+  cmd(Str $name) (Any)
+
+The cmd method returns truthy or falsy if the value passed to the CLI that
+corresponds to the argument registered and associated with the registered
+command using the name provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item cmd example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  my $name = $cli->cmd('name');
+
+  # undef
+
+=back
+
+=over 4
+
+=item cmd example 2
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  $cli->set('arg', 'action', {
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my $is_execute = $cli->cmd('execute');
+
+  # 1
+
+=back
+
+=over 4
+
+=item cmd example 3
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  $cli->set('arg', 'action', {
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # 1
+
+=back
+
+=over 4
+
+=item cmd example 4
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example']);
+
+  $cli->set('arg', 'action', {
+    prompt => 'Enter the desired action',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # prompts for action, e.g.
+
+  # > name: Enter the desired action
+  # > execute
+
+  # 1
+
+=back
+
+=over 4
+
+=item cmd example 5
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example']);
+
+  $cli->set('arg', 'action', {
+    default => 'execute',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # 1
+
+=back
+
+=over 4
+
+=item cmd example 6
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  $cli->set('arg', 'action', {
+    type => 'string',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # 1
+
+=back
+
+=over 4
+
+=item cmd example 7
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example']);
+
+  $cli->set('arg', 'action', {
+    type => 'string',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # Exception! (isa Venus::Cli::Error)
+
+  # Invalid option: action: received (undef), expected (string)
 
 =back
 
@@ -332,7 +442,7 @@ The exit method exits the program using the exit code provided. The exit code
 defaults to C<0>. Optionally, you can dispatch before exiting by providing a
 method name or coderef, and arguments.
 
-I<Since C<1.68>>
+I<Since C<2.55>>
 
 =over 4
 
@@ -384,7 +494,7 @@ I<Since C<1.68>>
 
   package main;
 
-  # my $exit = $cli->exit(1, 'log_info', 'Something failed!');
+  my $exit = $cli->exit(1, 'stash', 'executed', 1);
 
   # ()
 
@@ -399,7 +509,7 @@ I<Since C<1.68>>
 The fail method exits the program with the exit code C<1>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
 
-I<Since C<1.68>>
+I<Since C<2.55>>
 
 =over 4
 
@@ -423,7 +533,7 @@ I<Since C<1.68>>
 
   package main;
 
-  # my $fail = $cli->fail('log_info', 'Something failed!');
+  my $fail = $cli->fail('stash', 'executed', 1);
 
   # ()
 
@@ -431,26 +541,111 @@ I<Since C<1.68>>
 
 =cut
 
+=head2 get
+
+  get(Str $type, Str $name) (Any)
+
+The get method returns C<arg>, C<opt>, C<cmd>, or C<str> configuration values
+from the configuration database.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item get example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $get = $cli->get;
+
+  # undef
+
+=back
+
+=over 4
+
+=item get example 2
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $get = $cli->get('opt', 'help');
+
+  # undef
+
+=back
+
+=over 4
+
+=item get example 3
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  my $get = $cli->get('opt', 'help');
+
+  # {name => 'help', alias => 'h'}
+
+=back
+
+=over 4
+
+=item get example 4
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  my $get = $cli->get('opt');
+
+  # {help => {name => 'help', alias => 'h'}}
+
+=back
+
+=cut
+
 =head2 help
 
-  help(Str @data) (Str)
+  help() (Str)
 
-The help method returns the POD found in the file specified by the L</podfile>
-method, defaulting to the C<=head1 OPTIONS> section.
+The help method returns a string representing I<"usage"> information based on
+the configuration of the CLI.
 
-I<Since C<1.68>>
+I<Since C<2.55>>
 
 =over 4
 
 =item help example 1
 
-  # given: synopsis
-
   package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
 
   my $help = $cli->help;
 
-  # ""
+  # "Usage: application"
 
 =back
 
@@ -458,169 +653,237 @@ I<Since C<1.68>>
 
 =item help example 2
 
-  # given: synopsis
-
   package main;
 
-  # my $help = $cli->help('head1', 'NAME');
+  use Venus::Cli;
 
-  #  "Example"
+  my $cli = Venus::Cli->new;
+
+  $cli->set('str', 'name', 'program');
+
+  my $help = $cli->help;
+
+  # "Usage: program"
 
 =back
 
-=cut
-
-=head2 log_debug
-
-  log_debug(Str @data) (Log)
-
-The log_debug method logs C<debug> information.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item log_debug example 1
-
-  # given: synopsis
+=item help example 3
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_debug(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program [<argument>]
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (optional)"
 
 =back
 
-=cut
-
-=head2 log_error
-
-  log_error(Str @data) (Log)
-
-The log_error method logs C<error> information.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item log_error example 1
-
-  # given: synopsis
+=item help example 4
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_error(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    required => 1
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)"
 
 =back
 
-=cut
-
-=head2 log_fatal
-
-  log_fatal(Str @data) (Log)
-
-The log_fatal method logs C<fatal> information.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item log_fatal example 1
-
-  # given: synopsis
+=item help example 5
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_fatal(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    type => 'string',
+    required => 1,
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)
+  #     (string)"
 
 =back
 
-=cut
-
-=head2 log_info
-
-  log_info(Str @data) (Log)
-
-The log_info method logs C<info> information.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item log_info example 1
-
-  # given: synopsis
+=item help example 6
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_info(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    required => 1,
+  });
+
+  $cli->set('cmd', 'create', {
+    help => 'Create new resource',
+    arg => 'command',
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)
+  #
+  # Commands:
+  #
+  #   create
+  #     Create new resource
+  #     (ccommand)"
 
 =back
 
-=cut
-
-=head2 log_trace
-
-  log_trace(Str @data) (Log)
-
-The log_trace method logs C<trace> information.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item log_trace example 1
-
-  # given: synopsis
+=item help example 7
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_trace(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    required => 1,
+  });
+
+  $cli->set('opt', 'help', {
+    help => 'Show help information',
+    alias => ['?', 'h'],
+  });
+
+  $cli->set('cmd', 'create', {
+    help => 'Create new resource',
+    arg => 'command',
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument> [<option>]
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)
+  #
+  # Options:
+  #
+  #   -?, -h, --help
+  #     Show help information
+  #     (optional)
+  #
+  # Commands:
+  #
+  #   create
+  #     Create new resource
+  #     (command)"
 
 =back
 
-=cut
-
-=head2 log_warn
-
-  log_warn(Str @data) (Log)
-
-The log_warn method logs C<warn> information.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item log_warn example 1
-
-  # given: synopsis
+=item help example 8
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_warn(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'files', {
+    help => 'File paths',
+    required => 1,
+    range => '0:',
+  });
+
+  $cli->set('opt', 'verbose', {
+    help => 'Show details during processing',
+    alias => ['v'],
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>, ... [<option>]
+  #
+  # Arguments:
+  #
+  #   files, ...
+  #     File paths
+  #     (required)
+  #
+  # Options:
+  #
+  #   -v, --verbose
+  #     Show details during processing
+  #     (optional)"
 
 =back
 
@@ -633,7 +896,7 @@ I<Since C<1.68>>
 The okay method exits the program with the exit code C<0>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
 
-I<Since C<1.68>>
+I<Since C<2.55>>
 
 =over 4
 
@@ -657,7 +920,7 @@ I<Since C<1.68>>
 
   package main;
 
-  # my $okay = $cli->okay('log_info', 'Something worked!');
+  my $okay = $cli->okay('stash', 'executed', 1);
 
   # ()
 
@@ -667,21 +930,24 @@ I<Since C<1.68>>
 
 =head2 opt
 
-  opt(Str $name) (Str)
+  opt(Str $name) (Any)
 
-The opt method returns the named option specified by the L</options> method.
+The opt method returns the value passed to the CLI that corresponds to the
+registered option using the name provided.
 
-I<Since C<1.68>>
+I<Since C<2.55>>
 
 =over 4
 
 =item opt example 1
 
-  # given: synopsis
-
   package main;
 
-  my $opt = $cli->opt;
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  my $name = $cli->opt('help');
 
   # undef
 
@@ -691,37 +957,424 @@ I<Since C<1.68>>
 
 =item opt example 2
 
-  # given: synopsis
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('opt', 'help', {});
+
+  my $name = $cli->opt('help');
+
+  # [1]
+
+=back
+
+=over 4
+
+=item opt example 3
 
   package main;
 
-  my $opt = $cli->opt('help');
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('opt', 'help', {});
+
+  my ($name) = $cli->opt('help');
 
   # 1
 
 =back
 
-=cut
-
-=head2 options
-
-  options() (ArrayRef)
-
-The options method returns the list of L<Getopt::Long> definitions.
-
-I<Since C<1.68>>
-
 =over 4
 
-=item options example 1
-
-  # given: synopsis
+=item opt example 4
 
   package main;
 
-  my $options = $cli->options;
+  use Venus::Cli;
 
-  # ['help|h']
+  my $cli = Venus::Cli->new([]);
+
+  $cli->set('opt', 'name', {
+    prompt => 'Enter a name',
+    type => 'string',
+    multi => 0,
+  });
+
+  my ($name) = $cli->opt('name');
+
+  # prompts for name, e.g.
+
+  # > name: Enter a name
+  # > example
+
+  # "example"
+
+=back
+
+=over 4
+
+=item opt example 5
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    prompt => 'Enter a name',
+    type => 'string',
+    multi => 0,
+  });
+
+  my ($name) = $cli->opt('name');
+
+  # Does not prompt
+
+  # "example"
+
+=back
+
+=over 4
+
+=item opt example 6
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'string',
+    multi => 1,
+  });
+
+  my (@name) = $cli->opt('name');
+
+  # ("example", "example")
+
+=back
+
+=over 4
+
+=item opt example 7
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'number',
+    multi => 1,
+  });
+
+  my ($name) = $cli->opt('name');
+
+  # Exception! (isa Venus::Cli::Error)
+
+  # Invalid option: name: received (undef), expected (number)
+
+=back
+
+=cut
+
+=head2 parsed
+
+  parsed() (HashRef)
+
+The parsed method returns the values provided to the CLI for all registered
+arguments and options as a hashref.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item parsed example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('arg', 'name', {
+    range => '0',
+  });
+
+  $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  my $parsed = $cli->parsed;
+
+  # {name => "example", help => 1}
+
+=back
+
+=cut
+
+=head2 parser
+
+  parser() (Opts)
+
+The parser method returns a L<Venus::Opts> object using the L</spec> returned
+based on the CLI configuration.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item parser example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {
+    help => 'Show help information',
+    alias => 'h',
+  });
+
+  my $parser = $cli->parser;
+
+  # bless({...}, 'Venus::Opts')
+
+=back
+
+=cut
+
+=head2 set
+
+  set(Str $type, Str $name, Str|HashRef $data) (Any)
+
+The set method stores configuration values for C<arg>, C<opt>, C<cmd>, or
+C<str> data in the configuration database, and returns the invocant.
+
+The following are configurable C<arg> properties:
+
+=over 4
+
+=item *
+
+The C<default> property specifies the "default" value to be used if none is
+provided.
+
+=item *
+
+The C<help> property specifies the help text to output in usage instructions.
+
+=item *
+
+The C<label> property specifies the label text to output in usage instructions.
+
+=item *
+
+The C<name> property specifies the name of the argument.
+
+=item *
+
+The C<prompt> property specifies the text to be used in a prompt for input if
+no value is provided.
+
+=item *
+
+The C<range> property specifies the zero-indexed position where the CLI
+arguments can be found, using range notation.
+
+=item *
+
+The C<required> property specifies whether the argument is required and throws
+an exception is missing when fetched.
+
+=item *
+
+The C<type> property specifies the data type of the argument. Valid types are
+C<number> parsed as a L<Getopt::Long> integer, C<string> parsed as a
+L<Getopt::Long> string, C<float> parsed as a L<Getopt::Long> float, C<boolean>
+parsed as a L<Getopt::Long> flag, or C<yesno> parsed as a L<Getopt::Long>
+string. Otherwise, the type will default to C<boolean>.
+
+=back
+
+The following are configurable C<cmd> properties:
+
+=over 4
+
+=item *
+
+The C<arg> property specifies the CLI argument where the command can be found.
+
+=item *
+
+The C<help> property specifies the help text to output in usage instructions.
+
+=item *
+
+The C<label> property specifies the label text to output in usage instructions.
+
+=item *
+
+The C<name> property specifies the name of the command.
+
+=back
+
+The following are configurable C<opt> properties:
+
+=over 4
+
+=item *
+
+The C<alias> property specifies the alternate identifiers that can be provided.
+
+=item *
+
+The C<default> property specifies the "default" value to be used if none is
+provided.
+
+=item *
+
+The C<help> property specifies the help text to output in usage instructions.
+
+=item *
+
+The C<label> property specifies the label text to output in usage instructions.
+
+=item *
+
+The C<multi> property denotes whether the CLI will accept multiple occurrences
+of the option.
+
+=item *
+
+The C<name> property specifies the name of the option.
+
+=item *
+
+The C<prompt> property specifies the text to be used in a prompt for input if
+no value is provided.
+
+=item *
+
+The C<required> property specifies whether the option is required and throws an
+exception is missing when fetched.
+
+=item *
+
+The C<type> property specifies the data type of the option. Valid types are
+C<number> parsed as a L<Getopt::Long> integer, C<string> parsed as a
+L<Getopt::Long> string, C<float> parsed as a L<Getopt::Long> float, C<boolean>
+parsed as a L<Getopt::Long> flag, or C<yesno> parsed as a L<Getopt::Long>
+string. Otherwise, the type will default to C<boolean>.
+
+=back
+
+I<Since C<2.55>>
+
+=over 4
+
+=item set example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set;
+
+  # undef
+
+=back
+
+=over 4
+
+=item set example 2
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set('opt', 'help');
+
+  # bless({...}, 'Venus::Cli')
+
+=back
+
+=over 4
+
+=item set example 3
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  # bless({...}, 'Venus::Cli')
+
+=back
+
+=over 4
+
+=item set example 4
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set('opt', 'help', {
+    alias => ['?', 'h'],
+  });
+
+  # bless({...}, 'Venus::Cli')
+
+=back
+
+=cut
+
+=head2 str
+
+  str(Str $name) (Any)
+
+The str method gets or sets configuration strings used in CLI help text based
+on the arguments provided. The L</help> method uses C<"name">,
+C<"description">, C<"header">, and C<"footer"> strings.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item str example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('str', 'name', 'program');
+
+  my $str = $cli->str('name');
+
+  # "program"
 
 =back
 

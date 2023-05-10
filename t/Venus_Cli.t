@@ -10,13 +10,25 @@ use Venus::Test;
 
 my $test = test(__FILE__);
 
-our $CLI_EXIT_CODE;
+our $PACKAGE = "Venus::Cli";
 
-{
-  no strict 'refs'; no warnings 'redefine';
+use_ok $PACKAGE;
 
-  require Venus::Cli; *{"Venus::Cli::_exit"} = sub {$CLI_EXIT_CODE = $_[0]};
-}
+our $CLI_EXIT_RETVAL = 0;
+$PACKAGE->mock('_exit', sub {
+  sub {$CLI_EXIT_RETVAL = $_[0]}
+});
+
+our $CLI_PRINT_INPUT = [];
+our $CLI_PRINT_RETVAL = undef;
+$PACKAGE->mock('_print', sub {
+  sub {$CLI_PRINT_INPUT = [@_] if @_; $CLI_PRINT_RETVAL}
+});
+
+our $CLI_PROMPT_RETVAL = undef;
+$PACKAGE->mock('_prompt', sub {
+  sub {$CLI_PROMPT_RETVAL}
+});
 
 =name
 
@@ -45,19 +57,17 @@ $test->for('abstract');
 =includes
 
 method: arg
-method: execute
+method: cmd
 method: exit
 method: fail
 method: help
-method: log_debug
-method: log_error
-method: log_fatal
-method: log_info
-method: log_trace
-method: log_warn
+method: get
 method: okay
 method: opt
-method: options
+method: parsed
+method: parser
+method: set
+method: str
 
 =cut
 
@@ -69,19 +79,19 @@ $test->for('includes');
 
   use Venus::Cli;
 
-  my $cli = Venus::Cli->new(['example', '--help']);
+  my $cli = Venus::Cli->new(['--help']);
 
-  # $cli->program;
-
-  # "/path/to/executable"
-
-  # $cli->arg(0);
-
-  # "example"
+  $cli->set('opt', 'help', {
+    help => 'Show help information',
+  });
 
   # $cli->opt('help');
 
-  # 1
+  # [1]
+
+  # $cli->data;
+
+  # {help => 1}
 
 =cut
 
@@ -89,14 +99,16 @@ $test->for('synopsis', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Cli');
-  is_deeply $result->init, ['example', '--help'];
+  is_deeply [$result->opt('help')], [1];
+  is_deeply $result->data, ['--help'];
+  is_deeply $result->parsed, {help => 1};
 
   $result
 });
 
 =description
 
-This package provides a superclass and methods for providing simple yet robust
+This package provides a superclass and methods for creating simple yet robust
 command-line interfaces.
 
 =cut
@@ -113,56 +125,25 @@ $test->for('inherits');
 
 =integrates
 
-Venus::Role::Optional
+Venus::Role::Stashable
 
 =cut
 
 $test->for('integrates');
 
-=attribute args
-
-The args attribute holds a L<Venus::Args> object.
-
-=signature args
-
-  args(Args $data) (Args)
-
-=metadata args
-
-{
-  since => '1.71',
-}
-
-=example-1 args
-
-  # given: synopsis
-
-  package main;
-
-  my $args = $cli->args;
-
-=cut
-
-$test->for('example', 1, 'args', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Args');
-
-  $result
-});
-
 =attribute data
 
-The data attribute holds a L<Venus::Data> object.
+The data attribute holds an arrayref of command-line arguments and defaults to
+C<@ARGV>.
 
 =signature data
 
-  data(Data $data) (Data)
+  data(ArrayRef $data) (ArrayRef)
 
 =metadata data
 
 {
-  since => '1.71',
+  since => '2.55',
 }
 
 =example-1 data
@@ -171,204 +152,44 @@ The data attribute holds a L<Venus::Data> object.
 
   package main;
 
-  my $data = $cli->data;
+  my $data = $cli->data([]);
+
+  # []
 
 =cut
 
 $test->for('example', 1, 'data', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result->isa('Venus::Data');
-
-  $result
-});
-
-=attribute init
-
-The init attribute holds the "initial" raw arguments provided to the CLI,
-defaulting to C<[@ARGV]>, used by L</args> and L</opts>.
-
-=signature init
-
-  init(ArrayRef $data) (ArrayRef)
-
-=metadata init
-
-{
-  since => '1.68',
-}
-
-=example-1 init
-
-  # given: synopsis
-
-  package main;
-
-  my $init = $cli->init;
-
-  # ["example", "--help"]
-
-=cut
-
-$test->for('example', 1, 'init', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, ['example', '--help'];
-
-  $result
-});
-
-=attribute logs
-
-The logs attribute holds a L<Venus::Logs> object.
-
-=signature logs
-
-  logs(Logs $logs) (Logs)
-
-=metadata logs
-
-{
-  since => '1.71',
-}
-
-=example-1 logs
-
-  # given: synopsis
-
-  package main;
-
-  my $logs = $cli->logs;
-
-=cut
-
-$test->for('example', 1, 'logs', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Log');
-
-  $result
-});
-
-=attribute opts
-
-The opts attribute holds a L<Venus::Opts> object.
-
-=signature opts
-
-  opts(Opts $opts) (Opts)
-
-=metadata opts
-
-{
-  since => '1.71',
-}
-
-=example-1 opts
-
-  # given: synopsis
-
-  package main;
-
-  my $opts = $cli->opts;
-
-=cut
-
-$test->for('example', 1, 'opts', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Opts');
-
-  $result
-});
-
-=attribute path
-
-The path attribute holds a L<Venus::Path> object, meant to represent the path
-of the file where the CLI executable and POD is.
-
-=signature path
-
-  path(Path $data) (Path)
-
-=metadata path
-
-{
-  since => '1.71',
-}
-
-=example-1 path
-
-  # given: synopsis
-
-  package main;
-
-  my $path = $cli->path;
-
-=cut
-
-$test->for('example', 1, 'path', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Path');
-
-  $result
-});
-
-=attribute vars
-
-The vars attribute holds a L<Venus::Vars> object.
-
-=signature vars
-
-  vars(Vars $vars) (Vars)
-
-=metadata vars
-
-{
-  since => '1.71',
-}
-
-=example-1 vars
-
-  # given: synopsis
-
-  package main;
-
-  my $vars = $cli->vars;
-
-=cut
-
-$test->for('example', 1, 'vars', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Vars');
+  is_deeply $result, [];
 
   $result
 });
 
 =method arg
 
-The arg method returns the element specified by the index in the unnamed
-arguments list, i.e. arguments not parsed as options.
+The arg method returns the value passed to the CLI that corresponds to the
+registered argument using the name provided.
 
 =signature arg
 
-  arg(Str $pos) (Str)
+  arg(Str $name) (Any)
 
 =metadata arg
 
 {
-  since => '1.68',
+  since => '2.55',
 }
 
 =example-1 arg
 
-  # given: synopsis
-
   package main;
 
-  my $arg = $cli->arg;
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  my $name = $cli->arg('name');
 
   # undef
 
@@ -376,79 +197,65 @@ arguments list, i.e. arguments not parsed as options.
 
 $test->for('example', 1, 'arg', sub {
   my ($tryable) = @_;
-  ok !defined(my $result = $tryable->result);
+  my $result = $tryable->result;
+  ok !defined $result;
 
   !$result
 });
 
 =example-2 arg
 
-  # given: synopsis
-
   package main;
 
-  my $arg = $cli->arg(0);
+  use Venus::Cli;
 
-  # "example"
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('arg', 'name', {
+    range => '0',
+  });
+
+  my $name = $cli->arg('name');
+
+  # ["example"]
 
 =cut
 
 $test->for('example', 2, 'arg', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $result, "example";
+  my $result = $tryable->result;
+  is_deeply $result, ["example"];
 
   $result
 });
 
-=method execute
-
-The execute method is the default entrypoint of the program and runs the
-application.
-
-=signature execute
-
-  execute() (Any)
-
-=metadata execute
-
-{
-  since => '1.68',
-}
-
-=example-1 execute
+=example-3 arg
 
   package main;
 
   use Venus::Cli;
 
-  my $cli = Venus::Cli->new([]);
+  my $cli = Venus::Cli->new(['example', '--help']);
 
-  # e.g.
+  $cli->set('arg', 'name', {
+    range => '0',
+  });
 
-  # sub execute {
-  #   my ($self) = @_;
-  #
-  #   return $self->opt('help') ? $self->okay : $self->fail;
-  # }
+  my ($name) = $cli->arg('name');
 
-  # my $result = $cli->execute;
-
-  # ...
+  # "example"
 
 =cut
 
-$test->for('example', 1, 'execute', sub {
+$test->for('example', 3, 'arg', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  $result->execute;
-  is $CLI_EXIT_CODE, 1;
+  my $result = $tryable->result;
+  is $result, "example";
 
   $result
 });
 
-=example-2 execute
+=example-4 arg
 
   package main;
 
@@ -456,26 +263,348 @@ $test->for('example', 1, 'execute', sub {
 
   my $cli = Venus::Cli->new(['--help']);
 
-  # e.g.
+  $cli->set('arg', 'name', {
+    prompt => 'Enter a name',
+    range => '0',
+  });
 
-  # sub execute {
-  #   my ($self) = @_;
-  #
-  #   return $self->opt('help') ? $self->okay : $self->fail;
-  # }
+  my ($name) = $cli->arg('name');
 
-  # my $result = $cli->execute;
+  # prompts for name, e.g.
 
-  # ...
+  # > name: Enter a name
+  # > example
+
+  # "example"
 
 =cut
 
-$test->for('example', 2, 'execute', sub {
+$test->for('example', 4, 'arg', sub {
+  local $CLI_PRINT_INPUT;
+  local $CLI_PROMPT_RETVAL = "example";
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  $result->execute;
-  is $CLI_EXIT_CODE, 0;
+  my $result = $tryable->result;
+  is_deeply $CLI_PRINT_INPUT, ['name: Enter a name'];
+  is $result, "example";
+
+  $result
+});
+
+=example-5 arg
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    default => 'example',
+    range => '0',
+  });
+
+  my ($name) = $cli->arg('name');
+
+  # "example"
+
+=cut
+
+$test->for('example', 5, 'arg', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "example";
+
+  $result
+});
+
+=example-6 arg
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->arg('name');
+
+  # "example"
+
+=cut
+
+$test->for('example', 6, 'arg', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "example";
+
+  $result
+});
+
+=example-7 arg
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->arg('name');
+
+  # Exception! (isa Venus::Cli::Error)
+
+  # Invalid option: name: received (undef), expected (string)
+
+=cut
+
+$test->for('example', 7, 'arg', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Cli::Error';
+  ok $result->is('on.arg');
+  like $result->message, qr/Invalid argument: name/;
+
+  $result
+});
+
+=method cmd
+
+The cmd method returns truthy or falsy if the value passed to the CLI that
+corresponds to the argument registered and associated with the registered
+command using the name provided.
+
+=signature cmd
+
+  cmd(Str $name) (Any)
+
+=metadata cmd
+
+{
+  since => '2.55',
+}
+
+=example-1 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  my $name = $cli->cmd('name');
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'cmd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  $cli->set('arg', 'action', {
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my $is_execute = $cli->cmd('execute');
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'cmd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-3 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  $cli->set('arg', 'action', {
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'cmd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-4 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example']);
+
+  $cli->set('arg', 'action', {
+    prompt => 'Enter the desired action',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # prompts for action, e.g.
+
+  # > name: Enter the desired action
+  # > execute
+
+  # 1
+
+=cut
+
+$test->for('example', 4, 'cmd', sub {
+  local $CLI_PRINT_INPUT;
+  local $CLI_PROMPT_RETVAL = "execute";
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $CLI_PRINT_INPUT, ['action: Enter the desired action'];
+  is $result, 1;
+
+  $result
+});
+
+=example-5 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example']);
+
+  $cli->set('arg', 'action', {
+    default => 'execute',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # 1
+
+=cut
+
+$test->for('example', 5, 'cmd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-6 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', 'execute']);
+
+  $cli->set('arg', 'action', {
+    type => 'string',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # 1
+
+=cut
+
+$test->for('example', 6, 'cmd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=example-7 cmd
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example']);
+
+  $cli->set('arg', 'action', {
+    type => 'string',
+    range => '1',
+  });
+
+  $cli->set('cmd', 'execute', {
+    arg => 'action',
+  });
+
+  my ($is_execute) = $cli->cmd('execute');
+
+  # Exception! (isa Venus::Cli::Error)
+
+  # Invalid option: action: received (undef), expected (string)
+
+=cut
+
+$test->for('example', 7, 'cmd', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Cli::Error';
+  ok $result->is('on.cmd');
+  like $result->message, qr/Invalid argument: action/;
 
   $result
 });
@@ -493,7 +622,7 @@ method name or coderef, and arguments.
 =metadata exit
 
 {
-  since => '1.68',
+  since => '2.55',
 }
 
 =example-1 exit
@@ -509,9 +638,10 @@ method name or coderef, and arguments.
 =cut
 
 $test->for('example', 1, 'exit', sub {
+  local $CLI_EXIT_RETVAL = 0;
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $CLI_EXIT_CODE, 0;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 0;
 
   !$result
 });
@@ -529,9 +659,10 @@ $test->for('example', 1, 'exit', sub {
 =cut
 
 $test->for('example', 2, 'exit', sub {
+  local $CLI_EXIT_RETVAL = 0;
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $CLI_EXIT_CODE, 0;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 0;
 
   !$result
 });
@@ -549,9 +680,10 @@ $test->for('example', 2, 'exit', sub {
 =cut
 
 $test->for('example', 3, 'exit', sub {
+  local $CLI_EXIT_RETVAL = 0;
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $CLI_EXIT_CODE, 1;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 1;
 
   $result
 });
@@ -562,21 +694,17 @@ $test->for('example', 3, 'exit', sub {
 
   package main;
 
-  # my $exit = $cli->exit(1, 'log_info', 'Something failed!');
+  my $exit = $cli->exit(1, 'stash', 'executed', 1);
 
   # ()
 
 =cut
 
 $test->for('example', 4, 'exit', sub {
+  local $CLI_EXIT_RETVAL = 0;
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  $result->exit(1, 'log_info', 'Something failed!');
-  is_deeply $logs, [['Something failed!']];
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 1;
 
   $result
 });
@@ -593,7 +721,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 =metadata fail
 
 {
-  since => '1.68',
+  since => '2.55',
 }
 
 =example-1 fail
@@ -609,9 +737,10 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 =cut
 
 $test->for('example', 1, 'fail', sub {
+  local $CLI_EXIT_RETVAL = 0;
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is $CLI_EXIT_CODE, 1;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 1;
 
   $result
 });
@@ -622,330 +751,544 @@ $test->for('example', 1, 'fail', sub {
 
   package main;
 
-  # my $fail = $cli->fail('log_info', 'Something failed!');
+  my $fail = $cli->fail('stash', 'executed', 1);
 
   # ()
 
 =cut
 
 $test->for('example', 2, 'fail', sub {
+  local $CLI_EXIT_RETVAL = 0;
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  $result->fail('log_info', 'Something failed!');
-  is_deeply $logs, [['Something failed!']];
-  is $CLI_EXIT_CODE, 1;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 1;
+
+  $result
+});
+
+=method get
+
+The get method returns C<arg>, C<opt>, C<cmd>, or C<str> configuration values
+from the configuration database.
+
+=signature get
+
+  get(Str $type, Str $name) (Any)
+
+=metadata get
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 get
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $get = $cli->get;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'get', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 get
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $get = $cli->get('opt', 'help');
+
+  # undef
+
+=cut
+
+$test->for('example', 2, 'get', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-3 get
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  my $get = $cli->get('opt', 'help');
+
+  # {name => 'help', alias => 'h'}
+
+=cut
+
+$test->for('example', 3, 'get', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {name => 'help', alias => 'h'};
+
+  $result
+});
+
+=example-4 get
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  my $get = $cli->get('opt');
+
+  # {help => {name => 'help', alias => 'h'}}
+
+=cut
+
+$test->for('example', 4, 'get', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {help => {name => 'help', alias => 'h'}};
 
   $result
 });
 
 =method help
 
-The help method returns the POD found in the file specified by the L</podfile>
-method, defaulting to the C<=head1 OPTIONS> section.
+The help method returns a string representing I<"usage"> information based on
+the configuration of the CLI.
 
 =signature help
 
-  help(Str @data) (Str)
+  help() (Str)
 
 =metadata help
 
 {
-  since => '1.68',
+  since => '2.55',
 }
 
 =example-1 help
 
-  # given: synopsis
-
   package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
 
   my $help = $cli->help;
 
-  # ""
+  # "Usage: application"
 
 =cut
 
 $test->for('example', 1, 'help', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
+  my $result = $tryable->result;
+  is $result, "Usage: application";
 
-  !$result
+  $result
 });
 
 =example-2 help
 
-  # given: synopsis
-
   package main;
 
-  # my $help = $cli->help('head1', 'NAME');
+  use Venus::Cli;
 
-  #  "Example"
+  my $cli = Venus::Cli->new;
+
+  $cli->set('str', 'name', 'program');
+
+  my $help = $cli->help;
+
+  # "Usage: program"
 
 =cut
 
 $test->for('example', 2, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  $result->data->set('t/data/sections');
-  ok my $help = $result->help('head1', 'NAME');
-  is $help, "Example #1\nExample #2";
+  my $result = $tryable->result;
+  is $result, "Usage: program";
 
   $result
 });
 
-=method log_debug
-
-The log_debug method logs C<debug> information.
-
-=signature log_debug
-
-  log_debug(Str @data) (Log)
-
-=metadata log_debug
-
-{
-  since => '1.68',
-}
-
-=example-1 log_debug
-
-  # given: synopsis
+=example-3 help
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_debug(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program [<argument>]
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (optional)"
 
 =cut
 
-$test->for('example', 1, 'log_debug', sub {
+$test->for('example', 3, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  ok $result->log_debug(1, 'Something failed!');
-  is_deeply $logs, [['1 Something failed!']];
+  my $result = $tryable->result;
+  my $expected = <<"EOF";
+Usage: program [<argument>]
+
+Arguments:
+
+  command
+    Command to execute
+    (optional)
+EOF
+
+  chomp $expected;
+
+  is $result, $expected;
 
   $result
 });
 
-=method log_error
-
-The log_error method logs C<error> information.
-
-=signature log_error
-
-  log_error(Str @data) (Log)
-
-=metadata log_error
-
-{
-  since => '1.68',
-}
-
-=example-1 log_error
-
-  # given: synopsis
+=example-4 help
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_error(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    required => 1
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)"
 
 =cut
 
-$test->for('example', 1, 'log_error', sub {
+$test->for('example', 4, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  ok $result->log_error(1, 'Something failed!');
-  is_deeply $logs, [['1 Something failed!']];
+  my $result = $tryable->result;
+  my $expected = <<"EOF";
+Usage: program <argument>
+
+Arguments:
+
+  command
+    Command to execute
+    (required)
+EOF
+
+  chomp $expected;
+
+  is $result, $expected;
 
   $result
 });
 
-=method log_fatal
-
-The log_fatal method logs C<fatal> information.
-
-=signature log_fatal
-
-  log_fatal(Str @data) (Log)
-
-=metadata log_fatal
-
-{
-  since => '1.68',
-}
-
-=example-1 log_fatal
-
-  # given: synopsis
+=example-5 help
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_fatal(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    type => 'string',
+    required => 1,
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)
+  #     (string)"
 
 =cut
 
-$test->for('example', 1, 'log_fatal', sub {
+$test->for('example', 5, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  ok $result->log_fatal(1, 'Something failed!');
-  is_deeply $logs, [['1 Something failed!']];
+  my $result = $tryable->result;
+  my $expected = <<"EOF";
+Usage: program <argument>
+
+Arguments:
+
+  command
+    Command to execute
+    (required)
+    (string)
+EOF
+
+  chomp $expected;
+
+  is $result, $expected;
 
   $result
 });
 
-=method log_info
-
-The log_info method logs C<info> information.
-
-=signature log_info
-
-  log_info(Str @data) (Log)
-
-=metadata log_info
-
-{
-  since => '1.68',
-}
-
-=example-1 log_info
-
-  # given: synopsis
+=example-6 help
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_info(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    required => 1,
+  });
+
+  $cli->set('cmd', 'create', {
+    help => 'Create new resource',
+    arg => 'command',
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)
+  #
+  # Commands:
+  #
+  #   create
+  #     Create new resource
+  #     (ccommand)"
 
 =cut
 
-$test->for('example', 1, 'log_info', sub {
+$test->for('example', 6, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  ok $result->log_info(1, 'Something failed!');
-  is_deeply $logs, [['1 Something failed!']];
+  my $result = $tryable->result;
+  my $expected = <<"EOF";
+Usage: program <argument>
+
+Arguments:
+
+  command
+    Command to execute
+    (required)
+
+Commands:
+
+  create
+    Create new resource
+    (command)
+EOF
+
+  chomp $expected;
+
+  is $result, $expected;
 
   $result
 });
 
-=method log_trace
-
-The log_trace method logs C<trace> information.
-
-=signature log_trace
-
-  log_trace(Str @data) (Log)
-
-=metadata log_trace
-
-{
-  since => '1.68',
-}
-
-=example-1 log_trace
-
-  # given: synopsis
+=example-7 help
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_trace(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'command', {
+    help => 'Command to execute',
+    required => 1,
+  });
+
+  $cli->set('opt', 'help', {
+    help => 'Show help information',
+    alias => ['?', 'h'],
+  });
+
+  $cli->set('cmd', 'create', {
+    help => 'Create new resource',
+    arg => 'command',
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument> [<option>]
+  #
+  # Arguments:
+  #
+  #   command
+  #     Command to execute
+  #     (required)
+  #
+  # Options:
+  #
+  #   -?, -h, --help
+  #     Show help information
+  #     (optional)
+  #
+  # Commands:
+  #
+  #   create
+  #     Create new resource
+  #     (command)"
 
 =cut
 
-$test->for('example', 1, 'log_trace', sub {
+$test->for('example', 7, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  ok $result->log_trace(1, 'Something failed!');
-  is_deeply $logs, [['1 Something failed!']];
+  my $result = $tryable->result;
+  my $expected = <<"EOF";
+Usage: program <argument> [<option>]
+
+Arguments:
+
+  command
+    Command to execute
+    (required)
+
+Options:
+
+  -?, -h, --help
+    Show help information
+    (optional)
+
+Commands:
+
+  create
+    Create new resource
+    (command)
+EOF
+
+  chomp $expected;
+
+  is $result, $expected;
 
   $result
 });
 
-=method log_warn
-
-The log_warn method logs C<warn> information.
-
-=signature log_warn
-
-  log_warn(Str @data) (Log)
-
-=metadata log_warn
-
-{
-  since => '1.68',
-}
-
-=example-1 log_warn
-
-  # given: synopsis
+=example-8 help
 
   package main;
 
-  # $cli->logs->level('trace');
+  use Venus::Cli;
 
-  # my $log = $cli->log_warn(time, 'Something failed!');
+  my $cli = Venus::Cli->new;
 
-  # "0000000000 Something failed!"
+  $cli->set('str', 'name', 'program');
+
+  $cli->set('arg', 'files', {
+    help => 'File paths',
+    required => 1,
+    range => '0:',
+  });
+
+  $cli->set('opt', 'verbose', {
+    help => 'Show details during processing',
+    alias => ['v'],
+  });
+
+  my $help = $cli->help;
+
+  # "Usage: program <argument>, ... [<option>]
+  #
+  # Arguments:
+  #
+  #   files, ...
+  #     File paths
+  #     (required)
+  #
+  # Options:
+  #
+  #   -v, --verbose
+  #     Show details during processing
+  #     (optional)"
 
 =cut
 
-$test->for('example', 1, 'log_warn', sub {
+$test->for('example', 8, 'help', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->isa('Venus::Cli');
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  ok $result->log_warn(1, 'Something failed!');
-  is_deeply $logs, [['1 Something failed!']];
+  my $result = $tryable->result;
+  my $expected = <<"EOF";
+Usage: program <argument>, ... [<option>]
+
+Arguments:
+
+  files, ...
+    File paths
+    (required)
+
+Options:
+
+  -v, --verbose
+    Show details during processing
+    (optional)
+EOF
+
+  chomp $expected;
+
+  is $result, $expected;
 
   $result
 });
@@ -962,7 +1305,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 =metadata okay
 
 {
-  since => '1.68',
+  since => '2.55',
 }
 
 =example-1 okay
@@ -978,9 +1321,10 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 =cut
 
 $test->for('example', 1, 'okay', sub {
+  local $CLI_EXIT_RETVAL = 1;
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  is $CLI_EXIT_CODE, 0;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 0;
 
   !$result
 });
@@ -991,47 +1335,45 @@ $test->for('example', 1, 'okay', sub {
 
   package main;
 
-  # my $okay = $cli->okay('log_info', 'Something worked!');
+  my $okay = $cli->okay('stash', 'executed', 1);
 
   # ()
 
 =cut
 
 $test->for('example', 2, 'okay', sub {
+  local $CLI_EXIT_RETVAL = 1;
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  ok $result->logs->level('trace');
-  my $logs = [];
-  $result->logs->handler(sub{push @$logs, [@_]});
-  ok !@$logs;
-  $result->okay('log_info', 'Something worked!');
-  is_deeply $logs, [['Something worked!']];
-  is $CLI_EXIT_CODE, 0;
+  my $result = $tryable->result;
+  is $CLI_EXIT_RETVAL, 0;
 
-  $result
+  !$result
 });
 
 =method opt
 
-The opt method returns the named option specified by the L</options> method.
+The opt method returns the value passed to the CLI that corresponds to the
+registered option using the name provided.
 
 =signature opt
 
-  opt(Str $name) (Str)
+  opt(Str $name) (Any)
 
 =metadata opt
 
 {
-  since => '1.68',
+  since => '2.55',
 }
 
 =example-1 opt
 
-  # given: synopsis
-
   package main;
 
-  my $opt = $cli->opt;
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  my $name = $cli->opt('help');
 
   # undef
 
@@ -1039,61 +1381,659 @@ The opt method returns the named option specified by the L</options> method.
 
 $test->for('example', 1, 'opt', sub {
   my ($tryable) = @_;
-  ok !defined(my $result = $tryable->result);
+  my $result = $tryable->result;
+  ok !defined $result;
 
   !$result
 });
 
 =example-2 opt
 
-  # given: synopsis
-
   package main;
 
-  my $opt = $cli->opt('help');
+  use Venus::Cli;
 
-  # 1
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('opt', 'help', {});
+
+  my $name = $cli->opt('help');
+
+  # [1]
 
 =cut
 
 $test->for('example', 2, 'opt', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
+  my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-3 opt
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('opt', 'help', {});
+
+  my ($name) = $cli->opt('help');
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'opt', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
   is $result, 1;
 
   $result
 });
 
-=method options
-
-The options method returns the list of L<Getopt::Long> definitions.
-
-=signature options
-
-  options() (ArrayRef)
-
-=metadata options
-
-{
-  since => '1.68',
-}
-
-=example-1 options
-
-  # given: synopsis
+=example-4 opt
 
   package main;
 
-  my $options = $cli->options;
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new([]);
+
+  $cli->set('opt', 'name', {
+    prompt => 'Enter a name',
+    type => 'string',
+    multi => 0,
+  });
+
+  my ($name) = $cli->opt('name');
+
+  # prompts for name, e.g.
+
+  # > name: Enter a name
+  # > example
+
+  # "example"
+
+=cut
+
+$test->for('example', 4, 'opt', sub {
+  local $CLI_PRINT_INPUT;
+  local $CLI_PROMPT_RETVAL = "example";
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $CLI_PRINT_INPUT, ['name: Enter a name'];
+  is $result, "example";
+
+  $result
+});
+
+=example-5 opt
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    prompt => 'Enter a name',
+    type => 'string',
+    multi => 0,
+  });
+
+  my ($name) = $cli->opt('name');
+
+  # Does not prompt
+
+  # "example"
+
+=cut
+
+$test->for('example', 5, 'opt', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "example";
+
+  $result
+});
+
+=example-6 opt
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'string',
+    multi => 1,
+  });
+
+  my (@name) = $cli->opt('name');
+
+  # ("example", "example")
+
+=cut
+
+$test->for('example', 6, 'opt', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], ["example", "example"];
+
+  (@result)
+});
+
+=example-7 opt
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'number',
+    multi => 1,
+  });
+
+  my ($name) = $cli->opt('name');
+
+  # Exception! (isa Venus::Cli::Error)
+
+  # Invalid option: name: received (undef), expected (number)
+
+=cut
+
+$test->for('example', 7, 'opt', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Cli::Error';
+  ok $result->is('on.opt');
+  like $result->message, qr/Invalid option: name/;
+
+  $result
+});
+
+=method parsed
+
+The parsed method returns the values provided to the CLI for all registered
+arguments and options as a hashref.
+
+=signature parsed
+
+  parsed() (HashRef)
+
+=metadata parsed
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 parsed
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--help']);
+
+  $cli->set('arg', 'name', {
+    range => '0',
+  });
+
+  $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  my $parsed = $cli->parsed;
+
+  # {name => "example", help => 1}
+
+=cut
+
+$test->for('example', 1, 'parsed', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {name => "example", help => 1};
+
+  $result
+});
+
+=method parser
+
+The parser method returns a L<Venus::Opts> object using the L</spec> returned
+based on the CLI configuration.
+
+=signature parser
+
+  parser() (Opts)
+
+=metadata parser
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 parser
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {
+    help => 'Show help information',
+    alias => 'h',
+  });
+
+  my $parser = $cli->parser;
+
+  # bless({...}, 'Venus::Opts')
+
+=cut
+
+$test->for('example', 1, 'parser', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Opts';
+  is_deeply $result->specs, ['help|h'];
+
+  $result
+});
+
+=method set
+
+The set method stores configuration values for C<arg>, C<opt>, C<cmd>, or
+C<str> data in the configuration database, and returns the invocant.
+
+The following are configurable C<arg> properties:
+
++=over 4
+
++=item *
+
+The C<default> property specifies the "default" value to be used if none is
+provided.
+
++=item *
+
+The C<help> property specifies the help text to output in usage instructions.
+
++=item *
+
+The C<label> property specifies the label text to output in usage instructions.
+
++=item *
+
+The C<name> property specifies the name of the argument.
+
++=item *
+
+The C<prompt> property specifies the text to be used in a prompt for input if
+no value is provided.
+
++=item *
+
+The C<range> property specifies the zero-indexed position where the CLI
+arguments can be found, using range notation.
+
++=item *
+
+The C<required> property specifies whether the argument is required and throws
+an exception is missing when fetched.
+
++=item *
+
+The C<type> property specifies the data type of the argument. Valid types are
+C<number> parsed as a L<Getopt::Long> integer, C<string> parsed as a
+L<Getopt::Long> string, C<float> parsed as a L<Getopt::Long> float, C<boolean>
+parsed as a L<Getopt::Long> flag, or C<yesno> parsed as a L<Getopt::Long>
+string. Otherwise, the type will default to C<boolean>.
+
++=back
+
+The following are configurable C<cmd> properties:
+
++=over 4
+
++=item *
+
+The C<arg> property specifies the CLI argument where the command can be found.
+
++=item *
+
+The C<help> property specifies the help text to output in usage instructions.
+
++=item *
+
+The C<label> property specifies the label text to output in usage instructions.
+
++=item *
+
+The C<name> property specifies the name of the command.
+
++=back
+
+The following are configurable C<opt> properties:
+
++=over 4
+
++=item *
+
+The C<alias> property specifies the alternate identifiers that can be provided.
+
++=item *
+
+The C<default> property specifies the "default" value to be used if none is
+provided.
+
++=item *
+
+The C<help> property specifies the help text to output in usage instructions.
+
++=item *
+
+The C<label> property specifies the label text to output in usage instructions.
+
++=item *
+
+The C<multi> property denotes whether the CLI will accept multiple occurrences
+of the option.
+
++=item *
+
+The C<name> property specifies the name of the option.
+
++=item *
+
+The C<prompt> property specifies the text to be used in a prompt for input if
+no value is provided.
+
++=item *
+
+The C<required> property specifies whether the option is required and throws an
+exception is missing when fetched.
+
++=item *
+
+The C<type> property specifies the data type of the option. Valid types are
+C<number> parsed as a L<Getopt::Long> integer, C<string> parsed as a
+L<Getopt::Long> string, C<float> parsed as a L<Getopt::Long> float, C<boolean>
+parsed as a L<Getopt::Long> flag, or C<yesno> parsed as a L<Getopt::Long>
+string. Otherwise, the type will default to C<boolean>.
+
++=back
+
+=signature set
+
+  set(Str $type, Str $name, Str|HashRef $data) (Any)
+
+=metadata set
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 set
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'set', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 set
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set('opt', 'help');
+
+  # bless({...}, 'Venus::Cli')
+
+=cut
+
+$test->for('example', 2, 'set', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Cli';
+  is_deeply $result->store('opt', 'help'), {name => 'help'};
+
+  $result
+});
+
+=example-3 set
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set('opt', 'help', {
+    alias => 'h',
+  });
+
+  # bless({...}, 'Venus::Cli')
+
+=cut
+
+$test->for('example', 3, 'set', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Cli';
+  is_deeply $result->store('opt', 'help'), {name => 'help', alias => 'h'};
+
+  $result
+});
+
+=example-4 set
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  my $set = $cli->set('opt', 'help', {
+    alias => ['?', 'h'],
+  });
+
+  # bless({...}, 'Venus::Cli')
+
+=cut
+
+$test->for('example', 4, 'set', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Cli';
+  is_deeply $result->store('opt', 'help'), {name => 'help', alias => ['?', 'h']};
+
+  $result
+});
+
+=method spec
+
+The spec method returns parser L<specifications|Getopt::Long/"Summary of Option
+Specifications"> for use with L<Getopt::Long>.
+
+=signature spec
+
+  spec() (ArrayRef)
+
+=metadata spec
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 spec
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {});
+
+  my $spec = $cli->spec;
+
+  # ['help']
+
+=cut
+
+$test->for('example', 1, 'spec', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['help'];
+
+  $result
+});
+
+=example-2 spec
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {alias => 'h'});
+
+  my $spec = $cli->spec;
 
   # ['help|h']
 
 =cut
 
-$test->for('example', 1, 'options', sub {
+$test->for('example', 2, 'spec', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
+  my $result = $tryable->result;
   is_deeply $result, ['help|h'];
+
+  $result
+});
+
+=example-3 spec
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {alias => ['?', 'h']});
+
+  my $spec = $cli->spec;
+
+  # ['help|?|h']
+
+=cut
+
+$test->for('example', 3, 'spec', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['help|?|h'];
+
+  $result
+});
+
+=example-4 spec
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('opt', 'help', {alias => ['?', 'h']});
+
+  $cli->set('opt', 'verbose', {alias => ['v']});
+
+  my $spec = $cli->spec;
+
+  # ['help|?|h', 'verbose|v']
+
+=cut
+
+$test->for('example', 4, 'spec', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ['help|?|h', 'verbose|v'];
+
+  $result
+});
+
+=method str
+
+The str method gets or sets configuration strings used in CLI help text based
+on the arguments provided. The L</help> method uses C<"name">,
+C<"description">, C<"header">, and C<"footer"> strings.
+
+=signature str
+
+  str(Str $name) (Any)
+
+=metadata str
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 str
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new;
+
+  $cli->set('str', 'name', 'program');
+
+  my $str = $cli->str('name');
+
+  # "program"
+
+=cut
+
+$test->for('example', 1, 'str', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'program';
 
   $result
 });

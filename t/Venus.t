@@ -10,6 +10,7 @@ use Test::More;
 use Venus::Test;
 
 my $test = test(__FILE__);
+my $fsds = qr/[:\\\/\.]+/;
 
 =name
 
@@ -38,7 +39,9 @@ $test->for('abstract');
 =includes
 
 function: args
+function: array
 function: assert
+function: bool
 function: box
 function: call
 function: cast
@@ -46,25 +49,50 @@ function: catch
 function: caught
 function: chain
 function: check
+function: cli
+function: code
+function: config
 function: cop
+function: data
 function: date
 function: error
 function: false
 function: fault
+function: float
 function: gather
+function: hash
 function: json
 function: load
 function: log
 function: make
 function: match
 function: merge
+function: meta
+function: name
+function: number
+function: opts
+function: path
 function: perl
+function: process
+function: proto
 function: raise
+function: random
+function: regexp
+function: replace
 function: roll
+function: search
 function: space
+function: schema
+function: string
+function: template
+function: test
 function: then
+function: throw
 function: true
+function: try
+function: type
 function: unpack
+function: vars
 function: venus
 function: work
 function: wrap
@@ -301,6 +329,64 @@ $test->for('example', 4, 'args', sub {
   $result
 });
 
+=function array
+
+The array function builds and returns a L<Venus::Array> object, or dispatches
+to the coderef or method provided.
+
+=signature array
+
+  array(ArrayRef | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata array
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 array
+
+  package main;
+
+  use Venus 'array';
+
+  my $array = array [];
+
+  # bless({...}, 'Venus::Array')
+
+=cut
+
+$test->for('example', 1, 'array', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Array';
+  is_deeply $result->get, [];
+
+  $result
+});
+
+=example-2 array
+
+  package main;
+
+  use Venus 'array';
+
+  my $array = array [1..4], 'push', 5..9;
+
+  # [1..9]
+
+=cut
+
+$test->for('example', 2, 'array', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..9];
+
+  $result
+});
+
 =function assert
 
 The assert function builds a L<Venus::Assert> object and returns the result of
@@ -355,6 +441,64 @@ $test->for('example', 2, 'assert', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   isa_ok $result, 'Venus::Assert::Error';
+
+  $result
+});
+
+=function bool
+
+The bool function builds and returns a L<Venus::Boolean> object.
+
+=signature bool
+
+  bool(Any $value) (Boolean)
+
+=metadata bool
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 bool
+
+  package main;
+
+  use Venus 'bool';
+
+  my $bool = bool;
+
+  # bless({value => 0}, 'Venus::Boolean')
+
+=cut
+
+$test->for('example', 1, 'bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Boolean';
+  is $result->get, 0;
+
+  !$result
+});
+
+=example-2 bool
+
+  package main;
+
+  use Venus 'bool';
+
+  my $bool = bool 1_000;
+
+  # bless({value => 1}, 'Venus::Boolean')
+
+=cut
+
+$test->for('example', 2, 'bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Boolean';
+  is $result->get, 1;
 
   $result
 });
@@ -1066,6 +1210,187 @@ $test->for('example', 2, 'check', sub {
   !$result
 });
 
+=function cli
+
+The cli function builds and returns a L<Venus::Cli> object.
+
+=signature cli
+
+  cli(ArrayRef $args) (Cli)
+
+=metadata cli
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 cli
+
+  package main;
+
+  use Venus 'cli';
+
+  my $cli = cli;
+
+  # bless({...}, 'Venus::Cli')
+
+=cut
+
+$test->for('example', 1, 'cli', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Cli';
+
+  $result
+});
+
+=example-2 cli
+
+  package main;
+
+  use Venus 'cli';
+
+  my $cli = cli ['--help'];
+
+  # bless({...}, 'Venus::Cli')
+
+  # $cli->set('opt', 'help', {})->opt('help');
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'cli', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Cli';
+  is_deeply $result->data, ['--help'];
+
+  $result
+});
+
+=function code
+
+The code function builds and returns a L<Venus::Code> object, or dispatches
+to the coderef or method provided.
+
+=signature code
+
+  code(CodeRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata code
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 code
+
+  package main;
+
+  use Venus 'code';
+
+  my $code = code sub {};
+
+  # bless({...}, 'Venus::Code')
+
+=cut
+
+$test->for('example', 1, 'code', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Code';
+  ok ref $result->get eq 'CODE';
+  ok !defined $result->call;
+
+  $result
+});
+
+=example-2 code
+
+  package main;
+
+  use Venus 'code';
+
+  my $code = code sub {[1, @_]}, 'curry', 2,3,4;
+
+  # sub {...}
+
+=cut
+
+$test->for('example', 2, 'code', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'CODE';
+  is_deeply $result->(), [1..4];
+  is_deeply $result->(5..9), [1..9];
+
+  $result
+});
+
+=function config
+
+The config function builds and returns a L<Venus::Config> object, or dispatches
+to the coderef or method provided.
+
+=signature config
+
+  config(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata config
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 config
+
+  package main;
+
+  use Venus 'config';
+
+  my $config = config {};
+
+  # bless({...}, 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'config', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Config';
+  is_deeply $result->get, {};
+
+  $result
+});
+
+=example-2 config
+
+  package main;
+
+  use Venus 'config';
+
+  my $config = config {}, 'from_perl', '{"data"=>1}';
+
+  # bless({...}, 'Venus::Config')
+
+=cut
+
+$test->for('example', 2, 'config', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Config';
+  is_deeply $result->get, {data => 1};
+
+  $result
+});
+
 =function cop
 
 The cop function attempts to curry the given subroutine on the object or class
@@ -1123,6 +1448,64 @@ $test->for('example', 2, 'cop', sub {
   $result
 });
 
+=function data
+
+The data function builds and returns a L<Venus::Data> object, or dispatches
+to the coderef or method provided.
+
+=signature data
+
+  data(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata data
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 data
+
+  package main;
+
+  use Venus 'data';
+
+  my $data = data 't/data/sections';
+
+  # bless({...}, 'Venus::Data')
+
+=cut
+
+$test->for('example', 1, 'data', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Data';
+  is $result->get, 't/data/sections';
+
+  $result
+});
+
+=example-2 data
+
+  package main;
+
+  use Venus 'data';
+
+  my $data = data 't/data/sections', 'string', undef, 'name';
+
+  # "Example #1\nExample #2"
+
+=cut
+
+$test->for('example', 2, 'data', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "Example #1\nExample #2";
+
+  $result
+});
+
 =function date
 
 The date function builds and returns a L<Venus::Date> object, or dispatches to
@@ -1130,7 +1513,7 @@ the coderef or method provided.
 
 =signature date
 
-  date(Str | CodeRef $code, Any @args) (Date)
+  date(Int $value, Str | CodeRef $code, Any @args) (Any)
 
 =metadata date
 
@@ -1146,7 +1529,7 @@ the coderef or method provided.
 
   use Venus 'date';
 
-  my $date = date 'string';
+  my $date = date time, 'string';
 
   # '0000-00-00T00:00:00Z'
 
@@ -1166,7 +1549,7 @@ $test->for('example', 1, 'date', sub {
 
   use Venus 'date';
 
-  my $date = date 'reset', 570672000;
+  my $date = date time, 'reset', 570672000;
 
   # bless({...}, 'Venus::Date')
 
@@ -1190,7 +1573,7 @@ $test->for('example', 2, 'date', sub {
 
   use Venus 'date';
 
-  my $date = date;
+  my $date = date time;
 
   # bless({...}, 'Venus::Date')
 
@@ -1378,6 +1761,64 @@ $test->for('example', 2, 'fault', sub {
   $result
 });
 
+=function float
+
+The float function builds and returns a L<Venus::Float> object, or dispatches
+to the coderef or method provided.
+
+=signature float
+
+  float(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata float
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 float
+
+  package main;
+
+  use Venus 'float';
+
+  my $float = float 1.23;
+
+  # bless({...}, 'Venus::Float')
+
+=cut
+
+$test->for('example', 1, 'float', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Float';
+  is $result->get, 1.23;
+
+  $result
+});
+
+=example-2 float
+
+  package main;
+
+  use Venus 'float';
+
+  my $float = float 1.23, 'int';
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'float', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
 =function gather
 
 The gather function builds a L<Venus::Gather> object, passing it and the value
@@ -1513,6 +1954,64 @@ $test->for('example', 5, 'gather', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is_deeply $result, ['a -> A', 'b -> B'];
+
+  $result
+});
+
+=function hash
+
+The hash function builds and returns a L<Venus::Hash> object, or dispatches
+to the coderef or method provided.
+
+=signature hash
+
+  hash(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata hash
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 hash
+
+  package main;
+
+  use Venus 'hash';
+
+  my $hash = hash {1..4};
+
+  # bless({...}, 'Venus::Hash')
+
+=cut
+
+$test->for('example', 1, 'hash', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Hash';
+  is_deeply $result->get, {1..4};
+
+  $result
+});
+
+=example-2 hash
+
+  package main;
+
+  use Venus 'hash';
+
+  my $hash = hash {1..8}, 'pairs';
+
+  # [[1, 2], [3, 4], [5, 6], [7, 8]]
+
+=cut
+
+$test->for('example', 2, 'hash', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [[1, 2], [3, 4], [5, 6], [7, 8]];
 
   $result
 });
@@ -1979,6 +2478,301 @@ $test->for('example', 2, 'merge', sub {
   $result
 });
 
+=function meta
+
+The meta function builds and returns a L<Venus::Meta> object, or dispatches to
+the coderef or method provided.
+
+=signature meta
+
+  meta(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata meta
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 meta
+
+  package main;
+
+  use Venus 'meta';
+
+  my $meta = meta 'Venus';
+
+  # bless({...}, 'Venus::Meta')
+
+=cut
+
+$test->for('example', 1, 'meta', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Meta";
+  is $result->{name}, 'Venus';
+
+  $result
+});
+
+=example-2 meta
+
+  package main;
+
+  use Venus 'meta';
+
+  my $result = meta 'Venus', 'sub', 'meta';
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'meta', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=function name
+
+The name function builds and returns a L<Venus::Name> object, or dispatches to
+the coderef or method provided.
+
+=signature name
+
+  name(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata name
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 name
+
+  package main;
+
+  use Venus 'name';
+
+  my $name = name 'Foo/Bar';
+
+  # bless({...}, 'Venus::Name')
+
+=cut
+
+$test->for('example', 1, 'name', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Name';
+  is $result->package, 'Foo::Bar';
+
+  $result
+});
+
+=example-2 name
+
+  package main;
+
+  use Venus 'name';
+
+  my $name = name 'Foo/Bar', 'package';
+
+  # "Foo::Bar"
+
+=cut
+
+$test->for('example', 2, 'name', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'Foo::Bar';
+
+  $result
+});
+
+=function number
+
+The number function builds and returns a L<Venus::Number> object, or dispatches
+to the coderef or method provided.
+
+=signature number
+
+  number(Num $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata number
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 number
+
+  package main;
+
+  use Venus 'number';
+
+  my $number = number 1_000;
+
+  # bless({...}, 'Venus::Number')
+
+=cut
+
+$test->for('example', 1, 'number', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Number';
+  is $result->get, 1_000;
+
+  $result
+});
+
+=example-2 number
+
+  package main;
+
+  use Venus 'number';
+
+  my $number = number 1_000, 'prepend', 1;
+
+  # 11_000
+
+=cut
+
+$test->for('example', 2, 'number', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 11_000;
+
+  $result
+});
+
+=function opts
+
+The opts function builds and returns a L<Venus::Opts> object, or dispatches to
+the coderef or method provided.
+
+=signature opts
+
+  opts(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata opts
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 opts
+
+  package main;
+
+  use Venus 'opts';
+
+  my $opts = opts ['--resource', 'users'];
+
+  # bless({...}, 'Venus::Opts')
+
+=cut
+
+$test->for('example', 1, 'opts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Opts';
+
+  $result
+});
+
+=example-2 opts
+
+  package main;
+
+  use Venus 'opts';
+
+  my $opts = opts ['--resource', 'users'], 'reparse', ['resource|r=s', 'help|h'];
+
+  # bless({...}, 'Venus::Opts')
+
+  # my $resource = $opts->get('resource');
+
+  # "users"
+
+=cut
+
+$test->for('example', 2, 'opts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Opts';
+  is $result->get('resource'), "users";
+
+  $result
+});
+
+=function path
+
+The path function builds and returns a L<Venus::Path> object, or dispatches
+to the coderef or method provided.
+
+=signature path
+
+  path(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata path
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 path
+
+  package main;
+
+  use Venus 'path';
+
+  my $path = path 't/data/planets';
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 1, 'path', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  ok $result->get =~ m{t${fsds}data${fsds}planets};
+
+  $result
+});
+
+=example-2 path
+
+  package main;
+
+  use Venus 'path';
+
+  my $path = path 't/data/planets', 'absolute';
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 2, 'path', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  ok $result->get =~ m{t${fsds}data${fsds}planets};
+
+  $result
+});
+
 =function perl
 
 The perl function builds a L<Venus::Dump> object and will either
@@ -2079,6 +2873,130 @@ $test->for('example', 4, 'perl', sub {
   $result
 });
 
+=function process
+
+The process function builds and returns a L<Venus::Process> object, or
+dispatches to the coderef or method provided.
+
+=signature process
+
+  process(Str | CodeRef $code, Any @args) (Any)
+
+=metadata process
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 process
+
+  package main;
+
+  use Venus 'process';
+
+  my $process = process;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'process', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Process";
+
+  $result
+});
+
+=example-2 process
+
+  package main;
+
+  use Venus 'process';
+
+  my $process = process 'do', 'alarm', 10;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 2, 'process', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Process";
+  is $result->alarm, 10;
+
+  $result
+});
+
+=function proto
+
+The proto function builds and returns a L<Venus::Prototype> object, or
+dispatches to the coderef or method provided.
+
+=signature proto
+
+  proto(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata proto
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 proto
+
+  package main;
+
+  use Venus 'proto';
+
+  my $proto = proto {
+    '$counter' => 0,
+  };
+
+  # bless({...}, 'Venus::Prototype')
+
+=cut
+
+$test->for('example', 1, 'proto', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Prototype';
+  is $result->counter, 0;
+
+  $result
+});
+
+=example-2 proto
+
+  package main;
+
+  use Venus 'proto';
+
+  my $proto = proto { '$counter' => 0 }, 'apply', {
+    '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+    '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+  };
+
+  # bless({...}, 'Venus::Prototype')
+
+=cut
+
+$test->for('example', 2, 'proto', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Prototype';
+  is $result->counter, 0;
+  is $result->increment, 1;
+  is $result->decrement, 0;
+
+  $result
+});
+
 =function raise
 
 The raise function generates and throws a named exception object derived from
@@ -2166,6 +3084,191 @@ $test->for('example', 3, 'raise', sub {
   $result
 });
 
+=function random
+
+The random function builds and returns a L<Venus::Random> object, or dispatches
+to the coderef or method provided.
+
+=signature random
+
+  random(Str | CodeRef $code, Any @args) (Any)
+
+=metadata random
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 random
+
+  package main;
+
+  use Venus 'random';
+
+  my $random = random;
+
+  # bless({...}, 'Venus::Random')
+
+=cut
+
+$test->for('example', 1, 'random', sub {
+  if (require Venus::Random && Venus::Random->new(42)->range(1, 50) != 38) {
+    plan skip_all => "OS ($^O) rand function is undeterministic";
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Random";
+
+  $result
+});
+
+=example-2 random
+
+  package main;
+
+  use Venus 'random';
+
+  my $random = random 'collect', 10, 'letter';
+
+  # "ryKUPbJHYT"
+
+=cut
+
+$test->for('example', 2, 'random', sub {
+  if (require Venus::Random && Venus::Random->new(42)->range(1, 50) != 38) {
+    plan skip_all => "OS ($^O) rand function is undeterministic";
+  }
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
+
+  $result
+});
+
+=function regexp
+
+The regexp function builds and returns a L<Venus::Regexp> object, or dispatches
+to the coderef or method provided.
+
+=signature regexp
+
+  regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata regexp
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 regexp
+
+  package main;
+
+  use Venus 'regexp';
+
+  my $regexp = regexp '[0-9]';
+
+  # bless({...}, 'Venus::Regexp')
+
+=cut
+
+$test->for('example', 1, 'regexp', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Regexp";
+
+  $result
+});
+
+=example-2 regexp
+
+  package main;
+
+  use Venus 'regexp';
+
+  my $replace = regexp '[0-9]', 'replace', 'ID 12345', '0', 'g';
+
+  # bless({...}, 'Venus::Replace')
+
+  # $replace->get;
+
+  # "ID 00000"
+
+=cut
+
+$test->for('example', 2, 'regexp', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Replace";
+  is $result->get, "ID 00000";
+
+  $result
+});
+
+=function replace
+
+The replace function builds and returns a L<Venus::Replace> object, or
+dispatches to the coderef or method provided.
+
+=signature replace
+
+  replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata replace
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 replace
+
+  package main;
+
+  use Venus 'replace';
+
+  my $replace = replace ['hello world', 'world', 'universe'];
+
+  # bless({...}, 'Venus::Replace')
+
+=cut
+
+$test->for('example', 1, 'replace', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Replace";
+  is $result->string, 'hello world';
+  is $result->regexp, 'world';
+  is $result->substr, 'universe';
+
+  $result
+});
+
+=example-2 replace
+
+  package main;
+
+  use Venus 'replace';
+
+  my $replace = replace ['hello world', 'world', 'universe'], 'get';
+
+  # "hello universe"
+
+=cut
+
+$test->for('example', 2, 'replace', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "hello universe";
+
+  $result
+});
+
 =function roll
 
 The roll function takes a list of arguments, assuming the first argument is
@@ -2224,6 +3327,65 @@ $test->for('example', 2, 'roll', sub {
   @result
 });
 
+=function search
+
+The search function builds and returns a L<Venus::Search> object, or dispatches
+to the coderef or method provided.
+
+=signature search
+
+  search(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata search
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 search
+
+  package main;
+
+  use Venus 'search';
+
+  my $search = search ['hello world', 'world'];
+
+  # bless({...}, 'Venus::Search')
+
+=cut
+
+$test->for('example', 1, 'search', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Search";
+  is $result->string, 'hello world';
+  is $result->regexp, 'world';
+
+  $result
+});
+
+=example-2 search
+
+  package main;
+
+  use Venus 'search';
+
+  my $search = search ['hello world', 'world'], 'count';
+
+  # 1
+
+=cut
+
+$test->for('example', 2, 'search', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
 =function space
 
 The space function returns a L<Venus::Space> object for the package provided.
@@ -2255,6 +3417,241 @@ $test->for('example', 1, 'space', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Space');
   is $result->value, 'Venus::Scalar';
+
+  $result
+});
+
+=function schema
+
+The schema function builds and returns a L<Venus::Schema> object, or dispatches
+to the coderef or method provided.
+
+=signature schema
+
+  schema(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata schema
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 schema
+
+  package main;
+
+  use Venus 'schema';
+
+  my $schema = schema { name => 'string' };
+
+  # bless({...}, "Venus::Schema")
+
+=cut
+
+$test->for('example', 1, 'schema', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Schema';
+  is_deeply $result->definition, { name => 'string' };
+
+  $result
+});
+
+=example-2 schema
+
+  package main;
+
+  use Venus 'schema';
+
+  my $result = schema { name => 'string' }, 'validate', { name => 'example' };
+
+  # { name => 'example' }
+
+=cut
+
+$test->for('example', 2, 'schema', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, { name => 'example' };
+
+  $result
+});
+
+=function string
+
+The string function builds and returns a L<Venus::String> object, or dispatches
+to the coderef or method provided.
+
+=signature string
+
+  string(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata string
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 string
+
+  package main;
+
+  use Venus 'string';
+
+  my $string = string 'hello world';
+
+  # bless({...}, 'Venus::String')
+
+=cut
+
+$test->for('example', 1, 'string', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::String';
+  is $result->get, 'hello world';
+
+  $result
+});
+
+=example-2 string
+
+  package main;
+
+  use Venus 'string';
+
+  my $string = string 'hello world', 'camelcase';
+
+  # "helloWorld"
+
+=cut
+
+$test->for('example', 2, 'string', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'helloWorld';
+
+  $result
+});
+
+=function template
+
+The template function builds and returns a L<Venus::Template> object, or
+dispatches to the coderef or method provided.
+
+=signature template
+
+  template(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata template
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 template
+
+  package main;
+
+  use Venus 'template';
+
+  my $template = template 'Hi {{name}}';
+
+  # bless({...}, 'Venus::Template')
+
+=cut
+
+$test->for('example', 1, 'template', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Template';
+  is $result->get, 'Hi {{name}}';
+
+  $result
+});
+
+=example-2 template
+
+  package main;
+
+  use Venus 'template';
+
+  my $template = template 'Hi {{name}}', 'render', undef, {
+    name => 'stranger',
+  };
+
+  # "Hi stranger"
+
+=cut
+
+$test->for('example', 2, 'template', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'Hi stranger';
+
+  $result
+});
+
+=function test
+
+The test function builds and returns a L<Venus::Test> object, or dispatches to
+the coderef or method provided.
+
+=signature test
+
+  test(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata test
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 test
+
+  package main;
+
+  use Venus 'test';
+
+  my $test = test 't/Venus.t';
+
+  # bless({...}, 'Venus::Test')
+
+=cut
+
+$test->for('example', 1, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Test";
+  is $result->file, 't/Venus.t';
+
+  $result
+});
+
+=example-2 test
+
+  package main;
+
+  use Venus 'test';
+
+  my $test = test 't/Venus.t', 'for', 'synopsis';
+
+  # bless({...}, 'Venus::Test')
+
+=cut
+
+$test->for('example', 2, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Test";
+  is $result->file, 't/Venus.t';
 
   $result
 });
@@ -2292,6 +3689,95 @@ $test->for('example', 1, 'then', sub {
   is_deeply [@result], ["Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709"];
 
   @result
+});
+
+=function throw
+
+The throw function builds and returns a L<Venus::Throw> object, or dispatches
+to the coderef or method provided.
+
+=signature throw
+
+  throw(Str | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata throw
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 throw
+
+  package main;
+
+  use Venus 'throw';
+
+  my $throw = throw 'Example::Error';
+
+  # bless({...}, 'Venus::Throw')
+
+=cut
+
+$test->for('example', 1, 'throw', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Throw";
+  is $result->package, 'Example::Error';
+
+  $result
+});
+
+=example-2 throw
+
+  package main;
+
+  use Venus 'throw';
+
+  my $throw = throw 'Example::Error', 'catch', 'error';
+
+  # bless({...}, 'Example::Error')
+
+=cut
+
+$test->for('example', 2, 'throw', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Example::Error';
+
+  $result
+});
+
+=example-3 throw
+
+  package main;
+
+  use Venus 'throw';
+
+  my $throw = throw {
+    name => 'on.execute',
+    package => 'Example::Error',
+    capture => ['...'],
+    stash => {
+      time => time,
+    },
+  };
+
+  # bless({...}, 'Venus::Throw')
+
+=cut
+
+$test->for('example', 3, 'throw', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Throw';
+  ok $result->package eq 'Example::Error';
+  is $result->name, 'on.execute';
+  ok $result->stash('captured');
+  ok $result->stash('time');
+
+  $result
 });
 
 =function true
@@ -2346,6 +3832,159 @@ $test->for('example', 2, 'true', sub {
   ok !(my $result = $tryable->result);
 
   !$result
+});
+
+=function try
+
+The try function builds and returns a L<Venus::Try> object, or dispatches to
+the coderef or method provided.
+
+=signature try
+
+  try(Any $data, Str | CodeRef $code, Any @args) (Any)
+
+=metadata try
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 try
+
+  package main;
+
+  use Venus 'try';
+
+  my $try = try sub {};
+
+  # bless({...}, 'Venus::Try')
+
+  # my $result = $try->result;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'try', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Try";
+
+  $result
+});
+
+=example-2 try
+
+  package main;
+
+  use Venus 'try';
+
+  my $try = try sub { die };
+
+  # bless({...}, 'Venus::Try')
+
+  # my $result = $try->result;
+
+  # Exception! (isa Venus::Error)
+
+=cut
+
+$test->for('example', 2, 'try', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Try";
+
+  $result
+});
+
+=example-3 try
+
+  package main;
+
+  use Venus 'try';
+
+  my $try = try sub { die }, 'maybe';
+
+  # bless({...}, 'Venus::Try')
+
+  # my $result = $try->result;
+
+  # undef
+
+=cut
+
+$test->for('example', 3, 'try', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Try';
+  ok !defined $result->result;
+
+  $result
+});
+
+=function type
+
+The type function builds and returns a L<Venus::Type> object, or dispatches to
+the coderef or method provided.
+
+=signature type
+
+  type(Any $data, Str | CodeRef $code, Any @args) (Any)
+
+=metadata type
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 type
+
+  package main;
+
+  use Venus 'type';
+
+  my $type = type [1..4];
+
+  # bless({...}, 'Venus::Type')
+
+  # $type->deduce;
+
+  # bless({...}, 'Venus::Array')
+
+=cut
+
+$test->for('example', 1, 'type', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Type";
+  my $returned = $result->deduce;
+  isa_ok $returned, "Venus::Array";
+
+  $result
+});
+
+=example-2 type
+
+  package main;
+
+  use Venus 'type';
+
+  my $type = type [1..4], 'deduce';
+
+  # bless({...}, 'Venus::Array')
+
+=cut
+
+$test->for('example', 2, 'type', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Array";
+
+  $result
 });
 
 =function unpack
@@ -2422,6 +4061,63 @@ $test->for('example', 2, 'unpack', sub {
   ok scalar @{$result->args};
   is_deeply scalar $result->checks('number'), [0];
   is_deeply scalar $result->checks('float'), [1];
+
+  $result
+});
+
+=function vars
+
+The vars function builds and returns a L<Venus::Vars> object, or dispatches to
+the coderef or method provided.
+
+=signature vars
+
+  vars(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata vars
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 vars
+
+  package main;
+
+  use Venus 'vars';
+
+  my $vars = vars {};
+
+  # bless({...}, 'Venus::Vars')
+
+=cut
+
+$test->for('example', 1, 'vars', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Vars';
+
+  $result
+});
+
+=example-2 vars
+
+  package main;
+
+  use Venus 'vars';
+
+  my $path = vars {}, 'exists', 'path';
+
+  # "..."
+
+=cut
+
+$test->for('example', 2, 'vars', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result;
 
   $result
 });

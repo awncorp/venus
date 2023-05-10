@@ -74,6 +74,7 @@ method: path
 method: pop
 method: push
 method: random
+method: range
 method: reverse
 method: rotate
 method: rsort
@@ -3795,6 +3796,203 @@ The random method returns a random element from the array.
 $test->for('example', 1, 'random', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
+
+  $result
+});
+
+=method range
+
+The range method accepts a I<"range expression"> and returns the result of
+calling the L</slice> method with the computed range.
+
+=signature range
+
+  range(Int | Str @args) (ArrayRef)
+
+=metadata range
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range(0);
+
+  # [1]
+
+=cut
+
+$test->for('example', 2, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-3 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:');
+
+  # [1..9]
+
+=cut
+
+$test->for('example', 3, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..9];
+
+  $result
+});
+
+=example-4 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range(':4');
+
+  # [1..5]
+
+=cut
+
+$test->for('example', 4, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..5];
+
+  $result
+});
+
+=example-5 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('8:');
+
+  # [9]
+
+=cut
+
+$test->for('example', 5, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [9];
+
+  $result
+});
+
+=example-6 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('4:');
+
+  # [5..9]
+
+=cut
+
+$test->for('example', 6, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [5..9];
+
+  $result
+});
+
+=example-7 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:2');
+
+  # [1..3]
+
+=cut
+
+$test->for('example', 7, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..3];
+
+  $result
+});
+
+=example-8 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('2:4');
+
+  # [3..5]
+
+=cut
+
+$test->for('example', 8, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [3..5];
+
+  $result
+});
+
+=example-9 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range(0..3);
+
+  # [1..4]
+
+=cut
+
+$test->for('example', 9, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..4];
 
   $result
 });

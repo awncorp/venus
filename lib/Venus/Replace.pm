@@ -34,9 +34,9 @@ sub build_self {
   my ($self, $data) = @_;
 
   $self->flags('') if !$self->flags;
-  $self->regexp(qr//) if !$self->regexp;
-  $self->string('') if !$self->string;
-  $self->substr('') if !$self->substr;
+  $self->regexp(qr//) if !defined $self->regexp;
+  $self->string('') if !defined $self->string;
+  $self->substr('') if !defined $self->substr;
 
   return $self;
 }

@@ -47,6 +47,7 @@ method: default
 method: directories
 method: exists
 method: explain
+method: extension
 method: find
 method: files
 method: glob
@@ -524,6 +525,114 @@ $test->for('example', 1, 'explain', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result =~ m{t${fsds}data${fsds}planets};
+
+  $result
+});
+
+=method extension
+
+The extension method returns a new path object using the extension name
+provided. If no argument is provided this method returns the extension for the
+path represented by the invocant, otherwise returns undefined.
+
+=signature extension
+
+  extension(Str $name) (Str | Path)
+
+=metadata extension
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 extension
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/Venus_Path.t');
+
+  my $extension = $path->extension;
+
+  # "t"
+
+=cut
+
+$test->for('example', 1, 'extension', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "t";
+
+  $result
+});
+
+=example-2 extension
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data/mercury');
+
+  my $extension = $path->extension('txt');
+
+  # bless({ value => "t/data/mercury.txt"}, "Venus::Path")
+
+=cut
+
+$test->for('example', 2, 'extension', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  ok $result =~ m{t${fsds}data${fsds}mercury\.txt};
+
+  $result
+});
+
+=example-3 extension
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data');
+
+  my $extension = $path->extension;
+
+  # undef
+
+=cut
+
+$test->for('example', 3, 'extension', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-4 extension
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data');
+
+  my $extension = $path->extension('txt');
+
+  # bless({ value => "t/data.txt"}, "Venus::Path")
+
+=cut
+
+$test->for('example', 4, 'extension', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  ok $result =~ m{t${fsds}data\.txt};
 
   $result
 });

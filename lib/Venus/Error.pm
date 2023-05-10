@@ -52,23 +52,22 @@ sub build_self {
 
 # METHODS
 
-sub assertion {
-  my ($self) = @_;
+sub arguments {
+  my ($self, $index) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $captured = $self->captured;
 
-  $assert->clear->expression('string');
+  return undef if !$captured;
 
-  return $assert;
+  my $arguments = $captured->{arguments};
+
+  return $arguments if !defined $index;
+
+  return undef if !$arguments;
+
+  return $arguments->[$index];
 }
 
-sub id {
-  my ($self, $name) = @_;
-
-  $name = lc $name =~ s/\W+/_/gr if $name;
-
-  return $name;
-}
 
 sub as {
   my ($self, $name) = @_;
@@ -84,6 +83,46 @@ sub as {
   }
 
   return $self->$method;
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  my $assert = $self->SUPER::assertion;
+
+  $assert->clear->expression('string');
+
+  return $assert;
+}
+
+sub callframe {
+  my ($self, $index) = @_;
+
+  my $captured = $self->captured;
+
+  return undef if !$captured;
+
+  my $callframe = $captured->{callframe};
+
+  return $callframe if !defined $index;
+
+  return undef if !$callframe;
+
+  return $callframe->[$index];
+}
+
+sub captured {
+  my ($self) = @_;
+
+  return $self->stash('captured');
+}
+
+sub id {
+  my ($self, $name) = @_;
+
+  $name = lc $name =~ s/\W+/_/gr if $name;
+
+  return $name;
 }
 
 sub explain {

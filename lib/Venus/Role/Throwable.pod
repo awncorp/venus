@@ -42,7 +42,7 @@ This package provides the following methods:
 
 =head2 throw
 
-  throw(Maybe[Str] $package) (Throw)
+  throw(Maybe[Str | HashRef] $data) (Throw)
 
 The throw method builds a L<Venus::Throw> object, which can raise errors
 (exceptions).
@@ -58,6 +58,44 @@ I<Since C<0.01>>
   my $example = Example->new;
 
   my $throw = $example->throw;
+
+  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=back
+
+=over 4
+
+=item throw example 2
+
+  package main;
+
+  my $example = Example->new;
+
+  my $throw = $example->throw('Example::Error::Unknown');
+
+  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=back
+
+=over 4
+
+=item throw example 3
+
+  package main;
+
+  my $example = Example->new;
+
+  my $throw = $example->throw({
+    name => 'on.example',
+    capture => [$example],
+    stash => {
+      time => time,
+    },
+  });
 
   # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
 

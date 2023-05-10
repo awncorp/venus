@@ -9,6 +9,7 @@ use Test::More;
 use Venus::Test;
 
 my $test = test(__FILE__);
+my $fsds = qr/[:\\\/\.]+/;
 
 =name
 
@@ -141,7 +142,7 @@ $test->for('example', 1, 'frames', sub {
   ok my $result = $tryable->result;
   my $last_frame = $result->[-1];
   ok $last_frame->[0] eq 'main';
-  ok $last_frame->[1] =~ m{t/Venus_Fault.t$};
+  ok $last_frame->[1] =~ m{t${fsds}Venus_Fault.t$};
 
   $result
 });

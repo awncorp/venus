@@ -121,11 +121,11 @@ structurs with the appropriate replacements and returns the result. B<Note:>
 The rendering process expects variables to be hashrefs and sets (arrayrefs) of
 hashrefs.
 
-=signature add
+=signature render
 
   render(Str $template, HashRef $variables) (Str)
 
-=metadata add
+=metadata render
 
 {
   since => '0.01',

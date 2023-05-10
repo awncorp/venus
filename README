@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    2.55
+    2.80
 
 SYNOPSIS
 
@@ -143,6 +143,35 @@ FUNCTIONS
       
         # {content => "example", algorithm => undef}
 
+ array
+
+      array(ArrayRef | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The array function builds and returns a Venus::Array object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    array example 1
+
+        package main;
+      
+        use Venus 'array';
+      
+        my $array = array [];
+      
+        # bless({...}, 'Venus::Array')
+
+    array example 2
+
+        package main;
+      
+        use Venus 'array';
+      
+        my $array = array [1..4], 'push', 5..9;
+      
+        # [1..9]
+
  assert
 
       assert(Any $data, Str $expr) (Any)
@@ -171,6 +200,34 @@ FUNCTIONS
         my $assert = assert(1234567890, 'float');
       
         # Exception! (isa Venus::Assert::Error)
+
+ bool
+
+      bool(Any $value) (Boolean)
+
+    The bool function builds and returns a Venus::Boolean object.
+
+    Since 2.55
+
+    bool example 1
+
+        package main;
+      
+        use Venus 'bool';
+      
+        my $bool = bool;
+      
+        # bless({value => 0}, 'Venus::Boolean')
+
+    bool example 2
+
+        package main;
+      
+        use Venus 'bool';
+      
+        my $bool = bool 1_000;
+      
+        # bless({value => 1}, 'Venus::Boolean')
 
  box
 
@@ -547,6 +604,96 @@ FUNCTIONS
       
         # false
 
+ cli
+
+      cli(ArrayRef $args) (Cli)
+
+    The cli function builds and returns a Venus::Cli object.
+
+    Since 2.55
+
+    cli example 1
+
+        package main;
+      
+        use Venus 'cli';
+      
+        my $cli = cli;
+      
+        # bless({...}, 'Venus::Cli')
+
+    cli example 2
+
+        package main;
+      
+        use Venus 'cli';
+      
+        my $cli = cli ['--help'];
+      
+        # bless({...}, 'Venus::Cli')
+      
+        # $cli->set('opt', 'help', {})->opt('help');
+      
+        # 1
+
+ code
+
+      code(CodeRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The code function builds and returns a Venus::Code object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    code example 1
+
+        package main;
+      
+        use Venus 'code';
+      
+        my $code = code sub {};
+      
+        # bless({...}, 'Venus::Code')
+
+    code example 2
+
+        package main;
+      
+        use Venus 'code';
+      
+        my $code = code sub {[1, @_]}, 'curry', 2,3,4;
+      
+        # sub {...}
+
+ config
+
+      config(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The config function builds and returns a Venus::Config object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    config example 1
+
+        package main;
+      
+        use Venus 'config';
+      
+        my $config = config {};
+      
+        # bless({...}, 'Venus::Config')
+
+    config example 2
+
+        package main;
+      
+        use Venus 'config';
+      
+        my $config = config {}, 'from_perl', '{"data"=>1}';
+      
+        # bless({...}, 'Venus::Config')
+
  cop
 
       cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
@@ -578,9 +725,38 @@ FUNCTIONS
       
         # sub { ... }
 
+ data
+
+      data(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The data function builds and returns a Venus::Data object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    data example 1
+
+        package main;
+      
+        use Venus 'data';
+      
+        my $data = data 't/data/sections';
+      
+        # bless({...}, 'Venus::Data')
+
+    data example 2
+
+        package main;
+      
+        use Venus 'data';
+      
+        my $data = data 't/data/sections', 'string', undef, 'name';
+      
+        # "Example #1\nExample #2"
+
  date
 
-      date(Str | CodeRef $code, Any @args) (Date)
+      date(Int $value, Str | CodeRef $code, Any @args) (Any)
 
     The date function builds and returns a Venus::Date object, or
     dispatches to the coderef or method provided.
@@ -593,7 +769,7 @@ FUNCTIONS
       
         use Venus 'date';
       
-        my $date = date 'string';
+        my $date = date time, 'string';
       
         # '0000-00-00T00:00:00Z'
 
@@ -603,7 +779,7 @@ FUNCTIONS
       
         use Venus 'date';
       
-        my $date = date 'reset', 570672000;
+        my $date = date time, 'reset', 570672000;
       
         # bless({...}, 'Venus::Date')
       
@@ -617,7 +793,7 @@ FUNCTIONS
       
         use Venus 'date';
       
-        my $date = date;
+        my $date = date time;
       
         # bless({...}, 'Venus::Date')
 
@@ -711,6 +887,35 @@ FUNCTIONS
       
         # bless({message => 'Something failed!'}, 'Venus::Fault')
 
+ float
+
+      float(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The float function builds and returns a Venus::Float object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    float example 1
+
+        package main;
+      
+        use Venus 'float';
+      
+        my $float = float 1.23;
+      
+        # bless({...}, 'Venus::Float')
+
+    float example 2
+
+        package main;
+      
+        use Venus 'float';
+      
+        my $float = float 1.23, 'int';
+      
+        # 1
+
  gather
 
       gather(Any $value, CodeRef $callback) (Any)
@@ -791,6 +996,35 @@ FUNCTIONS
         };
       
         # ['a -> A', 'b -> B']
+
+ hash
+
+      hash(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The hash function builds and returns a Venus::Hash object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    hash example 1
+
+        package main;
+      
+        use Venus 'hash';
+      
+        my $hash = hash {1..4};
+      
+        # bless({...}, 'Venus::Hash')
+
+    hash example 2
+
+        package main;
+      
+        use Venus 'hash';
+      
+        my $hash = hash {1..8}, 'pairs';
+      
+        # [[1, 2], [3, 4], [5, 6], [7, 8]]
 
  json
 
@@ -1038,6 +1272,155 @@ FUNCTIONS
       
         # {1..9, 0}
 
+ meta
+
+      meta(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The meta function builds and returns a Venus::Meta object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    meta example 1
+
+        package main;
+      
+        use Venus 'meta';
+      
+        my $meta = meta 'Venus';
+      
+        # bless({...}, 'Venus::Meta')
+
+    meta example 2
+
+        package main;
+      
+        use Venus 'meta';
+      
+        my $result = meta 'Venus', 'sub', 'meta';
+      
+        # 1
+
+ name
+
+      name(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The name function builds and returns a Venus::Name object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    name example 1
+
+        package main;
+      
+        use Venus 'name';
+      
+        my $name = name 'Foo/Bar';
+      
+        # bless({...}, 'Venus::Name')
+
+    name example 2
+
+        package main;
+      
+        use Venus 'name';
+      
+        my $name = name 'Foo/Bar', 'package';
+      
+        # "Foo::Bar"
+
+ number
+
+      number(Num $value, Str | CodeRef $code, Any @args) (Any)
+
+    The number function builds and returns a Venus::Number object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    number example 1
+
+        package main;
+      
+        use Venus 'number';
+      
+        my $number = number 1_000;
+      
+        # bless({...}, 'Venus::Number')
+
+    number example 2
+
+        package main;
+      
+        use Venus 'number';
+      
+        my $number = number 1_000, 'prepend', 1;
+      
+        # 11_000
+
+ opts
+
+      opts(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The opts function builds and returns a Venus::Opts object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    opts example 1
+
+        package main;
+      
+        use Venus 'opts';
+      
+        my $opts = opts ['--resource', 'users'];
+      
+        # bless({...}, 'Venus::Opts')
+
+    opts example 2
+
+        package main;
+      
+        use Venus 'opts';
+      
+        my $opts = opts ['--resource', 'users'], 'reparse', ['resource|r=s', 'help|h'];
+      
+        # bless({...}, 'Venus::Opts')
+      
+        # my $resource = $opts->get('resource');
+      
+        # "users"
+
+ path
+
+      path(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The path function builds and returns a Venus::Path object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    path example 1
+
+        package main;
+      
+        use Venus 'path';
+      
+        my $path = path 't/data/planets';
+      
+        # bless({...}, 'Venus::Path')
+
+    path example 2
+
+        package main;
+      
+        use Venus 'path';
+      
+        my $path = path 't/data/planets', 'absolute';
+      
+        # bless({...}, 'Venus::Path')
+
  perl
 
       perl(Str $call, Any $data) (Any)
@@ -1088,6 +1471,69 @@ FUNCTIONS
       
         # Exception! (isa Venus::Fault)
 
+ process
+
+      process(Str | CodeRef $code, Any @args) (Any)
+
+    The process function builds and returns a Venus::Process object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    process example 1
+
+        package main;
+      
+        use Venus 'process';
+      
+        my $process = process;
+      
+        # bless({...}, 'Venus::Process')
+
+    process example 2
+
+        package main;
+      
+        use Venus 'process';
+      
+        my $process = process 'do', 'alarm', 10;
+      
+        # bless({...}, 'Venus::Process')
+
+ proto
+
+      proto(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The proto function builds and returns a Venus::Prototype object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    proto example 1
+
+        package main;
+      
+        use Venus 'proto';
+      
+        my $proto = proto {
+          '$counter' => 0,
+        };
+      
+        # bless({...}, 'Venus::Prototype')
+
+    proto example 2
+
+        package main;
+      
+        use Venus 'proto';
+      
+        my $proto = proto { '$counter' => 0 }, 'apply', {
+          '&decrement' => sub { $_[0]->counter($_[0]->counter - 1) },
+          '&increment' => sub { $_[0]->counter($_[0]->counter + 1) },
+        };
+      
+        # bless({...}, 'Venus::Prototype')
+
  raise
 
       raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -1130,6 +1576,97 @@ FUNCTIONS
       
         # bless({message => 'Something failed!', ...}, 'MyApp::Error')
 
+ random
+
+      random(Str | CodeRef $code, Any @args) (Any)
+
+    The random function builds and returns a Venus::Random object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    random example 1
+
+        package main;
+      
+        use Venus 'random';
+      
+        my $random = random;
+      
+        # bless({...}, 'Venus::Random')
+
+    random example 2
+
+        package main;
+      
+        use Venus 'random';
+      
+        my $random = random 'collect', 10, 'letter';
+      
+        # "ryKUPbJHYT"
+
+ regexp
+
+      regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The regexp function builds and returns a Venus::Regexp object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    regexp example 1
+
+        package main;
+      
+        use Venus 'regexp';
+      
+        my $regexp = regexp '[0-9]';
+      
+        # bless({...}, 'Venus::Regexp')
+
+    regexp example 2
+
+        package main;
+      
+        use Venus 'regexp';
+      
+        my $replace = regexp '[0-9]', 'replace', 'ID 12345', '0', 'g';
+      
+        # bless({...}, 'Venus::Replace')
+      
+        # $replace->get;
+      
+        # "ID 00000"
+
+ replace
+
+      replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The replace function builds and returns a Venus::Replace object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    replace example 1
+
+        package main;
+      
+        use Venus 'replace';
+      
+        my $replace = replace ['hello world', 'world', 'universe'];
+      
+        # bless({...}, 'Venus::Replace')
+
+    replace example 2
+
+        package main;
+      
+        use Venus 'replace';
+      
+        my $replace = replace ['hello world', 'world', 'universe'], 'get';
+      
+        # "hello universe"
+
  roll
 
       roll(Str $name, Any @args) (Any)
@@ -1161,6 +1698,64 @@ FUNCTIONS
       
         # (bless(do{\(my $o = '...')}, 'Digest::SHA'), 'sha1_hex');
 
+ schema
+
+      schema(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The schema function builds and returns a Venus::Schema object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    schema example 1
+
+        package main;
+      
+        use Venus 'schema';
+      
+        my $schema = schema { name => 'string' };
+      
+        # bless({...}, "Venus::Schema")
+
+    schema example 2
+
+        package main;
+      
+        use Venus 'schema';
+      
+        my $result = schema { name => 'string' }, 'validate', { name => 'example' };
+      
+        # { name => 'example' }
+
+ search
+
+      search(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The search function builds and returns a Venus::Search object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    search example 1
+
+        package main;
+      
+        use Venus 'search';
+      
+        my $search = search ['hello world', 'world'];
+      
+        # bless({...}, 'Venus::Search')
+
+    search example 2
+
+        package main;
+      
+        use Venus 'search';
+      
+        my $search = search ['hello world', 'world'], 'count';
+      
+        # 1
+
  space
 
       space(Any $name) (Space)
@@ -1180,6 +1775,95 @@ FUNCTIONS
       
         # bless({value => 'Venus::Scalar'}, 'Venus::Space')
 
+ string
+
+      string(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The string function builds and returns a Venus::String object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    string example 1
+
+        package main;
+      
+        use Venus 'string';
+      
+        my $string = string 'hello world';
+      
+        # bless({...}, 'Venus::String')
+
+    string example 2
+
+        package main;
+      
+        use Venus 'string';
+      
+        my $string = string 'hello world', 'camelcase';
+      
+        # "helloWorld"
+
+ template
+
+      template(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The template function builds and returns a Venus::Template object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    template example 1
+
+        package main;
+      
+        use Venus 'template';
+      
+        my $template = template 'Hi {{name}}';
+      
+        # bless({...}, 'Venus::Template')
+
+    template example 2
+
+        package main;
+      
+        use Venus 'template';
+      
+        my $template = template 'Hi {{name}}', 'render', undef, {
+          name => 'stranger',
+        };
+      
+        # "Hi stranger"
+
+ test
+
+      test(Str $value, Str | CodeRef $code, Any @args) (Any)
+
+    The test function builds and returns a Venus::Test object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    test example 1
+
+        package main;
+      
+        use Venus 'test';
+      
+        my $test = test 't/Venus.t';
+      
+        # bless({...}, 'Venus::Test')
+
+    test example 2
+
+        package main;
+      
+        use Venus 'test';
+      
+        my $test = test 't/Venus.t', 'for', 'synopsis';
+      
+        # bless({...}, 'Venus::Test')
+
  then
 
       then(Str | Object | CodeRef $self, Any @args) (Any)
@@ -1198,6 +1882,52 @@ FUNCTIONS
         my @list = then('Digest::SHA', 'sha1_hex');
       
         # ("Digest::SHA", "da39a3ee5e6b4b0d3255bfef95601890afd80709")
+
+ throw
+
+      throw(Str | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The throw function builds and returns a Venus::Throw object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    throw example 1
+
+        package main;
+      
+        use Venus 'throw';
+      
+        my $throw = throw 'Example::Error';
+      
+        # bless({...}, 'Venus::Throw')
+
+    throw example 2
+
+        package main;
+      
+        use Venus 'throw';
+      
+        my $throw = throw 'Example::Error', 'catch', 'error';
+      
+        # bless({...}, 'Example::Error')
+
+    throw example 3
+
+        package main;
+      
+        use Venus 'throw';
+      
+        my $throw = throw {
+          name => 'on.execute',
+          package => 'Example::Error',
+          capture => ['...'],
+          stash => {
+            time => time,
+          },
+        };
+      
+        # bless({...}, 'Venus::Throw')
 
  true
 
@@ -1228,6 +1958,90 @@ FUNCTIONS
         my $false = !true;
       
         # 0
+
+ try
+
+      try(Any $data, Str | CodeRef $code, Any @args) (Any)
+
+    The try function builds and returns a Venus::Try object, or dispatches
+    to the coderef or method provided.
+
+    Since 2.55
+
+    try example 1
+
+        package main;
+      
+        use Venus 'try';
+      
+        my $try = try sub {};
+      
+        # bless({...}, 'Venus::Try')
+      
+        # my $result = $try->result;
+      
+        # ()
+
+    try example 2
+
+        package main;
+      
+        use Venus 'try';
+      
+        my $try = try sub { die };
+      
+        # bless({...}, 'Venus::Try')
+      
+        # my $result = $try->result;
+      
+        # Exception! (isa Venus::Error)
+
+    try example 3
+
+        package main;
+      
+        use Venus 'try';
+      
+        my $try = try sub { die }, 'maybe';
+      
+        # bless({...}, 'Venus::Try')
+      
+        # my $result = $try->result;
+      
+        # undef
+
+ type
+
+      type(Any $data, Str | CodeRef $code, Any @args) (Any)
+
+    The type function builds and returns a Venus::Type object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    type example 1
+
+        package main;
+      
+        use Venus 'type';
+      
+        my $type = type [1..4];
+      
+        # bless({...}, 'Venus::Type')
+      
+        # $type->deduce;
+      
+        # bless({...}, 'Venus::Array')
+
+    type example 2
+
+        package main;
+      
+        use Venus 'type';
+      
+        my $type = type [1..4], 'deduce';
+      
+        # bless({...}, 'Venus::Array')
 
  unpack
 
@@ -1272,6 +2086,35 @@ FUNCTIONS
         # $unpack->check('float');
       
         # true
+
+ vars
+
+      vars(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The vars function builds and returns a Venus::Vars object, or
+    dispatches to the coderef or method provided.
+
+    Since 2.55
+
+    vars example 1
+
+        package main;
+      
+        use Venus 'vars';
+      
+        my $vars = vars {};
+      
+        # bless({...}, 'Venus::Vars')
+
+    vars example 2
+
+        package main;
+      
+        use Venus 'vars';
+      
+        my $path = vars {}, 'exists', 'path';
+      
+        # "..."
 
  venus
 

@@ -95,6 +95,61 @@ This package provides the following methods:
 
 =cut
 
+=head2 arguments
+
+  arguments(Int $index) (Any)
+
+The arguments method returns the stashed arguments under L</captured>, or a
+specific argument if an index is provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item arguments example 1
+
+  # given: synopsis
+
+  my $arguments = $error->arguments;
+
+  # undef
+
+=back
+
+=over 4
+
+=item arguments example 2
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->capture(1..4)->catch('error');
+
+  my $arguments = $error->arguments;
+
+  # [1..4]
+
+=back
+
+=over 4
+
+=item arguments example 3
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->capture(1..4)->catch('error');
+
+  my $arguments = $error->arguments(0);
+
+  # 1
+
+=back
+
+=cut
+
 =head2 as
 
   as(Str $name) (Error)
@@ -235,6 +290,83 @@ I<Since C<1.02>>
   # name is "on_save_error"
 
   # Exception! (isa Venus::Error)
+
+=back
+
+=cut
+
+=head2 callframe
+
+  callframe(Int $index) (Any)
+
+The callframe method returns the stashed callframe under L</captured>, or a
+specific argument if an index is provided.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item callframe example 1
+
+  # given: synopsis
+
+  my $callframe = $error->callframe;
+
+  # undef
+
+=back
+
+=over 4
+
+=item callframe example 2
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->do('frame', 0)->capture->catch('error');
+
+  my $callframe = $error->callframe;
+
+  # [...]
+
+=back
+
+=over 4
+
+=item callframe example 3
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->do('frame', 0)->capture->catch('error');
+
+  my $package = $error->callframe(0);
+
+  # 'main'
+
+=back
+
+=cut
+
+=head2 captured
+
+  captured() (HashRef)
+
+The captured method returns the value stashed as C<"captured">.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item captured example 1
+
+  # given: synopsis
+
+  my $captured = $error->captured;
+
+  # undef
 
 =back
 

@@ -36,7 +36,9 @@ $test->for('abstract');
 
 =includes
 
+method: as
 method: error
+method: on
 
 =cut
 
@@ -88,6 +90,7 @@ $test->for('integrates');
 
 =attributes
 
+frame: rw, opt, Int
 name: rw, opt, Str
 message: rw, opt, Str
 package: ro, opt, Str
@@ -97,6 +100,83 @@ context: ro, opt, Str
 =cut
 
 $test->for('attributes');
+
+=method as
+
+The as method sets a L</name> for the error and returns the invocant.
+
+=signature as
+
+  as(Str $name) (Throw)
+
+=metadata as
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 as
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->as('on.handler');
+
+  # bless({...}, 'Venus::Throw')
+
+=cut
+
+$test->for('example', 1, 'as', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Throw';
+  is $result->name, 'on.handler';
+
+  $result
+});
+
+=method capture
+
+The capture method captures the L<caller> info at the L</frame> specified, in
+the object stash, and returns the invocant.
+
+=signature capture
+
+  capture(Any @args) (Throw)
+
+=metadata capture
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 capture
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->capture;
+
+  # bless({...}, 'Venus::Throw')
+
+=cut
+
+$test->for('example', 1, 'capture', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Throw';
+  ok $result->stash('captured');
+  ok exists $result->stash('captured')->{arguments};
+  ok exists $result->stash('captured')->{callframe};
+
+  $result
+});
 
 =method error
 
@@ -325,6 +405,126 @@ $test->for('example', 7, 'error', sub {
   ok $error->name eq 'on_test_error';
 
   $result
+});
+
+=method on
+
+The on method sets a L</name> for the error in the form of
+C<"on.$subroutine.$name"> or C<"on.$name"> (if outside of a subroutine) and
+returns the invocant.
+
+=signature on
+
+  on(Str $name) (Throw)
+
+=metadata on
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 on
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->on('handler');
+
+  # bless({...}, 'Venus::Throw')
+
+  # $throw->name;
+
+  # "on.handler"
+
+=cut
+
+$test->for('example', 1, 'on', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Throw';
+  is $result->name, 'on.handler';
+
+  $result
+});
+
+=example-2 on
+
+  # given: synopsis
+
+  package main;
+
+  sub execute {
+    $throw->on('handler');
+  }
+
+  $throw = execute();
+
+  # bless({...}, 'Venus::Throw')
+
+  # $throw->name;
+
+  # "on.execute.handler"
+
+=cut
+
+$test->for('example', 2, 'on', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Throw';
+  is $result->name, 'on.execute.handler';
+
+  $result
+});
+
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+$test->for('operator', '("")');
+
+=example-1 ("")
+
+  # given: synopsis;
+
+  my $result = "$throw";
+
+  # "Exception!"
+
+=cut
+
+$test->for('example', 1, '("")', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result =~ 'Exception!';
+
+  $result
+});
+
+=operator (~~)
+
+This package overloads the C<~~> operator.
+
+=cut
+
+$test->for('operator', '(~~)');
+
+=example-1 (~~)
+
+  # given: synopsis;
+
+  my $result = $throw ~~ 'Exception!';
+
+  # 1
+
+=cut
+
+$test->for('example', 1, '(~~)', sub {
+  1;
 });
 
 =partials

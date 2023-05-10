@@ -83,7 +83,7 @@ The throw method builds a L<Venus::Throw> object, which can raise errors
 
 =signature throw
 
-  throw(Maybe[Str] $package) (Throw)
+  throw(Maybe[Str | HashRef] $data) (Throw)
 
 =metadata throw
 
@@ -110,6 +110,61 @@ $test->for('example', 1, 'throw', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Throw');
   ok $result->package eq 'Example::Error';
+
+  $result
+});
+
+=example-2 throw
+
+  package main;
+
+  my $example = Example->new;
+
+  my $throw = $example->throw('Example::Error::Unknown');
+
+  # bless({ "package" => "Example::Error::Unknown", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=cut
+
+$test->for('example', 2, 'throw', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Throw');
+  ok $result->package eq 'Example::Error::Unknown';
+
+  $result
+});
+
+=example-3 throw
+
+  package main;
+
+  my $example = Example->new;
+
+  my $throw = $example->throw({
+    name => 'on.example',
+    capture => [$example],
+    stash => {
+      time => time,
+    },
+  });
+
+  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=cut
+
+$test->for('example', 3, 'throw', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Throw');
+  ok $result->package eq 'Example::Error';
+  is $result->name, 'on.example';
+  ok $result->stash('captured');
+  ok $result->stash('time');
 
   $result
 });

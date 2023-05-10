@@ -9,6 +9,7 @@ use Test::More;
 use Venus::Test;
 
 my $test = test(__FILE__);
+my $fsds = qr/[:\\\/\.]+/;
 
 =name
 
@@ -37,6 +38,9 @@ $test->for('abstract');
 =includes
 
 method: as
+method: arguments
+method: callframe
+method: captured
 method: explain
 method: frame
 method: frames
@@ -289,6 +293,198 @@ $test->for('example', 4, 'as', sub {
   $result
 });
 
+=method arguments
+
+The arguments method returns the stashed arguments under L</captured>, or a
+specific argument if an index is provided.
+
+=signature arguments
+
+  arguments(Int $index) (Any)
+
+=metadata arguments
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 arguments
+
+  # given: synopsis
+
+  my $arguments = $error->arguments;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'arguments', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 arguments
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->capture(1..4)->catch('error');
+
+  my $arguments = $error->arguments;
+
+  # [1..4]
+
+=cut
+
+$test->for('example', 2, 'arguments', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..4];
+
+  $result
+});
+
+=example-3 arguments
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->capture(1..4)->catch('error');
+
+  my $arguments = $error->arguments(0);
+
+  # 1
+
+=cut
+
+$test->for('example', 3, 'arguments', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+=method callframe
+
+The callframe method returns the stashed callframe under L</captured>, or a
+specific argument if an index is provided.
+
+=signature callframe
+
+  callframe(Int $index) (Any)
+
+=metadata callframe
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 callframe
+
+  # given: synopsis
+
+  my $callframe = $error->callframe;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'callframe', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 callframe
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->do('frame', 0)->capture->catch('error');
+
+  my $callframe = $error->callframe;
+
+  # [...]
+
+=cut
+
+$test->for('example', 2, 'callframe', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok ref $result eq 'ARRAY';
+
+  $result
+});
+
+=example-3 callframe
+
+  package main;
+
+  use Venus::Throw;
+
+  my $error = Venus::Throw->new->do('frame', 0)->capture->catch('error');
+
+  my $package = $error->callframe(0);
+
+  # 'main'
+
+=cut
+
+$test->for('example', 3, 'callframe', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'main';
+
+  $result
+});
+
+=method captured
+
+The captured method returns the value stashed as C<"captured">.
+
+=signature captured
+
+  captured() (HashRef)
+
+=metadata captured
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 captured
+
+  # given: synopsis
+
+  my $captured = $error->captured;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'captured', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
 =method explain
 
 The explain method returns the error message and is used in stringification
@@ -454,7 +650,7 @@ $test->for('example', 1, 'frames', sub {
   ok my $result = $tryable->result;
   my $last_frame = $result->[-1];
   ok $last_frame->[0] eq 'main';
-  ok $last_frame->[1] =~ m{t/Venus_Error.t$};
+  ok $last_frame->[1] =~ m{t${fsds}Venus_Error.t$};
 
   $result
 });

@@ -36,6 +36,14 @@ This package has the following attributes:
 
 =cut
 
+=head2 frame
+
+  frame(Int)
+
+This attribute is read-write, accepts C<(Int)> values, and is optional.
+
+=cut
+
 =head2 name
 
   name(Str)
@@ -95,6 +103,30 @@ L<Venus::Role::Stashable>
 =head1 METHODS
 
 This package provides the following methods:
+
+=cut
+
+=head2 as
+
+  as(Str $name) (Throw)
+
+The as method sets a L</name> for the error and returns the invocant.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item as example 1
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->as('on.handler');
+
+  # bless({...}, 'Venus::Throw')
+
+=back
 
 =cut
 
@@ -260,6 +292,96 @@ I<Since C<0.01>>
 =back
 
 =cut
+
+=head2 on
+
+  on(Str $name) (Throw)
+
+The on method sets a L</name> for the error in the form of
+C<"on.$subroutine.$name"> or C<"on.$name"> (if outside of a subroutine) and
+returns the invocant.
+
+I<Since C<2.55>>
+
+=over 4
+
+=item on example 1
+
+  # given: synopsis
+
+  package main;
+
+  $throw = $throw->on('handler');
+
+  # bless({...}, 'Venus::Throw')
+
+  # $throw->name;
+
+  # "on.handler"
+
+=back
+
+=over 4
+
+=item on example 2
+
+  # given: synopsis
+
+  package main;
+
+  sub execute {
+    $throw->on('handler');
+  }
+
+  $throw = execute();
+
+  # bless({...}, 'Venus::Throw')
+
+  # $throw->name;
+
+  # "on.execute.handler"
+
+=back
+
+=cut
+
+=head1 OPERATORS
+
+This package overloads the following operators:
+
+=cut
+
+=over 4
+
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$throw";
+
+  # "Exception!"
+
+=back
+
+=over 4
+
+=item operation: C<(~~)>
+
+This package overloads the C<~~> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = $throw ~~ 'Exception!';
+
+  # 1
+
+=back
 
 =head1 AUTHORS
 

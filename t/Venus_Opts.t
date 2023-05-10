@@ -39,8 +39,9 @@ $test->for('abstract');
 method: default
 method: exists
 method: get
-method: parse
 method: name
+method: parse
+method: reparse
 method: set
 method: unnamed
 
@@ -309,14 +310,15 @@ and C<spec> values.
 
   my $parse = $opts->parse;
 
-  # { help => 1, resource => "users" }
+  # bless({...}, 'Venus::Opts')
 
 =cut
 
 $test->for('example', 1, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, { help => 1, resource => "users" };
+  isa_ok $result, 'Venus::Opts';
+  is_deeply $result->parsed, { help => 1, resource => "users" };
 
   $result
 });
@@ -327,14 +329,70 @@ $test->for('example', 1, 'parse', sub {
 
   my $parse = $opts->parse(['bundling']);
 
-  # { help => 1, resource => "users" }
+  # bless({...}, 'Venus::Opts')
 
 =cut
 
 $test->for('example', 2, 'parse', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  is_deeply $result, { help => 1, resource => "users" };
+  isa_ok $result, 'Venus::Opts';
+  is_deeply $result->parsed, { help => 1, resource => "users" };
+
+  $result
+});
+
+=method reparse
+
+The reparse method resets the parser, calls the L</parse> method and returns
+the result.
+
+=signature reparse
+
+  reparse(ArrayRef $specs, ArrayRef $args) (Opts)
+
+=metadata reparse
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 reparse
+
+  # given: synopsis;
+
+  my $reparse = $opts->reparse(['resource|r=s']);
+
+  # bless({...}, 'Venus::Opts')
+
+=cut
+
+$test->for('example', 1, 'reparse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  isa_ok $result, 'Venus::Opts';
+  is_deeply $result->parsed, { resource => "users" };
+
+  $result
+});
+
+=example-2 reparse
+
+  # given: synopsis;
+
+  my $reparse = $opts->reparse(['resource|r=s'], ['bundling']);
+
+  # bless({...}, 'Venus::Opts')
+
+=cut
+
+$test->for('example', 2, 'reparse', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  isa_ok $result, 'Venus::Opts';
+  is_deeply $result->parsed, { resource => "users" };
 
   $result
 });

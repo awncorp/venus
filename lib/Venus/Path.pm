@@ -117,6 +117,16 @@ sub explain {
   return $self->get;
 }
 
+sub extension {
+  my ($self, $name) = @_;
+
+  my $basename = $self->basename;
+
+  return ($basename =~ /\.?.+\.([^\.]+)$/)[0] || undef if !$name;
+
+  return $self->sibling(join '.', $basename, $name);
+}
+
 sub find {
   my ($self, $expr) = @_;
 

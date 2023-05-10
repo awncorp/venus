@@ -100,7 +100,7 @@ sub get {
 sub parse {
   my ($self, $extras) = @_;
 
-  return $self->parsed if %{$self->parsed};
+  return $self if %{$self->parsed};
 
   my $value = $self->value;
   my $specs = $self->specs;
@@ -148,6 +148,15 @@ sub name {
   }
 
   return undef;
+}
+
+sub reparse {
+  my ($self, $specs, $extras) = @_;
+
+  $self->parsed({});
+  $self->specs($specs || []) if defined $specs;
+
+  return $self->parse($extras || []);
 }
 
 sub set {

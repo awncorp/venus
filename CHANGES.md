@@ -1,5 +1,45 @@
 # Changelog
 
+## Version: 2.80
+
+- [feature] Implement Venus#array
+- [feature] Implement Venus#boolean
+- [feature] Implement Venus#code
+- [feature] Implement Venus#config
+- [feature] Implement Venus#data
+- [feature] Implement Venus#float
+- [feature] Implement Venus#hash
+- [feature] Implement Venus#name
+- [feature] Implement Venus#number
+- [feature] Implement Venus#path
+- [feature] Implement Venus#proto
+- [feature] Implement Venus#string
+- [feature] Implement Venus#template
+- [feature] Implement Venus#vars
+- [feature] Implement Venus::Assert#render
+- [feature] Implement Venus::Array#range
+- [feature] Enhance Venus::Throw
+- [feature] Implement Venus#meta
+- [feature] Implement Venus#opts
+- [feature] Implement Venus#process
+- [feature] Implement Venus#random
+- [feature] Implement Venus#regexp
+- [feature] Implement Venus#replace
+- [feature] Implement Venus#search
+- [feature] Implement Venus#test
+- [feature] Implement Venus#throw
+- [feature] Implement Venus#try
+- [feature] Implement Venus#type
+- [feature] Implement Venus::Schema
+- [feature] Implement Venus::Path#extension
+- [update] Resolve CPANTS issues
+- [update] Add missing signature for Venus::Template#render
+- [update] Implement Venus::Throw#{frame,capture}
+- [update] Update Venus#date syntax
+- [update] Fix Venus::Assert parser issue
+- [update] Refactor Venus::Cli
+- [update] Update Venus::Cli "opt" type logic and documentation
+
 ## Version: 2.55
 
 - [feature] Implement Venus#date

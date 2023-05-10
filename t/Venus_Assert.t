@@ -74,6 +74,7 @@ method: package
 method: parse
 method: reference
 method: regexp
+method: render
 method: routines
 method: scalar
 method: scalarref
@@ -2735,6 +2736,128 @@ $test->for('example', 1, 'regexp', sub {
   $result
 });
 
+=method render
+
+The render method builds and returns a type expressions suitable for providing
+to L</expression> based on the data provided.
+
+=signature render
+
+  render(Str $into, Str $expression) (Str)
+
+=metadata render
+
+{
+  since => '2.55',
+}
+
+=cut
+
+=example-1 render
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 render
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render(undef, 'string');
+
+  # "string"
+
+=cut
+
+$test->for('example', 2, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'string';
+
+  $result
+});
+
+=example-3 render
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('routines', ['say', 'say_pretty']);
+
+  # 'routines["say", "say_pretty"]'
+
+=cut
+
+$test->for('example', 3, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'routines["say", "say_pretty"]';
+
+  $result
+});
+
+=example-4 render
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('hashkeys', {id => 'number', name => 'string'});
+
+  # 'hashkeys["id", number, "name", string]'
+
+=cut
+
+$test->for('example', 4, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'hashkeys["id", number, "name", string]';
+
+  $result
+});
+
+=example-5 render
+
+  # given: synopsis
+
+  package main;
+
+  $assert = $assert->render('hashkeys', {
+    id => 'number',
+    profile => {
+      level => 'string',
+    },
+  });
+
+  # 'hashkeys["id", number, "profile", hashkeys["level", string]]'
+
+=cut
+
+$test->for('example', 5, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 'hashkeys["id", number, "profile", hashkeys["level", string]]';
+
+  $result
+});
+
 =method routines
 
 The routines method configures the object to accept an object having all of the
@@ -3472,33 +3595,64 @@ subtest 'test_for_parser', sub {
     'Venus::Code',
   ];
 
-  $string = join ' | ',
+  $string = <<'EOF';
+    number
+    | hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]
+    | tuple[number | string]
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    'either',
     'number',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]',
-    'tuple[number | string]';
-  is_deeply scalar $assert->parse($string),
     [
-    'either', 'number',
-    [
-      'hashkeys', 'id',
-      ['either', 'number', 'float'], 'upvotes',
-      ['within', 'arrayref', 'boolean'],
+      'hashkeys',
+      'id',
+      [
+        'either',
+        'number',
+        'float'
+      ],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        'boolean'
+      ],
     ],
-    ['tuple', ['either', 'number', 'string'],],
-    ];
+    [
+      'tuple',
+      [
+        'either',
+        'number',
+        'string'
+      ],
+    ],
+  ];
 
-  $string = join ' | ',
+  $string = <<'EOF';
+    number
+    | hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    'either',
     'number',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]';
-  is_deeply scalar $assert->parse($string),
     [
-    'either', 'number',
-    [
-      'hashkeys', 'id',
-      ['either', 'number', 'float'], 'upvotes',
-      ['within', 'arrayref', 'boolean'],
+      'hashkeys',
+      'id',
+      [
+        'either',
+        'number',
+        'float'
+      ],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        'boolean'
+      ],
     ],
-    ];
+  ];
 
   $string = 'within[arrayref, hashref] | arrayref';
   is_deeply scalar $assert->parse($string), [
@@ -3511,20 +3665,39 @@ subtest 'test_for_parser', sub {
     'arrayref',
   ];
 
-  $string = join ' | ',
+  $string = <<'EOF';
+    number
+    | hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]
+    | tuple[number | string]
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    'either',
     'number',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]',
-    'tuple[number | string]';
-  is_deeply scalar $assert->parse($string),
     [
-    'either', 'number',
-    [
-      'hashkeys', 'id',
-      ['either', 'number', 'float'], 'upvotes',
-      ['within', 'arrayref', 'boolean'],
+      'hashkeys',
+      'id',
+      [
+        'either',
+        'number',
+        'float'
+      ],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        'boolean'
+      ],
     ],
-    ['tuple', ['either', 'number', 'string'],],
-    ];
+    [
+      'tuple',
+      [
+        'either',
+        'number',
+        'string'
+      ],
+    ],
+  ];
 
   $string = 'string | number | tuple[string, number]';
   is_deeply scalar $assert->parse($string), [
@@ -3538,92 +3711,201 @@ subtest 'test_for_parser', sub {
     ],
   ];
 
-  $string = join ' | ',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean]]',
-    'string',
-    'number';
-  is_deeply scalar $assert->parse($string),
-    [
-    'either',
-    [
-      'hashkeys', 'id', ['either', 'number', 'float'],
-      'upvotes', ['within', 'arrayref', ['either', 'number', 'boolean',],],
-    ],
-    'string', 'number',
-    ];
-
-  $string = join ' | ',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]',
-    'string',
-    'Example::Thing';
-  is_deeply scalar $assert->parse($string),
-    [
-    'either',
-    [
-      'hashkeys', 'id',
-      ['either', 'number', 'float'], 'upvotes',
-      ['within', 'arrayref', 'boolean',],
-    ],
-    'string',
-    'Example::Thing',
-    ];
-
-  $string = join ' | ',
-    'Example::String',
-    'hashkeys["id", number', 'float, "upvotes", within[arrayref, boolean]]',
-    'Example::Thing',
-    'string',
-    'number';
-  is_deeply scalar $assert->parse($string),
-    [
-    'either',
-    'Example::String',
-    [
-      'hashkeys', 'id',
-      ['either', 'number', 'float'], 'upvotes',
-      ['within', 'arrayref', 'boolean',],
-    ],
-    'Example::Thing',
-    'string', 'number',
-    ];
-
-  $string = join ' | ',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean | hashkeys["id", number | float]]]',
-    'hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean | hashkeys["id", number | float]]]',
-    'Example';
-  is_deeply scalar $assert->parse($string),
-    [
+  $string = <<'EOF';
+    hashkeys["id", number | float, "upvotes", within[arrayref, number | boolean]]
+    | string
+    | number
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
     'either',
     [
       'hashkeys',
       'id',
-      ['either', 'number', 'float'],
+      [
+        'either',
+        'number',
+        'float'
+      ],
       'upvotes',
       [
         'within',
         'arrayref',
         [
-          'either', 'number',
-          'boolean', ['hashkeys', 'id', ['either', 'number', 'float',],],
+          'either',
+          'number',
+          'boolean',
+        ],
+      ],
+    ],
+    'string',
+    'number',
+  ];
+
+  $string = <<'EOF';
+    hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]
+    | string
+    | Example::Thing
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    [
+      'hashkeys',
+      'id',
+      [
+        'either',
+        'number',
+        'float'
+      ],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        'boolean',
+      ],
+    ],
+    'string',
+    'Example::Thing',
+  ];
+
+  $string = <<'EOF';
+    Example::String
+    | hashkeys["id", number | float, "upvotes", within[arrayref, boolean]]
+    | Example::Thing
+    | string
+    | number
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    'Example::String',
+    [
+      'hashkeys',
+      'id',
+      [
+        'either',
+        'number',
+        'float'
+      ],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        'boolean',
+      ],
+    ],
+    'Example::Thing',
+    'string',
+    'number',
+  ];
+
+  $string = <<'EOF';
+    hashkeys[
+      "id", number | float, "upvotes",
+      within[
+        arrayref, number | boolean | hashkeys["id", number | float]
+      ]
+    ]
+    | hashkeys[
+      "id", number | float, "upvotes",
+      within[
+        arrayref, number | boolean | hashkeys["id", number | float]
+      ]
+    ]
+    | Example
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    'either',
+    [
+      'hashkeys',
+      'id',
+      [
+        'either',
+        'number',
+        'float'
+      ],
+      'upvotes',
+      [
+        'within',
+        'arrayref',
+        [
+          'either',
+          'number',
+          'boolean',
+          [
+            'hashkeys',
+            'id',
+            [
+              'either',
+              'number',
+              'float',
+            ],
+          ],
         ],
       ],
     ],
     [
       'hashkeys',
       'id',
-      ['either', 'number', 'float'],
+      [
+        'either',
+        'number',
+        'float'
+      ],
       'upvotes',
       [
         'within',
         'arrayref',
         [
-          'either', 'number',
-          'boolean', ['hashkeys', 'id', ['either', 'number', 'float',],],
+          'either',
+          'number',
+          'boolean',
+          [
+            'hashkeys',
+            'id',
+            [
+              'either',
+              'number',
+              'float',
+            ],
+          ],
         ],
       ],
     ],
     'Example',
-    ];
+  ];
+
+  $string = <<'EOF';
+  hashkeys[
+    "name", string,
+    "type", enum[string, number, boolean, yesno],
+    "alias", within[arrayref, string]
+  ]
+EOF
+  $string =~ s/\s*\n+\s*/ /g;
+  is_deeply scalar $assert->parse($string), [
+    [
+      'hashkeys',
+      'name',
+      'string',
+      'type',
+      [
+        'enum',
+        'string',
+        'number',
+        'boolean',
+        'yesno'
+      ],
+      'alias',
+      [
+        'within',
+        'arrayref',
+        'string'
+      ]
+    ]
+  ];
 };
 
 # END
