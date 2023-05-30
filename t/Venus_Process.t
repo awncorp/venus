@@ -2805,19 +2805,19 @@ $test->for('example', 1, 'error_on_setid', sub {
   $result
 });
 
-=error error_on_stdin
+=error error_on_stderr
 
-This package may raise an error_on_stdin exception.
+This package may raise an error_on_stderr exception.
 
 =cut
 
-$test->for('error', 'error_on_stdin');
+$test->for('error', 'error_on_stderr');
 
 =example-1 error_on_stderr
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my @args = ("/nowhere", 123);
 
   my $error = $parent->throw('error_on_stderr', @args)->catch('error');
 
@@ -2827,11 +2827,15 @@ $test->for('error', 'error_on_stdin');
 
   # my $message = $error->message;
 
-  # "Can't redirect STDERR to \"$path\": $!"
+  # "Can't redirect STDERR to \"/nowhere\": $!"
 
   # my $path = $error->stash('path');
 
   # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
 
 =cut
 
@@ -2850,6 +2854,14 @@ $test->for('example', 1, 'error_on_stderr', sub {
 
   $result
 });
+
+=error error_on_stdin
+
+This package may raise an error_on_stdin exception.
+
+=cut
+
+$test->for('error', 'error_on_stdin');
 
 =example-1 error_on_stdin
 
@@ -2870,6 +2882,10 @@ $test->for('example', 1, 'error_on_stderr', sub {
   # my $path = $error->stash('path');
 
   # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
 
 =cut
 

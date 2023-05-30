@@ -268,7 +268,7 @@ $test->for('example', 1, 'find', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}bin${fsds}cmd$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}bin${fsds}cmd$/;
 
   $result
 });
@@ -290,8 +290,8 @@ $test->for('example', 2, 'find', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}bin${fsds}cmd$};
-  ok $result->[1] =~ m{t${fsds}path${fsds}usr${fsds}bin${fsds}cmd$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}bin${fsds}cmd$/;
+  like $result->[1], qr/t${fsds}path${fsds}usr${fsds}bin${fsds}cmd$/;
 
   $result
 });
@@ -1154,7 +1154,7 @@ $test->for('example', 1, 'name', sub {
 $Venus::Os::TYPES{$^O} = $^O;
 $ENV{PATH} = join((Venus::Os->is_win ? ';' : ':'),
   map Venus::Path->new($_)->absolute, qw(
-    t/path/user/.local/bin
+    t/path/user/local/bin
     t/path/user/bin
     t/path/usr/bin
     t/path/usr/local/bin
@@ -1188,7 +1188,7 @@ variable as an arrayref of unique paths. Returns a list in list context.
   my $paths = $os->paths;
 
   # [
-  #   "/root/.local/bin",
+  #   "/root/local/bin",
   #   "/root/bin",
   #   "/usr/local/sbin",
   #   "/usr/local/bin",
@@ -1445,7 +1445,7 @@ if the files found are actually executable.
   my $where = $os->where('cmd');
 
   # [
-  #   "t/path/user/.local/bin/cmd",
+  #   "t/path/user/local/bin/cmd",
   #   "t/path/user/bin/cmd",
   #   "t/path/usr/bin/cmd",
   #   "t/path/usr/local/bin/cmd",
@@ -1460,12 +1460,12 @@ $test->for('example', 1, 'where', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}cmd$};
-  ok $result->[1] =~ m{t${fsds}path${fsds}user${fsds}bin${fsds}cmd$};
-  ok $result->[2] =~ m{t${fsds}path${fsds}usr${fsds}bin${fsds}cmd$};
-  ok $result->[3] =~ m{t${fsds}path${fsds}usr${fsds}local${fsds}bin${fsds}cmd$};
-  ok $result->[4] =~ m{t${fsds}path${fsds}usr${fsds}local${fsds}sbin${fsds}cmd$};
-  ok $result->[5] =~ m{t${fsds}path${fsds}usr${fsds}sbin${fsds}cmd$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}cmd$/;
+  like $result->[1], qr/t${fsds}path${fsds}user${fsds}bin${fsds}cmd$/;
+  like $result->[2], qr/t${fsds}path${fsds}usr${fsds}bin${fsds}cmd$/;
+  like $result->[3], qr/t${fsds}path${fsds}usr${fsds}local${fsds}bin${fsds}cmd$/;
+  like $result->[4], qr/t${fsds}path${fsds}usr${fsds}local${fsds}sbin${fsds}cmd$/;
+  like $result->[5], qr/t${fsds}path${fsds}usr${fsds}sbin${fsds}cmd$/;
 
   $result
 });
@@ -1479,7 +1479,7 @@ $test->for('example', 1, 'where', sub {
   my $where = $os->where('app1');
 
   # [
-  #   "t/path/user/.local/bin/app1",
+  #   "t/path/user/local/bin/app1",
   #   "t/path/usr/bin/app1",
   #   "t/path/usr/sbin/app1"
   # ]
@@ -1491,9 +1491,9 @@ $test->for('example', 2, 'where', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}app1$};
-  ok $result->[1] =~ m{t${fsds}path${fsds}usr${fsds}bin${fsds}app1$};
-  ok $result->[2] =~ m{t${fsds}path${fsds}usr${fsds}sbin${fsds}app1$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}app1$/;
+  like $result->[1], qr/t${fsds}path${fsds}usr${fsds}bin${fsds}app1$/;
+  like $result->[2], qr/t${fsds}path${fsds}usr${fsds}sbin${fsds}app1$/;
 
   $result
 });
@@ -1507,7 +1507,7 @@ $test->for('example', 2, 'where', sub {
   my $where = $os->where('app2');
 
   # [
-  #   "t/path/user/.local/bin/app2",
+  #   "t/path/user/local/bin/app2",
   #   "t/path/usr/bin/app2",
   # ]
 
@@ -1518,8 +1518,8 @@ $test->for('example', 3, 'where', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}app2$};
-  ok $result->[1] =~ m{t${fsds}path${fsds}usr${fsds}bin${fsds}app2$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}app2$/;
+  like $result->[1], qr/t${fsds}path${fsds}usr${fsds}bin${fsds}app2$/;
 
   $result
 });
@@ -1544,8 +1544,8 @@ $test->for('example', 4, 'where', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}bin${fsds}app3$};
-  ok $result->[1] =~ m{t${fsds}path${fsds}usr${fsds}sbin${fsds}app3$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}bin${fsds}app3$/;
+  like $result->[1], qr/t${fsds}path${fsds}usr${fsds}sbin${fsds}app3$/;
 
   $result
 });
@@ -1559,7 +1559,7 @@ $test->for('example', 4, 'where', sub {
   my $where = $os->where('app4');
 
   # [
-  #   "t/path/user/.local/bin/app4",
+  #   "t/path/user/local/bin/app4",
   #   "t/path/usr/local/bin/app4",
   #   "t/path/usr/local/sbin/app4",
   # ]
@@ -1571,9 +1571,9 @@ $test->for('example', 5, 'where', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok ref $result eq 'ARRAY';
-  ok $result->[0] =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}app4$};
-  ok $result->[1] =~ m{t${fsds}path${fsds}usr${fsds}local${fsds}bin${fsds}app4$};
-  ok $result->[2] =~ m{t${fsds}path${fsds}usr${fsds}local${fsds}sbin${fsds}app4$};
+  like $result->[0], qr/t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}app4$/;
+  like $result->[1], qr/t${fsds}path${fsds}usr${fsds}local${fsds}bin${fsds}app4$/;
+  like $result->[2], qr/t${fsds}path${fsds}usr${fsds}local${fsds}sbin${fsds}app4$/;
 
   $result
 });
@@ -1624,7 +1624,7 @@ L</where> method with the arguments provided.
 
   my $which = $os->which('cmd');
 
-  # "t/path/user/.local/bin/cmd",
+  # "t/path/user/local/bin/cmd",
 
 =cut
 
@@ -1632,7 +1632,7 @@ $test->for('example', 1, 'which', sub {
   $Venus::Os::TYPES{$^O} = 'linux';
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok $result =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}cmd$};
+  ok $result =~ m{t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}cmd$};
 
   $result
 });
@@ -1645,7 +1645,7 @@ $test->for('example', 1, 'which', sub {
 
   my $which = $os->which('app1');
 
-  # "t/path/user/.local/bin/app1"
+  # "t/path/user/local/bin/app1"
 
 =cut
 
@@ -1653,7 +1653,7 @@ $test->for('example', 2, 'which', sub {
   $Venus::Os::TYPES{$^O} = 'linux';
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok $result =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}app1$};
+  ok $result =~ m{t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}app1$};
 
   $result
 });
@@ -1666,7 +1666,7 @@ $test->for('example', 2, 'which', sub {
 
   my $which = $os->which('app2');
 
-  # "t/path/user/.local/bin/app2"
+  # "t/path/user/local/bin/app2"
 
 =cut
 
@@ -1674,7 +1674,7 @@ $test->for('example', 3, 'which', sub {
   $Venus::Os::TYPES{$^O} = 'linux';
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok $result =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}app2$};
+  ok $result =~ m{t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}app2$};
 
   $result
 });
@@ -1708,7 +1708,7 @@ $test->for('example', 4, 'which', sub {
 
   my $which = $os->which('app4');
 
-  # "t/path/user/.local/bin/app4"
+  # "t/path/user/local/bin/app4"
 
 =cut
 
@@ -1716,7 +1716,7 @@ $test->for('example', 5, 'which', sub {
   $Venus::Os::TYPES{$^O} = 'linux';
   my ($tryable) = @_;
   my $result = $tryable->result;
-  ok $result =~ m{t${fsds}path${fsds}user${fsds}\.local${fsds}bin${fsds}app4$};
+  ok $result =~ m{t${fsds}path${fsds}user${fsds}local${fsds}bin${fsds}app4$};
 
   $result
 });

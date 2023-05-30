@@ -1839,6 +1839,38 @@ B<example 1>
 
 =over 4
 
+=item error: C<error_on_stderr>
+
+This package may raise an error_on_stderr exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("/nowhere", 123);
+
+  my $error = $parent->throw('error_on_stderr', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stderr"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDERR to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
 =item error: C<error_on_stdin>
 
 This package may raise an error_on_stdin exception.
@@ -1862,6 +1894,10 @@ B<example 1>
   # my $path = $error->stash('path');
 
   # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
 
 =back
 
