@@ -557,7 +557,7 @@ I<Since C<0.01>>
 
   my $result = $space->call('missing');
 
-  # Exception! Venus::Space::Error (isa Venus::Error)
+  # Exception! (isa Venus::Space::Error) (see error_on_call_missing)
 
 =back
 
@@ -747,7 +747,7 @@ I<Since C<0.01>>
 
   my $code = $space->cop('missing', $space->blessed);
 
-  # Exception! Venus::Space::Error (isa Venus::Error)
+  # Exception! (isa Venus::Space::Error) (see error_on_cop_missing)
 
 =back
 
@@ -813,7 +813,7 @@ I<Since C<0.01>>
 
   my $eval = $space->eval('die');
 
-  # Exception! Venus::Space::Error (isa Venus::Error)
+  # Exception! (isa Venus::Space::Error) (see error_on_eval)
 
 =back
 
@@ -1189,7 +1189,7 @@ I<Since C<0.01>>
 
   my $load = $space->load;
 
-  # Exception! Venus::Space::Error (isa Venus::Error)
+  # Exception! (isa Venus::Space::Error) (see error_on_load)
 
 =back
 
@@ -2124,7 +2124,7 @@ I<Since C<1.95>>
     return $self;
   });
 
-  # Exception! (isa Venus::Error) is "on.swap"
+  # Exception! (isa Venus::Space::Error) (see error_on_swap)
 
 =back
 
@@ -2462,6 +2462,228 @@ I<Since C<1.02>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_call_missing>
+
+This package may raise an error_on_call_missing exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "execute");
+
+  my $error = $space->throw('error_on_call_missing', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_call_missing"
+
+  # my $message = $error->message;
+
+  # "Unable to locate class method \"execute\" via package \"Example\""
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+  # my $routine = $error->stash('routine');
+
+  # "execute"
+
+=back
+
+=over 4
+
+=item error: C<error_on_call_undefined>
+
+This package may raise an error_on_call_undefined exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "execute");
+
+  my $error = $space->throw('error_on_call_undefined', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_call_undefined"
+
+  # my $message = $error->message;
+
+  # "Attempt to call undefined class method in package \"Example\""
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+  # my $routine = $error->stash('routine');
+
+  # "execute"
+
+=back
+
+=over 4
+
+=item error: C<error_on_cop_missing>
+
+This package may raise an error_on_cop_missing exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "execute");
+
+  my $error = $space->throw('error_on_cop_missing', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_cop_missing"
+
+  # my $message = $error->message;
+
+  # "Unable to locate object method \"execute\" via package \"Example\""
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+  # my $routine = $error->stash('routine');
+
+  # "execute"
+
+=back
+
+=over 4
+
+=item error: C<error_on_cop_undefined>
+
+This package may raise an error_on_cop_undefined exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "execute");
+
+  my $error = $space->throw('error_on_cop_undefined', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_cop_undefined"
+
+  # my $message = $error->message;
+
+  # "Attempt to cop undefined object method from package \"$class\""
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+  # my $routine = $error->stash('routine');
+
+  # "execute"
+
+=back
+
+=over 4
+
+=item error: C<error_on_eval>
+
+This package may raise an error_on_eval exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "Exception!");
+
+  my $error = $space->throw('error_on_eval', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_eval"
+
+  # my $message = $error->message;
+
+  # "Exception!"
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+=back
+
+=over 4
+
+=item error: C<error_on_load>
+
+This package may raise an error_on_load exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "cause unknown");
+
+  my $error = $space->throw('error_on_load', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_load"
+
+  # my $message = $error->message;
+
+  # "Error attempting to load Example: \"cause unknown\""
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+=back
+
+=over 4
+
+=item error: C<error_on_swap>
+
+This package may raise an error_on_swap exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("Example", "execute");
+
+  my $error = $space->throw('error_on_swap', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_swap"
+
+  # my $message = $error->message;
+
+  # "Attempt to swap undefined subroutine in package \"$class\""
+
+  # my $package = $error->stash('package');
+
+  # "Example"
+
+  # my $routine = $error->stash('routine');
+
+  # "execute"
+
+=back
 
 =head1 AUTHORS
 

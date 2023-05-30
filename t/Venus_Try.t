@@ -344,7 +344,7 @@ $test->for('example', 2, 'callback', sub {
 
   my $callback = $try->callback('missing_method');
 
-  # Exception! Venus::Try::Error (isa Venus::Error)
+  # Exception! (isa Venus::Try::Error) (see error_on_callback)
 
 =cut
 
@@ -1066,6 +1066,45 @@ $test->for('example', 3, 'result', sub {
 
   $result
 });
+
+=error error_on_callback
+
+This package may raise an error_on_callback exception.
+
+=cut
+
+$test->for('error', 'error_on_callback');
+
+=example-1 error_on_callback
+
+  # given: synopsis;
+
+  @args = ("Example", "execute");
+
+  my $error = $try->throw('error_on_callback', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_callback"
+
+  # my $message = $error->message;
+
+  # "Can't locate object method \"execute\" on package \"Example\""
+
+=cut
+
+$test->for('example', 1, 'error_on_callback', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_callback";
+  my $message = $result->message;
+  is $message, "Can't locate object method \"execute\" on package \"Example\"";
+
+  $result
+});
+
 
 =partials
 

@@ -344,7 +344,7 @@ sub hashkeys {
 
   $self->constraints->when(sub{
     CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-      && %{$_->value} > 0
+      && (keys %{$_->value}) > 0
   })->then(sub{
     my $check = 0;
     my $value = $_->value;
@@ -584,15 +584,9 @@ sub validate {
   my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
   my $message = sprintf($self->message, $self->name, $identity, $expected);
 
-  my $throw;
-  $throw = $self->throw;
-  $throw->name('on.validate');
-  $throw->message($message . "\n\nReceived:\n\n\"@{[$self->received($data)]}\"\n\n");
-  $throw->stash(identity => $identity);
-  $throw->stash(variable => $data);
-  $throw->error;
+  $self->throw('error_on_validate', $data)->error;
 
-  return $throw;
+  return;
 }
 
 sub validator {
@@ -625,7 +619,7 @@ sub within {
   if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
     $self->constraints->when(sub{
       CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-        && %{$_->value} > 0
+        && (keys %{$_->value}) > 0
     })->then(sub{
       my $value = $_->value;
       UNIVERSAL::isa($value, 'HASH')
@@ -643,12 +637,7 @@ sub within {
     });
   }
   else {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.within');
-    $throw->message(qq(Invalid type ("$type") provided to the "within" method));
-    $throw->stash(argument => $type);
-    $throw->error;
+    $self->throw('error_on_within', $type, @next)->error;
   }
 
   $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
@@ -664,6 +653,54 @@ sub yesno {
   })->then(@code ? @code : sub{true});
 
   return $self;
+}
+
+# ERRORS
+
+sub error_on_validate {
+  my ($self, $data) = @_;
+
+  require Venus::Type;
+
+  my $legend = {
+    array => 'arrayref',
+    code => 'coderef',
+    hash => 'hashref',
+    regexp => 'regexpref',
+    scalar => 'scalarref',
+    scalar => 'scalarref',
+  };
+
+  my $identity = Venus::Type->new(value => $data)->identify;
+     $identity = $legend->{lc($identity)} || lc($identity);
+
+  my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
+
+  my $message = sprintf($self->message, $self->name, $identity, $expected);
+     $message .= "\n\nReceived:\n\n\"@{[$self->received($data)]}\"\n\n";
+
+  return {
+    name => 'on.validate',
+    message => $message,
+    stash => {
+      identity => $identity,
+      variable => $data,
+    },
+  };
+}
+
+sub error_on_within {
+  my ($self, $type, @args) = @_;
+
+  return {
+    name => 'on.within',
+    message => "Invalid type (\"$type\") provided to the \"within\" method",
+    stash => {
+      self => $self,
+      type => $type,
+      args => [@args],
+    },
+  };
 }
 
 # ROUTINES

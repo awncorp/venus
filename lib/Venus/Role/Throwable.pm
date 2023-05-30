@@ -10,7 +10,7 @@ use Venus::Role 'with';
 # METHODS
 
 sub throw {
-  my ($self, $data) = @_;
+  my ($self, $data, @args) = @_;
 
   require Venus::Throw;
 
@@ -18,10 +18,20 @@ sub throw {
     frame => 1,
   );
 
-  if (ref $data ne 'HASH') {
+  if (!$data) {
     return $throw->do(
-      'package', $data || join('::', map ucfirst, ref($self), 'error')
+      'package', join('::', map ucfirst, ref($self), 'error')
     );
+  }
+  if (ref $data ne 'HASH') {
+    if ($data =~ /^\w+$/ && $self->can($data)) {
+      $data = $self->$data(@args);
+    }
+    else {
+      return $throw->do(
+        'package', $data,
+      );
+    }
   }
 
   if (exists $data->{as}) {

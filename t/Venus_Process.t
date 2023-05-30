@@ -370,7 +370,7 @@ $test->for('example', 2, 'chdir', sub {
 
   $parent = $parent->chdir('/xyz');
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_chdir)
 
 =cut
 
@@ -867,7 +867,7 @@ $test->for('example', 3, 'fork', sub {
 
   # no forking attempted if NOT supported
 
-  # Exception! Venus::Process:Error (isa Venus::Error)
+  # Exception! (isa Venus::Process:Error) (see error_on_fork_support)
 
 =cut
 
@@ -1483,7 +1483,7 @@ $test->for('example', 1, 'setsid', sub {
 
   my $setsid = $parent->setsid;
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_setid)
 
 =cut
 
@@ -1711,7 +1711,7 @@ $test->for('example', 1, 'stderr', sub {
 
   $parent = $parent->stderr('/nowhere');
 
-  # Exception! Venus::Process:Error (isa Venus::Error)
+  # Exception! (isa Venus::Process:Error) (see error_on_stderr)
 
 =cut
 
@@ -1765,7 +1765,7 @@ $test->for('example', 1, 'stdin', sub {
 
   $parent = $parent->stdin('/nowhere');
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_stdin)
 
 =cut
 
@@ -1819,7 +1819,7 @@ $test->for('example', 1, 'stdout', sub {
 
   $parent = $parent->stdout('/nowhere');
 
-  # Exception! Venus::Process::Error (isa Venus::Process)
+  # Exception! Venus::Process::Error (error_on_stdout)
 
 =cut
 
@@ -2621,6 +2621,322 @@ $test->for('operator', '(~~)');
 
 $test->for('example', 1, '(~~)', sub {
   1;
+});
+
+=error error_on_chdir
+
+This package may raise an error_on_chdir exception.
+
+=cut
+
+$test->for('error', 'error_on_chdir');
+
+=example-1 error_on_chdir
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_chdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_chdir"
+
+  # my $message = $error->message;
+
+  # "Can't chdir \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=cut
+
+$test->for('example', 1, 'error_on_chdir', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_chdir";
+  my $message = $result->message;
+  is $message, "Can't chdir \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+  my $pid = $result->stash('pid');
+  is $pid, 123;
+
+  $result
+});
+
+=error error_on_fork_process
+
+This package may raise an error_on_fork_process exception.
+
+=cut
+
+$test->for('error', 'error_on_fork_process');
+
+=example-1 error_on_fork_process
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_fork_process', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_fork_process"
+
+  # my $message = $error->message;
+
+  # "Can't fork process $pid: $!"
+
+  # my $pid = $error->stash('pid');
+
+  # "123"
+
+=cut
+
+$test->for('example', 1, 'error_on_fork_process', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_fork_process";
+  my $message = $result->message;
+  is $message, "Can't fork process 123: $!";
+  my $pid = $result->stash('pid');
+  is $pid, "123";
+
+  $result
+});
+
+=error error_on_fork_support
+
+This package may raise an error_on_fork_support exception.
+
+=cut
+
+$test->for('error', 'error_on_fork_support');
+
+=example-1 error_on_fork_support
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_fork_support', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_fork_support"
+
+  # my $message = $error->message;
+
+  # "Can't fork process $pid: Fork emulation not supported"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=cut
+
+$test->for('example', 1, 'error_on_fork_support', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_fork_support";
+  my $message = $result->message;
+  is $message, "Can't fork process 123: Fork emulation not supported";
+  my $pid = $result->stash('pid');
+  is $pid, 123;
+
+  $result
+});
+
+=error error_on_setid
+
+This package may raise an error_on_setid exception.
+
+=cut
+
+$test->for('error', 'error_on_setid');
+
+=example-1 error_on_setid
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_setid', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_setid"
+
+  # my $message = $error->message;
+
+  # "Can't start a new session: $!"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=cut
+
+$test->for('example', 1, 'error_on_setid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_setid";
+  my $message = $result->message;
+  is $message, "Can't start a new session: $!";
+  my $pid = $result->stash('pid');
+  is $pid, 123;
+
+  $result
+});
+
+=error error_on_stdin
+
+This package may raise an error_on_stdin exception.
+
+=cut
+
+$test->for('error', 'error_on_stdin');
+
+=example-1 error_on_stderr
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stderr', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stderr"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDERR to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_stderr', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_stderr";
+  my $message = $result->message;
+  is $message, "Can't redirect STDERR to \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+  my $pid = $result->stash('pid');
+  is $pid, 123;
+
+  $result
+});
+
+=example-1 error_on_stdin
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stdin', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stdin"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDIN to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_stdin', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_stdin";
+  my $message = $result->message;
+  is $message, "Can't redirect STDIN to \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+  my $pid = $result->stash('pid');
+  is $pid, 123;
+
+  $result
+});
+
+=error error_on_stdout
+
+This package may raise an error_on_stdout exception.
+
+=cut
+
+$test->for('error', 'error_on_stdout');
+
+=example-1 error_on_stdout
+
+  # given: synopsis;
+
+  my @args = ( '/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stdout', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stdout"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDOUT to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=cut
+
+$test->for('example', 1, 'error_on_stdout', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_stdout";
+  my $message = $result->message;
+  is $message, "Can't redirect STDOUT to \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+  my $pid = $result->stash('pid');
+  is $pid, 123;
+
+  $result
 });
 
 =partials

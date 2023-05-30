@@ -191,7 +191,7 @@ $test->for('example', 1, 'evaluate', sub {
 
   my $evaluate = $search->evaluate;
 
-  # Exception! Venus::Search::Error (isa Venus::Error)
+  # Exception! (isa Venus::Search::Error) (see error_on_evaluate)
 
 =cut
 
@@ -764,6 +764,44 @@ $test->for('operator', '(~~)');
 
 $test->for('example', 1, '(~~)', sub {
   1;
+});
+
+=error error_on_evaluate
+
+This package may raise an error_on_evaluate exception.
+
+=cut
+
+$test->for('error', 'error_on_evaluate');
+
+=example-1 error_on_evaluate
+
+  # given: synopsis;
+
+  my @args = ("Exception!");
+
+  my $error = $search->throw('error_on_evaluate', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_evaluate"
+
+  # my $message = $error->message;
+
+  # "Exception!"
+
+=cut
+
+$test->for('example', 1, 'error_on_evaluate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_evaluate";
+  my $message = $result->message;
+  is $message, "Exception!";
+
+  $result
 });
 
 =partials

@@ -154,7 +154,7 @@ I<Since C<0.06>>
 
   $parent = $parent->chdir('/xyz');
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_chdir)
 
 =back
 
@@ -516,7 +516,7 @@ I<Since C<0.06>>
 
   # no forking attempted if NOT supported
 
-  # Exception! Venus::Process:Error (isa Venus::Error)
+  # Exception! (isa Venus::Process:Error) (see error_on_fork_support)
 
 =back
 
@@ -952,7 +952,7 @@ I<Since C<0.06>>
 
   my $setsid = $parent->setsid;
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_setid)
 
 =back
 
@@ -1110,7 +1110,7 @@ I<Since C<0.06>>
 
   $parent = $parent->stderr('/nowhere');
 
-  # Exception! Venus::Process:Error (isa Venus::Error)
+  # Exception! (isa Venus::Process:Error) (see error_on_stderr)
 
 =back
 
@@ -1146,7 +1146,7 @@ I<Since C<0.06>>
 
   $parent = $parent->stdin('/nowhere');
 
-  # Exception! Venus::Process::Error (isa Venus::Error)
+  # Exception! (isa Venus::Process::Error) (see error_on_stdin)
 
 =back
 
@@ -1182,7 +1182,7 @@ I<Since C<0.06>>
 
   $parent = $parent->stdout('/nowhere');
 
-  # Exception! Venus::Process::Error (isa Venus::Process)
+  # Exception! Venus::Process::Error (error_on_stdout)
 
 =back
 
@@ -1714,6 +1714,188 @@ I<Since C<2.40>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_chdir>
+
+This package may raise an error_on_chdir exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_chdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_chdir"
+
+  # my $message = $error->message;
+
+  # "Can't chdir \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_fork_process>
+
+This package may raise an error_on_fork_process exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_fork_process', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_fork_process"
+
+  # my $message = $error->message;
+
+  # "Can't fork process $pid: $!"
+
+  # my $pid = $error->stash('pid');
+
+  # "123"
+
+=back
+
+=over 4
+
+=item error: C<error_on_fork_support>
+
+This package may raise an error_on_fork_support exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_fork_support', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_fork_support"
+
+  # my $message = $error->message;
+
+  # "Can't fork process $pid: Fork emulation not supported"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_setid>
+
+This package may raise an error_on_setid exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (123);
+
+  my $error = $parent->throw('error_on_setid', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_setid"
+
+  # my $message = $error->message;
+
+  # "Can't start a new session: $!"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_stdin>
+
+This package may raise an error_on_stdin exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ('/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stdin', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stdin"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDIN to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=back
+
+=over 4
+
+=item error: C<error_on_stdout>
+
+This package may raise an error_on_stdout exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ( '/nowhere', 123);
+
+  my $error = $parent->throw('error_on_stdout', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_stdout"
+
+  # my $message = $error->message;
+
+  # "Can't redirect STDOUT to \"$path\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $pid = $error->stash('pid');
+
+  # 123
+
+=back
 
 =head1 OPERATORS
 

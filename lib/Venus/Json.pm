@@ -75,13 +75,8 @@ sub assertion {
 sub config {
   my ($self, $package) = @_;
 
-  $package ||= $self->package or do {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.config');
-    $throw->message('No suitable JSON package');
-    $throw->error;
-  };
+  $package ||= $self->package
+    or $self->throw('error_on_config')->error;
 
   $package = $package->new
     ->canonical
@@ -233,6 +228,17 @@ sub TO_BOOL {
   }
 
   return Venus::Boolean::TO_BOOL_JPO($value);
+}
+
+# ERRORS
+
+sub error_on_config {
+  my ($self) = @_;
+
+  return {
+    name => 'on.config',
+    message => 'No suitable JSON package',
+  };
 }
 
 1;

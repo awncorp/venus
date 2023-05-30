@@ -75,13 +75,8 @@ sub assertion {
 sub config {
   my ($self, $package) = @_;
 
-  $package ||= $self->package or do {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.config');
-    $throw->message('No suitable YAML package');
-    $throw->error;
-  };
+  $package ||= $self->package
+    or $self->throw('error_on_config')->error;
 
   # YAML::XS
   if ($package eq 'YAML::XS') {
@@ -223,6 +218,17 @@ sub TO_BOOL {
   }
 
   return Venus::Boolean::TO_BOOL_JPO($value);
+}
+
+# ERRORS
+
+sub error_on_config {
+  my ($self) = @_;
+
+  return {
+    name => 'on.config',
+    message => 'No suitable YAML package',
+  };
 }
 
 1;

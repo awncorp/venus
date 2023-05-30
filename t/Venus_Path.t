@@ -43,6 +43,7 @@ method: child
 method: chmod
 method: chown
 method: children
+method: copy
 method: default
 method: directories
 method: exists
@@ -62,6 +63,9 @@ method: mkcall
 method: mkdir
 method: mkdirs
 method: mkfile
+method: mktemp_dir
+method: mktemp_file
+method: move
 method: name
 method: parent
 method: parents
@@ -378,6 +382,45 @@ $test->for('example', 1, 'children', sub {
 
   ok $result->[13]->isa('Venus::Path');
   ok $result->[13] =~ m{t${fsds}data${fsds}planets${fsds}venus};
+
+  $result
+});
+
+=method copy
+
+The copy method uses L<File::Copy/copy> to copy the file represented by the
+invocant to the path provided and returns the invocant.
+
+=signature copy
+
+  copy(Str | Path $path) (Path)
+
+=metadata copy
+
+{
+  since => '2.80',
+}
+
+=cut
+
+=example-1 copy
+
+  # given: synopsis
+
+  package main;
+
+  my $copy = $path->child('mercury')->copy($path->child('yrucrem'));
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 1, 'copy', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  like "$result", qr{t${fsds}data${fsds}planets${fsds}mercury};
+  $result->parent->child('yrucrem')->unlink;
 
   $result
 });
@@ -1285,7 +1328,7 @@ $test->for('example', 3, 'open', sub {
 
   my $fh = $path->open('>');
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_open)
 
 =cut
 
@@ -1345,14 +1388,14 @@ $test->for('example', 1, 'mkcall', sub {
 
   my ($call_output, $exit_code) = $path->mkcall('t/data/sun --heat-death');
 
-  # ("", 256)
+  # ("", 1)
 
 =cut
 
 $test->for('example', 2, 'mkcall', sub {
   my ($tryable) = @_;
   ok my @result = ($tryable->result);
-  is_deeply [@result], ['', 256];
+  is_deeply [@result], ['', 1];
 
   !$result[0]
 });
@@ -1367,7 +1410,7 @@ $test->for('example', 2, 'mkcall', sub {
 
   my $output = $path->mkcall;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_mkcall)
 
 =cut
 
@@ -1430,7 +1473,7 @@ $test->for('example', 1, 'mkdir', sub {
 
   $path = $path->mkdir;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_mkdir)
 
 =cut
 
@@ -1568,7 +1611,7 @@ $test->for('example', 1, 'mkfile', sub {
 
   $path = $path->mkfile;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_mkfile)
 
 =cut
 
@@ -1577,6 +1620,128 @@ $test->for('example', 2, 'mkfile', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Path::Error');
   ok $error->isa('Venus::Error');
+
+  $result
+});
+
+=method mktemp_dir
+
+The mktemp_dir method uses L<File::Temp/tempdir> to create a temporary
+directory which isn't automatically removed and returns a new path object.
+
+=signature mktemp_dir
+
+  mktemp_dir() (Path)
+
+=metadata mktemp_dir
+
+{
+  since => '2.80',
+}
+
+=cut
+
+=example-1 mktemp_dir
+
+  # given: synopsis
+
+  package main;
+
+  my $mktemp_dir = $path->mktemp_dir;
+
+  # bless({value => "/tmp/ZnKTxBpuBE"}, "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'mktemp_dir', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  ok $result->test('de');
+  $result->rmdir;
+
+  $result
+});
+
+=method mktemp_file
+
+The mktemp_file method uses L<File::Temp/tempfile> to create a temporary file
+which isn't automatically removed and returns a new path object.
+
+=signature mktemp_file
+
+  mktemp_file() (Path)
+
+=metadata mktemp_file
+
+{
+  since => '2.80',
+}
+
+=cut
+
+=example-1 mktemp_file
+
+  # given: synopsis
+
+  package main;
+
+  my $mktemp_file = $path->mktemp_file;
+
+  # bless({value => "/tmp/y5MvliBQ2F"}, "Venus::Path")
+
+=cut
+
+$test->for('example', 1, 'mktemp_file', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  ok $result->test('fe');
+  $result->unlink;
+
+  $result
+});
+
+=method move
+
+The move method uses L<File::Copy/move> to move the file represented by the
+invocant to the path provided and returns the invocant.
+
+=signature move
+
+  move(Str | Path $path) (Path)
+
+=metadata move
+
+{
+  since => '2.80',
+}
+
+=cut
+
+=example-1 move
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/data');
+
+  my $unknown = $path->child('unknown')->mkfile->move($path->child('titan'));
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 1, 'move', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  like "$result", qr{t${fsds}data${fsds}unknown};
+  ok !$result->exists;
+  my $titan = $result->parent->child('titan');
+  ok $titan->exists;
+  ok $titan->unlink;
 
   $result
 });
@@ -1764,7 +1929,7 @@ $test->for('example', 1, 'read', sub {
 
   my $content = $path->read;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_read_open)
 
 =cut
 
@@ -1885,7 +2050,7 @@ $test->for('example', 1, 'rmdir', sub {
 
   my $rmdir = $path->mkdir->rmdir;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_rmdir)
 
 =cut
 
@@ -2310,7 +2475,7 @@ $test->for('example', 1, 'unlink', sub {
 
   my $unlink = $path->unlink;
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_unlink)
 
 =cut
 
@@ -2370,7 +2535,7 @@ $test->for('example', 1, 'write', sub {
 
   my $write = $path->write('nothing');
 
-  # Exception! Venus::Path::Error (isa Venus::Error)
+  # Exception! (isa Venus::Path::Error) (see error_on_write_open)
 
 =cut
 
@@ -2553,6 +2718,640 @@ $test->for('operator', '(~~)');
 
 $test->for('example', 1, '(~~)', sub {
   1;
+});
+
+=error error_on_copy
+
+This package may raise an error_on_copy exception.
+
+=cut
+
+$test->for('error', 'error_on_copy');
+
+=example-1 error_on_copy
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_copy', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_copy"
+
+  # my $message = $error->message;
+
+  # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $self = $error->stash('self');
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 1, 'error_on_copy', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_copy";
+  my $message = $result->message;
+  like $message, qr/Can't copy "([^"]+)" to "\/nowhere": $!/;
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+  my $self = $result->stash('self');
+  isa_ok $self, "Venus::Path";
+
+  $result
+});
+
+=error error_on_mkcall
+
+This package may raise an error_on_mkcall exception.
+
+=cut
+
+$test->for('error', 'error_on_mkcall');
+
+=example-1 error_on_mkcall
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_mkcall', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_mkcall"
+
+  # my $message = $error->message;
+
+  # "Can't make system call to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_mkcall', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_mkcall";
+  my $message = $result->message;
+  like $message, qr/Can't make system call to "\/nowhere": exit code \(\d\)/;
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_mkdir
+
+This package may raise an error_on_mkdir exception.
+
+=cut
+
+$test->for('error', 'error_on_mkdir');
+
+=example-1 error_on_mkdir
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_mkdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_mkdir"
+
+  # my $message = $error->message;
+
+  # "Can't make directory \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_mkdir', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_mkdir";
+  my $message = $result->message;
+  is $message, "Can't make directory \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_mkfile
+
+This package may raise an error_on_mkfile exception.
+
+=cut
+
+$test->for('error', 'error_on_mkfile');
+
+=example-1 error_on_mkfile
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_mkfile', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_mkfile"
+
+  # my $message = $error->message;
+
+  # "Can't make file \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_mkfile', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_mkfile";
+  my $message = $result->message;
+  is $message, "Can't make file \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_move
+
+This package may raise an error_on_move exception.
+
+=cut
+
+$test->for('error', 'error_on_move');
+
+=example-1 error_on_move
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_move', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_move"
+
+  # my $message = $error->message;
+
+  # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+  # my $self = $error->stash('self');
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 1, 'error_on_move', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_move";
+  my $message = $result->message;
+  like $message, qr/Can't move "([^"]+)" to "\/nowhere": $!/;
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+  my $self = $result->stash('self');
+  isa_ok $self, "Venus::Path";
+
+  $result
+});
+
+=error error_on_open
+
+This package may raise an error_on_open exception.
+
+=cut
+
+$test->for('error', 'error_on_open');
+
+=example-1 error_on_open
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_open', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_open"
+
+  # my $message = $error->message;
+
+  # "Can't open \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_open', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_open";
+  my $message = $result->message;
+  is $message, "Can't open \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_read_binmode
+
+This package may raise an error_on_read_binmode exception.
+
+=cut
+
+$test->for('error', 'error_on_read_binmode');
+
+=example-1 error_on_read_binmode
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_read_binmode', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_read_binmode"
+
+  # my $message = $error->message;
+
+  # "Can't binmode \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_read_binmode', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_read_binmode";
+  my $message = $result->message;
+  is $message, "Can't binmode \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_read_error
+
+This package may raise an error_on_read_error exception.
+
+=cut
+
+$test->for('error', 'error_on_read_error');
+
+=example-1 error_on_read_error
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_read_error', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_read_error"
+
+  # my $message = $error->message;
+
+  # "Can't read from file \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_read_error', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_read_error";
+  my $message = $result->message;
+  is $message, "Can't read from file \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_read_open
+
+This package may raise an error_on_read_open exception.
+
+=cut
+
+$test->for('error', 'error_on_read_open');
+
+=example-1 error_on_read_open
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_read_open', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_read_open"
+
+  # my $message = $error->message;
+
+  # "Can't read \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_read_open', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_read_open";
+  my $message = $result->message;
+  is $message, "Can't read \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_rmdir
+
+This package may raise an error_on_rmdir exception.
+
+=cut
+
+$test->for('error', 'error_on_rmdir');
+
+=example-1 error_on_rmdir
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_rmdir', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_rmdir"
+
+  # my $message = $error->message;
+
+  # "Can't rmdir \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_rmdir', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_rmdir";
+  my $message = $result->message;
+  is $message, "Can't rmdir \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_write_binmode
+
+This package may raise an error_on_write_binmode exception.
+
+=cut
+
+$test->for('error', 'error_on_write_binmode');
+
+=example-1 error_on_write_binmode
+
+  # given: synopsis;
+
+  my @args = ("/nowhere", ":utf8");
+
+  my $error = $path->throw('error_on_write_binmode', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_write_binmode"
+
+  # my $message = $error->message;
+
+  # "Can't binmode \"/nowhere\": $!"
+
+  # my $binmode = $error->stash('binmode');
+
+  # ":utf8"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_write_binmode', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_write_binmode";
+  my $message = $result->message;
+  is $message, "Can't binmode \"/nowhere\": $!";
+  my $binmode = $result->stash('binmode');
+  is $binmode, ":utf8";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_write_error
+
+This package may raise an error_on_write_error exception.
+
+=cut
+
+$test->for('error', 'error_on_write_error');
+
+=example-1 error_on_write_error
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_write_error', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_write_error"
+
+  # my $message = $error->message;
+
+  # "Can't write to file \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_write_error', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_write_error";
+  my $message = $result->message;
+  is $message, "Can't write to file \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_write_open
+
+This package may raise an error_on_write_open exception.
+
+=cut
+
+$test->for('error', 'error_on_write_open');
+
+=example-1 error_on_write_open
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_write_open', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_write_open"
+
+  # my $message = $error->message;
+
+  # "Can't write \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_write_open', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_write_open";
+  my $message = $result->message;
+  is $message, "Can't write \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
+});
+
+=error error_on_unlink
+
+This package may raise an error_on_unlink exception.
+
+=cut
+
+$test->for('error', 'error_on_unlink');
+
+=example-1 error_on_unlink
+
+  # given: synopsis;
+
+  my @args = ("/nowhere");
+
+  my $error = $path->throw('error_on_unlink', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_unlink"
+
+  # my $message = $error->message;
+
+  # "Can't unlink \"/nowhere\": $!"
+
+  # my $path = $error->stash('path');
+
+  # "/nowhere"
+
+=cut
+
+$test->for('example', 1, 'error_on_unlink', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_unlink";
+  my $message = $result->message;
+  is $message, "Can't unlink \"/nowhere\": $!";
+  my $path = $result->stash('path');
+  is $path, "/nowhere";
+
+  $result
 });
 
 =partials

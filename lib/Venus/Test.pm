@@ -222,6 +222,7 @@ sub render {
     'methods: method',
     'messages: message',
     'features: feature',
+    'errors: error',
     'operators: operator',
     'partials',
     'authors',
@@ -230,7 +231,7 @@ sub render {
   );
 
   if (@{$self->find(undef, 'layout')}) {
-    @layout = (split /\n/, $self->text('layout'));
+    @layout = (split /\r?\n/, $self->text('layout'));
   }
 
   $path->write(join "\n", grep !!$_, map $self->show($_), @layout);
@@ -409,7 +410,20 @@ sub data_for_encoding {
 
   $self->error('on.data.for.encoding') if !@$data;
 
-  return (map {map uc, split /\n+/} @{$data->[0]{data}})[0];
+  return (map {map uc, split /\r?\n+/} @{$data->[0]{data}})[0];
+}
+
+sub data_for_error {
+  my ($self, $name) = @_;
+
+  my $data = $self->search({
+    list => 'error',
+    name => $name,
+  });
+
+  $self->error('on.data.for.error') if !@$data;
+
+  return join "\n\n", @{$data->[0]{data}};
 }
 
 sub data_for_example {
@@ -738,7 +752,7 @@ sub pdml_for_attributes_type1 {
 
   return () if !$text;
 
-  for my $line (split /\n/, $text) {
+  for my $line (split /\r?\n/, $text) {
     push @output, $self->pdml('attribute_type1', (
       map { split /,\s*/ } split /:\s*/, $line, 2
     ));
@@ -805,6 +819,44 @@ sub pdml_for_encoding {
   my $text = $self->text('encoding');
 
   return $text ? ($self->encoding($text)) : ();
+}
+
+sub pdml_for_error {
+  my ($self, $name) = @_;
+
+  my @output;
+
+  my $text = $self->text('error', $name);
+
+  return () if !$text;
+
+  my @results = $self->search({name => $name});
+
+  for my $i (1..(int grep {($$_{list} || '') =~ /^example-\d+/} @results)) {
+    push @output, "B<example $i>", $self->text('example', $i, $name);
+  }
+
+  return ($self->over($self->item("error: C<$name>", join "\n\n", $text, @output)));
+}
+
+sub pdml_for_errors {
+  my ($self) = @_;
+
+  my @output;
+
+  for my $list ($self->search({list => 'error'})) {
+    push @output, $self->pdml('error', $list->{name});
+  }
+
+  if (@output) {
+    unshift @output, $self->head1('errors',
+      $self->safe('text', 'heading', 'error')
+      || $self->safe('text', 'heading', 'errors')
+      || 'This package may raise the following errors:',
+    );
+  }
+
+  return join "\n", @output;
 }
 
 sub pdml_for_example {
@@ -901,7 +953,7 @@ sub pdml_for_functions {
   my $type = 'function';
   my $text = $self->text('includes');
 
-  for my $name (sort map /:\s*(\w+)$/, grep /^$type/, split /\n/, $text) {
+  for my $name (sort map /:\s*(\w+)$/, grep /^$type/, split /\r?\n/, $text) {
     push @output, $self->pdml($type, $name);
   }
 
@@ -942,7 +994,7 @@ sub pdml_for_inherits {
   my $text = $self->text('inherits');
 
   my @output = map +($self->link($_), ""), grep defined,
-    split /\n/, $self->text('inherits');
+    split /\r?\n/, $self->text('inherits');
 
   return '' if !@output;
 
@@ -961,7 +1013,7 @@ sub pdml_for_integrates {
   my $text = $self->text('integrates');
 
   my @output = map +($self->link($_), ""), grep defined,
-    split /\n/, $self->text('integrates');
+    split /\r?\n/, $self->text('integrates');
 
   return '' if !@output;
 
@@ -980,7 +1032,7 @@ sub pdml_for_libraries {
   my $text = $self->text('libraries');
 
   my @output = map +($self->link($_), ""), grep defined,
-    split /\n/, $self->text('libraries');
+    split /\r?\n/, $self->text('libraries');
 
   return '' if !@output;
 
@@ -1087,7 +1139,7 @@ sub pdml_for_methods {
   my $type = 'method';
   my $text = $self->text('includes');
 
-  for my $name (sort map /:\s*(\w+)$/, grep /^$type/, split /\n/, $text) {
+  for my $name (sort map /:\s*(\w+)$/, grep /^$type/, split /\r?\n/, $text) {
     push @output, $self->pdml($type, $name);
   }
 
@@ -1243,7 +1295,7 @@ sub test_for_attributes {
   my $package = $self->data('name');
 
   $code ||= sub {
-    for my $line (split /\n/, $data) {
+    for my $line (split /\r?\n/, $data) {
       my ($name, $is, $pre, $isa, $def) = map { split /,\s*/ } split /:\s*/,
         $line, 2;
       $self->pass($package->can($name), "$package has $name");
@@ -1305,6 +1357,22 @@ sub test_for_encoding {
   my $result = $code->();
 
   $self->pass($result, "=encoding");
+
+  return $result;
+}
+
+sub test_for_error {
+  my ($self, $name, $code) = @_;
+
+  my $data = $self->data('error', $name);
+
+  $code ||= sub {
+    length($data) > 1;
+  };
+
+  my $result = $code->();
+
+  $self->pass($result, "=error $name");
 
   return $result;
 }
@@ -1401,7 +1469,7 @@ sub test_for_includes {
   my $results = [];
 
   push @$results, $self->$code($_)
-    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $data;
+    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\r?\n/, $data;
 
   return $results;
 }
@@ -1421,7 +1489,7 @@ sub test_for_inherits {
 
   my $package = $self->data('name');
 
-  $self->pass($package->isa($_), "$package isa $_") for split /\n/, $data;
+  $self->pass($package->isa($_), "$package isa $_") for split /\r?\n/, $data;
 
   return $result;
 }
@@ -1442,7 +1510,7 @@ sub test_for_integrates {
   my $package = $self->data('name');
 
   $self->pass($package->can('does'), "$package has does");
-  $self->pass($package->does($_), "$package does $_") for split /\n/, $data;
+  $self->pass($package->does($_), "$package does $_") for split /\r?\n/, $data;
 
   return $result;
 }
@@ -1459,7 +1527,7 @@ sub test_for_libraries {
   my $result = $code->();
 
   $self->pass($result, "=libraries");
-  $self->pass(scalar(eval("require $_")), "$_ ok") for split /\n/, $data;
+  $self->pass(scalar(eval("require $_")), "$_ ok") for split /\r?\n/, $data;
 
   return $result;
 }
@@ -1576,7 +1644,7 @@ sub test_for_partials {
   my $results = [];
 
   push @$results, $self->$code($_)
-    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $data;
+    for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\r?\n/, $data;
 
   return $results;
 }
@@ -1751,6 +1819,20 @@ sub text_for_encoding {
   my ($self) = @_;
 
   my ($error, $result) = $self->catch('data', 'encoding');
+
+  my $output = [];
+
+  if (!$error) {
+    push @$output, $result;
+  }
+
+  return $output;
+}
+
+sub text_for_error {
+  my ($self, $name) = @_;
+
+  my ($error, $result) = $self->catch('data', 'error', $name);
 
   my $output = [];
 
@@ -2005,7 +2087,7 @@ sub text_for_partials {
 
   if (!$error) {
     push @$output, $self->text('partial', $_)
-      for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\n/, $result;
+      for map [split /\:\s*/], grep /\w/, grep !/^#/, split /\r?\n/, $result;
   }
 
   return $output;

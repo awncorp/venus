@@ -100,16 +100,8 @@ sub arg {
     my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
       'validate', $type_map{$_type}
     );
-    if ($caught) {
-      my $throw;
-      my $error = join ': ', 'Invalid argument', $name, $caught->message;
-      $throw = $self->throw;
-      $throw->name('on.arg');
-      $throw->message($error);
-      $throw->stash(name => $_name);
-      $throw->stash(type => $_type);
-      $throw->error;
-    }
+    $self->throw('error_on_arg_validation', $caught->message, $_name, $_type)->error
+      if $caught;
   }
 
   # return boolean values
@@ -127,18 +119,9 @@ sub cmd {
 
   my $data = $self->get('cmd', $name) or return undef;
 
-  my ($caught, $value) = $self->catch('arg', $data->{arg});
+  my $value = $self->try('arg')->maybe->result($data->{arg});
 
-  if ($caught) {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.cmd');
-    $throw->message($caught->message);
-    $throw->stash($_ => $caught->stash($_)) for keys %{$caught->stash};
-    $throw->error;
-  }
-
-  return ($value eq $name) ? true : false;
+  return (($value // '') eq $name) ? true : false;
 }
 
 sub exit {
@@ -783,16 +766,8 @@ sub opt {
     my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
       'validate', $type_map{$_type}
     );
-    if ($caught) {
-      my $throw;
-      my $error = join ': ', 'Invalid option', $name, $caught->message;
-      $throw = $self->throw;
-      $throw->name('on.opt');
-      $throw->message($error);
-      $throw->stash(name => $_name);
-      $throw->stash(type => $_type);
-      $throw->error;
-    }
+    $self->throw('error_on_opt_validation', $caught->message, $_name, $_type)->error
+      if $caught;
   }
 
   # return boolean values
@@ -1212,6 +1187,34 @@ sub _wrap_text {
 
   return join "\n",
     map {($indent ? (" " x $indent) : '') . join " ", @{$_}} @results;
+}
+
+# ERRORS
+
+sub error_on_arg_validation {
+  my ($self, $error, $name, $type) = @_;
+
+  return {
+    name => 'on.arg.validation',
+    message => (join ': ', 'Invalid argument', $name, $error),
+    stash => {
+      name => $name,
+      type => $type,
+    },
+  };
+}
+
+sub error_on_opt_validation {
+  my ($self, $error, $name, $type) = @_;
+
+  return {
+    name => 'on.opt.validation',
+    message => (join ': ', 'Invalid option', $name, $error),
+    stash => {
+      name => $name,
+      type => $type,
+    },
+  };
 }
 
 1;

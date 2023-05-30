@@ -3139,7 +3139,7 @@ registered constraints, or throws an exception.
 
   my $result = $assert->validate;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
 
 =cut
 
@@ -3164,7 +3164,7 @@ $test->for('example', 1, 'validate', sub {
 
   my $result = $assert->validate('0.01');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
 
 =cut
 
@@ -3211,7 +3211,7 @@ $test->for('example', 3, 'validate', sub {
 
   my $result = $assert->validate(time);
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Assert::Error) (see error_on_validate)
 
 =cut
 
@@ -3258,7 +3258,7 @@ constraints, or throws an exception.
 
   # $validator->(['goodbye']);
 
-  # Exception! (isa Venus::Error)
+  # Exception! (isa Venus::Error) (see error_on_validate)
 
 =cut
 
@@ -3270,7 +3270,7 @@ $test->for('example', 1, 'validator', sub {
   my ($return, $error) = catch {$result->(['goodbye'])};
   ok $return->isa('Venus::Error');
   ok $return->is('on.validate');
-  ok $return->stash('identity') eq 'array';
+  ok $return->stash('identity') eq 'arrayref';
 
   $result
 });
@@ -3559,6 +3559,108 @@ $test->for('example', 1, 'yesno', sub {
   ok $result->check('Yes');
   ok $result->check('y');
   ok !$result->check('Okay');
+
+  $result
+});
+
+=error error_on_validate
+
+This package may raise an error_on_validate exception.
+
+=cut
+
+$test->for('error', 'error_on_validate');
+
+=example-1 error_on_validate
+
+  # given: synopsis;
+
+  my @args = ("...");
+
+  my $error = $assert->throw('error_on_validate', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_validate"
+
+  # my $message = $error->message;
+
+  # "..."
+
+  # my $identity = $error->stash('identity');
+
+  # "string"
+
+=cut
+
+$test->for('example', 1, 'error_on_validate', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_validate";
+  my $message = $result->message;
+  like $message, qr/indescribable constraints/;
+  my $identity = $result->stash('identity');
+  is $identity, "string";
+  my $variable = $result->stash('variable');
+  is $variable, "...";
+
+  $result
+});
+
+=error error_on_within
+
+This package may raise an error_on_within exception.
+
+=cut
+
+$test->for('error', 'error_on_within');
+
+=example-1 error_on_within
+
+  # given: synopsis;
+
+  my @args = ('coderef', 'string');
+
+  my $error = $assert->throw('error_on_within', @args)->catch('error');
+
+  # my $ = $error->name;
+
+  # "on_within"
+
+  # my $message = $error->message;
+
+  # "Invalid type (\"$type\") palid ed to the \"within\" method"
+
+  # my $self = $error->stash('self');
+
+  # $assert
+
+  # my $type = $error->stash('type'
+
+  # "coderef"
+
+  # my $args = $error->stash('args');
+
+  # ["string"]
+
+=cut
+
+$test->for('example', 1, 'error_on_within', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_within";
+  my $message = $result->message;
+  is $message, "Invalid type (\"coderef\") provided to the \"within\" method";
+  my $self = $result->stash('self');
+  isa_ok $self, "Venus::Assert";
+  my $type = $result->stash('type');
+  is $type, "coderef";
+  my $args = $result->stash('args');
+  is_deeply $args, ["string"];
 
   $result
 });

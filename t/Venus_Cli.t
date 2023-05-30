@@ -359,9 +359,9 @@ $test->for('example', 6, 'arg', sub {
 
   my ($name) = $cli->arg('name');
 
-  # Exception! (isa Venus::Cli::Error)
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
 
-  # Invalid option: name: received (undef), expected (string)
+  # Invalid argument: name: received (undef), expected (string)
 
 =cut
 
@@ -369,7 +369,7 @@ $test->for('example', 7, 'arg', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Cli::Error';
-  ok $result->is('on.arg');
+  ok $result->is('on.arg.validation');
   like $result->message, qr/Invalid argument: name/;
 
   $result
@@ -593,20 +593,16 @@ $test->for('example', 6, 'cmd', sub {
 
   my ($is_execute) = $cli->cmd('execute');
 
-  # Exception! (isa Venus::Cli::Error)
-
-  # Invalid option: action: received (undef), expected (string)
+  # 0
 
 =cut
 
 $test->for('example', 7, 'cmd', sub {
   my ($tryable) = @_;
-  my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Cli::Error';
-  ok $result->is('on.cmd');
-  like $result->message, qr/Invalid argument: action/;
+  my $result = $tryable->result;
+  is $result, 0;
 
-  $result
+  !$result
 });
 
 =method exit
@@ -1543,7 +1539,7 @@ $test->for('example', 6, 'opt', sub {
 
   my ($name) = $cli->opt('name');
 
-  # Exception! (isa Venus::Cli::Error)
+  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
 
   # Invalid option: name: received (undef), expected (number)
 
@@ -1553,7 +1549,7 @@ $test->for('example', 7, 'opt', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Cli::Error';
-  ok $result->is('on.opt');
+  ok $result->is('on.opt.validation');
   like $result->message, qr/Invalid option: name/;
 
   $result
@@ -2034,6 +2030,106 @@ $test->for('example', 1, 'str', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is $result, 'program';
+
+  $result
+});
+
+=error error_on_arg_validation
+
+This package may raise an error_on_arg_validation exception.
+
+=cut
+
+$test->for('error', 'error_on_arg_validation');
+
+=example-1 error_on_arg_validation
+
+  # given: synopsis;
+
+  my @args = ("...", "example", "string");
+
+  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_arg_validation"
+
+  # my $message = $error->message;
+
+  # "Invalid argument: example: ..."
+
+  # my $name = $error->stash('name');
+
+  # "example"
+
+  # my $type = $error->stash('type');
+
+  # "string"
+
+=cut
+
+$test->for('example', 1, 'error_on_arg_validation', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_arg_validation";
+  my $message = $result->message;
+  is $message, "Invalid argument: example: ...";
+  $name = $result->stash('name');
+  is $name, "example";
+  my $type = $result->stash('type');
+  is $type, "string";
+
+  $result
+});
+
+=error error_on_opt_validation
+
+This package may raise an error_on_opt_validation exception.
+
+=cut
+
+$test->for('error', 'error_on_opt_validation');
+
+=example-1 error_on_opt_validation
+
+  # given: synopsis;
+
+  my @args = ("...", "example", "string");
+
+  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_opt_validation"
+
+  # my $message = $error->message;
+
+  # "Invalid option: example: ..."
+
+  # my $name = $error->stash('name');
+
+  # "example"
+
+  # my $type = $error->stash('type');
+
+  # "string"
+
+=cut
+
+$test->for('example', 1, 'error_on_opt_validation', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_opt_validation";
+  my $message = $result->message;
+  is $message, "Invalid option: example: ...";
+  $name = $result->stash('name');
+  is $name, "example";
+  my $type = $result->stash('type');
+  is $type, "string";
 
   $result
 });

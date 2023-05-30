@@ -79,11 +79,19 @@ $test->for('description');
 =method throw
 
 The throw method builds a L<Venus::Throw> object, which can raise errors
-(exceptions).
+(exceptions). If passed a string representing a package name, the throw object
+will be configured to throw an exception using that package name. If passed a
+string representing a method name, the throw object will call that method
+expecting a hashref of L<Venus::Throw> method names and arguments which will be
+called to configure the thrower. If passed a hashref, the keys and values are
+expected to be method names and arguments which will be called to configure the
+L<Venus::Throw> object returned. If passed additional arguments, assuming they
+are preceeded by a string representing a method name, the additional arguments
+will be supplied to the method when called.
 
 =signature throw
 
-  throw(Maybe[Str | HashRef] $data) (Throw)
+  throw(Maybe[Str | HashRef] $data, Any @args) (Throw)
 
 =metadata throw
 
@@ -158,6 +166,48 @@ $test->for('example', 2, 'throw', sub {
 =cut
 
 $test->for('example', 3, 'throw', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Throw');
+  ok $result->package eq 'Example::Error';
+  is $result->name, 'on.example';
+  ok $result->stash('captured');
+  ok $result->stash('time');
+
+  $result
+});
+
+=example-4 throw
+
+  # given: synopsis
+
+  package Example;
+
+  # ...
+
+  sub error_on_example {
+    my ($self) = @_;
+
+    return {
+      name => 'on.example',
+      capture => [$example],
+      stash => {
+        time => time,
+      },
+    };
+  }
+
+  package main;
+
+  my $throw = $example->throw('error_on_example');
+
+  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=cut
+
+$test->for('example', 4, 'throw', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Throw');

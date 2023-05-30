@@ -243,9 +243,9 @@ I<Since C<2.55>>
 
   my ($name) = $cli->arg('name');
 
-  # Exception! (isa Venus::Cli::Error)
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
 
-  # Invalid option: name: received (undef), expected (string)
+  # Invalid argument: name: received (undef), expected (string)
 
 =back
 
@@ -426,9 +426,7 @@ I<Since C<2.55>>
 
   my ($is_execute) = $cli->cmd('execute');
 
-  # Exception! (isa Venus::Cli::Error)
-
-  # Invalid option: action: received (undef), expected (string)
+  # 0
 
 =back
 
@@ -1078,7 +1076,7 @@ I<Since C<2.55>>
 
   my ($name) = $cli->opt('name');
 
-  # Exception! (isa Venus::Cli::Error)
+  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
 
   # Invalid option: name: received (undef), expected (number)
 
@@ -1379,6 +1377,76 @@ I<Since C<2.55>>
 =back
 
 =cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_arg_validation>
+
+This package may raise an error_on_arg_validation exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("...", "example", "string");
+
+  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_arg_validation"
+
+  # my $message = $error->message;
+
+  # "Invalid argument: example: ..."
+
+  # my $name = $error->stash('name');
+
+  # "example"
+
+  # my $type = $error->stash('type');
+
+  # "string"
+
+=back
+
+=over 4
+
+=item error: C<error_on_opt_validation>
+
+This package may raise an error_on_opt_validation exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = ("...", "example", "string");
+
+  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_opt_validation"
+
+  # my $message = $error->message;
+
+  # "Invalid option: example: ..."
+
+  # my $name = $error->stash('name');
+
+  # "example"
+
+  # my $type = $error->stash('type');
+
+  # "string"
+
+=back
 
 =head1 AUTHORS
 

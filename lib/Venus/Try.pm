@@ -71,13 +71,7 @@ sub callback {
     }
 
     if (!$method) {
-      my $throw;
-      my $error = sprintf(qq(Can't locate object method "%s" on package "%s"),
-        ($callback, $invocant ? ref($invocant) : ref($self)));
-      $throw = $self->throw;
-      $throw->name('on.callback');
-      $throw->message($error);
-      $throw->error;
+      $self->throw('error_on_callback', $invocant, $callback)->error;
     }
 
     $callback = sub {goto $method};
@@ -238,6 +232,18 @@ sub result {
   $@ = $dollarat;
 
   return wantarray ? (@returned) : $returned[0];
+}
+
+# ERRORS
+
+sub error_on_callback {
+  my ($self, $invocant, $callback) = @_;
+
+  return {
+    name => 'on.callback',
+    message => sprintf(qq(Can't locate object method "%s" on package "%s"),
+      ($callback, $invocant ? (ref($invocant) || $invocant) : (ref($self) || $self))),
+  };
 }
 
 1;

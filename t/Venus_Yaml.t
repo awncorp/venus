@@ -176,6 +176,42 @@ $test->for('example', 1, 'encode', sub {
   $result
 });
 
+=error error_on_config
+
+This package may raise an error_on_config exception.
+
+=cut
+
+$test->for('error', 'error_on_config');
+
+=example-1 error_on_config
+
+  # given: synopsis;
+
+  my $error = $yaml->throw('error_on_config')->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_config"
+
+  # my $message = $error->message;
+
+  # "No suitable YAML package"
+
+=cut
+
+$test->for('example', 1, 'error_on_config', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_config";
+  my $message = $result->message;
+  is $message, "No suitable YAML package";
+
+  $result
+});
+
 =partials
 
 t/Venus.t: pdml: authors

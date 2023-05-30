@@ -42,10 +42,18 @@ This package provides the following methods:
 
 =head2 throw
 
-  throw(Maybe[Str | HashRef] $data) (Throw)
+  throw(Maybe[Str | HashRef] $data, Any @args) (Throw)
 
 The throw method builds a L<Venus::Throw> object, which can raise errors
-(exceptions).
+(exceptions). If passed a string representing a package name, the throw object
+will be configured to throw an exception using that package name. If passed a
+string representing a method name, the throw object will call that method
+expecting a hashref of L<Venus::Throw> method names and arguments which will be
+called to configure the thrower. If passed a hashref, the keys and values are
+expected to be method names and arguments which will be called to configure the
+L<Venus::Throw> object returned. If passed additional arguments, assuming they
+are preceeded by a string representing a method name, the additional arguments
+will be supplied to the method when called.
 
 I<Since C<0.01>>
 
@@ -96,6 +104,38 @@ I<Since C<0.01>>
       time => time,
     },
   });
+
+  # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
+
+  # $throw->error;
+
+=back
+
+=over 4
+
+=item throw example 4
+
+  # given: synopsis
+
+  package Example;
+
+  # ...
+
+  sub error_on_example {
+    my ($self) = @_;
+
+    return {
+      name => 'on.example',
+      capture => [$example],
+      stash => {
+        time => time,
+      },
+    };
+  }
+
+  package main;
+
+  my $throw = $example->throw('error_on_example');
 
   # bless({ "package" => "Example::Error", ..., }, "Venus::Throw")
 

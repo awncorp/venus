@@ -116,14 +116,7 @@ sub call {
   my $class = $self->load;
 
   unless ($func) {
-    my $throw;
-    my $error = qq(Attempt to call undefined class method in package "$class");
-    $throw = $self->throw;
-    $throw->name('on.call.undefined');
-    $throw->message($error);
-    $throw->stash(package => $self->package);
-    $throw->stash(routine => $func);
-    $throw->error;
+    $self->throw('error_on_call_undefined', $class, $func)->error;
   }
 
   my $next = $class->can($func);
@@ -135,14 +128,7 @@ sub call {
   }
 
   unless ($next) {
-    my $throw;
-    my $error = qq(Unable to locate class method "$func" via package "$class");
-    $throw = $self->throw;
-    $throw->name('on.call.missing');
-    $throw->message($error);
-    $throw->stash(package => $self->package);
-    $throw->stash(routine => $func);
-    $throw->error;
+    $self->throw('error_on_call_missing', $class, $func)->error;
   }
 
   @_ = @args; goto $next;
@@ -209,27 +195,13 @@ sub cop {
   my $class = $self->load;
 
   unless ($func) {
-    my $throw;
-    my $error = qq(Attempt to cop undefined object method from package "$class");
-    $throw = $self->throw;
-    $throw->name('on.cop.undefined');
-    $throw->message($error);
-    $throw->stash(package => $self->package);
-    $throw->stash(routine => $func);
-    $throw->error;
+    $self->throw('error_on_cop_undefined', $class, $func)->error;
   }
 
   my $next = $class->can($func);
 
   unless ($next) {
-    my $throw;
-    my $error = qq(Unable to locate object method "$func" via package "$class");
-    $throw = $self->throw;
-    $throw->name('on.cop.missing');
-    $throw->message($error);
-    $throw->stash(package => $self->package);
-    $throw->stash(routine => $func);
-    $throw->error;
+    $self->throw('error_on_cop_missing', $class, $func)->error;
   }
 
   return sub { $next->(@args ? (@args, @_) : @_) };
@@ -266,12 +238,7 @@ sub eval {
   my $result = eval join ' ', map "$_", "package @{[$self->package]};", @args;
 
   if (my $error = $@) {
-    my $throw;
-    $throw = $self->throw;
-    $throw->name('on.eval');
-    $throw->message($error);
-    $throw->stash(package => $self->package);
-    $throw->error;
+    $self->throw('error_on_eval', $self->package, $error)->error;
   }
 
   return $result;
@@ -371,13 +338,7 @@ sub load {
   my $error = do{local $@; eval "require $class"; $@};
 
   if ($error) {
-    my $throw;
-    $error = qq(Error attempting to load $class: @{[$error || 'cause unknown']});
-    $throw = $self->throw;
-    $throw->name('on.load');
-    $throw->message($error);
-    $throw->stash(package => $self->package);
-    $throw->error;
+    $self->throw('error_on_load', $class, $error || 'cause unknown')->error;
   }
 
   return $class;
@@ -638,23 +599,15 @@ sub splice {
 sub swap {
   my ($self, $name, $code) = @_;
 
-  my $orig = $self->package->can($name);
+  my $orig = (my $package = $self->package)->can($name);
 
   return $orig if !$code;
 
-  unless ($orig) {
-    my $throw;
-    my $class = $self->package;
-    my $error = qq(Attempt to swap undefined subroutine in package "$class");
-    $throw = $self->throw;
-    $throw->name('on.swap');
-    $throw->message($error);
-    $throw->stash(package => $class);
-    $throw->stash(routine => $name);
-    $throw->error;
+  if (!$orig) {
+    $self->throw('error_on_swap', $package, $name)->error;
   }
 
-  $self->routine($name, sub { $code->($orig, @_) });
+  $self->routine($name, sub {$code->($orig, @_)});
 
   return $orig;
 }
@@ -740,6 +693,97 @@ sub visible {
   my $package = $self->package;
 
   return (grep !/\A[^:]+::\z/, keys %{"${package}::"}) ? true : false;
+}
+
+# ERRORS
+
+sub error_on_call_missing {
+  my ($self, $class, $routine) = @_;
+
+  return {
+    name => 'on.call.missing',
+    message => "Unable to locate class method \"$routine\" via package \"$class\"",
+    stash => {
+      package => $class,
+      routine => $routine,
+    },
+  };
+}
+
+sub error_on_call_undefined {
+  my ($self, $class, $routine) = @_;
+
+  return {
+    name => 'on.call.undefined',
+    message => "Attempt to call undefined class method in package \"$class\"",
+    stash => {
+      package => $class,
+      routine => $routine,
+    },
+  };
+}
+
+sub error_on_cop_missing {
+  my ($self, $class, $routine) = @_;
+
+  return {
+    name => 'on.cop.missing',
+    message => "Unable to locate object method \"$routine\" via package \"$class\"",
+    stash => {
+      package => $class,
+      routine => $routine,
+    },
+  };
+}
+
+sub error_on_cop_undefined {
+  my ($self, $class, $routine) = @_;
+
+  return {
+    name => 'on.cop.undefined',
+    message => "Attempt to cop undefined object method from package \"$class\"",
+    stash => {
+      package => $class,
+      routine => $routine,
+    },
+  };
+}
+
+sub error_on_eval {
+  my ($self, $class, $error) = @_;
+
+  return {
+    name => 'on.eval',
+    message => "$error",
+    stash => {
+      package => $class,
+    },
+  };
+}
+
+sub error_on_load {
+  my ($self, $class, $cause) = @_;
+
+  return {
+    name => 'on.load',
+    message => "Error attempting to load $class: \"$cause\"",
+    stash => {
+      package => $class,
+    },
+  };
+}
+
+sub error_on_swap {
+  my ($self, $package, $routine) = @_;
+
+  return {
+    name => 'on.swap',
+    message => "Attempt to swap undefined subroutine in package \"$package\"",
+    stash => {
+      package => $package,
+      routine => $routine,
+    },
+  };
 }
 
 1;

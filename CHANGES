@@ -1,3 +1,12 @@
+2.90 2023-05-23
+
+- [feature] Implement Venus::Os
+- [feature] Implement Venus::Path#{mktemp_dir,mktemp_file}
+- [feature] Implement Venus::Path#{copy,move}
+- [feature] Implement throw-via-dispatch errors
+- [feature] Better document all Venus errors
+- [feature] Implement POD for errors in Venus::Test
+
 2.80 2023-05-10
 
 - [feature] Implement Venus#array
