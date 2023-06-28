@@ -25,8 +25,11 @@ require Cwd;
 require File::Spec;
 require POSIX;
 
-state $GETCWD = Cwd->getcwd;
-state $MAPSIG = {%SIG};
+our $CWD = Cwd->getcwd;
+our $MAPSIG = {%SIG};
+our $PATH = $CWD;
+our $PID = $$;
+our $PPID;
 
 # ATTRIBUTES
 
@@ -66,16 +69,30 @@ sub _open {
   CORE::open(shift, shift, shift);
 }
 
-sub _pid {
-  $$;
+sub _ping {
+  _kill(0, @_);
 }
 
 sub _setsid {
   POSIX::setsid();
 }
 
+sub _time {
+  CORE::time();
+}
+
 sub _waitpid {
   CORE::waitpid(shift, shift);
+}
+
+# BUILD
+
+sub build_self {
+  my ($self, $data) = @_;
+
+  $PID = $self->value if $self->value;
+
+  return $self;
 }
 
 # METHODS
@@ -93,9 +110,9 @@ sub assertion {
 sub chdir {
   my ($self, $path) = @_;
 
-  $path ||= $GETCWD;
+  $path ||= $CWD;
 
-  _chdir($path) or $self->throw('error_on_chdir', $path, _pid())->error;
+  _chdir($path) or $self->throw('error_on_chdir', $path, $PID, $!)->error;
 
   return $self;
 }
@@ -131,8 +148,40 @@ sub daemon {
   }
 }
 
+sub data {
+  my ($self, @args) = @_;
+
+  my @pids = @args ? @args : ($self->watchlist);
+
+  return 0 if !@pids;
+
+  my $result = 0;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  for my $pid (@pids) {
+    next if !(my $pdir = $path->child($self->recv_key($pid)))->exists;
+
+    $result += 1 for CORE::glob($pdir->child('*.data')->absolute);
+  }
+
+  return $result;
+}
+
+sub decode {
+  my ($self, $data) = @_;
+
+  require Venus::Dump;
+
+  return Venus::Dump->new->decode($data);
+}
+
 sub default {
-  return _pid();
+  return $PID;
 }
 
 sub disengage {
@@ -145,6 +194,14 @@ sub disengage {
   return $self;
 }
 
+sub encode {
+  my ($self, $data) = @_;
+
+  require Venus::Dump;
+
+  return Venus::Dump->new($data)->encode;
+}
+
 sub engage {
   my ($self) = @_;
 
@@ -153,6 +210,12 @@ sub engage {
   $self->$_ for qw(stdin stdout stderr);
 
   return $self;
+}
+
+sub exchange {
+  my ($self, $name) = @_;
+
+  return $name ? ($self->{exchange} = $name) : $self->{exchange};
 }
 
 sub exit {
@@ -167,21 +230,31 @@ sub explain {
   return $self->get;
 }
 
+sub followers {
+  my ($self) = @_;
+
+  my $leader = $self->leader;
+
+  my $result = [sort grep {$_ != $leader} $self->others_active, $self->pid];
+
+  return wantarray ? @{$result} : $result;
+}
+
 sub fork {
   my ($self, $code, @args) = @_;
 
   if (not(_forkable())) {
-    $self->throw('error_on_fork_support', _pid())->error;
+    $self->throw('error_on_fork_support', $PID)->error;
   }
   if (defined(my $pid = _fork())) {
-    my $process;
-
     if ($pid) {
       $self->watch($pid);
       return wantarray ? (undef, $pid) : undef;
     }
 
-    $process = $self->class->new;
+    $PPID = $PID;
+    $PID = $$;
+    my $process = $self->class->new;
 
     my $orig_seed = srand;
     my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
@@ -194,10 +267,10 @@ sub fork {
       $process->$code(@args);
     }
 
-    return wantarray ? ($process, _pid()) : $process;
+    return wantarray ? ($process, $PID) : $process;
   }
   else {
-    $self->throw('error_on_fork_process', _pid())->error;
+    $self->throw('error_on_fork_process', $PID, $!)->error;
   }
 }
 
@@ -221,6 +294,42 @@ sub forks {
   return wantarray ? ($process ? ($process, []) : ($process, [@pids]) ) : $process;
 }
 
+sub is_leader {
+  my ($self) = @_;
+
+  return $self->leader == $self->pid ? true : false;
+}
+
+sub is_follower {
+  my ($self) = @_;
+
+  return $self->is_leader ? false : true;
+}
+
+sub is_registered {
+  my ($self) = @_;
+
+  return (grep {$_ == $self->pid} $self->registrants) ? true : false;
+}
+
+sub is_unregistered {
+  my ($self) = @_;
+
+  return $self->is_registered ? false : true;
+}
+
+sub join {
+  my ($self, $name) = @_;
+
+  $self->exchange($name) if $name;
+
+  $self->register;
+
+  @{$self->watchlist} = ();
+
+  return $self;
+}
+
 sub kill {
   my ($self, $name, @pids) = @_;
 
@@ -237,10 +346,61 @@ sub killall {
   return wantarray ? @{$result} : $result;
 }
 
-sub pid {
+sub leader {
   my ($self) = @_;
 
-  return $self->value;
+  my $leader = (sort $self->others_active, $self->pid)[0];
+
+  return $leader;
+}
+
+sub leave {
+  my ($self, $name) = @_;
+
+  $self->unregister;
+
+  delete $self->{exchange};
+  delete $self->{watchlist};
+
+  return $self;
+}
+
+sub others {
+  my ($self) = @_;
+
+  my $pid = $self->pid;
+
+  my $result = [grep {$_ != $pid} $self->registrants];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub others_active {
+  my ($self) = @_;
+
+  my $pid = $self->pid;
+
+  my $result = [grep $self->ping($_), $self->others];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub others_inactive {
+  my ($self) = @_;
+
+  my $pid = $self->pid;
+
+  my $result = [grep !$self->ping($_), $self->others];
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub pid {
+  my ($self, @data) = @_;
+
+  return $self->value if !@data;
+
+  return $self->value((($PID) = @data));
 }
 
 sub pids {
@@ -251,10 +411,75 @@ sub pids {
   return wantarray ? @{$result} : $result;
 }
 
+sub ppid {
+  my ($self, @data) = @_;
+
+  my $pid = @data ? (($PPID) = @data) : $PPID;
+
+  return $pid;
+}
+
 sub ping {
   my ($self, @pids) = @_;
 
-  return $self->kill(0, @pids);
+  return _ping(@pids);
+}
+
+sub poll {
+  my ($self, $timeout, $code, @args) = @_;
+
+  if (!$code) {
+    $code = 'recvall';
+  }
+
+  if (!$timeout) {
+    $timeout = 0;
+  }
+
+  my $result = [];
+
+  my $time = _time();
+  my $then = $time + $timeout;
+  my $seen = 0;
+
+  while (time <= $then) {
+    last if $seen = (@{$result} = grep defined, $self->$code(@args));
+  }
+
+  if (!$seen) {
+    $self->throw('error_on_timeout_poll', $timeout, $code)->error;
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub pool {
+  my ($self, $count, $timeout) = @_;
+
+  if (!$count) {
+    $count = 1;
+  }
+
+  if (!$timeout) {
+    $timeout = 0;
+  }
+
+  my @pids;
+  my $time = _time();
+  my $then = $time + $timeout;
+  my $seen = 0;
+
+  while (time <= $then) {
+    last if ($seen = (@pids = $self->others_active)) >= $count;
+  }
+
+  if ($seen < $count) {
+    $self->throw('error_on_timeout_pool', $timeout, $count)->error;
+  }
+
+  @{$self->watchlist} = @pids;
+
+  return $self;
 }
 
 sub prune {
@@ -263,6 +488,132 @@ sub prune {
   $self->unwatch($self->stopped);
 
   return $self;
+}
+
+sub read {
+  my ($self, $key) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  $path = $path->child($key);
+
+  $path->catch('mkdirs') if !$path->exists;
+
+  my $file = (CORE::glob($path->child('*.data')->absolute))[0];
+
+  return undef if !$file;
+
+  $path = Venus::Path->new($file);
+
+  my $data = $path->read;
+
+  $path->unlink;
+
+  return $data;
+}
+
+sub recall {
+  my ($self, $pid) = @_;
+
+  ($pid) = grep {$_ == $pid} $self->others_inactive if $pid;
+
+  return undef if !$pid;
+
+  my $key = $self->send_key($pid);
+
+  my $string = $self->read($key);
+
+  return undef if !defined $string;
+
+  my $data = $self->decode($string);
+
+  return $data;
+}
+
+sub recallall {
+  my ($self) = @_;
+
+  my $result = [];
+
+  for my $pid (grep defined, $self->ppid, $self->watchlist) {
+    my $data = $self->recall($pid);
+    push @{$result}, $data if defined $data;
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub recv {
+  my ($self, $pid) = @_;
+
+  return undef if !$pid;
+
+  my $key = $self->recv_key($pid);
+
+  my $string = $self->read($key);
+
+  return undef if !defined $string;
+
+  my $data = $self->decode($string);
+
+  return $data;
+}
+
+sub recvall {
+  my ($self) = @_;
+
+  my $result = [];
+
+  for my $pid (grep defined, $self->ppid, $self->watchlist) {
+    my $data = $self->recv($pid);
+    push @{$result}, $data if defined $data;
+  }
+
+  return wantarray ? @{$result} : $result;
+}
+
+sub recv_key {
+  my ($self, $pid) = @_;
+
+  return CORE::join '.', $pid, $self->pid;
+}
+
+sub register {
+  my ($self) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  my $key = $self->send_key($self->pid);
+
+  $path = $path->child($key);
+
+  $path->catch('mkdirs') if !$path->exists;
+
+  return $self;
+}
+
+sub registrants {
+  my ($self) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  my $result = [
+    map /(\d+)$/, grep /(\d+)\.\1$/, CORE::glob($path->child('*.*')->absolute)
+  ];
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub restart {
@@ -277,10 +628,40 @@ sub restart {
   return wantarray ? @{$result} : $result;
 }
 
+sub send {
+  my ($self, $pid, $data) = @_;
+
+  return $self if !$pid;
+
+  my $string = $self->encode($data);
+
+  my $key = $self->send_key($pid);
+
+  $self->write($key, $string);
+
+  return $self;
+}
+
+sub sendall {
+  my ($self, $data) = @_;
+
+  for my $pid (grep defined, $self->ppid, $self->watchlist) {
+    $self->send($pid, $data);
+  }
+
+  return $self;
+}
+
+sub send_key {
+  my ($self, $pid) = @_;
+
+  return CORE::join '.', $self->pid, $pid;
+}
+
 sub setsid {
   my ($self) = @_;
 
-  return _setsid != -1 || $self->throw('error_on_setid', _pid())->error;
+  return _setsid != -1 || $self->throw('error_on_setid', $PID, $!)->error;
 }
 
 sub started {
@@ -322,7 +703,7 @@ sub stderr {
   }
   else {
     _open(\*STDERR, '>&', IO::File->new($path, 'w'))
-      or $self->throw('error_on_stderr', $path, _pid())->error;
+      or $self->throw('error_on_stderr', $path, $PID, $!)->error;
   }
 
   return $self;
@@ -341,7 +722,7 @@ sub stdin {
   }
   else {
     _open(\*STDIN, '<&', IO::File->new($path, 'r'))
-      or $self->throw('error_on_stdin', $path, _pid())->error;
+      or $self->throw('error_on_stdin', $path, $PID, $!)->error;
   }
 
   return $self;
@@ -360,7 +741,7 @@ sub stdout {
   }
   else {
     _open(\*STDOUT, '>&', IO::File->new($path, 'w'))
-      or $self->throw('error_on_stdout', $path, _pid())->error;
+      or $self->throw('error_on_stdout', $path, $PID, $!)->error;
   }
 
   return $self;
@@ -376,6 +757,32 @@ sub stopped {
   });
 
   return wantarray ? @{$result} : $result;
+}
+
+sub sync {
+  my ($self, $count, $timeout) = @_;
+
+  if (!$count) {
+    $count = 1;
+  }
+
+  if (!$timeout) {
+    $timeout = 0;
+  }
+
+  my $time = _time();
+  my $then = $time + $timeout;
+  my $msgs = 0;
+
+  while (time <= $then) {
+    last if ($msgs = (scalar grep $self->data($_), $self->pool->watchlist)) >= $count;
+  }
+
+  if ($msgs < $count) {
+    $self->throw('error_on_timeout_sync', $timeout, $count)->error;
+  }
+
+  return $self;
 }
 
 sub trap {
@@ -448,6 +855,46 @@ sub works {
   return wantarray ? @{$result} : $result;
 }
 
+sub write {
+  my ($self, $key, $data) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  $path = $path->child($key);
+
+  $path->catch('mkdirs') if !$path->exists;
+
+  require Time::HiRes;
+
+  $path = $path->child(CORE::join '.', Time::HiRes::gettimeofday(), 'data');
+
+  $path->write($data);
+
+  return $self;
+}
+
+sub unregister {
+  my ($self) = @_;
+
+  require Venus::Path;
+
+  my $path = Venus::Path->new($PATH);
+
+  $path = $path->child($self->exchange) if $self->exchange;
+
+  my $key = $self->recv_key($self->pid);
+
+  $path = $path->child($key);
+
+  $path->rmdirs if $path->exists;
+
+  return $self;
+}
+
 sub untrap {
   my ($self, $name) = @_;
 
@@ -476,11 +923,13 @@ sub unwatch {
 # ERRORS
 
 sub error_on_chdir {
-  my ($self, $path, $pid) = @_;
+  my ($self, $path, $pid, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.chdir',
-    message => "Can't chdir \"$path\": $!",
+    message => "Can't chdir \"$path\": $err",
     stash => {
       path => $path,
       pid => $pid,
@@ -489,11 +938,13 @@ sub error_on_chdir {
 }
 
 sub error_on_fork_process {
-  my ($self, $pid) = @_;
+  my ($self, $pid, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.fork.process',
-    message => "Can't fork process $pid: $!",
+    message => "Can't fork process $pid: $err",
     stash => {
       pid => $pid,
     }
@@ -513,11 +964,13 @@ sub error_on_fork_support {
 }
 
 sub error_on_setid {
-  my ($self, $pid) = @_;
+  my ($self, $pid, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.setid',
-    message => "Can't start a new session: $!",
+    message => "Can't start a new session: $err",
     stash => {
       pid => $pid,
     }
@@ -525,11 +978,13 @@ sub error_on_setid {
 }
 
 sub error_on_stderr {
-  my ($self, $path, $pid) = @_;
+  my ($self, $path, $pid, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.stderr',
-    message => "Can't redirect STDERR to \"$path\": $!",
+    message => "Can't redirect STDERR to \"$path\": $err",
     stash => {
       path => $path,
       pid => $pid,
@@ -538,11 +993,13 @@ sub error_on_stderr {
 }
 
 sub error_on_stdin {
-  my ($self, $path, $pid) = @_;
+  my ($self, $path, $pid, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.stdin',
-    message => "Can't redirect STDIN to \"$path\": $!",
+    message => "Can't redirect STDIN to \"$path\": $err",
     stash => {
       path => $path,
       pid => $pid,
@@ -551,14 +1008,71 @@ sub error_on_stdin {
 }
 
 sub error_on_stdout {
-  my ($self, $path, $pid) = @_;
+  my ($self, $path, $pid, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.stdout',
-    message => "Can't redirect STDOUT to \"$path\": $!",
+    message => "Can't redirect STDOUT to \"$path\": $err",
     stash => {
       path => $path,
       pid => $pid,
+    }
+  };
+}
+
+sub error_on_timeout_poll {
+  my ($self, $timeout, $code) = @_;
+
+  my $name = ref $code eq 'CODE' ? '__ANON__' : "\"$code\"";
+  my $exchange = $self->exchange;
+  my $pid = $self->pid;
+
+  return {
+    name => 'on.timeout.poll',
+    message => "Timed out after $timeout seconds in process $pid while polling $name",
+    stash => {
+      exchange => $exchange,
+      pid => $pid,
+      code => $code,
+      timeout => $timeout,
+    }
+  };
+}
+
+sub error_on_timeout_pool {
+  my ($self, $timeout, $pool_size) = @_;
+
+  my $exchange = $self->exchange;
+  my $pid = $self->pid;
+
+  return {
+    name => 'on.timeout.pool',
+    message => "Timed out after $timeout seconds in process $pid while pooling",
+    stash => {
+      exchange => $exchange,
+      pid => $pid,
+      pool_size => $pool_size,
+      timeout => $timeout,
+    }
+  };
+}
+
+sub error_on_timeout_sync {
+  my ($self, $timeout, $pool_size) = @_;
+
+  my $exchange = $self->exchange;
+  my $pid = $self->pid;
+
+  return {
+    name => 'on.timeout.sync',
+    message => "Timed out after $timeout seconds in process $pid while syncing",
+    stash => {
+      exchange => $exchange,
+      pid => $pid,
+      pool_size => $pool_size,
+      timeout => $timeout,
     }
   };
 }

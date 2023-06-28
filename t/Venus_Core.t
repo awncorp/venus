@@ -48,13 +48,16 @@ method: destroy
 method: does
 method: export
 method: from
+method: get
 method: import
 method: item
 method: meta
 method: name
 method: role
+method: set
 method: subs
 method: test
+method: unimport
 
 =cut
 
@@ -941,11 +944,15 @@ interface provided.
   User->ROLE('Admin');
 
   sub BUILD {
-    return;
+    my ($self) = @_;
+
+    return $self;
   }
 
   sub BUILDARGS {
-    return;
+    my ($self, @args) = @_;
+
+    return (@args);
   }
 
   package main;
@@ -977,11 +984,15 @@ $test->for('example', 1, 'does', sub {
   User->ROLE('Admin');
 
   sub BUILD {
-    return;
+    my ($self) = @_;
+
+    return $self;
   }
 
   sub BUILDARGS {
-    return;
+    my ($self, @args) = @_;
+
+    return (@args);
   }
 
   package main;
@@ -1150,6 +1161,52 @@ $test->for('example', 2, 'from', sub {
   ok $result->isa('Entity');
   ok $result->can('startup');
   ok $result->can('shutdown');
+
+  $result
+});
+
+=method get
+
+The GET method is a class instance lifecycle hook which is responsible for
+I<"getting"> instance items (or attribute values). By default, all class
+attributes I<"getters"> are dispatched to this method.
+
+=signature get
+
+  GET(Str $name) (Any)
+
+=metadata get
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 get
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS(title => 'Engineer');
+
+  # bless({title => 'Engineer'}, 'User')
+
+  my $get = $user->GET('title');
+
+  # "Engineer"
+
+=cut
+
+$test->for('example', 1, 'get', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "Engineer";
 
   $result
 });
@@ -1531,6 +1588,52 @@ $test->for('example', 2, 'role', sub {
   $result
 });
 
+=method set
+
+The SET method is a class instance lifecycle hook which is responsible for
+I<"setting"> instance items (or attribute values). By default, all class
+attributes I<"setters"> are dispatched to this method.
+
+=signature set
+
+  SET(Str $name, Any @args) (Any)
+
+=metadata get
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 set
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS(title => 'Engineer');
+
+  # bless({title => 'Engineer'}, 'User')
+
+  my $set = $user->SET('title', 'Manager');
+
+  # "Manager"
+
+=cut
+
+$test->for('example', 1, 'set', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "Manager";
+
+  $result
+});
+
 =method subs
 
 The SUBS method returns the routines defined on the package and consumed from
@@ -1629,6 +1732,80 @@ $test->for('example', 1, 'test', sub {
   ok $result->isa('User');
   ok $result->DOES('Admin');
   ok $result->DOES('IsAdmin');
+
+  $result
+});
+
+=method unimport
+
+The UNIMPORT method is a class building lifecycle hook which is invoked
+whenever the L<perlfunc/no> declaration is used.
+
+=signature unimport
+
+  UNIMPORT(Str $into, Any @args) (Any)
+
+=metadata unimport
+
+{
+  since => '2.91',
+}
+
+=example-1 unimport
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  User->UNIMPORT;
+
+  # 'User'
+
+=cut
+
+$test->for('example', 1, 'unimport', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'User';
+
+  $result
+});
+
+=method use
+
+The USE method is a class building lifecycle hook which is invoked
+whenever the L<perlfunc/use> declaration is used.
+
+=signature use
+
+  USE(Str $into, Any @args) (Any)
+
+=metadata use
+
+{
+  since => '2.91',
+}
+
+=example-1 use
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  User->USE;
+
+  # 'User'
+
+=cut
+
+$test->for('example', 1, 'use', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'User';
 
   $result
 });

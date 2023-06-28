@@ -1,0 +1,1402 @@
+
+=head1 NAME
+
+Venus::Task - Task Class
+
+=cut
+
+=head1 ABSTRACT
+
+Task Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  # bless({...}, 'Example')
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a superclass, methods, and a simple framework for
+creating CLIs (command-line interfaces).
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 data
+
+  data(ArrayRef $data) (ArrayRef)
+
+The data attribute is read-write, accepts C<(ArrayRef)> values, and is
+optional.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $set_data = $task->data([1..4]);
+
+  # [1..4]
+
+=back
+
+=over 4
+
+=item data example 2
+
+  # given: synopsis
+
+  # given: example-1 data
+
+  package main;
+
+  my $get_data = $task->data;
+
+  # [1..4]
+
+=back
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 args
+
+  args() (HashRef)
+
+The args method can be overridden and returns a hashref suitable to be passed
+to the L<Venus::Cli/set> method as type C<"arg">. An C<"arg"> is a CLI
+positional argument.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item args example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $args = $task->args;
+
+  # {}
+
+=back
+
+=over 4
+
+=item args example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub args {
+
+    return {
+      name => {
+        help => 'Name of user',
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $args = $task->args;
+
+  # {
+  #   name => {
+  #     help => 'Name of user',
+  #   },
+  # }
+
+=back
+
+=cut
+
+=head2 cmds
+
+  cmds() (HashRef)
+
+The cmds method can be overridden and returns a hashref suitable to be passed
+to the L<Venus::Cli/set> method as type C<"cmd">. A C<"cmd"> is a CLI command
+which maps to an positional argument declare by L</arg>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item cmds example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $cmds = $task->cmds;
+
+  # {}
+
+=back
+
+=over 4
+
+=item cmds example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub args {
+
+    return {
+      op => {
+        help => 'Name of operation',
+      },
+    }
+  }
+
+  sub cmds {
+
+    return {
+      init => {
+        help => 'Initialize the system',
+        arg => 'op',
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $cmds = $task->cmds;
+
+  # {
+  #   init => {
+  #     help => 'Initialize the system',
+  #     arg => 'op',
+  #   },
+  # }
+
+=back
+
+=cut
+
+=head2 description
+
+  description() (Task)
+
+The description method doesn't exist on the L<Venus::Task> superclass but if
+defined returns a string that will be used as the CLI "description" (before the
+arguments, options, and commands text).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item description example 1
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub description {
+
+    "This text used in the description area of the usage text"
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $description = $task->description;
+
+  # "..."
+
+=back
+
+=cut
+
+=head2 execute
+
+  execute() (Task)
+
+The execute method can be overridden and returns the invocant. This method
+prepares the L<Venus::Cli> via L</prepare>, and runs the L</startup>,
+L</handler>, and L</shutdown> sequences, passing L<Venus::Cli/parsed> to each
+method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item execute example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $execute = $task->execute;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item execute example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub args {
+
+    return {
+      name => {
+        help => 'Name of user',
+      },
+    }
+  }
+
+  sub opts {
+
+    return {
+      sudo => {
+        help => 'Elevate user privileges',
+        alias => ['s'],
+      },
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  sub startup {
+    my ($self) = @_;
+
+    $self->{startup} = time;
+
+    return $self;
+  }
+
+  sub handler {
+    my ($self, $data) = @_;
+
+    $self->{handler} = time;
+    $self->{parsed} = $data;
+
+    return $self;
+  }
+
+  sub shutdown {
+    my ($self) = @_;
+
+    $self->{shutdown} = time;
+
+    return $self;
+  }
+
+  package main;
+
+  my $task = Example->new(['admin', '-s']);
+
+  my $execute = $task->execute;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item execute example 3
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub args {
+
+    return {
+      name => {
+        help => 'Name of user',
+      },
+    }
+  }
+
+  sub opts {
+
+    return {
+      sudo => {
+        help => 'Elevate user privileges',
+        alias => ['s'],
+      },
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  sub handler {
+    my ($self, $data) = @_;
+
+    $self->{handler} = time;
+    $self->{parsed} = $data;
+
+    return $self;
+  }
+
+  package main;
+
+  my $task = Example->new(['-s']);
+
+  my $execute = $task->execute;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=cut
+
+=head2 exit
+
+  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+
+The exit method exits the program using the exit code provided. The exit code
+defaults to C<0>. Optionally, you can dispatch before exiting by providing a
+method name or coderef, and arguments.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item exit example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $task->exit;
+
+  # ()
+
+=back
+
+=over 4
+
+=item exit example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $task->exit(0);
+
+  # ()
+
+=back
+
+=over 4
+
+=item exit example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $task->exit(1);
+
+  # ()
+
+=back
+
+=over 4
+
+=item exit example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $exit = $task->exit(1, 'log_error', 'oh no');
+
+  # ()
+
+=back
+
+=cut
+
+=head2 fail
+
+  fail(Str|CodeRef $code, Any @args) (Any)
+
+The fail method exits the program with the exit code C<1>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item fail example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $fail = $task->fail;
+
+  # ()
+
+=back
+
+=over 4
+
+=item fail example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $fail = $task->fail('log_error', 'oh no');
+
+  # ()
+
+=back
+
+=cut
+
+=head2 footer
+
+  footer() (Task)
+
+The footer method doesn't exist on the L<Venus::Task> superclass but if defined
+returns a string that will be used as the CLI "footer" (after the arguments,
+options, and commands text).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item footer example 1
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub footer {
+
+    "This text used in the footer area of the usage text"
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $footer = $task->footer;
+
+  # "..."
+
+=back
+
+=cut
+
+=head2 handler
+
+  handler(HashRef $data) (Task)
+
+The handler method can and should be overridden and returns the invocant. This
+method is where the central task operations are meant to happen. By default, if
+not overriden this method calls L</usage> if a "help" flag is detected.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item handler example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $handler = $task->handler({});
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item handler example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $handler = $task->handler({help => 1});
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item handler example 3
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub handler {
+    my ($self, $data) = @_;
+
+    $self->{handler} = time;
+    $self->{parsed} = $data;
+
+    return $self;
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $handler = $task->handler({});
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=cut
+
+=head2 header
+
+  header() (Task)
+
+The header method doesn't exist on the L<Venus::Task> superclass but if defined
+returns a string that will be used as the CLI "header" (after the title, before
+the arguments, options, and commands text).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item header example 1
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub header {
+
+    "This text used in the header area of the usage text"
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $header = $task->header;
+
+  # "..."
+
+=back
+
+=cut
+
+=head2 help
+
+  help() (Str)
+
+The help method can be overridden and returns the result of L<Venus::Cli/help>.
+This method is returns the default help text based on the configuration of the
+L</cli> object.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item help example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $help = $task->help;
+
+  # "Usage: application"
+
+=back
+
+=over 4
+
+=item help example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub name {
+
+    return 'eg';
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  $task->prepare;
+
+  my $help = $task->help;
+
+  # "Usage: application"
+
+=back
+
+=cut
+
+=head2 log_debug
+
+  log_debug(Any @log_debug) (Log)
+
+The log_debug method dispatches to the L<Venus::Log/debug> method and returns the
+result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_debug example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_debug = $task->log_debug('something' ,'happened');
+
+  # bless({...}, 'Venus::Log')
+
+=back
+
+=cut
+
+=head2 log_error
+
+  log_error(Any @log_error) (Log)
+
+The log_error method dispatches to the L<Venus::Log/error> method and returns the
+result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_error example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_error = $task->log_error('something' ,'happened');
+
+  # bless({...}, 'Venus::Log')
+
+=back
+
+=cut
+
+=head2 log_fatal
+
+  log_fatal(Any @log_fatal) (Log)
+
+The log_fatal method dispatches to the L<Venus::Log/fatal> method and returns the
+result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_fatal example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_fatal = $task->log_fatal('something' ,'happened');
+
+  # bless({...}, 'Venus::Log')
+
+=back
+
+=cut
+
+=head2 log_info
+
+  log_info(Any @log_info) (Log)
+
+The log_info method dispatches to the L<Venus::Log/info> method and returns the
+result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_info example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_info = $task->log_info('something' ,'happened');
+
+  # bless({...}, 'Venus::Log')
+
+=back
+
+=cut
+
+=head2 log_level
+
+  log_level() (Str)
+
+The log_level method can be overridden and returns a valid L<Venus::Log/level>
+value. This method defaults to returning L<info>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_level example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_level = $task->log_level;
+
+  # "info"
+
+=back
+
+=cut
+
+=head2 log_trace
+
+  log_trace(Any @log_trace) (Log)
+
+The log_trace method dispatches to the L<Venus::Log/trace> method and returns the
+result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_trace example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_trace = $task->log_trace('something' ,'happened');
+
+  # bless({...}, 'Venus::Log')
+
+=back
+
+=cut
+
+=head2 log_warn
+
+  log_warn(Any @log_warn) (Log)
+
+The log_warn method dispatches to the L<Venus::Log/warn> method and returns the
+result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item log_warn example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $log_warn = $task->log_warn('something' ,'happened');
+
+  # bless({...}, 'Venus::Log')
+
+=back
+
+=cut
+
+=head2 name
+
+  name() (Task)
+
+The name method can be overridden and returns the name of the task (and
+application). This method is default to C<$0> if not overridden.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $name = $task->name;
+
+  # "/path/to/application"
+
+=back
+
+=over 4
+
+=item name example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub name {
+
+    return 'eg';
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $name = $task->name;
+
+  # "eg"
+
+=back
+
+=cut
+
+=head2 okay
+
+  okay(Str|CodeRef $code, Any @args) (Any)
+
+The okay method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item okay example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $okay = $task->okay;
+
+  # ()
+
+=back
+
+=over 4
+
+=item okay example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $okay = $task->okay('log_info', 'yatta');
+
+  # ()
+
+=back
+
+=cut
+
+=head2 opts
+
+  opts() (HashRef)
+
+The opts method can be overridden and returns a hashref suitable to be passed
+to the L<Venus::Cli/set> method as type C<"opt">. An C<"opt"> is a CLI option
+(or flag).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item opts example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $opts = $task->opts;
+
+  # {}
+
+=back
+
+=over 4
+
+=item opts example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $opts = $task->opts;
+
+  # {
+  #   help => {
+  #     help => 'Display help',
+  #     alias => ['h'],
+  #   },
+  # }
+
+=back
+
+=cut
+
+=head2 output
+
+  output(Str $level, Str @messages) (Task)
+
+The output method is configured as the L<Venus::Log/handler> by L</prepare>,
+can be overridden and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item output example 1
+
+  # given: synopsis
+
+  package main;
+
+  $task->prepare;
+
+  $task = $task->output('info', 'something happened');
+
+  # bless({...}, 'Example')
+
+=back
+
+=cut
+
+=head2 prepare
+
+  prepare() (Task)
+
+The prepare method can be overridden, but typically shouldn't, is responsible
+for configuring the L</cli> and L</log> objects, parsing the arguments, and
+after returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item prepare example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $prepare = $task->prepare;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item prepare example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub args {
+
+    return {
+      name => {
+        help => 'Name of user',
+      },
+    }
+  }
+
+  sub opts {
+
+    return {
+      sudo => {
+        help => 'Elevate user privileges',
+        alias => ['s'],
+      },
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new;
+
+  my $prepare = $task->prepare;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item prepare example 3
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub args {
+
+    return {
+      name => {
+        help => 'Name of user',
+      },
+    }
+  }
+
+  sub cmds {
+
+    return {
+      admin => {
+        help => 'Run as an admin',
+        arg => 'name',
+      },
+      user => {
+        help => 'Run as a user',
+        arg => 'name',
+      },
+    }
+  }
+
+  sub opts {
+
+    return {
+      sudo => {
+        help => 'Elevate user privileges',
+        alias => ['s'],
+      },
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['admin', '-s']);
+
+  my $prepare = $task->prepare;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=cut
+
+=head2 run
+
+  run(Any @args) (Task)
+
+The run class method will automatically execute the task class by instansiating
+the class and calling the L</execute> method and returns the invocant. This
+method is meant to be used directly in package scope outside of any routine,
+and will only auto-execute under the conditions that the caller is the "main"
+package space and the C<VENUS_TASK_RUN> environment variable is truthy.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item run example 1
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my $run = $task->run;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item run example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  run Example;
+
+  # 'Example'
+
+=back
+
+=cut
+
+=head2 shutdown
+
+  shutdown(HashRef $data) (Task)
+
+The shutdown method can be overridden and returns the invocant. This method is
+called by L</execute> automatically after L</handler> and is passed the result
+of L<Venus::Cli/parsed>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item shutdown example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $shutdown = $task->shutdown({});
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=cut
+
+=head2 startup
+
+  startup(HashRef $data) (Task)
+
+The startup method can be overridden and returns the invocant. This method is
+called by L</execute> automatically after L</prepare> and before L</handler>,
+and is passed the result of L<Venus::Cli/parsed>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item startup example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $startup = $task->startup({});
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=cut
+
+=head2 system
+
+  system(Str @args) (Task)
+
+The system method attempts to make a L<perlfunc/system> call and returns the
+invocant. If the system call is unsuccessful an error is thrown.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item system example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $system = $task->system($^X, '-V');
+
+  # bless({...},  'Example')
+
+=back
+
+=over 4
+
+=item system example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $system = $task->system('/path/to/nowhere');
+
+  # Exception! (isa Example::Error) (see error_on_system_call)
+
+=back
+
+=cut
+
+=head2 usage
+
+  usage() (Task)
+
+The usage method exits the program with the exit code C<1> after calling
+L</log_info> with the result of L</help>. This method makes it easy to output
+the default help text and end the program if some condition isn't met.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item usage example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $usage = $task->usage;
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_system_call>
+
+This package may raise an error_on_system_call exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (['/path/to/nowhere', 'arg1', 'arg2'], $?);
+
+  my $error = $task->throw('error_on_system_call', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_system_call"
+
+  # my $message = $error->message;
+
+  # "Can't make system call \"/path/to/nowhere arg1 arg2\": $?"
+
+  # my $args = $error->stash('args');
+
+  # []
+
+=back
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

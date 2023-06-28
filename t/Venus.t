@@ -1376,7 +1376,7 @@ $test->for('example', 1, 'config', sub {
 
   use Venus 'config';
 
-  my $config = config {}, 'from_perl', '{"data"=>1}';
+  my $config = config {}, 'read_perl', '{"data"=>1}';
 
   # bless({...}, 'Venus::Config')
 

@@ -109,6 +109,16 @@ sub data {
   return ${"${name}::META"};
 }
 
+sub emit {
+  my ($self, $hook, @args) = @_;
+
+  my $name = $self->{name};
+
+  $hook = uc $hook;
+
+  return $name->$hook(@args);
+}
+
 sub find {
   my ($self, $type, $name) = @_;
 

@@ -29,10 +29,18 @@ sub catch {
   return wantarray ? ($error ? ($error, undef) : ($error, @result)) : $error;
 }
 
+sub maybe {
+  my ($self, $method, @args) = @_;
+
+  my @result = $self->try($method, @args)->error(\my $error)->result;
+
+  return wantarray ? ($error ? (undef) : (@result)) : ($error ? undef : $result[0]);
+}
+
 # EXPORTS
 
 sub EXPORT {
-  ['catch']
+  ['catch', 'maybe']
 }
 
 1;

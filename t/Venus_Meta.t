@@ -41,6 +41,7 @@ method: attrs
 method: base
 method: bases
 method: data
+method: emit
 method: find
 method: local
 method: mixin
@@ -415,6 +416,44 @@ $test->for('example', 1, 'data', sub {
   $result
 });
 
+=method emit
+
+The emit method invokes the lifecycle hook specified on the underlying package
+and returns the result.
+
+=signature emit
+
+  emit(Str $name, Any @args) (Any)
+
+=metadata emit
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 emit
+
+  # given: synopsis
+
+  package main;
+
+  my $result = $meta->emit('attr', 'mname');
+
+  # "User"
+
+=cut
+
+$test->for('example', 1, 'emit', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "User";
+  ok $result->meta->attr('mname');
+
+  $result
+});
+
 =method find
 
 The find method finds and returns the first configuration for the property type
@@ -633,6 +672,7 @@ $test->for('example', 4, 'local', sub {
     'id',
     'login',
     'mixin',
+    'mname',
     'password',
     'test',
     'true',

@@ -30,7 +30,7 @@ sub ATTR {
 
   $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$index, [$attr, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
 }
@@ -58,7 +58,7 @@ sub BASE {
 
   $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$index, [$base, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
 }
@@ -78,16 +78,17 @@ sub BLESS {
   # defined in each attached role.
 
   # If one (or more) roles use reflection (i.e. calls "META") to introspect the
-  # package's configuration, that could cause a performance problem given that
+  # package's configuration, which could cause a performance problem given that
   # the Venus::Meta class uses recursion to introspect all superclasses and
-  # roles in order to determine and present aggregate lists of package members.
+  # roles to determine and present aggregate lists of package members.  It's
+  # your classic n+1 problem.
 
   # The solution to this is to cache the associated Venus::Meta object which
   # itself caches the results of its recursive lookups. The cache is stored on
-  # the subclass (i.e. on the calling package) the cache wil go away whenever
-  # the package does, e.g. Venus::Space#unload.
+  # the subclass (i.e. on the calling package) and the cache will go away
+  # whenever the package does.
 
-  ${"${name}::@{[$self->METAOBJECT]}"} ||= Venus::Meta->new(name => $name)
+  ${"${name}::@{[$self->METACACHE]}"} ||= Venus::Meta->new(name => $name)
     if $name ne 'Venus::Meta';
 
   return $anew;
@@ -145,6 +146,12 @@ sub FROM {
   return $self;
 }
 
+sub GET {
+  my ($self, $name) = @_;
+
+  return $self->{$name};
+}
+
 sub IMPORT {
   my ($self, $into) = @_;
 
@@ -155,8 +162,8 @@ sub ITEM {
   my ($self, $name, @args) = @_;
 
   return undef if !$name;
-  return $self->{$name} if !@args;
-  return $self->{$name} = $args[0];
+  return $self->GET($name) if !@args;
+  return $self->SET($name, $args[0]);
 }
 
 sub META {
@@ -168,14 +175,14 @@ sub META {
 
   my $name = $self->NAME;
 
-  return ${"${name}::@{[$self->METAOBJECT]}"}
+  return ${"${name}::@{[$self->METACACHE]}"}
     || Venus::Meta->new(name => $name);
 }
 
-sub METAOBJECT {
+sub METACACHE {
   my ($self) = @_;
 
-  return 'METAOBJECT';
+  return 'METACACHE';
 }
 
 sub MIXIN {
@@ -197,7 +204,7 @@ sub MIXIN {
 
   $${"@{[$self->NAME]}::META"}{MIXIN}{$mixin} = [$index, [$mixin, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
 }
@@ -227,9 +234,15 @@ sub ROLE {
 
   $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$index, [$role, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METAOBJECT]}"} = undef;
+  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
 
   return $self;
+}
+
+sub SET {
+  my ($self, $name, $data) = @_;
+
+  return $self->{$name} = $data;
 }
 
 sub SUBS {
@@ -249,6 +262,18 @@ sub TEST {
   $self->ROLE($role);
 
   $role->AUDIT($self->NAME) if $role->can('AUDIT');
+
+  return $self;
+}
+
+sub UNIMPORT {
+  my ($self, $into, @args) = @_;
+
+  return $self;
+}
+
+sub USE {
+  my ($self, $into, @args) = @_;
 
   return $self;
 }

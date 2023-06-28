@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+
+package main;
+
+use 5.018;
+
+use strict;
+use warnings;
+
+BEGIN {
+  $ENV{VENUS_TASK_RUN} = 1;
+  $ENV{VENUS_RUN_NAME} = 'vns';
+}
+
+use Venus::Run;
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+vns
+
+=head1 SYNOPSIS
+
+  vns init
+
+=head1 DESCRIPTION
+
+Run and alias arbitrary commands, and tasks derived from L<Venus::Task>, using
+L<Venus::Run>.
+
+=head1 QUICKSTART
+
+  # Mint a new configuration file
+  vns init
+
+  # Install a distribution
+  vns cpan $DIST
+
+  # Install dependencies in the CWD
+  vns deps
+
+  # Check that a package can be compiled
+  vns okay $FILE
+
+  # Use the Perl debugger as a REPL
+  vns repl
+
+  # Evaluate arbitrary Perl expressions
+  vns exec "say 'hello'"
+
+  # Test the Perl project in the CWD
+  vns test t
+
+=head1 SEE ALSO
+
+L<Venus>, L<Venus::Run>, L<Venus::Task>.
+
+=cut

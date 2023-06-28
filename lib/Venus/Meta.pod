@@ -289,6 +289,31 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 emit
+
+  emit(Str $name, Any @args) (Any)
+
+The emit method invokes the lifecycle hook specified on the underlying package
+and returns the result.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item emit example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $result = $meta->emit('attr', 'mname');
+
+  # "User"
+
+=back
+
+=cut
+
 =head2 find
 
   find(Str $type, Str $name) (Tuple[Str,Tuple[Int,ArrayRef]])

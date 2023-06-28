@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    2.91
+    3.04
 
 SYNOPSIS
 
@@ -690,7 +690,7 @@ FUNCTIONS
       
         use Venus 'config';
       
-        my $config = config {}, 'from_perl', '{"data"=>1}';
+        my $config = config {}, 'read_perl', '{"data"=>1}';
       
         # bless({...}, 'Venus::Config')
 

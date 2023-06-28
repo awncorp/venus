@@ -36,17 +36,24 @@ $test->for('abstract');
 
 =includes
 
-method: from_file
-method: from_json
-method: from_json_file
-method: from_perl
-method: from_perl_file
-method: from_yaml
-method: from_yaml_file
+method: read_file
+method: read_json
+method: read_json_file
+method: read_perl
+method: read_perl_file
+method: read_yaml
+method: read_yaml_file
 method: metadata
 method: reify
 method: resolve
 method: services
+method: write_file
+method: write_json
+method: write_json_file
+method: write_perl
+method: write_perl_file
+method: write_yaml
+method: write_yaml_file
 
 =cut
 
@@ -60,7 +67,7 @@ $test->for('includes');
 
   my $config = Venus::Config->new;
 
-  # $config = $config->from_file('app.pl');
+  # $config = $config->read_file('app.pl');
 
   # my $name = $config->resolve('name');
 
@@ -103,34 +110,34 @@ Venus::Role::Valuable
 
 $test->for('integrates');
 
-=method from_file
+=method read_file
 
-The from_file method load a Perl, YAML, or JSON configuration file, based on
+The read_file method load a Perl, YAML, or JSON configuration file, based on
 the file extension, and returns a new L<Venus::Config> object.
 
-=signature from_file
+=signature read_file
 
-  from_file(Str $path) (Config)
+  read_file(Str $path) (Config)
 
-=metadata from_file
+=metadata read_file
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_file
+=example-1 read_file
 
   package main;
 
   use Venus::Config;
 
-  my $config = Venus::Config->from_file('t/conf/test.perl');
+  my $config = Venus::Config->read_file('t/conf/read.perl');
 
   # bless(..., 'Venus::Config')
 
 =cut
 
-$test->for('example', 1, 'from_file', sub {
+$test->for('example', 1, 'read_file', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Config');
@@ -141,19 +148,19 @@ $test->for('example', 1, 'from_file', sub {
   $result
 });
 
-=example-2 from_file
+=example-2 read_file
 
   package main;
 
   use Venus::Config;
 
-  my $config = Venus::Config->from_file('t/conf/test.json');
+  my $config = Venus::Config->read_file('t/conf/read.json');
 
   # bless(..., 'Venus::Config')
 
 =cut
 
-$test->for('example', 2, 'from_file', sub {
+$test->for('example', 2, 'read_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
@@ -172,19 +179,19 @@ $test->for('example', 2, 'from_file', sub {
   $result
 });
 
-=example-3 from_file
+=example-3 read_file
 
   package main;
 
   use Venus::Config;
 
-  my $config = Venus::Config->from_file('t/conf/test.yaml');
+  my $config = Venus::Config->read_file('t/conf/read.yaml');
 
   # bless(..., 'Venus::Config')
 
 =cut
 
-$test->for('example', 3, 'from_file', sub {
+$test->for('example', 3, 'read_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
@@ -203,28 +210,28 @@ $test->for('example', 3, 'from_file', sub {
   $result
 });
 
-=method from_json
+=method read_json
 
-The from_json method returns a new L<Venus::Config> object based on the JSON
+The read_json method returns a new L<Venus::Config> object based on the JSON
 string provided.
 
-=signature from_json
+=signature read_json
 
-  from_json(Str $data) (Config)
+  read_json(Str $data) (Config)
 
-=metadata from_json
+=metadata read_json
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_json
+=example-1 read_json
 
   # given: synopsis
 
   package main;
 
-  $config = $config->from_json(q(
+  $config = $config->read_json(q(
   {
     "$metadata": {
       "tmplog": "/tmp/log"
@@ -241,7 +248,7 @@ string provided.
 
 =cut
 
-$test->for('example', 1, 'from_json', sub {
+$test->for('example', 1, 'read_json', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
@@ -260,28 +267,28 @@ $test->for('example', 1, 'from_json', sub {
   $result
 });
 
-=method from_json_file
+=method read_json_file
 
-The from_json_file method uses L<Venus::Path> to return a new L<Venus::Config>
+The read_json_file method uses L<Venus::Path> to return a new L<Venus::Config>
 object based on the file provided.
 
-=signature from_json_file
+=signature read_json_file
 
-  from_json_file(Str $file) (Config)
+  read_json_file(Str $file) (Config)
 
-=metadata from_json_file
+=metadata read_json_file
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_json_file
+=example-1 read_json_file
 
   # given: synopsis
 
   package main;
 
-  $config = $config->from_json_file('t/conf/test.json');
+  $config = $config->read_json_file('t/conf/read.json');
 
   # bless(..., 'Venus::Config')
 
@@ -289,7 +296,7 @@ object based on the file provided.
 
 =cut
 
-$test->for('example', 1, 'from_json_file', sub {
+$test->for('example', 1, 'read_json_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
@@ -308,28 +315,28 @@ $test->for('example', 1, 'from_json_file', sub {
   $result
 });
 
-=method from_perl
+=method read_perl
 
-The from_perl method returns a new L<Venus::Config> object based on the Perl
+The read_perl method returns a new L<Venus::Config> object based on the Perl
 string provided.
 
-=signature from_perl
+=signature read_perl
 
-  from_perl(Str $data) (Config)
+  read_perl(Str $data) (Config)
 
-=metadata from_perl
+=metadata read_perl
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_perl
+=example-1 read_perl
 
   # given: synopsis
 
   package main;
 
-  $config = $config->from_perl(q(
+  $config = $config->read_perl(q(
   {
     '$metadata' => {
       tmplog => "/tmp/log"
@@ -346,7 +353,7 @@ string provided.
 
 =cut
 
-$test->for('example', 1, 'from_perl', sub {
+$test->for('example', 1, 'read_perl', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Config');
@@ -357,28 +364,28 @@ $test->for('example', 1, 'from_perl', sub {
   $result
 });
 
-=method from_perl_file
+=method read_perl_file
 
-The from_perl_file method uses L<Venus::Path> to return a new L<Venus::Config>
+The read_perl_file method uses L<Venus::Path> to return a new L<Venus::Config>
 object based on the file provided.
 
-=signature from_perl_file
+=signature read_perl_file
 
-  from_perl_file(Str $file) (Config)
+  read_perl_file(Str $file) (Config)
 
-=metadata from_perl_file
+=metadata read_perl_file
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_perl_file
+=example-1 read_perl_file
 
   # given: synopsis
 
   package main;
 
-  $config = $config->from_perl_file('t/conf/test.perl');
+  $config = $config->read_perl_file('t/conf/read.perl');
 
   # bless(..., 'Venus::Config')
 
@@ -386,7 +393,7 @@ object based on the file provided.
 
 =cut
 
-$test->for('example', 1, 'from_perl_file', sub {
+$test->for('example', 1, 'read_perl_file', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Config');
@@ -397,28 +404,28 @@ $test->for('example', 1, 'from_perl_file', sub {
   $result
 });
 
-=method from_yaml
+=method read_yaml
 
-The from_yaml method returns a new L<Venus::Config> object based on the YAML
+The read_yaml method returns a new L<Venus::Config> object based on the YAML
 string provided.
 
-=signature from_yaml
+=signature read_yaml
 
-  from_yaml(Str $data) (Config)
+  read_yaml(Str $data) (Config)
 
-=metadata from_yaml
+=metadata read_yaml
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_yaml
+=example-1 read_yaml
 
   # given: synopsis
 
   package main;
 
-  $config = $config->from_yaml(q(
+  $config = $config->read_yaml(q(
   '$metadata':
     tmplog: /tmp/log
   '$services':
@@ -434,7 +441,7 @@ string provided.
 
 =cut
 
-$test->for('example', 1, 'from_yaml', sub {
+$test->for('example', 1, 'read_yaml', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
@@ -453,28 +460,28 @@ $test->for('example', 1, 'from_yaml', sub {
   $result
 });
 
-=method from_yaml_file
+=method read_yaml_file
 
-The from_yaml_file method uses L<Venus::Path> to return a new L<Venus::Config>
+The read_yaml_file method uses L<Venus::Path> to return a new L<Venus::Config>
 object based on the YAML string provided.
 
-=signature from_yaml_file
+=signature read_yaml_file
 
-  from_yaml_file(Str $file) (Config)
+  read_yaml_file(Str $file) (Config)
 
-=metadata from_yaml_file
+=metadata read_yaml_file
 
 {
-  since => '1.95',
+  since => '2.91',
 }
 
-=example-1 from_yaml_file
+=example-1 read_yaml_file
 
   # given: synopsis
 
   package main;
 
-  $config = $config->from_yaml_file('t/conf/test.yaml');
+  $config = $config->read_yaml_file('t/conf/read.yaml');
 
   # bless(..., 'Venus::Config')
 
@@ -482,7 +489,7 @@ object based on the YAML string provided.
 
 =cut
 
-$test->for('example', 1, 'from_yaml_file', sub {
+$test->for('example', 1, 'read_yaml_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
@@ -543,7 +550,7 @@ $test->for('example', 1, 'metadata', sub {
 
   package main;
 
-  $config = $config->from_perl(q(
+  $config = $config->read_perl(q(
   {
     '$metadata' => {
       tmplog => "/tmp/log"
@@ -578,7 +585,7 @@ $test->for('example', 2, 'metadata', sub {
 
   package main;
 
-  $config = $config->from_perl(q(
+  $config = $config->read_perl(q(
   {
     '$metadata' => {
       tmplog => "/tmp/log"
@@ -1010,7 +1017,7 @@ $test->for('example', 1, 'services', sub {
 
   package main;
 
-  $config = $config->from_perl(q(
+  $config = $config->read_perl(q(
   {
     '$metadata' => {
       tmplog => "/tmp/log"
@@ -1051,7 +1058,7 @@ $test->for('example', 2, 'services', sub {
 
   package main;
 
-  $config = $config->from_perl(q(
+  $config = $config->read_perl(q(
   {
     '$metadata' => {
       tmplog => "/tmp/log"
@@ -1328,6 +1335,404 @@ $test->for('example', 1, '$metadata', sub {
   ok $result->isa('Venus::Config');
   my $return = $result->resolve('home');
   ok $return->isa('Venus::Path');
+
+  $result
+});
+
+=method write_file
+
+The write_file method saves a Perl, YAML, or JSON configuration file, based on
+the file extension, and returns a new L<Venus::Config> object.
+
+=signature write_file
+
+  write_file(Str $path) (Config)
+
+=metadata write_file
+
+{
+  since => '2.91',
+}
+
+=example-1 write_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  });
+
+  $config = $config->write_file('t/conf/write.perl');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'write_file', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  ok $result->value;
+  $result = $result->read_file('t/conf/write.perl');
+  ok exists $result->value->{'$services'};
+
+  $result
+});
+
+=example-2 write_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => { package => "Venus/Path", argument => { '$metadata' => "tmplog" } }
+    }
+  });
+
+  $config = $config->write_file('t/conf/write.json');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 2, 'write_file', sub {
+  my ($tryable) = @_;
+  my $result;
+  if (require Venus::Json && not Venus::Json->package) {
+    diag 'No suitable JSON library found';
+    $result = Venus::Config->new;
+    ok 1;
+  }
+  else {
+    ok $result = $tryable->result;
+    ok $result->isa('Venus::Config');
+    ok $result->value;
+    $result = $result->read_file('t/conf/write.json');
+    ok exists $result->value->{'$metadata'};
+    ok exists $result->value->{'$services'};
+  }
+
+  $result
+});
+
+=example-3 write_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => { package => "Venus/Path", argument => { '$metadata' => "tmplog" } }
+    }
+  });
+
+  $config = $config->write_file('t/conf/write.yaml');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 3, 'write_file', sub {
+  my ($tryable) = @_;
+  my $result;
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    diag 'No suitable YAML library found';
+    $result = Venus::Config->new;
+    ok 1;
+  }
+  else {
+    ok $result = $tryable->result;
+    ok $result->isa('Venus::Config');
+    ok $result->value;
+    $result = $result->read_file('t/conf/write.yaml');
+    ok exists $result->value->{'$metadata'};
+    ok exists $result->value->{'$services'};
+  }
+
+  $result
+});
+
+=method write_json
+
+The write_json method returns a JSON encoded string based on the L</value> held
+by the underlying L<Venus::Config> object.
+
+=signature write_json
+
+  write_json() (Str)
+
+=metadata write_json
+
+{
+  since => '2.91',
+}
+
+=example-1 write_json
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus::Path" },
+    },
+  });
+
+  my $json = $config->write_json;
+
+  # '{ "$services":{ "log":{ "package":"Venus::Path" } } }'
+
+=cut
+
+$test->for('example', 1, 'write_json', sub {
+  my ($tryable) = @_;
+  my $result;
+  if (require Venus::Json && not Venus::Json->package) {
+    diag 'No suitable JSON library found';
+    $result = Venus::Config->new;
+    ok 1;
+  }
+  else {
+    $result = $tryable->result;
+    $result =~ s/[\n\s]//g;
+    is $result, '{"$services":{"log":{"package":"Venus::Path"}}}';
+  }
+
+  $result
+});
+
+=method write_json_file
+
+The write_json_file method saves a JSON configuration file and returns a new
+L<Venus::Config> object.
+
+=signature write_json_file
+
+  write_json_file(Str $path) (Config)
+
+=metadata write_json_file
+
+{
+  since => '2.91',
+}
+
+=example-1 write_json_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  });
+
+  $config = $config->write_json_file('t/conf/write.json');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'write_json_file', sub {
+  my ($tryable) = @_;
+  my $result;
+  if (require Venus::Json && not Venus::Json->package) {
+    diag 'No suitable JSON library found';
+    $result = Venus::Config->new;
+    ok 1;
+  }
+  else {
+    ok $result = $tryable->result;
+    ok $result->isa('Venus::Config');
+    ok $result->value;
+    $result = $result->read_file('t/conf/write.json');
+    ok exists $result->value->{'$services'};
+  }
+
+  $result
+});
+
+=method write_perl
+
+The write_perl method returns a FILE encoded string based on the L</value> held
+by the underlying L<Venus::Config> object.
+
+=signature write_perl
+
+  write_perl() (Str)
+
+=metadata write_perl
+
+{
+  since => '2.91',
+}
+
+=example-1 write_perl
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus::Path" },
+    },
+  });
+
+  my $perl = $config->write_perl;
+
+  # '{ "\$services" => { log => { package => "Venus::Path" } } }'
+
+=cut
+
+$test->for('example', 1, 'write_perl', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  $result =~ s/[\n\s]//g;
+  is $result, '{"\$services"=>{log=>{package=>"Venus::Path"}}}';
+
+  $result
+});
+
+=method write_perl_file
+
+The write_perl_file method saves a Perl configuration file and returns a new
+L<Venus::Config> object.
+
+=signature write_perl_file
+
+  write_perl_file(Str $path) (Config)
+
+=metadata write_perl_file
+
+{
+  since => '2.91',
+}
+
+=example-1 write_perl_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  });
+
+  $config = $config->write_perl_file('t/conf/write.perl');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'write_perl_file', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  ok $result->value;
+  $result = $result->read_file('t/conf/write.perl');
+  ok exists $result->value->{'$services'};
+
+  $result
+});
+
+=method write_yaml
+
+The write_yaml method returns a FILE encoded string based on the L</value> held
+by the underlying L<Venus::Config> object.
+
+=signature write_yaml
+
+  write_yaml() (Str)
+
+=metadata write_yaml
+
+{
+  since => '2.91',
+}
+
+=example-1 write_yaml
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus::Path" },
+    },
+  });
+
+  my $yaml = $config->write_yaml;
+
+  # '---\n$services:\n\s\slog:\n\s\s\s\spackage:\sVenus::Path'
+
+=cut
+
+$test->for('example', 1, 'write_yaml', sub {
+  my ($tryable) = @_;
+  my $result;
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    diag 'No suitable YAML library found';
+    $result = Venus::Config->new;
+    ok 1;
+  }
+  else {
+    $result = $tryable->result;
+    $result =~ s/[\n\s]//g;
+    is $result, '---$services:log:package:Venus::Path';
+  }
+
+  $result
+});
+
+=method write_yaml_file
+
+The write_yaml_file method saves a YAML configuration file and returns a new
+L<Venus::Config> object.
+
+=signature write_yaml_file
+
+  write_yaml_file(Str $path) (Config)
+
+=metadata write_yaml_file
+
+{
+  since => '2.91',
+}
+
+=example-1 write_yaml_file
+
+  # given: synopsis
+
+  my $value = $config->value({
+    '$services' => {
+      log => { package => "Venus/Path", argument => { value => "." } }
+    }
+  });
+
+  $config = $config->write_yaml_file('t/conf/write.yaml');
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'write_yaml_file', sub {
+  my ($tryable) = @_;
+  my $result;
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    diag 'No suitable YAML library found';
+    $result = Venus::Config->new;
+    ok 1;
+  }
+  else {
+    $result = $tryable->result;
+    ok $result->isa('Venus::Config');
+    ok $result->value;
+    $result = $result->read_file('t/conf/write.yaml');
+    ok exists $result->value->{'$services'};
+  }
 
   $result
 });

@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+no warnings 'once';
+
 use base 'Venus::Core';
 
 # METHODS
@@ -27,6 +29,12 @@ sub DESTROY {
   my ($self, @data) = @_;
 
   no strict 'refs';
+
+  my @mixins = @{$self->META->mixins};
+
+  for my $action (grep defined, map *{"${_}::DESTROY"}{"CODE"}, @mixins) {
+    $self->$action(@data);
+  }
 
   my @roles = @{$self->META->roles};
 
@@ -62,10 +70,28 @@ sub does {
   return $self->DOES(@args);
 }
 
+sub import {
+  my ($self) = @_;
+
+  require Venus;
+
+  @_ = ("${self} cannot be used via the \"use\" declaration");
+
+  goto \&Venus::fault;
+}
+
 sub meta {
   my ($self) = @_;
 
   return $self->META;
+}
+
+sub unimport {
+  my ($self, @args) = @_;
+
+  my $target = caller;
+
+  return $self->UNIMPORT($target, @args);
 }
 
 1;

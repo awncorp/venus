@@ -741,7 +741,7 @@ I<Since C<0.01>>
 
   my $path = Venus::Path->new($^X);
 
-  my ($call_output, $exit_code) = $path->mkcall('t/data/sun --heat-death');
+  my ($call_output, $exit_code) = $path->mkcall('t/data/sun', '--heat-death');
 
   # ("", 1)
 
@@ -968,7 +968,7 @@ I<Since C<2.80>>
 
   my $unknown = $path->child('unknown')->mkfile->move($path->child('titan'));
 
-  # bless({...}, 'Venus::Path')
+  # bless({value => 't/data/titan'}, 'Venus::Path')
 
 =back
 
@@ -1218,6 +1218,33 @@ I<Since C<0.01>>
   my $relative = $path->relative('/path/to/t');
 
   # bless({ value => "data/planets/mars" }, "Venus::Path")
+
+=back
+
+=cut
+
+=head2 rename
+
+  rename(Str | Path $path) (Path)
+
+The rename method performs a L</move> unless the path provided is only a file
+name, in which case it attempts a rename under the directory of the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item rename example 1
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/path/001');
+
+  my $rename = $path->rename('002');
+
+  # bless({value => 't/path/002'}, 'Venus::Path')
 
 =back
 

@@ -89,7 +89,7 @@ $test->for('includes');
 
   # [1]
 
-  # $cli->data;
+  # $cli->parsed;
 
   # {help => 1}
 

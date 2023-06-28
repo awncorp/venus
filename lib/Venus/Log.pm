@@ -43,7 +43,7 @@ sub build_args {
 sub build_self {
   my ($self, $data) = @_;
 
-  $self->handler(sub{CORE::print(STDOUT @_, "\n")}) if !$self->handler;
+  $self->handler(sub{shift; CORE::print(STDOUT @_, "\n")}) if !$self->handler;
   $self->separator(" ") if !$self->separator;
 
   return $self;
@@ -58,7 +58,7 @@ sub commit {
   my $set_level = $self->level_code($self->level);
 
   return ($req_level && $set_level && ($req_level >= $set_level))
-    ? $self->write($self->output($self->input(@args)))
+    ? $self->write($level, $self->output($self->input(@args)))
     : $self;
 }
 
@@ -171,9 +171,9 @@ sub warn {
 }
 
 sub write {
-  my ($self, @args) = @_;
+  my ($self, $level, @args) = @_;
 
-  $self->handler->(@args);
+  $self->handler->($level, @args);
 
   return $self;
 }

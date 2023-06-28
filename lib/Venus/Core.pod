@@ -659,11 +659,15 @@ I<Since C<1.00>>
   User->ROLE('Admin');
 
   sub BUILD {
-    return;
+    my ($self) = @_;
+
+    return $self;
   }
 
   sub BUILDARGS {
-    return;
+    my ($self, @args) = @_;
+
+    return (@args);
   }
 
   package main;
@@ -689,11 +693,15 @@ I<Since C<1.00>>
   User->ROLE('Admin');
 
   sub BUILD {
-    return;
+    my ($self) = @_;
+
+    return $self;
   }
 
   sub BUILDARGS {
-    return;
+    my ($self, @args) = @_;
+
+    return (@args);
   }
 
   package main;
@@ -822,6 +830,40 @@ I<Since C<1.00>>
   my $user = User->BLESS;
 
   # bless({}, 'User')
+
+=back
+
+=cut
+
+=head2 get
+
+  GET(Str $name) (Any)
+
+The GET method is a class instance lifecycle hook which is responsible for
+I<"getting"> instance items (or attribute values). By default, all class
+attributes I<"getters"> are dispatched to this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item get example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS(title => 'Engineer');
+
+  # bless({title => 'Engineer'}, 'User')
+
+  my $get = $user->GET('title');
+
+  # "Engineer"
 
 =back
 
@@ -1080,6 +1122,38 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 set
+
+  SET(Str $name, Any @args) (Any)
+
+The SET method is a class instance lifecycle hook which is responsible for
+I<"setting"> instance items (or attribute values). By default, all class
+attributes I<"setters"> are dispatched to this method.
+
+=over 4
+
+=item set example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->ATTR('name');
+
+  package main;
+
+  my $user = User->BLESS(title => 'Engineer');
+
+  # bless({title => 'Engineer'}, 'User')
+
+  my $set = $user->SET('title', 'Manager');
+
+  # "Manager"
+
+=back
+
+=cut
+
 =head2 subs
 
   SUBS() (ArrayRef)
@@ -1155,6 +1229,33 @@ I<Since C<1.00>>
   my $user = User->BLESS;
 
   # bless({}, 'User')
+
+=back
+
+=cut
+
+=head2 unimport
+
+  UNIMPORT(Str $into, Any @args) (Any)
+
+The UNIMPORT method is a class building lifecycle hook which is invoked
+whenever the L<perlfunc/no> declaration is used.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item unimport example 1
+
+  package User;
+
+  use base 'Venus::Core';
+
+  package main;
+
+  User->UNIMPORT;
+
+  # 'User'
 
 =back
 

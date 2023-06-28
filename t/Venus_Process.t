@@ -10,12 +10,14 @@ use Venus::Test;
 
 use Config;
 use Venus::Process;
+use Venus::Path;
 
 if ($Config{d_pseudofork}) {
   diag 'Fork emulation not supported';
   goto SKIP;
 }
 
+our @TEST_VENUS_PROCESS_PIDS;
 our $TEST_VENUS_PROCESS_ALARM = 0;
 our $TEST_VENUS_PROCESS_CHDIR = 1;
 our $TEST_VENUS_PROCESS_EXIT = 0;
@@ -25,8 +27,14 @@ our $TEST_VENUS_PROCESS_FORKABLE = 1;
 our $TEST_VENUS_PROCESS_KILL = 0;
 our $TEST_VENUS_PROCESS_OPEN = 1;
 our $TEST_VENUS_PROCESS_PID = 12345;
+our $TEST_VENUS_PROCESS_PPID = undef;
+our $TEST_VENUS_PROCESS_PING = 1;
 our $TEST_VENUS_PROCESS_SETSID = 1;
+our $TEST_VENUS_PROCESS_TIME = 0;
 our $TEST_VENUS_PROCESS_WAITPID = undef;
+
+$Venus::Process::PATH = Venus::Path->mktemp_dir;
+$Venus::Process::PID = $TEST_VENUS_PROCESS_PID;
 
 # _alarm
 {
@@ -73,7 +81,9 @@ our $TEST_VENUS_PROCESS_WAITPID = undef;
       return $TEST_VENUS_PROCESS_FORK;
     }
     else {
-      return $TEST_VENUS_PROCESS_PID++;
+      push @TEST_VENUS_PROCESS_PIDS,
+        $TEST_VENUS_PROCESS_PID+@TEST_VENUS_PROCESS_PIDS;
+      return $TEST_VENUS_PROCESS_PIDS[-1];
     }
   };
 }
@@ -105,12 +115,12 @@ our $TEST_VENUS_PROCESS_WAITPID = undef;
   };
 }
 
-# _pid
+# _ping
 {
   no strict 'refs';
   no warnings 'redefine';
-  *{"Venus::Process::_pid"} = sub {
-    $TEST_VENUS_PROCESS_PID
+  *{"Venus::Process::_ping"} = sub {
+    $TEST_VENUS_PROCESS_PING
   };
 }
 
@@ -123,6 +133,15 @@ our $TEST_VENUS_PROCESS_WAITPID = undef;
   };
 }
 
+# _time
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_time"} = sub {
+    $TEST_VENUS_PROCESS_TIME || time
+  };
+}
+
 # _waitpid
 {
   no strict 'refs';
@@ -132,8 +151,17 @@ our $TEST_VENUS_PROCESS_WAITPID = undef;
       return $TEST_VENUS_PROCESS_WAITPID;
     }
     else {
-      return --$TEST_VENUS_PROCESS_PID;
+      return pop @TEST_VENUS_PROCESS_PIDS;
     }
+  };
+}
+
+# default
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::default"} = sub {
+    $TEST_VENUS_PROCESS_PID
   };
 }
 
@@ -169,18 +197,44 @@ method: chdir
 method: check
 method: count
 method: daemon
+method: data
+method: decode
 method: disengage
+method: encode
 method: engage
+method: exchange
 method: exit
+method: followers
 method: fork
 method: forks
+method: is_follower
+method: is_leader
+method: is_registered
+method: is_unregistered
+method: join
 method: kill
 method: killall
+method: leader
+method: leave
+method: others
+method: others_active
+method: others_inactive
+method: poll
+method: pool
 method: pid
 method: pids
 method: ping
+method: ppid
 method: prune
+method: recall
+method: recallall
+method: recv
+method: recvall
+method: register
+method: registrants
 method: restart
+method: send
+method: sendall
 method: setsid
 method: started
 method: status
@@ -188,6 +242,7 @@ method: stderr
 method: stdin
 method: stdout
 method: stopped
+method: sync
 method: trap
 method: wait
 method: waitall
@@ -195,6 +250,7 @@ method: watch
 method: watchlist
 method: work
 method: works
+method: unregister
 method: untrap
 method: unwatch
 
@@ -488,10 +544,10 @@ $test->for('example', 2, 'check', sub {
 
 $test->for('example', 3, 'check', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_PROCESS_WAITPID = $TEST_VENUS_PROCESS_PID + 1;
+  local $TEST_VENUS_PROCESS_WAITPID = $TEST_VENUS_PROCESS_PIDS[-1];
   local $TEST_VENUS_PROCESS_EXITCODE = local $TEST_VENUS_PROCESS_EXIT = 1;
   ok my @result = $tryable->result;
-  is_deeply \@result, [$TEST_VENUS_PROCESS_PID, 1];
+  is_deeply \@result, [$TEST_VENUS_PROCESS_WAITPID, 1];
 
   $result[0]
 });
@@ -616,6 +672,249 @@ $test->for('example', 1, 'daemon', sub {
   my ($tryable) = @_;
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
+  $Venus::Process::PPID = undef;
+
+  $result
+});
+
+=method data
+
+The data method returns the number of messages sent to the current process,
+from the PID or PIDs provided (if any). If no PID list is provided, the count
+returned is based on the PIDs returned from L</watchlist>.
+
+=signature data
+
+  data(Int @pids) (Int)
+
+=metadata data
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 data
+
+  # given: synopsis
+
+  package main;
+
+  my $data = $parent->data;
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'data', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 data
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->join('procs');
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->join('procs');
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->join('procs');
+
+  # in process 1
+
+  $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # in process 2
+
+  $process_2->pool(2)->sendall({
+    from => $process_2->pid, said => 'hello',
+  });
+
+  # $process_2->data;
+
+  # 2
+
+  # in process 3
+
+  $process_3->pool(2)->sendall({
+    from => $process_3->pid, said => 'hello',
+  });
+
+  # $process_3->data;
+
+  # 2
+
+  # in process 1
+
+  my $data = $process_1->data;
+
+  # 2
+
+=cut
+
+$test->for('example', 2, 'data', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  is $result, 2;
+  if (my $proc = Venus::Process->new(12345)->join('procs')) {
+    local $TEST_VENUS_PROCESS_TIME = time + 1;
+    $proc->pool(2);
+    is $proc->data, 2;
+    $proc->recvall;
+  }
+  if (my $proc = Venus::Process->new(12346)->join('procs')) {
+    local $TEST_VENUS_PROCESS_TIME = time + 1;
+    $proc->pool(2);
+    is $proc->data, 2;
+    $proc->recvall;
+  }
+  if (my $proc = Venus::Process->new(12347)->join('procs')) {
+    local $TEST_VENUS_PROCESS_TIME = time + 1;
+    $proc->pool(2);
+    is $proc->data, 2;
+    $proc->recvall;
+  }
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=example-3 data
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->join('procs');
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->join('procs');
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->join('procs');
+
+  # in process 1
+
+  $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # in process 2
+
+  $process_2->pool(2)->sendall({
+    from => $process_2->pid, said => 'hello',
+  });
+
+  # $process_2->data;
+
+  # 2
+
+  # in process 3
+
+  $process_3->pool(2)->sendall({
+    from => $process_3->pid, said => 'hello',
+  });
+
+  # $process_3->data;
+
+  # 2
+
+  # in process 1
+
+  $process_1->recvall;
+
+  my $data = $process_1->data;
+
+  # 0
+
+=cut
+
+$test->for('example', 3, 'data', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  is $result, 0;
+  if (my $proc = Venus::Process->new(12345)->join('procs')) {
+    local $TEST_VENUS_PROCESS_TIME = time + 1;
+    $proc->pool(2);
+    is $proc->data, 0;
+    $proc->recvall;
+  }
+  if (my $proc = Venus::Process->new(12346)->join('procs')) {
+    local $TEST_VENUS_PROCESS_TIME = time + 1;
+    $proc->pool(2);
+    is $proc->data, 2;
+    $proc->recvall;
+  }
+  if (my $proc = Venus::Process->new(12347)->join('procs')) {
+    local $TEST_VENUS_PROCESS_TIME = time + 1;
+    $proc->pool(2);
+    is $proc->data, 2;
+    $proc->recvall;
+  }
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  !$result
+});
+
+=method decode
+
+The decode method accepts a string representation of a Perl value and returns
+the Perl value.
+
+=signature decode
+
+  decode(Str $data) (Any)
+
+=metadata decode
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 decode
+
+  # given: synopsis
+
+  package main;
+
+  my $decode = $parent->decode("{ok=>1}");
+
+  # { ok => 1 }
+
+=cut
+
+$test->for('example', 1, 'decode', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, { ok => 1 };
 
   $result
 });
@@ -654,6 +953,43 @@ $test->for('example', 1, 'disengage', sub {
   $result
 });
 
+=method encode
+
+The encode method accepts a Perl value and returns a string representation of
+that Perl value.
+
+=signature encode
+
+  encode(Any $data) (Str)
+
+=metadata encode
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 encode
+
+  # given: synopsis
+
+  package main;
+
+  my $encode = $parent->encode({ok=>1});
+
+  # "{ok=>1}"
+
+=cut
+
+$test->for('example', 1, 'encode', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  like $result, qr/.*ok.*=>.*1.*/;
+
+  $result
+});
+
 =method engage
 
 The engage method ensures the interactivity of the process by changing the
@@ -684,6 +1020,90 @@ This method effectively does the opposite of the L</disengage> method.
 $test->for('example', 1, 'engage', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
+
+  $result
+});
+
+=method exchange
+
+The exchange method gets and/or sets the name of the data exchange. The
+exchange is the ontext in which processes can register and cooperate. Process
+can cooperate in different exchanges (or contexts) and messages sent to a
+process in one context are not available to be retrieved will operating in
+another exchange (or context).
+
+=signature exchange
+
+  exchange(Str $name) (Any)
+
+=metadata exchange
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 exchange
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'exchange', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 exchange
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange('procs');
+
+  # "procs"
+
+=cut
+
+$test->for('example', 2, 'exchange', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "procs";
+
+  $result
+});
+
+=example-3 exchange
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange('procs');
+
+  # "procs"
+
+  $exchange = $parent->exchange;
+
+  # "procs"
+
+=cut
+
+$test->for('example', 3, 'exchange', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "procs";
 
   $result
 });
@@ -740,6 +1160,80 @@ $test->for('example', 2, 'exit', sub {
   $result
 });
 
+=method followers
+
+The followers method returns the list of PIDs registered under the current
+L</exchange> who are not the L</leader>.
+
+=signature followers
+
+  followers() (ArrayRef)
+
+=metadata followers
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 followers
+
+  # given: synopsis
+
+  package main;
+
+  my $followers = $parent->followers;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'followers', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 followers
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $followers = $process_1->followers;
+
+  # [12346, 12347]
+
+=cut
+
+$test->for('example', 2, 'followers', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [12346, 12347];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
 =method fork
 
 The fork method calls the system L<perlfunc/fork> function and creates a new
@@ -786,6 +1280,7 @@ $test->for('example', 1, 'fork', sub {
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Process');
+  $Venus::Process::PPID = undef;
 
   $result
 });
@@ -818,6 +1313,7 @@ $test->for('example', 2, 'fork', sub {
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my @result = $tryable->result;
   is $result[1], $TEST_VENUS_PROCESS_PID;
+  $Venus::Process::PPID = undef;
 
   @result
 });
@@ -853,6 +1349,7 @@ $test->for('example', 3, 'fork', sub {
   ok my @result = $tryable->result;
   is $result[1], $TEST_VENUS_PROCESS_PID;
   ok $result[0]->{started};
+  $Venus::Process::PPID = undef;
 
   @result
 });
@@ -878,6 +1375,7 @@ $test->for('example', 4, 'fork', sub {
   ok my $result = $tryable->error(\my $error)->result;
   ok $error->isa('Venus::Process::Error');
   ok $error->isa('Venus::Error');
+  $Venus::Process::PPID = undef;
 
   $result
 });
@@ -910,6 +1408,7 @@ $test->for('example', 5, 'fork', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Process');
   is $TEST_VENUS_PROCESS_ALARM, 10;
+  $Venus::Process::PPID = undef;
 
   $result
 });
@@ -959,6 +1458,7 @@ $test->for('example', 1, 'forks', sub {
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Process');
+  $Venus::Process::PPID = undef;
 
   $result
 });
@@ -993,6 +1493,7 @@ $test->for('example', 2, 'forks', sub {
   ok !defined $result[0];
   is @{$result[1]}, 5;
   like($_, qr/^\d+$/) for @{$result[1]};
+  $Venus::Process::PPID = undef;
 
   @result
 });
@@ -1029,6 +1530,451 @@ $test->for('example', 3, 'forks', sub {
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Process');
+  $Venus::Process::PPID = undef;
+
+  $result
+});
+
+=method is_follower
+
+The is_follower method returns true if the process is not the L</leader>, otherwise
+returns false.
+
+=signature is_follower
+
+  is_follower() (Bool)
+
+=metadata is_follower
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 is_follower
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_follower = $process->is_follower;
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'is_follower', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 is_follower
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  my $is_follower = $process_1->is_follower;
+
+  # false
+
+  # my $is_follower = $process_2->is_follower;
+
+  # true
+
+  # my $is_follower = $process_3->is_follower;
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'is_follower', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  !$result
+});
+
+=example-3 is_follower
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # my $is_follower = $process_1->is_follower;
+
+  # false
+
+  my $is_follower = $process_2->is_follower;
+
+  # true
+
+  # my $is_follower = $process_3->is_follower;
+
+  # true
+
+=cut
+
+$test->for('example', 3, 'is_follower', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=method is_leader
+
+The is_leader method returns true if the process is the L</leader>, otherwise
+returns false.
+
+=signature is_leader
+
+  is_leader() (Bool)
+
+=metadata is_leader
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 is_leader
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_leader = $process->is_leader;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_leader', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_leader
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  my $is_leader = $process_1->is_leader;
+
+  # true
+
+  # my $is_leader = $process_2->is_leader;
+
+  # false
+
+  # my $is_leader = $process_3->is_leader;
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'is_leader', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=example-3 is_leader
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # my $is_leader = $process_1->is_leader;
+
+  # true
+
+  my $is_leader = $process_2->is_leader;
+
+  # false
+
+  # my $is_leader = $process_3->is_leader;
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'is_leader', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  !$result
+});
+
+=method is_registered
+
+The is_registered method returns true if the process has registered using the
+L</register> method, otherwise returns false.
+
+=signature is_registered
+
+  is_registered() (Bool)
+
+=metadata is_registered
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 is_registered
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_registered = $process->is_registered;
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'is_registered', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 is_registered
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345)->register;
+
+  my $is_registered = $process->is_registered;
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'is_registered', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+  Venus::Process->new(12345)->unregister;
+
+  $result
+});
+
+=method is_unregistered
+
+The is_unregistered method returns true if the process has unregistered using
+the L</unregister> method, or had never registered at all, otherwise returns
+false.
+
+=signature is_unregistered
+
+  is_unregistered() (Bool)
+
+=metadata is_unregistered
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 is_unregistered
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_unregistered', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_unregistered
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345);
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'is_unregistered', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+  Venus::Process->new(12345)->unregister;
+
+  $result
+});
+
+=example-3 is_unregistered
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345)->register;
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'is_unregistered', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+  Venus::Process->new(12345)->unregister;
+
+  !$result
+});
+
+=method join
+
+The join method sets the L</exchange>, registers the process with the exchange
+using L</register>, and clears the L</watchlist>, then returns the invocant.
+
+=signature join
+
+  join(Str $name) (Process)
+
+=metadata join
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 join
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->join;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'join', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->exchange, undef;
+  is_deeply [$result->watchlist], [];
+  $result->unregister;
+
+  $result
+});
+
+=example-2 join
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->join('procs');
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 2, 'join', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->exchange, 'procs';
+  is_deeply [$result->watchlist], [];
+  $result->unregister;
 
   $result
 });
@@ -1070,6 +2016,7 @@ $test->for('example', 1, 'kill', sub {
   local $TEST_VENUS_PROCESS_KILL = 1;
   ok my $result = $tryable->result;
   is $result, 1;
+  $Venus::Process::PPID = undef;
 
   $result
 });
@@ -1115,6 +2062,7 @@ $test->for('example', 1, 'killall', sub {
   local $TEST_VENUS_PROCESS_KILL = 1;
   my $result = $tryable->result;
   is_deeply $result, [1];
+  $Venus::Process::PPID = undef;
 
   $result
 });
@@ -1142,6 +2090,587 @@ $test->for('example', 2, 'killall', sub {
   local $TEST_VENUS_PROCESS_KILL = 1;
   my $result = $tryable->result;
   is_deeply $result, [1, 1, 1, 1];
+  $Venus::Process::PPID = undef;
+
+  $result
+});
+
+=method leader
+
+The leader method uses a simple leader election algorithm to determine the
+process leader and returns the PID for that process. The leader is always the
+lowest value active PID (i.e. that responds to L</ping>).
+
+=signature leader
+
+  leader() (Int)
+
+=metadata leader
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 leader
+
+  # given: synopsis
+
+  package main;
+
+  my $leader = $parent->leader;
+
+  # 12345
+
+=cut
+
+$test->for('example', 1, 'leader', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 12345;
+
+  $result
+});
+
+=example-2 leader
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $leader = $process_3->leader;
+
+  # 12345
+
+=cut
+
+$test->for('example', 2, 'leader', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 12345;
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=example-3 leader
+
+  # given: synopsis
+
+  package main;
+
+  my $leader = $parent->register->leader;
+
+  # 12345
+
+=cut
+
+$test->for('example', 3, 'leader', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 12345;
+
+  $result
+});
+
+=method leave
+
+The leave method sets the L</exchange> to undefined, unregisters the process
+using L</unregister>, and clears the L</watchlist>, then returns the invocant.
+
+=signature leave
+
+  leave(Str $name) (Process)
+
+=metadata leave
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 leave
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->leave;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'leave', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->exchange, undef;
+  is_deeply [$result->watchlist], [];
+  ok $result->is_unregistered;
+
+  $result
+});
+
+=example-2 leave
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->leave('procs');
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 2, 'leave', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply $result->exchange, undef;
+  is_deeply [$result->watchlist], [];
+  ok $result->is_unregistered;
+
+  $result
+});
+
+=method others
+
+The others method returns all L</registrants> other than the current process,
+i.e. all other registered process PIDs whether active or inactive.
+
+=signature others
+
+  others() (ArrayRef)
+
+=metadata others
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 others
+
+  # given: synopsis
+
+  package main;
+
+  my $others = $parent->others;
+
+  # []
+
+=cut
+
+$test->for('example', 1, 'others', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-2 others
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $others = $process_1->others;
+
+  # [12346, 12347]
+
+=cut
+
+$test->for('example', 2, 'others', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [12346, 12347];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=method others_active
+
+The others_active method returns all L</registrants> other than the current
+process which are active, i.e. all other registered process PIDs that responds
+to L</ping>.
+
+=signature others_active
+
+  others_active() (ArrayRef)
+
+=metadata others_active
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 others_active
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $others_active = $process_1->others_active;
+
+  # [12346, 12347]
+
+=cut
+
+$test->for('example', 1, 'others_active', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PING = 1;
+  my $result = $tryable->result;
+  is_deeply $result, [12346, 12347];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=method others_inactive
+
+The others_inactive method returns all L</registrants> other than the current
+process which are inactive, i.e. all other registered process PIDs that do not
+respond to L</ping>.
+
+=signature others_inactive
+
+  others_inactive() (ArrayRef)
+
+=metadata others_inactive
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 others_inactive
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1 (assuming all processes exited)
+
+  my $others_inactive = $process_1->others_inactive;
+
+  # [12346, 12347]
+
+=cut
+
+$test->for('example', 1, 'others_inactive', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  my $result = $tryable->result;
+  is_deeply $result, [12346, 12347];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=method poll
+
+The poll method continuously calls the named method or coderef and returns the
+result that's not undefined, or throws an exception on timeout. If no method
+name is provided this method will default to calling L</recvall>.
+
+=signature poll
+
+  poll(Int $timeout, Str | CodeRef $code, Any @args) (ArrayRef)
+
+=metadata poll
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 poll
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(0, 'ping', $parent->pid);
+
+  # [1]
+
+=cut
+
+$test->for('example', 1, 'poll', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-2 poll
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(5, 'ping', $parent->pid);
+
+  # [1]
+
+=cut
+
+$test->for('example', 2, 'poll', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1];
+
+  $result
+});
+
+=example-3 poll
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(0, 'recv', $parent->pid);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_poll)
+
+=cut
+
+$test->for('example', 3, 'poll', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = (time - 6);
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Process::Error';
+  is $result->name, 'on_timeout_poll';
+
+  $result
+});
+
+=example-4 poll
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(5, sub {
+    int(rand(2)) ? "" : ()
+  });
+
+  # [""]
+
+=cut
+
+$test->for('example', 4, 'poll', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [""];
+
+  $result
+});
+
+=method pool
+
+The pool method blocks the execution of the current process until the number of
+L</other> processes are registered and pingable. This method returns the
+invocant when successful, or throws an exception if the operation timed out.
+
+=signature pool
+
+  pool(Int $count, Int $timeout) (Process)
+
+=metadata pool
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 pool
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'pool', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply [$result->watchlist], [12346];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+
+  $result
+});
+
+=example-2 pool
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(2);
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 2, 'pool', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply [$result->watchlist], [12346, 12347];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=example-3 pool
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(3, 0);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_pool)
+
+=cut
+
+$test->for('example', 3, 'pool', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = (time - 1);
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Process::Error';
+  is $result->name, 'on_timeout_pool';
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
 
   $result
 });
@@ -1283,6 +2812,65 @@ $test->for('example', 1, 'ping', sub {
   local $TEST_VENUS_PROCESS_KILL = 1;
   ok my $result = $tryable->result;
   is $result, 1;
+  $Venus::Process::PPID = undef;
+
+  $result
+});
+
+=method ppid
+
+The ppid method returns the PID of the parent process (i.e. the process which
+forked the current process, if any).
+
+=signature ppid
+
+  ppid() (Int)
+
+=metadata ppid
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 ppid
+
+  # given: synopsis;
+
+  my $ppid = $parent->ppid;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'ppid', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok not defined $result;
+
+  !$result
+});
+
+=example-2 ppid
+
+  # given: synopsis;
+
+  $process = $parent->fork;
+
+  # in child process
+
+  my $ppid = $process->ppid;
+
+  # 00000
+
+=cut
+
+$test->for('example', 2, 'ppid', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  ok my $result = $tryable->result;
+  is $result, $TEST_VENUS_PROCESS_PID;
 
   $result
 });
@@ -1395,6 +2983,406 @@ $test->for('example', 3, 'prune', sub {
   $result
 });
 
+=method recall
+
+The recall method returns the earliest message, sent by the current process to
+the process specified by the PID provided, which is no longer active (i.e.
+responding to L</ping>).
+
+=signature recall
+
+  recall(Int $pid) (Any)
+
+=metadata recall
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 recall
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 1
+
+  $process_1->send($process_2->pid, {from => $process_1->pid});
+
+  # in process 1 (process 2)
+
+  my $recall = $process_1->recall($process_2->pid);
+
+  # {from => 12345}
+
+=cut
+
+$test->for('example', 1, 'recall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  is_deeply $result, {from => 12345};
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+
+  $result
+});
+
+=method recallall
+
+The recallall method performs a L</recall> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the results.
+
+=signature recallall
+
+  recallall() (ArrayRef)
+
+=metadata recallall
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 recallall
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1->send($process_2->pid, {from => $process_1->pid});
+
+  $process_1->send($process_3->pid, {from => $process_1->pid});
+
+  $process_1->watch($process_2->pid, $process_3->pid);
+
+  # in process 1 (process 2 and 3 died)
+
+  my $recallall = $process_1->recallall;
+
+  # [{from => 12345}, {from => 12345}]
+
+=cut
+
+$test->for('example', 1, 'recallall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  is_deeply $result, [{from => 12345}, {from => 12345}];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=method recv
+
+The recv method returns the earliest message found from the process specified
+by the PID provided.
+
+=signature recv
+
+  recv(Int $pid) (Any)
+
+=metadata recv
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 recv
+
+  # given: synopsis
+
+  package main;
+
+  my $recv = $parent->recv;
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'recv', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 recv
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345);
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346);
+
+  # in process 1
+
+  my $recv = $process_1->recv($process_2->pid);
+
+  # undef
+
+  # in process 2
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => 'hello'});
+
+  # in process 1
+
+  $recv = $process_1->recv($process_2->pid);
+
+  # {from => 12346, said => 'hello'}
+
+=cut
+
+$test->for('example', 2, 'recv', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, {from => 12346, said => 'hello'};
+
+  $result
+});
+
+=method recvall
+
+The recvall method performs a L</recv> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the results.
+
+=signature recvall
+
+  recvall() (ArrayRef)
+
+=metadata recvall
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 recvall
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid});
+
+  # in process 1
+
+  my $recvall = $process_1->pool(2)->recvall;
+
+  # [{from => 12346}, {from => 12347}]
+
+=cut
+
+$test->for('example', 1, 'recvall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  is_deeply $result, [{from => 12346}, {from => 12347}];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=example-2 recvall
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid});
+
+  # in process 1
+
+  my $recvall = $process_1->pool(2)->recvall;
+
+  # [{from => 12346}, {from => 12347}]
+
+  # in process 2
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 1
+
+  $recvall = $process_1->recvall;
+
+  # [{from => 12346}]
+
+=cut
+
+$test->for('example', 2, 'recvall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  is_deeply $result, [{from => 12346}];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=method register
+
+The register method declares that the process is willing to cooperate with
+others (e.g. L</send> nad L</recv> messages), in a way that's discoverable by
+other processes, and returns the invocant.
+
+=signature register
+
+  register() (Process)
+
+=metadata register
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 register
+
+  # given: synopsis
+
+  package main;
+
+  my $register = $parent->register;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'register', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  ok $result->is_registered;
+
+  $result
+});
+
+=method registrants
+
+The registrants method returns the PIDs for all the processes that registered
+using the L</register> method whether they're currently active or not.
+
+=signature registrants
+
+  registrants() (ArrayRef)
+
+=metadata registrants
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 registrants
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $registrants = $process_1->registrants;
+
+  # [12345, 12346, 12347]
+
+=cut
+
+$test->for('example', 1, 'registrants', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [12345, 12346, 12347];
+
+  $result
+});
+
 =method restart
 
 The restart method executes the callback provided for each PID returned by the
@@ -1441,6 +3429,146 @@ $test->for('example', 1, 'restart', sub {
   local $TEST_VENUS_PROCESS_EXITCODE = 255;
   my $result = $tryable->result;
   is_deeply $result, [[1001, 1001, 255]];
+
+  $result
+});
+
+=method send
+
+The send method makes the data provided available to the process specified by
+the PID provided.
+
+=signature send
+
+  send(Int $pid, Any $data) (Process)
+
+=metadata send
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 send
+
+  # given: synopsis
+
+  package main;
+
+  my $send = $parent->send;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'send', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+
+  $result
+});
+
+=example-2 send
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345);
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346);
+
+  # in process 1
+
+  $process_1 = $process_1->send($process_2->pid, {
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # bless({...}, 'Venus::Process')
+
+  # in process 2
+
+  # $process_2->recv($process_1->pid);
+
+  # {from => 12345, said => 'hello'}
+
+=cut
+
+$test->for('example', 2, 'send', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply [Venus::Process->new(12346)->recv(12345)],
+    [{from => 12345, said => 'hello'}];
+
+  $result
+});
+
+=method sendall
+
+The sendall method performs a L</send> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the invocant.
+
+=signature sendall
+
+  sendall(Any $data) (Process)
+
+=metadata sendall
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 sendall
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'sendall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  my $process_1 = Venus::Process->new(12345);
+  is_deeply $process_1->recv(12345), undef;
+  $process_1->unregister;
+  my $process_2 = Venus::Process->new(12346);
+  is_deeply $process_2->recv(12345), {from => 12345, said => 'hello'};
+  $process_2->unregister;
+  my $process_3 = Venus::Process->new(12347);
+  is_deeply $process_3->recv(12345), {from => 12345, said => 'hello'};
+  $process_3->unregister;
 
   $result
 });
@@ -1531,7 +3659,7 @@ which have not terminated. Returns a list in list context.
 $test->for('example', 1, 'started', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is_deeply $result, [12345];
+  is_deeply $result, [12346];
 
   $result
 });
@@ -1580,93 +3708,96 @@ this method returns a list.
 
 =example-1 status
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my $status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 is still running (not terminated)
-
+    # assuming PID 12346 is still running (not terminated)
     return [$pid, $check, $exit];
   });
 
-  # [[1001, 0, -1]]
+  # [[12346, 0, -1]]
 
 =cut
 
 $test->for('example', 1, 'status', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_PROCESS_PID = 1001;
+  local $TEST_VENUS_PROCESS_PID = 12346;
   local $TEST_VENUS_PROCESS_WAITPID = 0;
   local $TEST_VENUS_PROCESS_EXITCODE = -1;
   my $result = $tryable->result;
-  is_deeply $result, [[1001, 0, -1]];
+  is_deeply $result, [[12346, 0, -1]];
 
   $result
 });
 
 =example-2 status
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my $status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 terminated with exit code 255
-
+    # assuming process 12346 terminated with exit code 255
     return [$pid, $check, $exit];
   });
 
-  # [[1001, 1001, 255]]
+  # [[12346, 12346, 255]]
 
 =cut
 
 $test->for('example', 2, 'status', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_PROCESS_PID = 1001;
-  local $TEST_VENUS_PROCESS_WAITPID = 1001;
+  local $TEST_VENUS_PROCESS_PID = 12346;
+  local $TEST_VENUS_PROCESS_WAITPID = 12346;
   local $TEST_VENUS_PROCESS_EXITCODE = 255;
   my $result = $tryable->result;
-  is_deeply $result, [[1001, 1001, 255]];
+  is_deeply $result, [[12346, 12346, 255]];
 
   $result
 });
 
 =example-3 status
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my @status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 terminated with exit code 255
-
+    # assuming process 12346 terminated with exit code 255
     return [$pid, $check, $exit];
   });
 
-  # ([1001, 1001, 255])
+  # ([12346, 12346, 255])
 
 =cut
 
 $test->for('example', 3, 'status', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_PROCESS_PID = 1001;
-  local $TEST_VENUS_PROCESS_WAITPID = 1001;
+  local $TEST_VENUS_PROCESS_PID = 12346;
+  local $TEST_VENUS_PROCESS_WAITPID = 12346;
   local $TEST_VENUS_PROCESS_EXITCODE = 255;
   my @result = $tryable->result;
-  is_deeply [@result], [[1001, 1001, 255]];
+  is_deeply [@result], [[12346, 12346, 255]];
 
   [@result]
 });
@@ -1868,7 +3999,7 @@ $test->for('example', 1, 'stopped', sub {
   my ($tryable) = @_;
   local $TEST_VENUS_PROCESS_WAITPID = -1;
   my $result = $tryable->result;
-  is_deeply $result, [12345];
+  is_deeply $result, [12346];
 
   $result
 });
@@ -1892,6 +4023,147 @@ $test->for('example', 2, 'stopped', sub {
   local $TEST_VENUS_PROCESS_WAITPID = 0;
   my $result = $tryable->result;
   is_deeply $result, [];
+
+  $result
+});
+
+=method sync
+
+The sync method blocks the execution of the current process until the number of
+L</other> processes are registered, pingable, and have each sent at-least one
+message to the current process. This method returns the invocant when
+successful, or throws an exception if the operation timed out.
+
+=signature sync
+
+  sync(Int $count, Int $timeout) (Process)
+
+=metadata sync
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 sync
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'sync', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply [$result->watchlist], [12346];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+
+  $result
+});
+
+=example-2 sync
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync(2);
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 2, 'sync', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  is_deeply [$result->watchlist], [12346, 12347];
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
+
+  $result
+});
+
+=example-3 sync
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync(3, 0);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_sync)
+
+=cut
+
+$test->for('example', 3, 'sync', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_TIME = (time - 1);
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Process::Error';
+  is $result->name, 'on_timeout_sync';
+  Venus::Process->new(12345)->unregister;
+  Venus::Process->new(12346)->unregister;
+  Venus::Process->new(12347)->unregister;
 
   $result
 });
@@ -2037,10 +4309,10 @@ $test->for('example', 2, 'wait', sub {
 
 $test->for('example', 3, 'wait', sub {
   my ($tryable) = @_;
-  local $TEST_VENUS_PROCESS_WAITPID = $TEST_VENUS_PROCESS_PID + 1;
+  local $TEST_VENUS_PROCESS_WAITPID = $TEST_VENUS_PROCESS_PIDS[-1];
   local $TEST_VENUS_PROCESS_EXITCODE = local $TEST_VENUS_PROCESS_EXIT = 1;
   ok my @result = $tryable->result;
-  is_deeply \@result, [$TEST_VENUS_PROCESS_PID, 1];
+  is_deeply \@result, [$TEST_VENUS_PROCESS_WAITPID, 1];
 
   $result[0]
 });
@@ -2421,6 +4693,45 @@ $test->for('example', 1, 'works', sub {
     $TEST_VENUS_PROCESS_PID,
     $TEST_VENUS_PROCESS_PID
   ];
+
+  $result
+});
+
+=method unregister
+
+The unregister method declares that the process is no longer willing to
+cooperate with others (e.g. L</send> nad L</recv> messages), and will no longer
+be discoverable by other processes, and returns the invocant.
+
+=signature unregister
+
+  unregister() (Process)
+
+=metadata unregister
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 unregister
+
+  # given: synopsis
+
+  package main;
+
+  my $unregister = $parent->unregister;
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'unregister', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Process';
+  ok !$result->is_registered;
 
   $result
 });
@@ -2955,6 +5266,192 @@ $test->for('example', 1, 'error_on_stdout', sub {
   $result
 });
 
+=error error_on_timeout_poll
+
+This package may raise an error_on_timeout_poll exception.
+
+=cut
+
+$test->for('error', 'error_on_timeout_poll');
+
+=example-1 error_on_timeout_poll
+
+  # given: synopsis;
+
+  my @args = (0, sub{});
+
+  my $error = $parent->throw('error_on_timeout_poll', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_timeout_poll"
+
+  # my $message = $error->message;
+
+  # "Timed out after 0 seconds in process 12345 while polling __ANON__"
+
+  # my $code = $error->stash('code');
+
+  # sub{}
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'error_on_timeout_poll', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_timeout_poll";
+  my $message = $result->message;
+  is $message, "Timed out after 0 seconds in process 12345 while polling __ANON__";
+  my $code = $result->stash('code');
+  ok ref $code, 'CODE';
+  my $exchange = $result->stash('exchange');
+  is $exchange, undef;
+  my $pid = $result->stash('pid');
+  is $pid, 12345;
+  my $timeout = $result->stash('timeout');
+  is $timeout, 0;
+
+  $result
+});
+
+=error error_on_timeout_pool
+
+This package may raise an error_on_timeout_pool exception.
+
+=cut
+
+$test->for('error', 'error_on_timeout_pool');
+
+=example-1 error_on_timeout_pool
+
+  # given: synopsis;
+
+  my @args = (0, 2);
+
+  my $error = $parent->throw('error_on_timeout_pool', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_timeout_pool"
+
+  # my $message = $error->message;
+
+  # "Timed out after 0 seconds in process 12345 while pooling"
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $pool_size = $error->stash('pool_size');
+
+  # 2
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'error_on_timeout_pool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_timeout_pool";
+  my $message = $result->message;
+  is $message, "Timed out after 0 seconds in process 12345 while pooling";
+  my $exchange = $result->stash('exchange');
+  is $exchange, undef;
+  my $pid = $result->stash('pid');
+  is $pid, 12345;
+  my $pool_size = $result->stash('pool_size');
+  is $pool_size, 2;
+  my $timeout = $result->stash('timeout');
+  is $timeout, 0;
+
+  $result
+});
+
+=error error_on_timeout_sync
+
+This package may raise an error_on_timeout_sync exception.
+
+=cut
+
+$test->for('error', 'error_on_timeout_sync');
+
+=example-1 error_on_timeout_sync
+
+  # given: synopsis;
+
+  my @args = (0, 2);
+
+  my $error = $parent->throw('error_on_timeout_sync', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_timeout_sync"
+
+  # my $message = $error->message;
+
+  # "Timed out after 0 seconds in process 12345 while syncing"
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $pool_size = $error->stash('pool_size');
+
+  # 2
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=cut
+
+$test->for('example', 1, 'error_on_timeout_sync', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_timeout_sync";
+  my $message = $result->message;
+  is $message, "Timed out after 0 seconds in process 12345 while syncing";
+  my $exchange = $result->stash('exchange');
+  is $exchange, undef;
+  my $pid = $result->stash('pid');
+  is $pid, 12345;
+  my $pool_size = $result->stash('pool_size');
+  is $pool_size, 2;
+  my $timeout = $result->stash('timeout');
+  is $timeout, 0;
+
+  $result
+});
+
 =partials
 
 t/Venus.t: pdml: authors
@@ -2965,6 +5462,8 @@ t/Venus.t: pdml: license
 $test->for('partials');
 
 # END
+
+Venus::Path->new($Venus::Process::PATH)->rmdirs;
 
 $test->render('lib/Venus/Process.pod') if $ENV{RENDER};
 

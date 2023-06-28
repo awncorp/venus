@@ -1,0 +1,922 @@
+
+=head1 NAME
+
+Venus::Run - Runner Class
+
+=cut
+
+=head1 ABSTRACT
+
+Runner Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  # bless({...}, 'Venus::Run')
+
+=cut
+
+=head1 DESCRIPTION
+
+This package is a L<Venus::Task> which provides generic task running
+capabilities. A simple CLI using this package has been made available in
+L<vns>.
+
+=head1 USAGES
+
+Here is an example configuration file in YAML (e.g. in C<.vns.yaml>).
+
+  ---
+  data:
+    ECHO: true
+  exec:
+    okay: \$PERL -c
+    cpan: cpanm -llocal -qn
+    deps: cpan --installdeps .
+    each: \$PERL -MVenus=log -nE
+    exec: \$PERL -MVenus=log -E
+    repl: \$PERL -dE0
+    says: exec "map log(\$_), map eval, \@ARGV"
+    test: \$PROVE
+  libs:
+  - -Ilib
+  - -Ilocal/lib/perl5
+  load:
+  - -MVenus=true,false
+  path:
+  - ./bin
+  - ./dev
+  - -Ilocal/bin
+  perl:
+    perl: perl
+    prove: prove
+  vars:
+    PERL: perl
+    PROVE: prove
+
+The following describes the configuration file sections and how they're used:
+
+=over 4
+
+=item *
+
+The C<data> section provides a non-dynamic list of key/value pairs that will
+be used as environment variables.
+
+=item *
+
+The C<exec> section provides the main dynamic tasks which can be recursively
+resolved and expanded.
+
+=item *
+
+The C<find> section provides aliases which can be recursively resolved and
+expanded for use in other tasks.
+
+=item *
+
+The C<libs> section provides a list of C<-I/path/to/lib> "include" statements
+that will be automatically added to tasks expanded from the C<perl> section.
+
+=item *
+
+The C<load> section provides a list of C<-MPackage> "import" statements
+that will be automatically added to tasks expanded from the C<perl> section.
+
+=item *
+
+The C<path> section provides a list of paths to be prepended to the C<PATH>
+environment variable which allows programs to be found.
+
+=item *
+
+The C<perl> section provides the dynamic perl tasks which can serve as tasks
+with default commands (with options) and which can be recursively resolved and
+expanded.
+
+=item *
+
+The C<task> section provides the dynamic perl tasks which "load" L<Venus::Task>
+derived packages, and which can be recursively resolved and expanded. These
+tasks will typically take the form of C<perl -Ilib -MMyApp::Task -E0 --> and
+will be automatically executed as a CLI.
+
+=item *
+
+The C<vars> section provides a list of dynamic key/value pairs that can be
+recursively resolved and expanded and will be used as environment variables.
+
+=back
+
+Here are example usages using the example YAML configuration file and the
+L<vns> CLI.
+
+  # Mint a new configuration file
+  vns init
+
+  ...
+
+  # Install a distribution
+  vns cpan $DIST
+
+  i.e. $(which cpanm) --llocal -qn $DIST
+
+  # Install dependencies in the CWD
+  vns deps
+
+  i.e. $(which cpanm) --llocal -qn --installdeps .
+
+  # Check that a package can be compiled
+  vns okay $FILE
+
+  i.e. $(which perl) -Ilib -Ilocal/lib/perl5 -c $FILE
+
+  # Use the Perl debugger as a REPL
+  vns repl
+
+  i.e. $(which perl) -Ilib -Ilocal/lib/perl5 -dE0
+
+  # Evaluate arbitrary Perl expressions
+  vns exec ...
+
+  i.e. $(which perl) -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
+
+  # Test the Perl project in the CWD
+  vns test t
+
+  i.e. $(which prove) -Ilib -Ilocal/lib/perl5 t
+
+This package and CLI allows you to define task definitions for any application,
+which you can run using the name of the task. You can reuse existing task
+definitions in new tasks which will be recursively resolved when needed. You
+can define static and dynamic environment variables, and also pre-define
+"includes" and the order in which they're declared.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Task>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 args
+
+  args() (HashRef)
+
+The args method returns the task argument declarations.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item args example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $args = $run->args;
+
+  # {
+  #   'command' => {
+  #     help => 'Command to run',
+  #     required => 1,
+  #   }
+  # }
+
+=back
+
+=cut
+
+=head2 cmds
+
+  cmds() (HashRef)
+
+The cmds method returns the task command declarations.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item cmds example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $cmds = $run->cmds;
+
+  # {
+  #   'help' => {
+  #     help => 'Display help and usages',
+  #     arg => 'command',
+  #   },
+  #   'init' => {
+  #     help => 'Initialize the configuration file',
+  #     arg => 'command',
+  #   },
+  # }
+
+=back
+
+=cut
+
+=head2 conf
+
+  conf() (HashRef)
+
+The conf method loads the configuration file returned by L</file>, then decodes
+and returns the information as a hashref.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item conf example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $conf = $run->conf;
+
+  # {}
+
+=back
+
+=over 4
+
+=item conf example 2
+
+  # given: synopsis
+
+  package main;
+
+  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=over 4
+
+=item conf example 3
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.yaml file
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=over 4
+
+=item conf example 4
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.yml file
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=over 4
+
+=item conf example 5
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.json file
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=over 4
+
+=item conf example 6
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.js file
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=over 4
+
+=item conf example 7
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.perl file
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=over 4
+
+=item conf example 8
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.pl file
+
+  my $conf = $run->conf;
+
+  # {...}
+
+=back
+
+=cut
+
+=head2 file
+
+  file() (Str)
+
+The file method returns the configuration file specified in the C<VENUS_FILE>
+environment variable, or the discovered configuration file in the current
+directory. The default name for a configuration file is in the form of
+C<.vns.*>. Configuration files will be decoded based on their file extensions.
+Valid file extensions are C<yaml>, C<yml>, C<json>, C<js>, C<perl>, and C<pl>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item file example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $file = $run->file;
+
+  # undef
+
+=back
+
+=over 4
+
+=item file example 2
+
+  # given: synopsis
+
+  package main;
+
+  local $ENV{VENUS_FILE} = 't/conf/.vns.pl';
+
+  my $file = $run->file;
+
+  # "t/conf/.vns.pl"
+
+=back
+
+=over 4
+
+=item file example 3
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.yaml file
+
+  my $file = $run->file;
+
+  # ".vns.yaml"
+
+=back
+
+=over 4
+
+=item file example 4
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.yml file
+
+  my $file = $run->file;
+
+  # ".vns.yml"
+
+=back
+
+=over 4
+
+=item file example 5
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.json file
+
+  my $file = $run->file;
+
+  # ".vns.json"
+
+=back
+
+=over 4
+
+=item file example 6
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.js file
+
+  my $file = $run->file;
+
+  # ".vns.js"
+
+=back
+
+=over 4
+
+=item file example 7
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.perl file
+
+  my $file = $run->file;
+
+  # ".vns.perl"
+
+=back
+
+=over 4
+
+=item file example 8
+
+  # given: synopsis
+
+  package main;
+
+  # e.g. current directory has only a .vns.pl file
+
+  my $file = $run->file;
+
+  # ".vns.pl"
+
+=back
+
+=cut
+
+=head2 footer
+
+  footer() (Str)
+
+The footer method returns examples and usage information used in usage text.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item footer example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $footer = $run->footer;
+
+  # "..."
+
+=back
+
+=cut
+
+=head2 handler
+
+  handler(HashRef $data) (Any)
+
+The handler method processes the data provided and executes the request then
+returns the invocant unless the program is exited.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item handler example 1
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new;
+
+  $run->execute;
+
+  # ()
+
+=back
+
+=over 4
+
+=item handler example 2
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['help']);
+
+  $run->execute;
+
+  # ()
+
+=back
+
+=over 4
+
+=item handler example 3
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['--help']);
+
+  $run->execute;
+
+  # ()
+
+=back
+
+=over 4
+
+=item handler example 4
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['init']);
+
+  $run->execute;
+
+  # ()
+
+=back
+
+=over 4
+
+=item handler example 5
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['echo']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. ['echo']
+
+=back
+
+=over 4
+
+=item handler example 6
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['cpan', 'Venus']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. cpanm '-llocal' '-qn' Venus
+
+=back
+
+=over 4
+
+=item handler example 7
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['deps']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. cpanm '-llocal' '-qn' '--installdeps' '.'
+
+=back
+
+=over 4
+
+=item handler example 8
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['okay', 'lib/Venus.pm']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-c'
+
+=back
+
+=over 4
+
+=item handler example 9
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['repl']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-dE0'
+
+=back
+
+=over 4
+
+=item handler example 10
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['exec', '-MVenus=date', 'say date']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. perl '-Ilib' '-Ilocal/lib/perl5' '-MVenus=date' 'say date'
+
+=back
+
+=over 4
+
+=item handler example 11
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['test', 't']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. prove '-Ilib' '-Ilocal/lib/perl5' t
+
+=back
+
+=cut
+
+=head2 init
+
+  init() (HashRef)
+
+The init method returns the default configuration to be used when initializing
+the system with a new configuration file.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item init example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $init = $run->init;
+
+  # {
+  #   data => {
+  #     ECHO => 1,
+  #   },
+  #   exec => {
+  #     brew => 'perlbrew',
+  #     cpan => 'cpanm -llocal -qn',
+  #     deps => 'cpan --installdeps .',
+  #     each => '$PERL -MVenus=true,false,log -nE',
+  #     eval => '$PERL -MVenus=true,false,log -E',
+  #     exec => '$PERL',
+  #     info => '$PERL -V',
+  #     okay => '$PERL -c',
+  #     repl => '$PERL -dE0',
+  #     says => 'eval "map log($_), map eval, @ARGV"',
+  #     test => '$PROVE'
+  #   },
+  #   find => {
+  #   },
+  #   libs => [
+  #     '-Ilib',
+  #     '-Ilocal/lib/perl5',
+  #   ],
+  #   load => [
+  #   ],
+  #   path => [
+  #     './bin',
+  #     './dev',
+  #     './local/bin',
+  #   ],
+  #   perl => {
+  #     perl => 'perl',
+  #     prove => 'prove',
+  #     'perl-5.18.0' => 'perlbrew exec --with perl-5.18.0 perl',
+  #     'prove-5.18.0' => 'perlbrew exec --with perl-5.18.0 prove'
+  #   },
+  #   task => {
+  #   },
+  #   vars => {
+  #     PERL => 'perl',
+  #     PROVE => 'prove'
+  #   },
+  # }
+
+=back
+
+=cut
+
+=head2 name
+
+  name() (Str)
+
+The name method returns the default name for the task. This is used in usage
+text and can be controlled via the C<VENUS_RUN_NAME> environment variable, or
+the C<NAME> package variable.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item name example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $name = $run->name;
+
+  # "Venus::Run"
+
+=back
+
+=over 4
+
+=item name example 2
+
+  # given: synopsis
+
+  package main;
+
+  local $ENV{VENUS_RUN_NAME} = 'venus-runner';
+
+  my $name = $run->name;
+
+  # "venus-runner"
+
+=back
+
+=over 4
+
+=item name example 3
+
+  # given: synopsis
+
+  package main;
+
+  local $Venus::Run::NAME = 'venus-runner';
+
+  my $name = $run->name;
+
+  # "venus-runner"
+
+=back
+
+=cut
+
+=head2 opts
+
+  opts() (HashRef)
+
+The opts method returns the task options declarations.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item opts example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $opts = $run->opts;
+
+  # {
+  #   'help' => {
+  #     help => 'Show help information',
+  #   }
+  # }
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Al Newkirk.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

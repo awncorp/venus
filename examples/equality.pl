@@ -1,24 +1,29 @@
 #!/usr/bin/env perl
 
+use 5.018;
+
+use strict;
+use warnings;
+
 use Venus::Number;
 
-# e.g. 0 ~~ ''
-Venus::Number->new(0)->say('reify', 'eq', ''); # DMMT and DWIM
+#
+# perform smart-match equality
+#
 
-# e.g. 0 eq ''
-Venus::Number->new(0)->say('reify', 'tv', ''); # TYPE and VALUE
-
-# e.g. 0 ~~ bless{}
-Venus::Number->new(0)->say('reify', 'eq', bless{}); # DMMT and DWIM
-
-# e.g. 0 ~~ Venus::Number->new
-Venus::Number->new(0)->say('reify', 'eq', Venus::Number->new); # SAME
-
-# e.g. 0 eq Venus::Number->new
-Venus::Number->new(0)->say('reify', 'tv', Venus::Number->new); # SAME
-
-# e.g. 0 eq Venus::Number->new(0)
-Venus::Number->new(0)->say('reify', 'tv', Venus::Number->new(0)); # SAME
-
-# e.g. 0 eq Venus::Number->new
-Venus::Number->new(0)->say('reify', 'tv', Venus::Number->new(1)); # NOPE
+Venus::Number->new(0)->say('is_true', @$_) for (
+  # e.g. 0 ~~ ''
+  ['eq', ''],
+  # e.g. 0 eq ''
+  ['tv', ''],
+  # e.g. 0 ~~ bless{}
+  ['eq', bless{}],
+  # e.g. 0 ~~ Venus::Number->new
+  ['eq', Venus::Number->new],
+  # e.g. 0 eq Venus::Number->new
+  ['tv', Venus::Number->new],
+  # e.g. 0 eq Venus::Number->new(0)
+  ['tv', Venus::Number->new(0)],
+  # e.g. 0 eq Venus::Number->new(1)
+  ['tv', Venus::Number->new(1)],
+);

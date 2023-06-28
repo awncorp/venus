@@ -93,6 +93,46 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 print_json
+
+  print_json(Str | CodeRef $method, Any @args) (Any)
+
+The print_json method prints a JSON representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item print_json example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_json = $example->print_json;
+
+  # "{\"test\": 123}"
+
+=back
+
+=over 4
+
+=item print_json example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_json = $example->print_json('execute');
+
+  # "[{\"test\": 123}]"
+
+=back
+
+=cut
+
 =head2 print_pretty
 
   print_pretty(Any @data) (Any)
@@ -169,6 +209,46 @@ I<Since C<0.09>>
 
 =cut
 
+=head2 print_yaml
+
+  print_yaml(Str | CodeRef $method, Any @args) (Any)
+
+The print_yaml method prints a YAML representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item print_yaml example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_yaml = $example->print_yaml;
+
+  # "---\ntest: 123"
+
+=back
+
+=over 4
+
+=item print_yaml example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_yaml = $example->print_yaml('execute');
+
+  # "---\n- test: 123"
+
+=back
+
+=cut
+
 =head2 say
 
   say(Any @data) (Any)
@@ -207,6 +287,46 @@ I<Since C<0.01>>
   # [bless({test => 123}, 'Example'),1,2,3]\n
 
   # 1
+
+=back
+
+=cut
+
+=head2 say_json
+
+  say_json(Str | CodeRef $method, Any @args) (Any)
+
+The say_json method prints a JSON representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method, with a trailing newline.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item say_json example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_json = $example->say_json;
+
+  # "{\"test\": 123}\n"
+
+=back
+
+=over 4
+
+=item say_json example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_json = $example->say_json('execute');
+
+  # "[{\"test\": 123}]\n"
 
 =back
 
@@ -284,6 +404,46 @@ I<Since C<0.09>>
   # "Example\n"
 
   # 1
+
+=back
+
+=cut
+
+=head2 say_yaml
+
+  say_yaml(Str | CodeRef $method, Any @args) (Any)
+
+The say_yaml method prints a YAML representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method, with a trailing newline.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item say_yaml example 1
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_yaml = $example->say_yaml;
+
+  # "---\ntest: 123\n"
+
+=back
+
+=over 4
+
+=item say_yaml example 2
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_yaml = $example->say_yaml('execute');
+
+  # "---\n- test: 123\n"
 
 =back
 

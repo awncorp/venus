@@ -21,16 +21,16 @@ Install Venus using [cpanm](https://metacpan.org/pod/App::cpanminus):
 cpanm -qn Venus
 ```
 
-Install Venus using Perl:
+Install Venus using Perl (via cpanm):
 
 ```bash
 curl -sSL https://cpanmin.us | perl - -qn Venus
 ```
 
-Install Venus using Perl (from GitHub):
+Install Venus using Perl (via cpanm, from GitHub):
 
 ```bash
-curl -ssL https://cpanmin.us | perl - -qn git://github.com/awncorp/venus.git
+curl -ssL https://cpanmin.us | perl - -qn https://github.com/awncorp/venus.zip
 ```
 
 ## Features

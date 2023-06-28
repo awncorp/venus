@@ -27,7 +27,7 @@ Cli Class for Perl 5
 
   # [1]
 
-  # $cli->data;
+  # $cli->parsed;
 
   # {help => 1}
 

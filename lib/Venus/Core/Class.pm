@@ -5,6 +5,8 @@ use 5.018;
 use strict;
 use warnings;
 
+no warnings 'once';
+
 use base 'Venus::Core';
 
 # METHODS
@@ -27,6 +29,12 @@ sub DESTROY {
   my ($self, @data) = @_;
 
   no strict 'refs';
+
+  my @mixins = @{$self->META->mixins};
+
+  for my $action (grep defined, map *{"${_}::DESTROY"}{"CODE"}, @mixins) {
+    $self->$action(@data);
+  }
 
   my @roles = @{$self->META->roles};
 
@@ -62,6 +70,16 @@ sub IMPORT {
   return $self;
 }
 
+sub import {
+  my ($self, @args) = @_;
+
+  my $target = caller;
+
+  $self->USE($target);
+
+  return $self->IMPORT($target, @args);
+}
+
 sub meta {
   my ($self) = @_;
 
@@ -72,6 +90,14 @@ sub new {
   my ($self, @args) = @_;
 
   return $self->BLESS(@args);
+}
+
+sub unimport {
+  my ($self, @args) = @_;
+
+  my $target = caller;
+
+  return $self->UNIMPORT($target, @args);
 }
 
 1;

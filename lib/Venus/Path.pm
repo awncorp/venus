@@ -102,7 +102,8 @@ sub copy {
 
   require File::Copy;
 
-  File::Copy::copy("$self", "$path") or $self->throw('error_on_copy', $path)->error;
+  File::Copy::copy("$self", "$path")
+    or $self->throw('error_on_copy', $path, $!)->error;
 
   return $self;
 }
@@ -245,13 +246,13 @@ sub open {
   my $handle = IO::File->new;
 
   $handle->open($path, @args)
-    or $self->throw('error_on_open', $path)->error;
+    or $self->throw('error_on_open', $path, $!)->error;
 
   return $handle;
 }
 
 sub mkcall {
-  my ($self, $args) = @_;
+  my ($self, @args) = @_;
 
   require File::Spec;
 
@@ -259,8 +260,12 @@ sub mkcall {
 
   my $result;
 
+  require Venus::Os;
+
+  my $args = join ' ', map Venus::Os->quote($_), grep defined, @args;
+
   (defined($result = ($args ? qx($path $args) : qx($path))))
-    or $self->throw('error_on_mkcall', $path)->error;
+    or $self->throw('error_on_mkcall', $path, $!)->error;
 
   chomp $result;
 
@@ -273,7 +278,7 @@ sub mkdir {
   my $path = $self->get;
 
   ($mode ? CORE::mkdir($path, $mode) : CORE::mkdir($path))
-    or $self->throw('error_on_mkdir', $path)->error;
+    or $self->throw('error_on_mkdir', $path, $!)->error;
 
   return $self;
 }
@@ -324,7 +329,7 @@ sub mkfile {
   $self->open('>');
 
   CORE::utime(undef, undef, $path)
-    or $self->throw('error_on_mkfile', $path)->error;
+    or $self->throw('error_on_mkfile', $path, $!)->error;
 
   return $self;
 }
@@ -334,9 +339,10 @@ sub move {
 
   require File::Copy;
 
-  File::Copy::move("$self", "$path") or $self->throw('error_on_move', $path)->error;
+  File::Copy::move("$self", "$path")
+    or $self->throw('error_on_move', $path, $!)->error;
 
-  return $self;
+  return $self->class->make($path)->absolute;
 }
 
 sub name {
@@ -381,10 +387,10 @@ sub read {
   my $path = $self->get;
 
   CORE::open(my $handle, '<', $path)
-    or $self->throw('error_on_read_open', $path)->error;
+    or $self->throw('error_on_read_open', $path, $!)->error;
 
   CORE::binmode($handle, $binmode) or do {
-    $self->throw('error_on_read_binmode', $path, $binmode)->error;
+    $self->throw('error_on_read_binmode', $path, $binmode, $!)->error;
   } if defined($binmode);
 
   my $result = my $content = '';
@@ -393,7 +399,7 @@ sub read {
     $content .= $buffer;
   }
 
-  $self->throw('error_on_read_error', $path)->error if !defined $result;
+  $self->throw('error_on_read_error', $path, $!)->error if !defined $result;
 
   require Venus::Os;
   $content =~ s/\015\012/\012/g if Venus::Os->is_win;
@@ -411,13 +417,23 @@ sub relative {
   return $self->class->new(File::Spec->abs2rel($self->get, $path));
 }
 
+sub rename {
+  my ($self, $path) = @_;
+
+  $path = $self->class->make($path);
+
+  $path = $self->sibling("$path") if $path->is_relative;
+
+  return $self->move($path);
+}
+
 sub rmdir {
   my ($self) = @_;
 
   my $path = $self->get;
 
   CORE::rmdir($path)
-    or $self->throw('error_on_rmdir', $path)->error;
+    or $self->throw('error_on_rmdir', $path, $!)->error;
 
   return $self;
 }
@@ -524,7 +540,7 @@ sub unlink {
   my $path = $self->get;
 
   CORE::unlink($path)
-    or $self->throw('error_on_unlink', $path)->error;
+    or $self->throw('error_on_unlink', $path, $!)->error;
 
   return $self;
 }
@@ -535,14 +551,14 @@ sub write {
   my $path = $self->get;
 
   CORE::open(my $handle, '>', $path)
-    or $self->throw('error_on_write_open', $path)->error;
+    or $self->throw('error_on_write_open', $path, $!)->error;
 
   CORE::binmode($handle, $binmode) or do {
-    $self->throw('error_on_write_binmode', $path, $binmode)->error;
+    $self->throw('error_on_write_binmode', $path, $binmode, $!)->error;
   } if defined($binmode);
 
   (($handle->syswrite($data) // -1) == length($data))
-    or $self->throw('error_on_write_error', $path)->error;
+    or $self->throw('error_on_write_error', $path, $!)->error;
 
   return $self;
 }
@@ -550,11 +566,13 @@ sub write {
 # ERRORS
 
 sub error_on_copy {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.copy',
-    message => "Can't copy \"$self\" to \"$path\": $!",
+    message => "Can't copy \"$self\" to \"$path\": $err",
     stash => {
       path => $path,
       self => $self,
@@ -563,12 +581,14 @@ sub error_on_copy {
 }
 
 sub error_on_mkcall {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.mkcall',
     message => ("Can't make system call to \"$path\": "
-        . ($! ? "$!" : sprintf("exit code (%s)", _exitcode()))),
+        . ($err ? "$err" : sprintf("exit code (%s)", _exitcode()))),
     stash => {
       path => $path,
     },
@@ -576,11 +596,13 @@ sub error_on_mkcall {
 }
 
 sub error_on_mkdir {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.mkdir',
-    message => "Can't make directory \"$path\": $!",
+    message => "Can't make directory \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -588,11 +610,13 @@ sub error_on_mkdir {
 }
 
 sub error_on_mkfile {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.mkfile',
-    message => "Can't make file \"$path\": $!",
+    message => "Can't make file \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -600,11 +624,13 @@ sub error_on_mkfile {
 }
 
 sub error_on_move {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.move',
-    message => "Can't move \"$self\" to \"$path\": $!",
+    message => "Can't move \"$self\" to \"$path\": $err",
     stash => {
       path => $path,
       self => $self,
@@ -613,11 +639,13 @@ sub error_on_move {
 }
 
 sub error_on_open {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.open',
-    message => "Can't open \"$path\": $!",
+    message => "Can't open \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -625,11 +653,13 @@ sub error_on_open {
 }
 
 sub error_on_read_binmode {
-  my ($self, $path, $binmode) = @_;
+  my ($self, $path, $binmode, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.read.binmode',
-    message => "Can't binmode \"$path\": $!",
+    message => "Can't binmode \"$path\": $err",
     stash => {
       binmode => $binmode,
       path => $path,
@@ -638,11 +668,13 @@ sub error_on_read_binmode {
 }
 
 sub error_on_read_error {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.read.error',
-    message => "Can't read from file \"$path\": $!",
+    message => "Can't read from file \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -650,11 +682,13 @@ sub error_on_read_error {
 }
 
 sub error_on_read_open {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.read.open',
-    message => "Can't read \"$path\": $!",
+    message => "Can't read \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -662,11 +696,13 @@ sub error_on_read_open {
 }
 
 sub error_on_rmdir {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.rmdir',
-    message => "Can't rmdir \"$path\": $!",
+    message => "Can't rmdir \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -674,11 +710,13 @@ sub error_on_rmdir {
 }
 
 sub error_on_write_binmode {
-  my ($self, $path, $binmode) = @_;
+  my ($self, $path, $binmode, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.write.binmode',
-    message => "Can't binmode \"$path\": $!",
+    message => "Can't binmode \"$path\": $err",
     stash => {
       binmode => $binmode,
       path => $path,
@@ -687,11 +725,13 @@ sub error_on_write_binmode {
 }
 
 sub error_on_write_error {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.write.error',
-    message => "Can't write to file \"$path\": $!",
+    message => "Can't write to file \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -699,11 +739,13 @@ sub error_on_write_error {
 }
 
 sub error_on_write_open {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.write.open',
-    message => "Can't write \"$path\": $!",
+    message => "Can't write \"$path\": $err",
     stash => {
       path => $path,
     },
@@ -711,11 +753,13 @@ sub error_on_write_open {
 }
 
 sub error_on_unlink {
-  my ($self, $path) = @_;
+  my ($self, $path, $err) = @_;
+
+  $err = "" if !defined $err;
 
   return {
     name => 'on.unlink',
-    message => "Can't unlink \"$path\": $!",
+    message => "Can't unlink \"$path\": $err",
     stash => {
       path => $path,
     },

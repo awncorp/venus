@@ -331,6 +331,167 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 data
+
+  data(Int @pids) (Int)
+
+The data method returns the number of messages sent to the current process,
+from the PID or PIDs provided (if any). If no PID list is provided, the count
+returned is based on the PIDs returned from L</watchlist>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item data example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $data = $parent->data;
+
+  # 0
+
+=back
+
+=over 4
+
+=item data example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->join('procs');
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->join('procs');
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->join('procs');
+
+  # in process 1
+
+  $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # in process 2
+
+  $process_2->pool(2)->sendall({
+    from => $process_2->pid, said => 'hello',
+  });
+
+  # $process_2->data;
+
+  # 2
+
+  # in process 3
+
+  $process_3->pool(2)->sendall({
+    from => $process_3->pid, said => 'hello',
+  });
+
+  # $process_3->data;
+
+  # 2
+
+  # in process 1
+
+  my $data = $process_1->data;
+
+  # 2
+
+=back
+
+=over 4
+
+=item data example 3
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->join('procs');
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->join('procs');
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->join('procs');
+
+  # in process 1
+
+  $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # in process 2
+
+  $process_2->pool(2)->sendall({
+    from => $process_2->pid, said => 'hello',
+  });
+
+  # $process_2->data;
+
+  # 2
+
+  # in process 3
+
+  $process_3->pool(2)->sendall({
+    from => $process_3->pid, said => 'hello',
+  });
+
+  # $process_3->data;
+
+  # 2
+
+  # in process 1
+
+  $process_1->recvall;
+
+  my $data = $process_1->data;
+
+  # 0
+
+=back
+
+=cut
+
+=head2 decode
+
+  decode(Str $data) (Any)
+
+The decode method accepts a string representation of a Perl value and returns
+the Perl value.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item decode example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $decode = $parent->decode("{ok=>1}");
+
+  # { ok => 1 }
+
+=back
+
+=cut
+
 =head2 disengage
 
   disengage() (Process)
@@ -356,6 +517,31 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 encode
+
+  encode(Any $data) (Str)
+
+The encode method accepts a Perl value and returns a string representation of
+that Perl value.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item encode example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $encode = $parent->encode({ok=>1});
+
+  # "{ok=>1}"
+
+=back
+
+=cut
+
 =head2 engage
 
   engage() (Process)
@@ -376,6 +562,66 @@ I<Since C<0.06>>
   $parent = $parent->engage;
 
   # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 exchange
+
+  exchange(Str $name) (Any)
+
+The exchange method gets and/or sets the name of the data exchange. The
+exchange is the ontext in which processes can register and cooperate. Process
+can cooperate in different exchanges (or contexts) and messages sent to a
+process in one context are not available to be retrieved will operating in
+another exchange (or context).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item exchange example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange;
+
+  # undef
+
+=back
+
+=over 4
+
+=item exchange example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange('procs');
+
+  # "procs"
+
+=back
+
+=over 4
+
+=item exchange example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $exchange = $parent->exchange('procs');
+
+  # "procs"
+
+  $exchange = $parent->exchange;
+
+  # "procs"
 
 =back
 
@@ -410,6 +656,59 @@ I<Since C<0.06>>
   my $exit = $parent->exit(1);
 
   # 1
+
+=back
+
+=cut
+
+=head2 followers
+
+  followers() (ArrayRef)
+
+The followers method returns the list of PIDs registered under the current
+L</exchange> who are not the L</leader>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item followers example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $followers = $parent->followers;
+
+  # []
+
+=back
+
+=over 4
+
+=item followers example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $followers = $process_1->followers;
+
+  # [12346, 12347]
 
 =back
 
@@ -637,6 +936,310 @@ I<Since C<0.06>>
 
 =cut
 
+=head2 is_follower
+
+  is_follower() (Bool)
+
+The is_follower method returns true if the process is not the L</leader>, otherwise
+returns false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_follower example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_follower = $process->is_follower;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_follower example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  my $is_follower = $process_1->is_follower;
+
+  # false
+
+  # my $is_follower = $process_2->is_follower;
+
+  # true
+
+  # my $is_follower = $process_3->is_follower;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_follower example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # my $is_follower = $process_1->is_follower;
+
+  # false
+
+  my $is_follower = $process_2->is_follower;
+
+  # true
+
+  # my $is_follower = $process_3->is_follower;
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_leader
+
+  is_leader() (Bool)
+
+The is_leader method returns true if the process is the L</leader>, otherwise
+returns false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_leader example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_leader = $process->is_leader;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_leader example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  my $is_leader = $process_1->is_leader;
+
+  # true
+
+  # my $is_leader = $process_2->is_leader;
+
+  # false
+
+  # my $is_leader = $process_3->is_leader;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_leader example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $process_1 = Venus::Process->new(12345)->register;
+  my $process_2 = Venus::Process->new(12346)->register;
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # my $is_leader = $process_1->is_leader;
+
+  # true
+
+  my $is_leader = $process_2->is_leader;
+
+  # false
+
+  # my $is_leader = $process_3->is_leader;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_registered
+
+  is_registered() (Bool)
+
+The is_registered method returns true if the process has registered using the
+L</register> method, otherwise returns false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_registered example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_registered = $process->is_registered;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_registered example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345)->register;
+
+  my $is_registered = $process->is_registered;
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_unregistered
+
+  is_unregistered() (Bool)
+
+The is_unregistered method returns true if the process has unregistered using
+the L</unregister> method, or had never registered at all, otherwise returns
+false.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item is_unregistered example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_unregistered example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345);
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_unregistered example 3
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new(12345)->register;
+
+  my $is_unregistered = $process->is_unregistered;
+
+  # false
+
+=back
+
+=cut
+
+=head2 join
+
+  join(Str $name) (Process)
+
+The join method sets the L</exchange>, registers the process with the exchange
+using L</register>, and clears the L</watchlist>, then returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item join example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->join;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item join example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->join('procs');
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
 =head2 kill
 
   kill(Str $signal, Int @pids) (Int)
@@ -711,6 +1314,250 @@ I<Since C<2.40>>
   my $killall = $parent->killall('term', 1001..1004);
 
   # [1, 1, 1, 1]
+
+=back
+
+=cut
+
+=head2 leader
+
+  leader() (Int)
+
+The leader method uses a simple leader election algorithm to determine the
+process leader and returns the PID for that process. The leader is always the
+lowest value active PID (i.e. that responds to L</ping>).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item leader example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $leader = $parent->leader;
+
+  # 12345
+
+=back
+
+=over 4
+
+=item leader example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $leader = $process_3->leader;
+
+  # 12345
+
+=back
+
+=over 4
+
+=item leader example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $leader = $parent->register->leader;
+
+  # 12345
+
+=back
+
+=cut
+
+=head2 leave
+
+  leave(Str $name) (Process)
+
+The leave method sets the L</exchange> to undefined, unregisters the process
+using L</unregister>, and clears the L</watchlist>, then returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item leave example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->leave;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item leave example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  $process = $process->leave('procs');
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 others
+
+  others() (ArrayRef)
+
+The others method returns all L</registrants> other than the current process,
+i.e. all other registered process PIDs whether active or inactive.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item others example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $others = $parent->others;
+
+  # []
+
+=back
+
+=over 4
+
+=item others example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $others = $process_1->others;
+
+  # [12346, 12347]
+
+=back
+
+=cut
+
+=head2 others_active
+
+  others_active() (ArrayRef)
+
+The others_active method returns all L</registrants> other than the current
+process which are active, i.e. all other registered process PIDs that responds
+to L</ping>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item others_active example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $others_active = $process_1->others_active;
+
+  # [12346, 12347]
+
+=back
+
+=cut
+
+=head2 others_inactive
+
+  others_inactive() (ArrayRef)
+
+The others_inactive method returns all L</registrants> other than the current
+process which are inactive, i.e. all other registered process PIDs that do not
+respond to L</ping>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item others_inactive example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1 (assuming all processes exited)
+
+  my $others_inactive = $process_1->others_inactive;
+
+  # [12346, 12347]
 
 =back
 
@@ -815,6 +1662,207 @@ I<Since C<2.01>>
 
 =cut
 
+=head2 poll
+
+  poll(Int $timeout, Str | CodeRef $code, Any @args) (ArrayRef)
+
+The poll method continuously calls the named method or coderef and returns the
+result that's not undefined, or throws an exception on timeout. If no method
+name is provided this method will default to calling L</recvall>.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item poll example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(0, 'ping', $parent->pid);
+
+  # [1]
+
+=back
+
+=over 4
+
+=item poll example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(5, 'ping', $parent->pid);
+
+  # [1]
+
+=back
+
+=over 4
+
+=item poll example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(0, 'recv', $parent->pid);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_poll)
+
+=back
+
+=over 4
+
+=item poll example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $poll = $parent->poll(5, sub {
+    int(rand(2)) ? "" : ()
+  });
+
+  # [""]
+
+=back
+
+=cut
+
+=head2 pool
+
+  pool(Int $count, Int $timeout) (Process)
+
+The pool method blocks the execution of the current process until the number of
+L</other> processes are registered and pingable. This method returns the
+invocant when successful, or throws an exception if the operation timed out.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item pool example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item pool example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(2);
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item pool example 3
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(3, 0);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_pool)
+
+=back
+
+=cut
+
+=head2 ppid
+
+  ppid() (Int)
+
+The ppid method returns the PID of the parent process (i.e. the process which
+forked the current process, if any).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item ppid example 1
+
+  # given: synopsis;
+
+  my $ppid = $parent->ppid;
+
+  # undef
+
+=back
+
+=over 4
+
+=item ppid example 2
+
+  # given: synopsis;
+
+  $process = $parent->fork;
+
+  # in child process
+
+  my $ppid = $process->ppid;
+
+  # 00000
+
+=back
+
+=cut
+
 =head2 prune
 
   prune() (Process)
@@ -888,6 +1936,302 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 recall
+
+  recall(Int $pid) (Any)
+
+The recall method returns the earliest message, sent by the current process to
+the process specified by the PID provided, which is no longer active (i.e.
+responding to L</ping>).
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 1
+
+  $process_1->send($process_2->pid, {from => $process_1->pid});
+
+  # in process 1 (process 2)
+
+  my $recall = $process_1->recall($process_2->pid);
+
+  # {from => 12345}
+
+=back
+
+=cut
+
+=head2 recallall
+
+  recallall() (ArrayRef)
+
+The recallall method performs a L</recall> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the results.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recallall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1->send($process_2->pid, {from => $process_1->pid});
+
+  $process_1->send($process_3->pid, {from => $process_1->pid});
+
+  $process_1->watch($process_2->pid, $process_3->pid);
+
+  # in process 1 (process 2 and 3 died)
+
+  my $recallall = $process_1->recallall;
+
+  # [{from => 12345}, {from => 12345}]
+
+=back
+
+=cut
+
+=head2 recv
+
+  recv(Int $pid) (Any)
+
+The recv method returns the earliest message found from the process specified
+by the PID provided.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recv example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $recv = $parent->recv;
+
+  # undef
+
+=back
+
+=over 4
+
+=item recv example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345);
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346);
+
+  # in process 1
+
+  my $recv = $process_1->recv($process_2->pid);
+
+  # undef
+
+  # in process 2
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => 'hello'});
+
+  # in process 1
+
+  $recv = $process_1->recv($process_2->pid);
+
+  # {from => 12346, said => 'hello'}
+
+=back
+
+=cut
+
+=head2 recvall
+
+  recvall() (ArrayRef)
+
+The recvall method performs a L</recv> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the results.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item recvall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid});
+
+  # in process 1
+
+  my $recvall = $process_1->pool(2)->recvall;
+
+  # [{from => 12346}, {from => 12347}]
+
+=back
+
+=over 4
+
+=item recvall example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid});
+
+  # in process 1
+
+  my $recvall = $process_1->pool(2)->recvall;
+
+  # [{from => 12346}, {from => 12347}]
+
+  # in process 2
+
+  $process_2->send($process_1->pid, {from => $process_2->pid});
+
+  # in process 1
+
+  $recvall = $process_1->recvall;
+
+  # [{from => 12346}]
+
+=back
+
+=cut
+
+=head2 register
+
+  register() (Process)
+
+The register method declares that the process is willing to cooperate with
+others (e.g. L</send> nad L</recv> messages), in a way that's discoverable by
+other processes, and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item register example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $register = $parent->register;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 registrants
+
+  registrants() (ArrayRef)
+
+The registrants method returns the PIDs for all the processes that registered
+using the L</register> method whether they're currently active or not.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item registrants example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  my $registrants = $process_1->registrants;
+
+  # [12345, 12346, 12347]
+
+=back
+
+=cut
+
 =head2 restart
 
   restart(CodeRef $callback) (ArrayRef)
@@ -918,6 +2262,104 @@ I<Since C<2.40>>
   });
 
   # [[1001, 1001, 255]]
+
+=back
+
+=cut
+
+=head2 send
+
+  send(Int $pid, Any $data) (Process)
+
+The send method makes the data provided available to the process specified by
+the PID provided.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item send example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $send = $parent->send;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item send example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345);
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346);
+
+  # in process 1
+
+  $process_1 = $process_1->send($process_2->pid, {
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # bless({...}, 'Venus::Process')
+
+  # in process 2
+
+  # $process_2->recv($process_1->pid);
+
+  # {from => 12345, said => 'hello'}
+
+=back
+
+=cut
+
+=head2 sendall
+
+  sendall(Any $data) (Process)
+
+The sendall method performs a L</send> on the parent process (if any) via
+L</ppid> and any process listed in the L</watchlist>, and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item sendall example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  # in process 1
+
+  $process_1 = $process_1->pool(2)->sendall({
+    from => $process_1->pid, said => 'hello',
+  });
+
+  # bless({...}, 'Venus::Process')
 
 =back
 
@@ -1016,21 +2458,22 @@ I<Since C<2.40>>
 
 =item status example 1
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my $status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 is still running (not terminated)
-
+    # assuming PID 12346 is still running (not terminated)
     return [$pid, $check, $exit];
   });
 
-  # [[1001, 0, -1]]
+  # [[12346, 0, -1]]
 
 =back
 
@@ -1038,21 +2481,22 @@ I<Since C<2.40>>
 
 =item status example 2
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my $status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 terminated with exit code 255
-
+    # assuming process 12346 terminated with exit code 255
     return [$pid, $check, $exit];
   });
 
-  # [[1001, 1001, 255]]
+  # [[12346, 12346, 255]]
 
 =back
 
@@ -1060,21 +2504,22 @@ I<Since C<2.40>>
 
 =item status example 3
 
-  # given: synopsis
-
   package main;
 
-  $parent->watch(1001);
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->watch(12346);
 
   my @status = $parent->status(sub {
     my ($pid, $check, $exit) = @_;
 
-    # assuming process 1001 terminated with exit code 255
-
+    # assuming process 12346 terminated with exit code 255
     return [$pid, $check, $exit];
   });
 
-  # ([1001, 1001, 255])
+  # ([12346, 12346, 255])
 
 =back
 
@@ -1231,6 +2676,109 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 sync
+
+  sync(Int $count, Int $timeout) (Process)
+
+The sync method blocks the execution of the current process until the number of
+L</other> processes are registered, pingable, and have each sent at-least one
+message to the current process. This method returns the invocant when
+successful, or throws an exception if the operation timed out.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item sync example 1
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync;
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item sync example 2
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync(2);
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=over 4
+
+=item sync example 3
+
+  # given: synopsis
+
+  package main;
+
+  # in process 1
+
+  my $process_1 = Venus::Process->new(12345)->register;
+
+  # in process 2
+
+  my $process_2 = Venus::Process->new(12346)->register;
+
+  $process_2->send($process_1->pid, {from => $process_2->pid, said => "hello"});
+
+  # in process 3
+
+  my $process_3 = Venus::Process->new(12347)->register;
+
+  $process_3->send($process_1->pid, {from => $process_3->pid, said => "hello"});
+
+  # in process 1
+
+  $process_1 = $process_1->sync(3, 0);
+
+  # Exception! (isa Venus::Process::Error) (see error_on_timeout_sync)
+
+=back
+
+=cut
+
 =head2 trap
 
   trap(Str $name, Str | CodeRef $expr) (Process)
@@ -1253,6 +2801,32 @@ I<Since C<0.06>>
   $parent = $parent->trap(term => sub{
     die 'Something failed!';
   });
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 unregister
+
+  unregister() (Process)
+
+The unregister method declares that the process is no longer willing to
+cooperate with others (e.g. L</send> nad L</recv> messages), and will no longer
+be discoverable by other processes, and returns the invocant.
+
+I<Since C<2.91>>
+
+=over 4
+
+=item unregister example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $unregister = $parent->unregister;
 
   # bless({...}, 'Venus::Process')
 
@@ -1930,6 +3504,126 @@ B<example 1>
   # my $pid = $error->stash('pid');
 
   # 123
+
+=back
+
+=over 4
+
+=item error: C<error_on_timeout_poll>
+
+This package may raise an error_on_timeout_poll exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (0, sub{});
+
+  my $error = $parent->throw('error_on_timeout_poll', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_timeout_poll"
+
+  # my $message = $error->message;
+
+  # "Timed out after 0 seconds in process 12345 while polling __ANON__"
+
+  # my $code = $error->stash('code');
+
+  # sub{}
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=back
+
+=over 4
+
+=item error: C<error_on_timeout_pool>
+
+This package may raise an error_on_timeout_pool exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (0, 2);
+
+  my $error = $parent->throw('error_on_timeout_pool', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_timeout_pool"
+
+  # my $message = $error->message;
+
+  # "Timed out after 0 seconds in process 12345 while pooling"
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $pool_size = $error->stash('pool_size');
+
+  # 2
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
+
+=back
+
+=over 4
+
+=item error: C<error_on_timeout_sync>
+
+This package may raise an error_on_timeout_sync exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my @args = (0, 2);
+
+  my $error = $parent->throw('error_on_timeout_sync', @args)->catch('error');
+
+  # my $name = $error->name;
+
+  # "on_timeout_sync"
+
+  # my $message = $error->message;
+
+  # "Timed out after 0 seconds in process 12345 while syncing"
+
+  # my $exchange = $error->stash('exchange');
+
+  # undef
+
+  # my $pid = $error->stash('pid');
+
+  # 12345
+
+  # my $pool_size = $error->stash('pool_size');
+
+  # 2
+
+  # my $timeout = $error->stash('timeout');
+
+  # 0
 
 =back
 

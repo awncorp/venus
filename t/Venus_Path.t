@@ -72,6 +72,7 @@ method: parents
 method: parts
 method: read
 method: relative
+method: rename
 method: rmdir
 method: rmdirs
 method: rmfiles
@@ -1386,7 +1387,7 @@ $test->for('example', 1, 'mkcall', sub {
 
   my $path = Venus::Path->new($^X);
 
-  my ($call_output, $exit_code) = $path->mkcall('t/data/sun --heat-death');
+  my ($call_output, $exit_code) = $path->mkcall('t/data/sun', '--heat-death');
 
   # ("", 1)
 
@@ -1729,7 +1730,7 @@ invocant to the path provided and returns the invocant.
 
   my $unknown = $path->child('unknown')->mkfile->move($path->child('titan'));
 
-  # bless({...}, 'Venus::Path')
+  # bless({value => 't/data/titan'}, 'Venus::Path')
 
 =cut
 
@@ -1737,11 +1738,11 @@ $test->for('example', 1, 'move', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Path';
-  like "$result", qr{t${fsds}data${fsds}unknown};
-  ok !$result->exists;
-  my $titan = $result->parent->child('titan');
-  ok $titan->exists;
-  ok $titan->unlink;
+  like "$result", qr{t${fsds}data${fsds}titan};
+  ok $result->exists;
+  my $unknown = $result->parent->child('unknown');
+  ok !$unknown->exists;
+  ok $result->unlink;
 
   $result
 });
@@ -1999,6 +2000,49 @@ $test->for('example', 2, 'relative', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Path');
   ok $result =~ m{data${fsds}planets${fsds}mars$};
+
+  $result
+});
+
+=method rename
+
+The rename method performs a L</move> unless the path provided is only a file
+name, in which case it attempts a rename under the directory of the invocant.
+
+=signature rename
+
+  rename(Str | Path $path) (Path)
+
+=metadata rename
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 rename
+
+  package main;
+
+  use Venus::Path;
+
+  my $path = Venus::Path->new('t/path/001');
+
+  my $rename = $path->rename('002');
+
+  # bless({value => 't/path/002'}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 1, 'rename', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Path';
+  like "$result", qr{t${fsds}path${fsds}002};
+  my $former = $result->parent->child('001');
+  ok !$former->exists;
+  $result->rename('001');
 
   $result
 });
@@ -2761,7 +2805,7 @@ $test->for('example', 1, 'error_on_copy', sub {
   my $name = $result->name;
   is $name, "on_copy";
   my $message = $result->message;
-  like $message, qr/Can't copy "([^"]+)" to "\/nowhere": $!/;
+  like $message, qr/Can't copy "([^"]+)" to "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
   my $self = $result->stash('self');
@@ -2807,7 +2851,7 @@ $test->for('example', 1, 'error_on_mkcall', sub {
   my $name = $result->name;
   is $name, "on_mkcall";
   my $message = $result->message;
-  like $message, qr/Can't make system call to "\/nowhere": exit code \(\d\)/;
+  like $message, qr/Can't make system call to "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -2851,7 +2895,7 @@ $test->for('example', 1, 'error_on_mkdir', sub {
   my $name = $result->name;
   is $name, "on_mkdir";
   my $message = $result->message;
-  is $message, "Can't make directory \"/nowhere\": $!";
+  like $message, qr/Can't make directory "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -2895,7 +2939,7 @@ $test->for('example', 1, 'error_on_mkfile', sub {
   my $name = $result->name;
   is $name, "on_mkfile";
   my $message = $result->message;
-  is $message, "Can't make file \"/nowhere\": $!";
+  like $message, qr/Can't make file "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -2943,7 +2987,7 @@ $test->for('example', 1, 'error_on_move', sub {
   my $name = $result->name;
   is $name, "on_move";
   my $message = $result->message;
-  like $message, qr/Can't move "([^"]+)" to "\/nowhere": $!/;
+  like $message, qr/Can't move "([^"]+)" to "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
   my $self = $result->stash('self');
@@ -2989,7 +3033,7 @@ $test->for('example', 1, 'error_on_open', sub {
   my $name = $result->name;
   is $name, "on_open";
   my $message = $result->message;
-  is $message, "Can't open \"/nowhere\": $!";
+  like $message, qr/Can't open "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3033,7 +3077,7 @@ $test->for('example', 1, 'error_on_read_binmode', sub {
   my $name = $result->name;
   is $name, "on_read_binmode";
   my $message = $result->message;
-  is $message, "Can't binmode \"/nowhere\": $!";
+  like $message, qr/Can't binmode "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3077,7 +3121,7 @@ $test->for('example', 1, 'error_on_read_error', sub {
   my $name = $result->name;
   is $name, "on_read_error";
   my $message = $result->message;
-  is $message, "Can't read from file \"/nowhere\": $!";
+  like $message, qr/Can't read from file "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3121,7 +3165,7 @@ $test->for('example', 1, 'error_on_read_open', sub {
   my $name = $result->name;
   is $name, "on_read_open";
   my $message = $result->message;
-  is $message, "Can't read \"/nowhere\": $!";
+  like $message, qr/Can't read "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3165,7 +3209,7 @@ $test->for('example', 1, 'error_on_rmdir', sub {
   my $name = $result->name;
   is $name, "on_rmdir";
   my $message = $result->message;
-  is $message, "Can't rmdir \"/nowhere\": $!";
+  like $message, qr/Can't rmdir "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3213,7 +3257,7 @@ $test->for('example', 1, 'error_on_write_binmode', sub {
   my $name = $result->name;
   is $name, "on_write_binmode";
   my $message = $result->message;
-  is $message, "Can't binmode \"/nowhere\": $!";
+  like $message, qr/Can't binmode "\/nowhere"/;
   my $binmode = $result->stash('binmode');
   is $binmode, ":utf8";
   my $path = $result->stash('path');
@@ -3259,7 +3303,7 @@ $test->for('example', 1, 'error_on_write_error', sub {
   my $name = $result->name;
   is $name, "on_write_error";
   my $message = $result->message;
-  is $message, "Can't write to file \"/nowhere\": $!";
+  like $message, qr/Can't write to file "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3303,7 +3347,7 @@ $test->for('example', 1, 'error_on_write_open', sub {
   my $name = $result->name;
   is $name, "on_write_open";
   my $message = $result->message;
-  is $message, "Can't write \"/nowhere\": $!";
+  like $message, qr/Can't write "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 
@@ -3347,7 +3391,7 @@ $test->for('example', 1, 'error_on_unlink', sub {
   my $name = $result->name;
   is $name, "on_unlink";
   my $message = $result->message;
-  is $message, "Can't unlink \"/nowhere\": $!";
+  like $message, qr/Can't unlink "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
 

@@ -155,6 +155,24 @@ sub paths {
   return wantarray ? @{$result} : $result;
 }
 
+sub quote {
+  my ($self, $data) = @_;
+
+  if (!defined $data) {
+    return '';
+  }
+  elsif ($self->is_win) {
+    return ($data =~ /^"/ && $data =~ /"$/)
+      ? $data
+      : ('"' . (($data =~ s/"/\\"/gr) || "") . '"');
+  }
+  else {
+    return ($data =~ /^'/ && $data =~ /'$/)
+      ? $data
+      : ("'" . (($data =~ s/'/'\\''/gr) || "") . "'");
+  }
+}
+
 sub type {
   my ($self) = @_;
 

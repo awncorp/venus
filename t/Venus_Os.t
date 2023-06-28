@@ -56,6 +56,7 @@ method: is_vms
 method: is_win
 method: name
 method: paths
+method: quote
 method: type
 method: where
 method: which
@@ -204,7 +205,7 @@ $test->for('example', 3, 'call', sub {
 =cut
 
 $test->for('example', 4, 'call', sub {
-  $Venus::Os::TYPES{$^O} = 'linux';
+  $Venus::Os::TYPES{$^O} = $^O;
   my ($tryable) = @_;
   my @result = $tryable->result;
   is_deeply [@result], ["osname='$^O';", 0];
@@ -225,7 +226,7 @@ $test->for('example', 4, 'call', sub {
 =cut
 
 $test->for('example', 5, 'call', sub {
-  $Venus::Os::TYPES{$^O} = 'linux';
+  $Venus::Os::TYPES{$^O} = $^O;
   my ($tryable) = @_;
   my @result = $tryable->result;
   is_deeply [@result], ["", 1];
@@ -1204,6 +1205,115 @@ $test->for('example', 1, 'paths', sub {
   my $is_win = Venus::Os->is_win;
   my $paths = [($is_win ? '.' : ()), split(($is_win ? ';' : ':'), $ENV{PATH})];
   is_deeply $result, $paths;
+
+  $result
+});
+
+=method quote
+
+The quote method accepts a string and returns the OS-specific quoted version of
+the string.
+
+=signature quote
+
+  quote(Str $data) (Str)
+
+=metadata quote
+
+{
+  since => '2.91',
+}
+
+=cut
+
+=example-1 quote
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $quote = $os->quote("hello \"world\"");
+
+  # "'hello \"world\"'"
+
+=cut
+
+$test->for('example', 1, 'quote', sub {
+  my ($tryable) = @_;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $result, "'hello \"world\"'";
+
+  $result
+});
+
+=example-2 quote
+
+  # given: synopsis
+
+  package main;
+
+  # on linux
+
+  my $quote = $os->quote('hello \'world\'');
+
+  # "'hello '\\''world'\\'''"
+
+=cut
+
+$test->for('example', 2, 'quote', sub {
+  my ($tryable) = @_;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $result, "'hello '\\''world'\\'''";
+
+  $result
+});
+
+=example-3 quote
+
+  # given: synopsis
+
+  package main;
+
+  # on mswin32
+
+  my $quote = $os->quote("hello \"world\"");
+
+  # "\"hello \\"world\\"\""
+
+=cut
+
+$test->for('example', 3, 'quote', sub {
+  my ($tryable) = @_;
+  $Venus::Os::TYPES{$^O} = 'mswin32';
+  my $result = $tryable->result;
+  is $result, '"hello \\"world\\""';
+
+  $result
+});
+
+=example-4 quote
+
+  # given: synopsis
+
+  package main;
+
+  # on mswin32
+
+  my $quote = $os->quote('hello "world"');
+
+  # '"hello \"world\""'
+
+=cut
+
+$test->for('example', 4, 'quote', sub {
+  my ($tryable) = @_;
+  $Venus::Os::TYPES{$^O} = 'mswin32';
+  my $result = $tryable->result;
+  is $result, '"hello \"world\""';
 
   $result
 });

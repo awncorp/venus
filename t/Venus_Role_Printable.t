@@ -37,11 +37,15 @@ $test->for('abstract');
 =includes
 
 method: print
+method: print_json
 method: print_pretty
 method: print_string
+method: print_yaml
 method: say
+method: say_json
 method: say_pretty
 method: say_string
+method: say_yaml
 
 =cut
 
@@ -143,6 +147,68 @@ $test->for('example', 1, 'print', sub {
 =cut
 
 $test->for('example', 2, 'print', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+
+  $result
+});
+
+=method print_json
+
+The print_json method prints a JSON representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+=signature print_json
+
+  print_json(Str | CodeRef $method, Any @args) (Any)
+
+=metadata print_json
+
+{
+  since => '2.91',
+}
+
+=example-1 print_json
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_json = $example->print_json;
+
+  # "{\"test\": 123}"
+
+=cut
+
+$test->for('example', 1, 'print_json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+
+  $result
+});
+
+=example-2 print_json
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_json = $example->print_json('execute');
+
+  # "[{\"test\": 123}]"
+
+=cut
+
+$test->for('example', 2, 'print_json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result == 2;
@@ -252,6 +318,68 @@ $test->for('example', 1, 'print_string', sub {
   $result
 });
 
+=method print_yaml
+
+The print_yaml method prints a YAML representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method.
+
+=signature print_yaml
+
+  print_yaml(Str | CodeRef $method, Any @args) (Any)
+
+=metadata print_yaml
+
+{
+  since => '2.91',
+}
+
+=example-1 print_yaml
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_yaml = $example->print_yaml;
+
+  # "---\ntest: 123"
+
+=cut
+
+$test->for('example', 1, 'print_yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+
+  $result
+});
+
+=example-2 print_yaml
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $print_yaml = $example->print_yaml('execute');
+
+  # "---\n- test: 123"
+
+=cut
+
+$test->for('example', 2, 'print_yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 2;
+
+  $result
+});
+
 =method say
 
 The say method prints a stringified representation of the underlying data, with
@@ -304,6 +432,68 @@ $test->for('example', 1, 'say', sub {
 =cut
 
 $test->for('example', 2, 'say', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 3;
+
+  $result
+});
+
+=method say_json
+
+The say_json method prints a JSON representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method, with a trailing newline.
+
+=signature say_json
+
+  say_json(Str | CodeRef $method, Any @args) (Any)
+
+=metadata say_json
+
+{
+  since => '2.91',
+}
+
+=example-1 say_json
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_json = $example->say_json;
+
+  # "{\"test\": 123}\n"
+
+=cut
+
+$test->for('example', 1, 'say_json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 3;
+
+  $result
+});
+
+=example-2 say_json
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_json = $example->say_json('execute');
+
+  # "[{\"test\": 123}]\n"
+
+=cut
+
+$test->for('example', 2, 'say_json', sub {
+  if (require Venus::Json && not Venus::Json->package) {
+    plan skip_all => 'No suitable JSON library found';
+  }
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result == 3;
@@ -407,6 +597,68 @@ be acted on by this method.
 =cut
 
 $test->for('example', 1, 'say_string', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 3;
+
+  $result
+});
+
+=method say_yaml
+
+The say_yaml method prints a YAML representation of the underlying data. This
+method supports dispatching, i.e. providing a method name and arguments whose
+return value will be acted on by this method, with a trailing newline.
+
+=signature say_yaml
+
+  say_yaml(Str | CodeRef $method, Any @args) (Any)
+
+=metadata say_yaml
+
+{
+  since => '2.91',
+}
+
+=example-1 say_yaml
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_yaml = $example->say_yaml;
+
+  # "---\ntest: 123\n"
+
+=cut
+
+$test->for('example', 1, 'say_yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok @$result == 3;
+
+  $result
+});
+
+=example-2 say_yaml
+
+  package main;
+
+  my $example = Example->new(test => 123);
+
+  my $say_yaml = $example->say_yaml('execute');
+
+  # "---\n- test: 123\n"
+
+=cut
+
+$test->for('example', 2, 'say_yaml', sub {
+  if (require Venus::Yaml && not Venus::Yaml->package) {
+    plan skip_all => 'No suitable YAML library found';
+  }
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok @$result == 3;

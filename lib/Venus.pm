@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '2.91';
+our $VERSION = '3.04';
 
 # AUTHORITY
 
