@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.04';
+our $VERSION = '3.10';
 
 # AUTHORITY
 
@@ -46,7 +46,10 @@ sub import {
     float => 1,
     gather => 1,
     hash => 1,
+    is_false => 1,
+    is_true => 1,
     json => 1,
+    list => 1,
     load => 1,
     log => 1,
     make => 1,
@@ -56,6 +59,7 @@ sub import {
     name => 1,
     number => 1,
     opts => 1,
+    pairs => 1,
     path => 1,
     perl => 1,
     process => 1,
@@ -64,11 +68,13 @@ sub import {
     random => 1,
     regexp => 1,
     replace => 1,
+    render => 1,
     roll => 1,
     search => 1,
     space => 1,
     schema => 1,
     string => 1,
+    syscall => 1,
     template => 1,
     test => 1,
     then => 1,
@@ -92,6 +98,15 @@ sub import {
   }
 
   return $self;
+}
+
+# HOOKS
+
+sub _qx {
+  my (@args) = @_;
+  local $| = 1;
+  local $SIG{__WARN__} = sub {};
+  (do{local $_ = qx(@{[@args]}); chomp if $_; $_}, $?, ($? >> 8))
 }
 
 # FUNCTIONS
@@ -378,6 +393,22 @@ sub hash ($;$@) {
   return Venus::Hash->new($data)->$code(@args);
 }
 
+sub is_false ($) {
+  my ($data) = @_;
+
+  require Venus::Boolean;
+
+  return Venus::Boolean->new($data)->is_false;
+}
+
+sub is_true ($) {
+  my ($data) = @_;
+
+  require Venus::Boolean;
+
+  return Venus::Boolean->new($data)->is_true;
+}
+
 sub json (;$$) {
   my ($code, $data) = @_;
 
@@ -396,6 +427,12 @@ sub json (;$$) {
   }
 
   return fault(qq(Invalid "json" action "$code"));
+}
+
+sub list (@) {
+  my (@args) = @_;
+
+  return map {defined $_ ? (ref eq 'ARRAY' ? (@{$_}) : ($_)) : ($_)} @args;
 }
 
 sub load ($) {
@@ -491,6 +528,19 @@ sub opts ($;$@) {
   }
 
   return Venus::Opts->new($data)->$code(@args);
+}
+
+sub pairs (@) {
+  my ($args) = @_;
+
+  my $result = defined $args
+    ? (
+    ref $args eq 'ARRAY'
+    ? ([map {[$_, $args->[$_]]} 0..$#{$args}])
+    : (ref $args eq 'HASH' ? ([map {[$_, $args->{$_}]} sort keys %{$args}]) : ([])))
+    : [];
+
+  return wantarray ? @{$result} : $result;
 }
 
 sub path ($;$@) {
@@ -590,6 +640,12 @@ sub regexp ($;$@) {
   return Venus::Regexp->new($data)->$code(@args);
 }
 
+sub render ($;$) {
+  my ($data, $args) = @_;
+
+  return template($data, 'render', undef, $args || {});
+}
+
 sub replace ($;$@) {
   my ($data, $code, @args) = @_;
 
@@ -668,6 +724,41 @@ sub string ($;$@) {
   }
 
   return Venus::String->new($data)->$code(@args);
+}
+
+sub syscall ($;@) {
+  my (@args) = @_;
+
+  require Venus::Os;
+
+  for (my $i = 0; $i < @args; $i++) {
+    if ($args[$i] =~ /^\|+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\&+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\w+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^[<>]+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\d[<>&]+\d?$/) {
+      next;
+    }
+    if ($args[$i] =~ /\$[A-Z]\w+/) {
+      next;
+    }
+    if ($args[$i] =~ /^\$\((.*)\)$/) {
+      next;
+    }
+    $args[$i] = Venus::Os->quote($args[$i]);
+  }
+
+  my ($data, $exit, $code) = (_qx(@args));
+
+  return wantarray ? ($data, $code) : (($exit == 0) ? true() : false());
 }
 
 sub template ($;$@) {

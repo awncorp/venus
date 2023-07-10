@@ -1,4 +1,7 @@
 {
+  asks => {
+    PASS => 'What\'s the password',
+  },
   data => {
     ECHO => 1
   },
@@ -15,12 +18,10 @@
     says => "eval \"map log(\$_), map eval, \@ARGV\"",
     test => "\$PROVE"
   },
-  find => {},
   libs => [
     "-Ilib",
     "-Ilocal/lib/perl5"
   ],
-  load => [],
   path => [
     "./bin",
     "./dev",
@@ -28,11 +29,8 @@
   ],
   perl => {
     perl => "perl",
-    "perl-5.18.0" => "perlbrew exec --with perl-5.18.0 perl",
     prove => "prove",
-    "prove-5.18.0" => "perlbrew exec --with perl-5.18.0 prove"
   },
-  task => {},
   vars => {
     PERL => "perl",
     PROVE => "prove"

@@ -346,7 +346,7 @@ $test->for('example', 1, 'cli', sub {
 
 The cmds method can be overridden and returns a hashref suitable to be passed
 to the L<Venus::Cli/set> method as type C<"cmd">. A C<"cmd"> is a CLI command
-which maps to an positional argument declare by L</arg>.
+which maps to an positional argument declare by L</args>.
 
 =signature cmds
 
@@ -1071,9 +1071,9 @@ $test->for('example', 1, 'header', sub {
 
 =method help
 
-The help method can be overridden and returns the result of L<Venus::Cli/help>.
-This method is returns the default help text based on the configuration of the
-L</cli> object.
+The help method can be overridden and returns a string representing "help" text
+for the CLI. By default this method returns the result of L<Venus::Cli/help>,
+based on the L</cli> object.
 
 =signature help
 
@@ -1463,7 +1463,7 @@ $test->for('example', 1, 'log_warn', sub {
 =method name
 
 The name method can be overridden and returns the name of the task (and
-application). This method is default to C<$0> if not overridden.
+application). This method defaults to C<$0> if not overridden.
 
 =signature name
 

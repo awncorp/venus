@@ -29,7 +29,8 @@ vns
 =head1 DESCRIPTION
 
 Run and alias arbitrary commands, and tasks derived from L<Venus::Task>, using
-L<Venus::Run>.
+L<Venus::Run>. See L<FEATURES|Venus::Run/FEATURES> for usage and configuration
+information.
 
 =head1 QUICKSTART
 

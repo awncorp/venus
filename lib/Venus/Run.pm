@@ -13,6 +13,16 @@ require Venus;
 
 our $NAME = __PACKAGE__;
 
+# HOOKS
+
+sub _print {
+  do {local $| = 1; CORE::print(@_, "\n")}
+}
+
+sub _prompt {
+  do {local $\ = ''; local $_ = <STDIN>; chomp; $_}
+}
+
 # METHODS
 
 state $args = {
@@ -117,7 +127,7 @@ Here are examples usages using the example YAML configuration.
 Copyright 2022-2023, Vesion $Venus::VERSION, The Venus "AUTHOR" and "CONTRIBUTORS"
 
 More information on "vns" and/or the "Venus" standard library, visit
-https://p3rl.org/Venus.
+https://p3rl.org/vns.
 EOF
 
 sub footer {
@@ -252,6 +262,8 @@ sub _exec {
 
   return () if !@data;
 
+  $conf = _set_conf($conf);
+
   my %ORIG_ENV = %ENV;
 
   _set_vars($conf);
@@ -260,21 +272,15 @@ sub _exec {
 
   _set_libs($conf);
 
-  my @args = grep defined, _make($conf, shift(@data)), @data;
+  for my $step (_flow($conf, @data)) {
+    my ($prog, @args) = @{$step};
 
-  my $prog = shift @args;
-
-  require Venus::Os;
-
-  @args = map +(/^\w+$/ ? $_ : /^\$[A-Z]\w+$/ ? $_ : Venus::Os->quote($_)), @args;
-
-  return () if !$prog;
-
-  $code->($prog, @args);
+    $code->($prog, @args) if $prog;
+  }
 
   %ENV = %ORIG_ENV;
 
-  return ($prog, @args);
+  return (@data);
 }
 
 sub _find {
@@ -298,6 +304,18 @@ sub _find {
     unshift @data, @item; @item = shift @data;
   }
 
+  @item = (_find_in_flow($seen, $conf, @item));
+
+  if (@item > 1) {
+    unshift @data, @item; @item = shift @data;
+  }
+
+  @item = (_find_in_func($seen, $conf, @item));
+
+  if (@item > 1) {
+    unshift @data, @item; @item = shift @data;
+  }
+
   @item = (_find_in_perl($seen, $conf, @item));
 
   if (@item > 1) {
@@ -314,6 +332,12 @@ sub _find {
 
   if (@item > 1) {
     unshift @data, @item; @item = shift @data;
+  }
+
+  @item = (_find_in_with($seen, $conf, @item));
+
+  if (@item > 1) {
+    shift @data; unshift @data, @item; @item = shift @data;
   }
 
   return (@item, @data);
@@ -347,6 +371,36 @@ sub _find_in_find {
       ($value eq $item)
         ? ($value)
         : (_find_in_seen($seen, $conf, 'find', $item, $value));
+    })
+    : ($item)
+    )
+    : ($item);
+}
+
+sub _find_in_flow {
+  my ($seen, $conf, $item) = @_;
+
+  return $conf->{flow}
+    ? (
+    $conf->{flow}{$item}
+    ? (do {
+      my $value = $conf->{flow}{$item};
+      join ' && ', map +(join(' ', _exec(sub{}, $conf, $_))), @{$value}
+    })
+    : ($item)
+    )
+    : ($item);
+}
+
+sub _find_in_func {
+  my ($seen, $conf, $item) = @_;
+
+  return $conf->{func}
+    ? (
+    $conf->{func}{$item}
+    ? (do {
+      my $value = _vars($conf->{func}{$item});
+      ('perl', '-E', "(do \"$value\")->(\\\@ARGV)")
     })
     : ($item)
     )
@@ -408,12 +462,46 @@ sub _find_in_vars {
     : ($item);
 }
 
+sub _find_in_with {
+  my ($seen, $conf, $item) = @_;
+
+  return $conf->{with}
+    ? (
+    $conf->{with}{$item}
+    ? (do {
+      $ENV{ECHO} = 0;
+      $ENV{VENUS_FILE} = _vars($conf->{with}{$item});
+      $ENV{VENUS_RUN_NAME} || 'vns';
+    })
+    : ($item)
+    )
+    : ($item);
+}
+
 sub _find_in_seen {
   my ($seen, $conf, $item, $name, $value) = @_;
 
   return $seen->{$item}{$name}++
     ? ((_split($value))[0])
     : (_find($seen, $conf, $value));
+}
+
+sub _flow {
+  my ($conf, @data) = @_;
+
+  return () if !@data;
+
+  my $item = shift @data;
+
+  return $conf->{flow}
+    ? (
+    $conf->{flow}{$item}
+    ? (do {
+     (map _flow($conf, $_, @data), @{$conf->{flow}{$item}});
+    })
+    : (_prep($conf, $item, @data))
+    )
+    : (_prep($conf, $item, @data));
 }
 
 sub _libs {
@@ -446,22 +534,61 @@ sub _make {
   return (($path ? $path : $item), @data);
 }
 
+sub _prep {
+  my ($conf, @data) = @_;
+
+  my @args = map _vars($_), grep defined, _make($conf, shift(@data)), @data;
+
+  my $prog = shift @args;
+
+  require Venus::Os;
+
+  for (my $i = 0; $i < @args; $i++) {
+    if ($args[$i] =~ /^\|+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\&+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\w+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^[<>]+$/) {
+      next;
+    }
+    if ($args[$i] =~ /^\d[<>&]+\d?$/) {
+      next;
+    }
+    if ($args[$i] =~ /\$[A-Z]\w+/) {
+      next;
+    }
+    if ($args[$i] =~ /^\$\((.*)\)$/) {
+      if ($1) {
+        $args[$i] = "\$(@{[@{_prep($conf, $1)}]})";
+      }
+      next;
+    }
+    $args[$i] = Venus::Os->quote($args[$i]);
+  }
+
+  return [$prog ? ($prog, @args) : ()];
+}
+
 sub _split {
   my ($text) = @_;
 
   return (grep length, ($text // '') =~ /(?x)(?:"([^"]*)"|([^\s]*))\s?/g);
 }
 
-sub _set_path {
+sub _set_conf {
   my ($conf) = @_;
 
-  require Venus::Os;
-  require Venus::Path;
-
-  if (my $path = $conf->{path}) {
-    $ENV{PATH} = join((Venus::Os->is_win ? ';' : ':'),
-      (map Venus::Path->new($_)->absolute, @{$conf->{path}}), $ENV{PATH});
-  }
+  $conf = Venus::merge(Venus::Config->read_file(_vars($_))->value, $conf)
+    for (
+      $conf->{from}
+      ? ((ref $conf->{from} eq 'ARRAY') ? (@{$conf->{from}}) : ($conf->{from}))
+      : ()
+    );
 
   return $conf;
 }
@@ -474,7 +601,21 @@ sub _set_libs {
 
   my %seen;
   $ENV{PERL5LIB} = join((Venus::Os->is_win ? ';' : ':'),
-    (grep !$seen{$_}++, map Venus::Path->new($_)->absolute, _libs($conf)));
+    (grep !$seen{$_}++, map Venus::Path->new(_vars($_))->absolute, _libs($conf)));
+
+  return $conf;
+}
+
+sub _set_path {
+  my ($conf) = @_;
+
+  require Venus::Os;
+  require Venus::Path;
+
+  if (my $path = $conf->{path}) {
+    $ENV{PATH} = join((Venus::Os->is_win ? ';' : ':'),
+      (map Venus::Path->new(_vars($_))->absolute, @{$conf->{path}}), $ENV{PATH});
+  }
 
   return $conf;
 }
@@ -490,7 +631,17 @@ sub _set_vars {
     $ENV{$_} = join(' ', grep defined, _find({}, $conf, $_)) for keys %{$vars};
   }
 
+  if (my $asks = $conf->{asks}) {
+    for my $key (sort keys %{$asks}) {
+      next if defined $ENV{$key}; _print $asks->{$key}; $ENV{$key} = _prompt;
+    }
+  }
+
   return $conf;
+}
+
+sub _vars {
+  (($_[0] // '') =~ s{\$([A-Z]+)}{$ENV{$1}//"\$".$1}egr)
 }
 
 # AUTORUN

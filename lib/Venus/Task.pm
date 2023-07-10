@@ -240,7 +240,7 @@ sub run {
 
   my $CAN_RUN = not(caller(1)) || scalar(caller(1)) eq 'main';
 
-  $self->class->new(@args)->execute if $ENV{VENUS_TASK_RUN} && $CAN_RUN;
+  $self->class->new(@args)->maybe('execute') if $ENV{VENUS_TASK_RUN} && $CAN_RUN;
 
   return $self;
 }

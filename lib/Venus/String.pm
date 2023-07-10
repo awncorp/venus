@@ -324,6 +324,16 @@ sub substr {
   }
 }
 
+sub template {
+  my ($self, $code, @args) = @_;
+
+  require Venus::Template;
+
+  my $template = Venus::Template->new($self->get);
+
+  return $code ? $template->$code(@args) : $template;
+}
+
 sub titlecase {
   my ($self) = @_;
 

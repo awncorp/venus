@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    3.04
+    3.10
 
 SYNOPSIS
 
@@ -1026,6 +1026,64 @@ FUNCTIONS
       
         # [[1, 2], [3, 4], [5, 6], [7, 8]]
 
+ is_false
+
+      is_false(Any $data) (Bool)
+
+    The is_false function accepts a scalar value and returns true if the
+    value is falsy.
+
+    Since 3.04
+
+    is_false example 1
+
+        package main;
+      
+        use Venus 'is_false';
+      
+        my $is_false = is_false 0;
+      
+        # true
+
+    is_false example 2
+
+        package main;
+      
+        use Venus 'is_false';
+      
+        my $is_false = is_false 1;
+      
+        # false
+
+ is_true
+
+      is_true(Any $data) (Bool)
+
+    The is_true function accepts a scalar value and returns true if the
+    value is truthy.
+
+    Since 3.04
+
+    is_true example 1
+
+        package main;
+      
+        use Venus 'is_true';
+      
+        my $is_true = is_true 1;
+      
+        # true
+
+    is_true example 2
+
+        package main;
+      
+        use Venus 'is_true';
+      
+        my $is_true = is_true 0;
+      
+        # false
+
  json
 
       json(Str $call, Any $data) (Any)
@@ -1075,6 +1133,45 @@ FUNCTIONS
         my $json = json 'class', {data => "..."};
       
         # Exception! (isa Venus::Fault)
+
+ list
+
+      list(Any @args) (Any)
+
+    The list function accepts a list of values and flattens any arrayrefs,
+    returning a list of scalars.
+
+    Since 3.04
+
+    list example 1
+
+        package main;
+      
+        use Venus 'list';
+      
+        my @list = list 1..4;
+      
+        # (1..4)
+
+    list example 2
+
+        package main;
+      
+        use Venus 'list';
+      
+        my @list = list [1..4];
+      
+        # (1..4)
+
+    list example 3
+
+        package main;
+      
+        use Venus 'list';
+      
+        my @list = list [1..4], 5, [6..10];
+      
+        # (1..10)
 
  load
 
@@ -1392,6 +1489,57 @@ FUNCTIONS
       
         # "users"
 
+ pairs
+
+      pairs(Any $data) (ArrayRef)
+
+    The pairs function accepts an arrayref or hashref and returns an
+    arrayref of arrayrefs holding keys (or indices) and values. The
+    function returns an empty arrayref for all other values provided.
+    Returns a list in list context.
+
+    Since 3.04
+
+    pairs example 1
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my $pairs = pairs [1..4];
+      
+        # [[0,1], [1,2], [2,3], [3,4]]
+
+    pairs example 2
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my $pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+      
+        # [['a',1], ['b',2], ['c',3], ['d',4]]
+
+    pairs example 3
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my @pairs = pairs [1..4];
+      
+        # ([0,1], [1,2], [2,3], [3,4])
+
+    pairs example 4
+
+        package main;
+      
+        use Venus 'pairs';
+      
+        my @pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+      
+        # (['a',1], ['b',2], ['c',3], ['d',4])
+
  path
 
       path(Str $value, Str | CodeRef $code, Any @args) (Any)
@@ -1638,6 +1786,27 @@ FUNCTIONS
       
         # "ID 00000"
 
+ render
+
+      render(Str $data, HashRef $args) (Str)
+
+    The render function accepts a string as a template and renders it using
+    Venus::Template, and returns the result.
+
+    Since 3.04
+
+    render example 1
+
+        package main;
+      
+        use Venus 'render';
+      
+        my $render = render 'hello {{name}}', {
+          name => 'user',
+        };
+      
+        # "hello user"
+
  replace
 
       replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
@@ -1803,6 +1972,57 @@ FUNCTIONS
         my $string = string 'hello world', 'camelcase';
       
         # "helloWorld"
+
+ syscall
+
+      syscall(Int | Str @args) (Any)
+
+    The syscall function perlforms system call, i.e. a "qx" in perlfunc
+    operation, and returns true if the command succeeds, otherwise returns
+    false. In list context, returns the output of the operation and the
+    exit code.
+
+    Since 3.04
+
+    syscall example 1
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my $syscall = syscall 'perl', '-v';
+      
+        # true
+
+    syscall example 2
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my $syscall = syscall 'perl', '-z';
+      
+        # false
+
+    syscall example 3
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my ($data, $code) = syscall 'sun', '--heat-death';
+      
+        # ('done', 0)
+
+    syscall example 4
+
+        package main;
+      
+        use Venus 'syscall';
+      
+        my ($data, $code) = syscall 'earth', '--melt-icecaps';
+      
+        # ('', 127)
 
  template
 
@@ -2445,6 +2665,12 @@ FEATURES
       This library contains a Venus::Replace class which provides methods
       for manipulating regexp replacement data.
 
+    venus-run
+
+      This library contains a Venus::Run class which provides a base class
+      for providing a command execution system for creating CLIs
+      (command-line interfaces).
+
     venus-scalar
 
       This library contains a Venus::Scalar class which provides methods
@@ -2464,6 +2690,11 @@ FEATURES
 
       This library contains a Venus::String class which provides methods
       for manipulating string data.
+
+    venus-task
+
+      This library contains a Venus::Task class which provides a base class
+      for creating CLIs (command-line interfaces).
 
     venus-template
 

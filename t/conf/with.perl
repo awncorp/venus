@@ -37,4 +37,7 @@
     PERL => "perl",
     PROVE => "prove"
   },
+  with => {
+    psql => "t/conf/psql.perl",
+  },
 }

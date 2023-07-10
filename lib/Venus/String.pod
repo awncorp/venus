@@ -2615,6 +2615,51 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 template
+
+  template(Str | CodeRef $code, Any @args) (Any)
+
+The template method uses the underlying string value to build and return a
+L<Venus::Template> object, or dispatches to the coderef or method provided.
+
+I<Since C<3.04>>
+
+=over 4
+
+=item template example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello {{name}}');
+
+  my $template = $string->template;
+
+  # bless({...}, "Venus::Template")
+
+=back
+
+=over 4
+
+=item template example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello {{name}}');
+
+  my $template = $string->template('render', undef, {
+    name => 'user',
+  });
+
+  # "hello user"
+
+=back
+
+=cut
+
 =head2 titlecase
 
   titlecase() (Str)

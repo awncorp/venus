@@ -9,8 +9,27 @@ use Config;
 use Test::More;
 use Venus::Test;
 
+use_ok "Venus";
+
 my $test = test(__FILE__);
 my $fsds = qr/[:\\\/\.]+/;
+
+our $TEST_VENUS_QX_DATA = '';
+our $TEST_VENUS_QX_EXIT = 0;
+our $TEST_VENUS_QX_CODE = 0;
+
+# _qx
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::_qx"} = sub {
+    (
+      $TEST_VENUS_QX_DATA,
+      $TEST_VENUS_QX_EXIT,
+      $TEST_VENUS_QX_CODE
+    )
+  };
+}
 
 =name
 
@@ -61,7 +80,10 @@ function: fault
 function: float
 function: gather
 function: hash
+function: is_false
+function: is_true
 function: json
+function: list
 function: load
 function: log
 function: make
@@ -71,6 +93,7 @@ function: meta
 function: name
 function: number
 function: opts
+function: pairs
 function: path
 function: perl
 function: process
@@ -78,12 +101,14 @@ function: proto
 function: raise
 function: random
 function: regexp
+function: render
 function: replace
 function: roll
 function: search
 function: space
 function: schema
 function: string
+function: syscall
 function: template
 function: test
 function: then
@@ -2016,6 +2041,124 @@ $test->for('example', 2, 'hash', sub {
   $result
 });
 
+=function is_false
+
+The is_false function accepts a scalar value and returns true if the value is
+falsy.
+
+=signature is_false
+
+  is_false(Any $data) (Bool)
+
+=metadata is_false
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 is_false
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $is_false = is_false 0;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_false', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_false
+
+  package main;
+
+  use Venus 'is_false';
+
+  my $is_false = is_false 1;
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'is_false', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=function is_true
+
+The is_true function accepts a scalar value and returns true if the value is
+truthy.
+
+=signature is_true
+
+  is_true(Any $data) (Bool)
+
+=metadata is_true
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 is_true
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $is_true = is_true 1;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_true', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_true
+
+  package main;
+
+  use Venus 'is_true';
+
+  my $is_true = is_true 0;
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'is_true', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
 =function json
 
 The json function builds a L<Venus::Json> object and will either
@@ -2126,6 +2269,83 @@ $test->for('example', 4, 'json', sub {
   like $result, qr/Invalid "json" action "class"/;
 
   $result
+});
+
+=function list
+
+The list function accepts a list of values and flattens any arrayrefs,
+returning a list of scalars.
+
+=signature list
+
+  list(Any @args) (Any)
+
+=metadata list
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 list
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list 1..4;
+
+  # (1..4)
+
+=cut
+
+$test->for('example', 1, 'list', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..4];
+
+  @result
+});
+
+=example-2 list
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list [1..4];
+
+  # (1..4)
+
+=cut
+
+$test->for('example', 2, 'list', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..4];
+
+  @result
+});
+
+=example-3 list
+
+  package main;
+
+  use Venus 'list';
+
+  my @list = list [1..4], 5, [6..10];
+
+  # (1..10)
+
+=cut
+
+$test->for('example', 3, 'list', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [1..10];
+
+  @result
 });
 
 =function load
@@ -2714,6 +2934,104 @@ $test->for('example', 2, 'opts', sub {
   $result
 });
 
+=function pairs
+
+The pairs function accepts an arrayref or hashref and returns an arrayref of
+arrayrefs holding keys (or indices) and values. The function returns an empty
+arrayref for all other values provided. Returns a list in list context.
+
+=signature pairs
+
+  pairs(Any $data) (ArrayRef)
+
+=metadata pairs
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my $pairs = pairs [1..4];
+
+  # [[0,1], [1,2], [2,3], [3,4]]
+
+=cut
+
+$test->for('example', 1, 'pairs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [[0,1], [1,2], [2,3], [3,4]];
+
+  $result
+});
+
+=example-2 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my $pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+
+  # [['a',1], ['b',2], ['c',3], ['d',4]]
+
+=cut
+
+$test->for('example', 2, 'pairs', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [['a',1], ['b',2], ['c',3], ['d',4]];
+
+  $result
+});
+
+=example-3 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my @pairs = pairs [1..4];
+
+  # ([0,1], [1,2], [2,3], [3,4])
+
+=cut
+
+$test->for('example', 3, 'pairs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [[0,1], [1,2], [2,3], [3,4]];
+
+  @result
+});
+
+=example-4 pairs
+
+  package main;
+
+  use Venus 'pairs';
+
+  my @pairs = pairs {'a' => 1, 'b' => 2, 'c' => 3, 'd' => 4};
+
+  # (['a',1], ['b',2], ['c',3], ['d',4])
+
+=cut
+
+$test->for('example', 4, 'pairs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  is_deeply [@result], [['a',1], ['b',2], ['c',3], ['d',4]];
+
+  @result
+});
+
 =function path
 
 The path function builds and returns a L<Venus::Path> object, or dispatches
@@ -3209,6 +3527,45 @@ $test->for('example', 2, 'regexp', sub {
   $result
 });
 
+=function render
+
+The render function accepts a string as a template and renders it using
+L<Venus::Template>, and returns the result.
+
+=signature render
+
+  render(Str $data, HashRef $args) (Str)
+
+=metadata render
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 render
+
+  package main;
+
+  use Venus 'render';
+
+  my $render = render 'hello {{name}}', {
+    name => 'user',
+  };
+
+  # "hello user"
+
+=cut
+
+$test->for('example', 1, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "hello user";
+
+  $result
+});
+
 =function replace
 
 The replace function builds and returns a L<Venus::Replace> object, or
@@ -3535,6 +3892,118 @@ $test->for('example', 2, 'string', sub {
   is $result, 'helloWorld';
 
   $result
+});
+
+=function syscall
+
+The syscall function perlforms system call, i.e. a L<perlfunc/qx> operation,
+and returns C<true> if the command succeeds, otherwise returns C<false>. In
+list context, returns the output of the operation and the exit code.
+
+=signature syscall
+
+  syscall(Int | Str @args) (Any)
+
+=metadata syscall
+
+{
+  since => '3.04',
+}
+
+=cut
+
+=example-1 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my $syscall = syscall 'perl', '-v';
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = 'perl';
+  local $TEST_VENUS_QX_EXIT = 0;
+  local $TEST_VENUS_QX_CODE = 0;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my $syscall = syscall 'perl', '-z';
+
+  # false
+
+=cut
+
+$test->for('example', 2, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = 'perl';
+  local $TEST_VENUS_QX_EXIT = 7424;
+  local $TEST_VENUS_QX_CODE = 29;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-3 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my ($data, $code) = syscall 'sun', '--heat-death';
+
+  # ('done', 0)
+
+=cut
+
+$test->for('example', 3, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = 'done';
+  local $TEST_VENUS_QX_EXIT = 0;
+  local $TEST_VENUS_QX_CODE = 0;
+  my @result = $tryable->result;
+  is_deeply [@result], ['done', 0];
+
+  @result
+});
+
+=example-4 syscall
+
+  package main;
+
+  use Venus 'syscall';
+
+  my ($data, $code) = syscall 'earth', '--melt-icecaps';
+
+  # ('', 127)
+
+=cut
+
+$test->for('example', 4, 'syscall', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_QX_DATA = '';
+  local $TEST_VENUS_QX_EXIT = -1;
+  local $TEST_VENUS_QX_CODE = 127;
+  my @result = $tryable->result;
+  is_deeply [@result], ['', 127];
+
+  @result
 });
 
 =function template
@@ -4846,6 +5315,16 @@ manipulating regexp replacement data.
 
 $test->for('feature', 'venus-replace');
 
+=feature venus-run
+
+This library contains a L<Venus::Run> class which provides a base class for
+providing a command execution system for creating CLIs (command-line
+interfaces).
+
+=cut
+
+$test->for('feature', 'venus-run');
+
 =feature venus-scalar
 
 This library contains a L<Venus::Scalar> class which provides methods for
@@ -4881,6 +5360,15 @@ manipulating string data.
 =cut
 
 $test->for('feature', 'venus-string');
+
+=feature venus-task
+
+This library contains a L<Venus::Task> class which provides a base class for
+creating CLIs (command-line interfaces).
+
+=cut
+
+$test->for('feature', 'venus-task');
 
 =feature venus-template
 

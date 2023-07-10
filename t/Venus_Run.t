@@ -14,6 +14,8 @@ BEGIN {
 use Test::More;
 use Venus::Test;
 
+use_ok "Venus::Run";
+
 my $test = test(__FILE__);
 
 my $init = {
@@ -63,6 +65,27 @@ my $init = {
 our $TEST_VENUS_RUN_EXIT;
 our $TEST_VENUS_RUN_OUTPUT = [];
 our $TEST_VENUS_RUN_SYSTEM = [];
+our $TEST_VENUS_RUN_SYSTEM_LOG = [];
+our $TEST_VENUS_RUN_PRINT = [];
+our $TEST_VENUS_RUN_PROMPT = undef;
+
+# _print
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Run::_print"} = sub {
+    $TEST_VENUS_RUN_PRINT = [@_];
+  };
+}
+
+# _prompt
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Run::_prompt"} = sub {
+    $TEST_VENUS_RUN_PROMPT;
+  };
+}
 
 # exit
 {
@@ -89,7 +112,7 @@ our $TEST_VENUS_RUN_SYSTEM = [];
   no strict 'refs';
   no warnings 'redefine';
   *{"Venus::Run::system"} = sub {
-    $TEST_VENUS_RUN_SYSTEM = [@_];
+    push @{$TEST_VENUS_RUN_SYSTEM_LOG}, $TEST_VENUS_RUN_SYSTEM = [@_];
   };
 }
 
@@ -155,139 +178,13 @@ $test->for('synopsis', sub {
 
 =description
 
-This package is a L<Venus::Task> which provides generic task running
-capabilities. A simple CLI using this package has been made available in
-L<vns>.
-
-+=head1 USAGES
-
-Here is an example configuration file in YAML (e.g. in C<.vns.yaml>).
-
-  ---
-  data:
-    ECHO: true
-  exec:
-    okay: \$PERL -c
-    cpan: cpanm -llocal -qn
-    deps: cpan --installdeps .
-    each: \$PERL -MVenus=log -nE
-    exec: \$PERL -MVenus=log -E
-    repl: \$PERL -dE0
-    says: exec "map log(\$_), map eval, \@ARGV"
-    test: \$PROVE
-  libs:
-  - -Ilib
-  - -Ilocal/lib/perl5
-  load:
-  - -MVenus=true,false
-  path:
-  - ./bin
-  - ./dev
-  - -Ilocal/bin
-  perl:
-    perl: perl
-    prove: prove
-  vars:
-    PERL: perl
-    PROVE: prove
-
-The following describes the configuration file sections and how they're used:
-
-+=over 4
-
-+=item *
-
-The C<data> section provides a non-dynamic list of key/value pairs that will
-be used as environment variables.
-
-+=item *
-
-The C<exec> section provides the main dynamic tasks which can be recursively
-resolved and expanded.
-
-+=item *
-
-The C<find> section provides aliases which can be recursively resolved and
-expanded for use in other tasks.
-
-+=item *
-
-The C<libs> section provides a list of C<-I/path/to/lib> "include" statements
-that will be automatically added to tasks expanded from the C<perl> section.
-
-+=item *
-
-The C<load> section provides a list of C<-MPackage> "import" statements
-that will be automatically added to tasks expanded from the C<perl> section.
-
-+=item *
-
-The C<path> section provides a list of paths to be prepended to the C<PATH>
-environment variable which allows programs to be found.
-
-+=item *
-
-The C<perl> section provides the dynamic perl tasks which can serve as tasks
-with default commands (with options) and which can be recursively resolved and
-expanded.
-
-+=item *
-
-The C<task> section provides the dynamic perl tasks which "load" L<Venus::Task>
-derived packages, and which can be recursively resolved and expanded. These
-tasks will typically take the form of C<perl -Ilib -MMyApp::Task -E0 --> and
-will be automatically executed as a CLI.
-
-+=item *
-
-The C<vars> section provides a list of dynamic key/value pairs that can be
-recursively resolved and expanded and will be used as environment variables.
-
-+=back
-
-Here are example usages using the example YAML configuration file and the
-L<vns> CLI.
-
-  # Mint a new configuration file
-  vns init
-
-  ...
-
-  # Install a distribution
-  vns cpan $DIST
-
-  i.e. $(which cpanm) --llocal -qn $DIST
-
-  # Install dependencies in the CWD
-  vns deps
-
-  i.e. $(which cpanm) --llocal -qn --installdeps .
-
-  # Check that a package can be compiled
-  vns okay $FILE
-
-  i.e. $(which perl) -Ilib -Ilocal/lib/perl5 -c $FILE
-
-  # Use the Perl debugger as a REPL
-  vns repl
-
-  i.e. $(which perl) -Ilib -Ilocal/lib/perl5 -dE0
-
-  # Evaluate arbitrary Perl expressions
-  vns exec ...
-
-  i.e. $(which perl) -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
-
-  # Test the Perl project in the CWD
-  vns test t
-
-  i.e. $(which prove) -Ilib -Ilocal/lib/perl5 t
-
-This package and CLI allows you to define task definitions for any application,
-which you can run using the name of the task. You can reuse existing task
-definitions in new tasks which will be recursively resolved when needed. You
-can define static and dynamic environment variables, and also pre-define
-"includes" and the order in which they're declared.
+This package is a subclass of L<Venus::Task> which provides a command execution
+system. This package loads the configuration file used for defining tasks (i.e.
+command-line operations) which can recursively resolve, injects environment
+variables, resets the C<PATH> and C<PERL5LIB> variables where appropriate, and
+executes the tasks by name. See L<vns> for an executable file which loads this
+package and provides the CLI. See L</FEATURES> for usage and configuration
+information.
 
 =cut
 
@@ -1000,6 +897,7 @@ $test->for('example', 1, 'handler', sub {
   is $TEST_VENUS_RUN_EXIT, 0;
   is_deeply $TEST_VENUS_RUN_SYSTEM, [];
   is_deeply $TEST_VENUS_RUN_OUTPUT, [];
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1028,6 +926,7 @@ $test->for('example', 2, 'handler', sub {
   is_deeply $TEST_VENUS_RUN_SYSTEM, [];
   is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: Venus::Run \<argument\> \[\<option\>\]|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1056,6 +955,7 @@ $test->for('example', 3, 'handler', sub {
   is_deeply $TEST_VENUS_RUN_SYSTEM, [];
   is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: Venus::Run \<argument\> \[\<option\>\]|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1087,6 +987,7 @@ $test->for('example', 4, 'handler', sub {
   is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Initialized with generated file \.vns\.pl|;
   ok -f '.vns.pl';
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1122,6 +1023,7 @@ $test->for('example', 5, 'handler', sub {
   like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo$|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1133,6 +1035,14 @@ $test->for('example', 5, 'handler', sub {
   use Venus::Run;
 
   # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   cpan: cpanm -llocal -qn
+  #
+  # ...
 
   my $run = Venus::Run->new(['cpan', 'Venus']);
 
@@ -1157,6 +1067,7 @@ $test->for('example', 6, 'handler', sub {
   like $$TEST_VENUS_RUN_SYSTEM[1], qr|cpanm '-llocal' '-qn' Venus|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1168,6 +1079,15 @@ $test->for('example', 6, 'handler', sub {
   use Venus::Run;
 
   # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   cpan: cpanm -llocal -qn
+  #   deps: cpan --installdeps .
+  #
+  # ...
 
   my $run = Venus::Run->new(['deps']);
 
@@ -1192,6 +1112,7 @@ $test->for('example', 7, 'handler', sub {
   like $$TEST_VENUS_RUN_SYSTEM[1], qr|cpanm '-llocal' '-qn' '--installdeps' '.'|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1203,6 +1124,25 @@ $test->for('example', 7, 'handler', sub {
   use Venus::Run;
 
   # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   okay: $PERL -c
+  #
+  # ...
+  #
+  # libs:
+  # - -Ilib
+  # - -Ilocal/lib/perl5
+  #
+  # ...
+  #
+  # vars:
+  #   PERL: perl
+  #
+  # ...
 
   my $run = Venus::Run->new(['okay', 'lib/Venus.pm']);
 
@@ -1227,6 +1167,7 @@ $test->for('example', 8, 'handler', sub {
   like $$TEST_VENUS_RUN_SYSTEM[1], qr|perl '-Ilib' '-Ilocal/lib/perl5' '-c'|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1238,6 +1179,25 @@ $test->for('example', 8, 'handler', sub {
   use Venus::Run;
 
   # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   repl: $PERL -dE0
+  #
+  # ...
+  #
+  # libs:
+  # - -Ilib
+  # - -Ilocal/lib/perl5
+  #
+  # ...
+  #
+  # vars:
+  #   PERL: perl
+  #
+  # ...
 
   my $run = Venus::Run->new(['repl']);
 
@@ -1262,6 +1222,7 @@ $test->for('example', 9, 'handler', sub {
   like $$TEST_VENUS_RUN_SYSTEM[1], qr|perl '-Ilib' '-Ilocal/lib/perl5' '-dE0'|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1273,6 +1234,25 @@ $test->for('example', 9, 'handler', sub {
   use Venus::Run;
 
   # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   exec: $PERL
+  #
+  # ...
+  #
+  # libs:
+  # - -Ilib
+  # - -Ilocal/lib/perl5
+  #
+  # ...
+  #
+  # vars:
+  #   PERL: perl
+  #
+  # ...
 
   my $run = Venus::Run->new(['exec', '-MVenus=date', 'say date']);
 
@@ -1298,6 +1278,7 @@ $test->for('example', 10, 'handler', sub {
     qr|perl '-Ilib' '-Ilocal/lib/perl5' '-MVenus=date' 'say date'|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1309,6 +1290,25 @@ $test->for('example', 10, 'handler', sub {
   use Venus::Run;
 
   # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   test: $PROVE
+  #
+  # ...
+  #
+  # libs:
+  # - -Ilib
+  # - -Ilocal/lib/perl5
+  #
+  # ...
+  #
+  # vars:
+  #   PROVE: prove
+  #
+  # ...
 
   my $run = Venus::Run->new(['test', 't']);
 
@@ -1333,6 +1333,474 @@ $test->for('example', 11, 'handler', sub {
   like $$TEST_VENUS_RUN_SYSTEM[1], qr|prove '-Ilib' '-Ilocal/lib/perl5' t|;
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*prove|;
   like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-12 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['echo', 1, '|', 'less']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. echo 1 | less
+
+=cut
+
+$test->for('example', 12, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo 1 \| less|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-13 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  my $run = Venus::Run->new(['echo', 1, '&&', 'echo', 2]);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. echo 1 && echo 2
+
+=cut
+
+$test->for('example', 13, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo 1 \| echo 2|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-14 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  local $ENV{VENUS_FILE} = 't/conf/from.perl';
+
+  # in config
+  #
+  # ---
+  # from:
+  # - /path/to/parent
+  #
+  # ...
+  #
+  # exec:
+  #   mypan: cpan -M https://pkg.myapp.com
+
+  # in config (/path/to/parent)
+  #
+  # ---
+  # exec:
+  #   cpan: cpanm -llocal -qn
+  #
+  # ...
+
+  my $run = Venus::Run->new(['mypan']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. cpanm '-llocal' '-qn' '-M' 'https://pkg.myapp.com'
+
+=cut
+
+$test->for('example', 14, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1],
+    qr|cpanm '-llocal' '-qn' '-M' 'https://pkg.myapp.com'|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-15 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  local $ENV{VENUS_FILE} = 't/conf/with.perl';
+
+  # in config
+  #
+  # ---
+  # with:
+  #   psql: /path/to/other
+  #
+  # ...
+
+  # in config (/path/to/other)
+  #
+  # ---
+  # exec:
+  #   backup: pg_backupcluster
+  #   restore: pg_restorecluster
+  #
+  # ...
+
+  my $run = Venus::Run->new(['psql', 'backup']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. vns backup
+
+=cut
+
+$test->for('example', 15, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|vns backup|;
+  is_deeply $TEST_VENUS_RUN_OUTPUT, [];
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-16 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  local $ENV{VENUS_FILE} = 't/conf/with.perl';
+
+  # in config
+  #
+  # ---
+  # with:
+  #   psql: /path/to/other
+  #
+  # ...
+
+  # in config (/path/to/other)
+  #
+  # ---
+  # exec:
+  #   backup: pg_backupcluster
+  #   restore: pg_restorecluster
+  #
+  # ...
+
+  my $run = Venus::Run->new(['psql', 'backup']);
+
+  $run->execute;
+
+  # VENUS_FILE=t/conf/psql.perl vns backup
+
+  local $ENV{VENUS_FILE} = 't/conf/psql.perl';
+
+  $run = Venus::Run->new(['backup']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. pg_backupcluster
+
+=cut
+
+$test->for('example', 16, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|pg_backupcluster|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*pg_backupcluster|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-17 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   cpan: cpanm -llocal -qn
+  #
+  # ...
+  #
+  # flow:
+  #   setup-term:
+  #   - cpan Term::ReadKey
+  #   - cpan Term::ReadLine::Gnu
+  #
+  # ...
+
+  local $ENV{VENUS_FILE} = 't/conf/flow.perl';
+
+  my $run = Venus::Run->new(['setup-term']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e.
+  # cpanm '-llocal' '-qn' 'Term::ReadKey'
+  # cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'
+
+=cut
+
+$test->for('example', 17, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM_LOG[0][1],
+    qr|.*cpanm '-llocal' '-qn' 'Term::ReadKey'|;
+  like $$TEST_VENUS_RUN_SYSTEM_LOG[1][1],
+    qr|.*cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-17 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   cpan: cpanm -llocal -qn
+  #
+  # ...
+  #
+  # flow:
+  #   setup-term:
+  #   - cpan Term::ReadKey
+  #   - cpan Term::ReadLine::Gnu
+  #
+  # ...
+
+  local $ENV{VENUS_FILE} = 't/conf/flow.perl';
+
+  my $run = Venus::Run->new(['setup-term']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e.
+  # cpanm '-llocal' '-qn' 'Term::ReadKey'
+  # cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'
+
+=cut
+
+$test->for('example', 17, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM_LOG[0][1],
+    qr|.*cpanm '-llocal' '-qn' 'Term::ReadKey'|;
+  like $$TEST_VENUS_RUN_SYSTEM_LOG[1][1],
+    qr|.*cpanm '-llocal' '-qn' 'Term::ReadLine::Gnu'|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*cpanm|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+
+  1
+});
+
+=example-18 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  # in config
+  #
+  # ---
+  # asks:
+  #   PASS: What's the password
+  #
+  # ...
+
+  local $ENV{VENUS_FILE} = 't/conf/asks.perl';
+
+  my $run = Venus::Run->new(['echo', '$PASS']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. echo '$PASS'
+
+=cut
+
+$test->for('example', 18, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  local $TEST_VENUS_RUN_PROMPT = 'secret';
+  local $ENV{PASS} = undef;
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo secret$|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  is_deeply $TEST_VENUS_RUN_PRINT, ["What's the password"];
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-19 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  # in config
+  #
+  # ---
+  # func:
+  #   dump: /path/to/dump.pl
+  #
+  # ...
+
+  # in dump.pl (/path/to/dump.pl)
+  #
+  # sub {
+  #   my ($args) = @_;
+  #
+  #   ...
+  # }
+
+  local $ENV{VENUS_FILE} = 't/conf/func.perl';
+
+  my $run = Venus::Run->new(['dump', '--', 'hello']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. perl -Ilib ... -E '(do "./t/path/etc/dump.pl")->(\@ARGV)' '--' hello
+
+=cut
+
+$test->for('example', 19, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  my $command =
+    qr|perl.* '-E' '\(do "./t/path/etc/dump.pl"\)->\(\\\@ARGV\)' '--' hello|;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|$command$|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*perl|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
 });
@@ -1545,6 +2013,299 @@ $test->for('example', 1, 'opts', sub {
 
   $result
 });
+
+=feature config
+
+The CLI provided by this package operates on a configuration file, typically
+having a base name of C<.vns> with a Perl, JSON, or YAML file extension. Here
+is an example of a configuration file using YAML with the filename
+C<.vns.yaml>.
+
+  ---
+  data:
+    ECHO: true
+  exec:
+    okay: $PERL -c
+    cpan: cpanm -llocal -qn
+    deps: cpan --installdeps .
+    each: $PERL -MVenus=log -nE
+    exec: $PERL -MVenus=log -E
+    repl: $PERL -dE0
+    says: exec "map log(\$_), map eval, \@ARGV"
+    test: $PROVE
+  libs:
+  - -Ilib
+  - -Ilocal/lib/perl5
+  load:
+  - -MVenus=true,false
+  path:
+  - ./bin
+  - ./dev
+  - -Ilocal/bin
+  perl:
+    perl: perl
+    prove: prove
+  vars:
+    PERL: perl
+    PROVE: prove
+
+=cut
+
+$test->for('feature', 'config');
+
+=feature config-asks
+
+  ---
+  asks:
+    HOME: Enter your home dir
+
+The configuration file's C<asks> section provides a list of key/value pairs
+where the key is the name of the environment variable and the value is used as
+the message used by the CLI to prompt for input if the environment variable is
+not defined.
+
+=cut
+
+$test->for('feature', 'config-asks');
+
+=feature config-data
+
+  ---
+  data:
+    ECHO: true
+
+The configuration file's C<data> section provides a non-dynamic list of
+key/value pairs that will be used as environment variables.
+
+=cut
+
+$test->for('feature', 'config-data');
+
+=feature config-exec
+
+  ---
+  exec:
+    okay: $PERL -c
+
+The configuration file's C<exec> section provides the main dynamic tasks which
+can be recursively resolved and expanded.
+
+=cut
+
+$test->for('feature', 'config-exec');
+
+=feature config-find
+
+  ---
+  find:
+    cpanm: /usr/local/bin/cpanm
+
+The configuration file's C<find> section provides aliases which can be
+recursively resolved and expanded for use in other tasks.
+
+=cut
+
+$test->for('feature', 'config-find');
+
+=feature config-flow
+
+  ---
+  flow:
+    deps:
+    - cpan Term::ReadKey
+    - cpan Term::ReadLine::Gnu
+
+The configuration file's C<flow> section provides chainable tasks which are
+recursively resolved and expanded from other tasks.
+
+=cut
+
+$test->for('feature', 'config-flow');
+
+=feature config-from
+
+  ---
+  from:
+  - /usr/share/vns/.vns.yaml
+
+The configuration file's C<from> section provides paths to other configuration
+files which will be merged before execution allowing the inheritance of of
+configuration values.
+
+=cut
+
+$test->for('feature', 'config-from');
+
+=feature config-func
+
+  ---
+  func:
+    build: ./scripts/build.pl
+
+The configuration file's C<func> section provides a list of static key/value
+pairs where the key is the "subcommand" passed to the runner as the first
+arugment, and the value is the Perl script that will be loaded and executed.
+The Perl script is expected to return a subroutine reference and will be passed
+an array reference to the arguments provided.
+
+=cut
+
+$test->for('feature', 'config-func');
+
+=feature config-libs
+
+  ---
+  libs:
+  - -Ilib
+  - -Ilocal/lib/perl5
+
+The configuration file's C<libs> section provides a list of C<-I/path/to/lib>
+"include" statements that will be automatically added to tasks expanded from
+the C<perl> section.
+
+=cut
+
+$test->for('feature', 'config-libs');
+
+=feature config-load
+
+  ---
+  load:
+  - -MVenus=true,false
+
+The configuration file's C<load> section provides a list of C<-MPackage>
+"import" statements that will be automatically added to tasks expanded from the
+C<perl> section.
+
+=cut
+
+$test->for('feature', 'config-load');
+
+=feature config-path
+
+  ---
+  path:
+  - ./bin
+  - ./dev
+  - -Ilocal/bin
+
+The configuration file's C<path> section provides a list of paths to be
+prepended to the C<PATH> environment variable which allows programs to be
+found.
+
+=cut
+
+$test->for('feature', 'config-path');
+
+=feature config-perl
+
+  ---
+  perl:
+    perl: perl
+
+The configuration file's C<perl> section provides the dynamic perl tasks which
+can serve as tasks with default commands (with options) and which can be
+recursively resolved and expanded.
+
+=cut
+
+$test->for('feature', 'config-perl');
+
+=feature config-task
+
+  ---
+  task:
+    setup: $PERL -MMyApp::Task::Setup -E0 --
+
+The configuration file's C<task> section provides the dynamic perl tasks which
+"load" L<Venus::Task> derived packages, and which can be recursively resolved
+and expanded. These tasks will typically take the form of C<perl -Ilib
+-MMyApp::Task -E0 --> and will be automatically executed as a CLI.
+
+=cut
+
+$test->for('feature', 'config-task');
+
+=feature config-vars
+
+  ---
+  vars:
+    PERL: perl
+
+The configuration file's C<vars> section provides a list of dynamic key/value
+pairs that can be recursively resolved and expanded and will be used as
+environment variables.
+
+=back
+
+$test->for('feature', 'config-vars');
+
+=feature config-with
+
+  ---
+  with:
+    psql: ./psql-tools/.vns.yml
+
+The configuration file's C<with> section provides a list of static key/value
+pairs where the key is the "subcommand" passed to the runner as the first
+arugment, and the value is the configuration file where the subcommand task
+definitions are defined which the runner dispatches to.
+
+=back
+
+$test->for('feature', 'config-with');
+
+=feature vns-cli
+
+Here are example usages of the configuration file mentioned, executed by the
+L<vns> CLI, which is simply an executable file which loads this package.
+
+  # Mint a new configuration file
+  vns init
+
+  ...
+
+  # Mint a new JSON configuration file
+  VENUS_FILE=.vns.json vns init
+
+  # Mint a new YAML configuration file
+  VENUS_FILE=.vns.yaml vns init
+
+  ...
+
+  # Install a distribution
+  vns cpan $DIST
+
+  i.e. cpanm --llocal -qn $DIST
+
+  # Install dependencies in the CWD
+  vns deps
+
+  i.e. cpanm --llocal -qn --installdeps .
+
+  # Check that a package can be compiled
+  vns okay $FILE
+
+  i.e. perl -Ilib -Ilocal/lib/perl5 -c $FILE
+
+  # Use the Perl debugger as a REPL
+  vns repl
+
+  i.e. perl -Ilib -Ilocal/lib/perl5 -dE0
+
+  # Evaluate arbitrary Perl expressions
+  vns exec ...
+
+  i.e. perl -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
+
+  # Test the Perl project in the CWD
+  vns test t
+
+  i.e. prove -Ilib -Ilocal/lib/perl5 t
+
+=cut
+
+$test->for('feature', 'vns-cli');
 
 =partials
 

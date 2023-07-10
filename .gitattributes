@@ -7,3 +7,4 @@ cpanfiles/** linguist-documentation
 dev/** linguist-documentation
 examples/** linguist-documentation
 plx/** linguist-documentation
+shim/** linguist-documentation
