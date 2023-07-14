@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    3.10
+    3.18
 
 SYNOPSIS
 
@@ -17,6 +17,7 @@ SYNOPSIS
       use Venus qw(
         catch
         error
+        is_true
         raise
       );
     
@@ -26,16 +27,16 @@ SYNOPSIS
       };
     
       # boolean keywords
-      if ($result and $result eq false) {
-        true;
+      if (is_true $result) {
+        error;
       }
     
       # raise exceptions
-      if (false) {
+      if (is_true $result) {
         raise 'MyApp::Error';
       }
     
-      # and much more!
+      # boolean keywords, and more!
       true ne false;
 
 DESCRIPTION
@@ -97,11 +98,12 @@ FUNCTIONS
 
  args
 
-      args(Any @args) (HashRef)
+      args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
 
-    The args function takes a list of arguments and returns a hashref.
+    The args function builds and returns a Venus::Args object, or
+    dispatches to the coderef or method provided.
 
-    Since 2.32
+    Since 3.10
 
     args example 1
 
@@ -109,9 +111,9 @@ FUNCTIONS
       
         use Venus 'args';
       
-        my $args = args(content => 'example');
+        my $args = args ['--resource', 'users'];
       
-        # {content => "example"}
+        # bless({...}, 'Venus::Args')
 
     args example 2
 
@@ -119,29 +121,9 @@ FUNCTIONS
       
         use Venus 'args';
       
-        my $args = args({content => 'example'});
+        my $args = args ['--resource', 'users'], 'indexed';
       
-        # {content => "example"}
-
-    args example 3
-
-        package main;
-      
-        use Venus 'args';
-      
-        my $args = args('content');
-      
-        # {content => undef}
-
-    args example 4
-
-        package main;
-      
-        use Venus 'args';
-      
-        my $args = args('content', 'example', 'algorithm');
-      
-        # {content => "example", algorithm => undef}
+        # {0 => '--resource', 1 => 'users'}
 
  array
 
@@ -171,6 +153,44 @@ FUNCTIONS
         my $array = array [1..4], 'push', 5..9;
       
         # [1..9]
+
+ arrayref
+
+      arrayref(Any @args) (ArrayRef)
+
+    The arrayref function takes a list of arguments and returns a arrayref.
+
+    Since 3.10
+
+    arrayref example 1
+
+        package main;
+      
+        use Venus 'arrayref';
+      
+        my $arrayref = arrayref(content => 'example');
+      
+        # [content => "example"]
+
+    arrayref example 2
+
+        package main;
+      
+        use Venus 'arrayref';
+      
+        my $arrayref = arrayref([content => 'example']);
+      
+        # [content => "example"]
+
+    arrayref example 3
+
+        package main;
+      
+        use Venus 'arrayref';
+      
+        my $arrayref = arrayref('content');
+      
+        # ['content']
 
  assert
 
@@ -604,6 +624,61 @@ FUNCTIONS
       
         # false
 
+ clargs
+
+      clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+
+    The clargs function accepts a single arrayref of Getopt::Long specs, or
+    an arrayref of arguments followed by an arrayref of Getopt::Long specs,
+    and returns a three element list of Venus::Args, Venus::Opts, and
+    Venus::Vars objects. If only a single arrayref is provided, the
+    arguments will be taken from @ARGV.
+
+    Since 3.10
+
+    clargs example 1
+
+        package main;
+      
+        use Venus 'clargs';
+      
+        my ($args, $opts, $vars) = clargs;
+      
+        # (
+        #   bless(..., 'Venus::Args'),
+        #   bless(..., 'Venus::Opts'),
+        #   bless(..., 'Venus::Vars')
+        # )
+
+    clargs example 2
+
+        package main;
+      
+        use Venus 'clargs';
+      
+        my ($args, $opts, $vars) = clargs ['resource|r=s', 'help|h'];
+      
+        # (
+        #   bless(..., 'Venus::Args'),
+        #   bless(..., 'Venus::Opts'),
+        #   bless(..., 'Venus::Vars')
+        # )
+
+    clargs example 3
+
+        package main;
+      
+        use Venus 'clargs';
+      
+        my ($args, $opts, $vars) = clargs ['--resource', 'help'],
+          ['resource|r=s', 'help|h'];
+      
+        # (
+        #   bless(..., 'Venus::Args'),
+        #   bless(..., 'Venus::Opts'),
+        #   bless(..., 'Venus::Vars')
+        # )
+
  cli
 
       cli(ArrayRef $args) (Cli)
@@ -1025,6 +1100,54 @@ FUNCTIONS
         my $hash = hash {1..8}, 'pairs';
       
         # [[1, 2], [3, 4], [5, 6], [7, 8]]
+
+ hashref
+
+      hashref(Any @args) (HashRef)
+
+    The hashref function takes a list of arguments and returns a hashref.
+
+    Since 3.10
+
+    hashref example 1
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref(content => 'example');
+      
+        # {content => "example"}
+
+    hashref example 2
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref({content => 'example'});
+      
+        # {content => "example"}
+
+    hashref example 3
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref('content');
+      
+        # {content => undef}
+
+    hashref example 4
+
+        package main;
+      
+        use Venus 'hashref';
+      
+        my $hashref = hashref('content', 'example', 'algorithm');
+      
+        # {content => "example", algorithm => undef}
 
  is_false
 

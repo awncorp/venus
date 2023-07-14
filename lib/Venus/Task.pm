@@ -93,9 +93,9 @@ sub execute {
 sub exit {
   my ($self, $code, $method, @args) = @_;
 
-  $self->$method(@args) if $method;
+  my $result = $self->$method(@args) ? 0 : 1 if $method;
 
-  $code ||= 0;
+  $code //= $result // 0;
 
   _exit($code);
 }
@@ -235,6 +235,12 @@ sub prepare {
   return $self;
 }
 
+sub pass {
+  my ($self, $method, @args) = @_;
+
+  return $self->exit(0, $method, @args);
+}
+
 sub run {
   my ($self, @args) = @_;
 
@@ -263,6 +269,12 @@ sub system {
   (_system(@args) == 0) or $self->throw('error_on_system_call', \@args, $?)->error;
 
   return $self;
+}
+
+sub test {
+  my ($self, @args) = @_;
+
+  return $self->cli->test(@args);
 }
 
 sub usage {

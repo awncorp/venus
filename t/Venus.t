@@ -59,6 +59,7 @@ $test->for('abstract');
 
 function: args
 function: array
+function: arrayref
 function: assert
 function: bool
 function: box
@@ -68,6 +69,7 @@ function: catch
 function: caught
 function: chain
 function: check
+function: clargs
 function: cli
 function: code
 function: config
@@ -80,6 +82,7 @@ function: fault
 function: float
 function: gather
 function: hash
+function: hashref
 function: is_false
 function: is_true
 function: json
@@ -134,6 +137,7 @@ $test->for('includes');
   use Venus qw(
     catch
     error
+    is_true
     raise
   );
 
@@ -143,16 +147,16 @@ $test->for('includes');
   };
 
   # boolean keywords
-  if ($result and $result eq false) {
-    true;
+  if (is_true $result) {
+    error;
   }
 
   # raise exceptions
-  if (false) {
+  if (is_true $result) {
     raise 'MyApp::Error';
   }
 
-  # and much more!
+  # boolean keywords, and more!
   true ne false;
 
 =cut
@@ -262,17 +266,20 @@ $test->for('description');
 
 =function args
 
-The args function takes a list of arguments and returns a hashref.
+The args function builds and returns a L<Venus::Args> object, or dispatches to
+the coderef or method provided.
 
 =signature args
 
-  args(Any @args) (HashRef)
+  args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
 
 =metadata args
 
 {
-  since => '2.32',
+  since => '3.10',
 }
+
+=cut
 
 =example-1 args
 
@@ -280,16 +287,16 @@ The args function takes a list of arguments and returns a hashref.
 
   use Venus 'args';
 
-  my $args = args(content => 'example');
+  my $args = args ['--resource', 'users'];
 
-  # {content => "example"}
+  # bless({...}, 'Venus::Args')
 
 =cut
 
 $test->for('example', 1, 'args', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => "example"};
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Args';
 
   $result
 });
@@ -300,56 +307,16 @@ $test->for('example', 1, 'args', sub {
 
   use Venus 'args';
 
-  my $args = args({content => 'example'});
+  my $args = args ['--resource', 'users'], 'indexed';
 
-  # {content => "example"}
+  # {0 => '--resource', 1 => 'users'}
 
 =cut
 
 $test->for('example', 2, 'args', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => "example"};
-
-  $result
-});
-
-=example-3 args
-
-  package main;
-
-  use Venus 'args';
-
-  my $args = args('content');
-
-  # {content => undef}
-
-=cut
-
-$test->for('example', 3, 'args', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => undef};
-
-  $result
-});
-
-=example-4 args
-
-  package main;
-
-  use Venus 'args';
-
-  my $args = args('content', 'example', 'algorithm');
-
-  # {content => "example", algorithm => undef}
-
-=cut
-
-$test->for('example', 4, 'args', sub {
-  my ($tryable) = @_;
-  ok my $result = $tryable->result;
-  is_deeply $result, {content => "example", algorithm => undef};
+  my $result = $tryable->result;
+  is_deeply $result, {0 => '--resource', 1 => 'users'};
 
   $result
 });
@@ -408,6 +375,80 @@ $test->for('example', 2, 'array', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is_deeply $result, [1..9];
+
+  $result
+});
+
+=function arrayref
+
+The arrayref function takes a list of arguments and returns a arrayref.
+
+=signature arrayref
+
+  arrayref(Any @args) (ArrayRef)
+
+=metadata arrayref
+
+{
+  since => '3.10',
+}
+
+=example-1 arrayref
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref(content => 'example');
+
+  # [content => "example"]
+
+=cut
+
+$test->for('example', 1, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [content => "example"];
+
+  $result
+});
+
+=example-2 arrayref
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref([content => 'example']);
+
+  # [content => "example"]
+
+=cut
+
+$test->for('example', 2, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [content => "example"];
+
+  $result
+});
+
+=example-3 arrayref
+
+  package main;
+
+  use Venus 'arrayref';
+
+  my $arrayref = arrayref('content');
+
+  # ['content']
+
+=cut
+
+$test->for('example', 3, 'arrayref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['content'];
 
   $result
 });
@@ -1235,6 +1276,113 @@ $test->for('example', 2, 'check', sub {
   !$result
 });
 
+=function clargs
+
+The clargs function accepts a single arrayref of L<Getopt::Long> specs, or an
+arrayref of arguments followed by an arrayref of L<Getopt::Long> specs, and
+returns a three element list of L<Venus::Args>, L<Venus::Opts>, and
+L<Venus::Vars> objects. If only a single arrayref is provided, the arguments
+will be taken from C<@ARGV>.
+
+=signature clargs
+
+  clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+
+=metadata clargs
+
+{
+  since => '3.10',
+}
+
+=cut
+
+=example-1 clargs
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs;
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=cut
+
+$test->for('example', 1, 'clargs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  isa_ok $result[0], 'Venus::Args';
+  is_deeply $result[0]->value, [];
+  isa_ok $result[1], 'Venus::Opts';
+  is_deeply $result[1]->value, [];
+  isa_ok $result[2], 'Venus::Vars';
+
+  @result
+});
+
+=example-2 clargs
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=cut
+
+$test->for('example', 2, 'clargs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  isa_ok $result[0], 'Venus::Args';
+  is_deeply $result[0]->value, [];
+  isa_ok $result[1], 'Venus::Opts';
+  is_deeply $result[1]->value, [];
+  is_deeply $result[1]->specs, ['resource|r=s', 'help|h'];
+  isa_ok $result[2], 'Venus::Vars';
+
+  @result
+});
+
+=example-3 clargs
+
+  package main;
+
+  use Venus 'clargs';
+
+  my ($args, $opts, $vars) = clargs ['--resource', 'help'],
+    ['resource|r=s', 'help|h'];
+
+  # (
+  #   bless(..., 'Venus::Args'),
+  #   bless(..., 'Venus::Opts'),
+  #   bless(..., 'Venus::Vars')
+  # )
+
+=cut
+
+$test->for('example', 3, 'clargs', sub {
+  my ($tryable) = @_;
+  my @result = $tryable->result;
+  isa_ok $result[0], 'Venus::Args';
+  is_deeply $result[0]->value, ['--resource', 'help'];
+  isa_ok $result[1], 'Venus::Opts';
+  is_deeply $result[1]->value, ['--resource', 'help'];
+  is_deeply $result[1]->specs, ['resource|r=s', 'help|h'];
+  isa_ok $result[2], 'Venus::Vars';
+
+  @result
+});
+
 =function cli
 
 The cli function builds and returns a L<Venus::Cli> object.
@@ -2037,6 +2185,100 @@ $test->for('example', 2, 'hash', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is_deeply $result, [[1, 2], [3, 4], [5, 6], [7, 8]];
+
+  $result
+});
+
+=function hashref
+
+The hashref function takes a list of arguments and returns a hashref.
+
+=signature hashref
+
+  hashref(Any @args) (HashRef)
+
+=metadata hashref
+
+{
+  since => '3.10',
+}
+
+=example-1 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref(content => 'example');
+
+  # {content => "example"}
+
+=cut
+
+$test->for('example', 1, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example"};
+
+  $result
+});
+
+=example-2 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref({content => 'example'});
+
+  # {content => "example"}
+
+=cut
+
+$test->for('example', 2, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example"};
+
+  $result
+});
+
+=example-3 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref('content');
+
+  # {content => undef}
+
+=cut
+
+$test->for('example', 3, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => undef};
+
+  $result
+});
+
+=example-4 hashref
+
+  package main;
+
+  use Venus 'hashref';
+
+  my $hashref = hashref('content', 'example', 'algorithm');
+
+  # {content => "example", algorithm => undef}
+
+=cut
+
+$test->for('example', 4, 'hashref', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, {content => "example", algorithm => undef};
 
   $result
 });

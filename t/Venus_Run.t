@@ -30,18 +30,18 @@ my $init = {
     eval => '$PERL -MVenus=true,false,log -E',
     exec => '$PERL',
     info => '$PERL -V',
+    lint => 'perlcritic',
     okay => '$PERL -c',
     repl => '$PERL -dE0',
-    says => 'eval "map log($_), map eval, @ARGV"',
+    reup => 'cpan Venus',
+    says => 'eval "map log(eval), @ARGV"',
+    step => 'eval "while(<>){log(eval)}"',
+    tidy => 'perltidy',
     test => '$PROVE'
-  },
-  find => {
   },
   libs => [
     '-Ilib',
     '-Ilocal/lib/perl5',
-  ],
-  load => [
   ],
   path => [
     './bin',
@@ -51,10 +51,6 @@ my $init = {
   perl => {
     perl => 'perl',
     prove => 'prove',
-    'perl-5.18.0' => 'perlbrew exec --with perl-5.18.0 perl',
-    'prove-5.18.0' => 'perlbrew exec --with perl-5.18.0 prove'
-  },
-  task => {
   },
   vars => {
     PERL => 'perl',

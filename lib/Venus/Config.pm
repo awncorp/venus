@@ -47,6 +47,16 @@ sub build_args {
 
 # METHODS
 
+sub edit_file {
+  my ($self, $file, $code) = @_;
+
+  $self = $self->read_file($file);
+
+  $self->value($self->$code($self->value));
+
+  return $self->write_file($file);
+}
+
 sub read_file {
   my ($self, $file) = @_;
 

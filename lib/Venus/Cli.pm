@@ -69,7 +69,6 @@ sub arg {
   my $_type = $data->{type};
 
   require Venus::Array;
-  require Venus::Unpack;
 
   # value
   @values = @{Venus::Array->new($self->parser->unused)->range($_range // 0)};
@@ -85,23 +84,6 @@ sub arg {
     && exists $data->{default})
   {
     @values = ($_default);
-  }
-
-  my %type_map = (
-    boolean => 'number',
-    float => 'float',
-    number => 'number',
-    string => 'string',
-    yesno => 'yesno',
-  );
-
-  # type
-  if ($_type) {
-    my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
-      'validate', $type_map{$_type}
-    );
-    $self->throw('error_on_arg_validation', $caught->message, $_name, $_type)->error
-      if $caught;
   }
 
   # return boolean values
@@ -733,7 +715,6 @@ sub opt {
   my $_type = $data->{type};
 
   require Venus::Array;
-  require Venus::Unpack;
 
   my $parsed = $self->parser->get($name);
 
@@ -751,23 +732,6 @@ sub opt {
     && exists $data->{default})
   {
     @values = ($_default);
-  }
-
-  my %type_map = (
-    boolean => 'number',
-    float => 'float',
-    number => 'number',
-    string => 'string',
-    yesno => 'yesno',
-  );
-
-  # type
-  if ($_type) {
-    my ($caught, @values) = Venus::Unpack->new(args => [@values])->all->catch(
-      'validate', $type_map{$_type}
-    );
-    $self->throw('error_on_opt_validation', $caught->message, $_name, $_type)->error
-      if $caught;
   }
 
   # return boolean values
@@ -806,6 +770,12 @@ sub parser {
   require Venus::Opts;
 
   return Venus::Opts->new(value => $self->data, specs => $self->spec);
+}
+
+sub pass {
+  my ($self, $method, @args) = @_;
+
+  return $self->exit(0, $method, @args);
 }
 
 sub set {
@@ -1159,6 +1129,40 @@ sub str {
   return undef if !$name;
 
   return $self->get_str($name);
+}
+
+sub test {
+  my ($self, $key, $name) = @_;
+
+  my @values = $self->$key($name);
+
+  my $data = $self->get($key, $name);
+
+  my $type = $data->{type} || 'boolean';
+
+  my %type_map = (
+    boolean => 'number',
+    float => 'float',
+    number => 'number',
+    string => 'string',
+    yesno => 'yesno',
+  );
+
+  require Venus::Assert;
+
+  if ($type) {
+    for (my $i = 0; $i < @values; $i++) {
+      my $assert = Venus::Assert->new("at index $i")->expression(
+        $type_map{$type}
+      );
+      if (my $caught = $assert->catch('validate', $values[$i])) {
+        my $error = "error_on_${key}_validation";
+        $self->throw($error, $caught->message, $name, $type)->error;
+      }
+    }
+  }
+
+  return wantarray ? (@values) : [@values];
 }
 
 # ROUTINES

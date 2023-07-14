@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.10';
+our $VERSION = '3.18';
 
 # AUTHORITY
 
@@ -25,6 +25,7 @@ sub import {
   my %exports = (
     args => 1,
     array => 1,
+    arrayref => 1,
     assert => 1,
     bool => 1,
     box => 1,
@@ -34,6 +35,7 @@ sub import {
     caught => 1,
     chain => 1,
     check => 1,
+    clargs => 1,
     cli => 1,
     code => 1,
     config => 1,
@@ -46,6 +48,7 @@ sub import {
     float => 1,
     gather => 1,
     hash => 1,
+    hashref => 1,
     is_false => 1,
     is_true => 1,
     json => 1,
@@ -111,14 +114,16 @@ sub _qx {
 
 # FUNCTIONS
 
-sub args (@) {
-  my (@args) = @_;
+sub args ($;$@) {
+  my ($data, $code, @args) = @_;
 
-  return (!@args)
-    ? ({})
-    : ((@args == 1 && ref($args[0]) eq 'HASH')
-    ? (!%{$args[0]} ? {} : {%{$args[0]}})
-    : (@args % 2 ? {@args, undef} : {@args}));
+  require Venus::Args;
+
+  if (!$code) {
+    return Venus::Args->new($data);
+  }
+
+  return Venus::Args->new($data)->$code(@args);
 }
 
 sub array ($;$@) {
@@ -131,6 +136,14 @@ sub array ($;$@) {
   }
 
   return Venus::Array->new($data)->$code(@args);
+}
+
+sub arrayref (@) {
+  my (@args) = @_;
+
+  return @args > 1
+    ? ([@args])
+    : ((ref $args[0] eq 'ARRAY') ? ($args[0]) : ([@args]));
 }
 
 sub assert ($$) {
@@ -253,6 +266,18 @@ sub check ($$) {
   require Venus::Assert;
 
   return Venus::Assert->new->expression($expr)->check($data);
+}
+
+sub clargs (@) {
+  my (@args) = @_;
+
+  my ($argv, $specs) = (@args > 1)
+    ? (map arrayref($_), @args)
+    : ([@ARGV], arrayref(@args));
+
+  return (
+    args($argv), opts($argv, 'reparse', $specs), vars({}),
+  );
 }
 
 sub cli (;$) {
@@ -391,6 +416,16 @@ sub hash ($;$@) {
   }
 
   return Venus::Hash->new($data)->$code(@args);
+}
+
+sub hashref (@) {
+  my (@args) = @_;
+
+  return @args > 1
+    ? ({(scalar(@args) % 2) ? (@args, undef) : @args})
+    : ((ref $args[0] eq 'HASH')
+    ? ($args[0])
+    : ({(scalar(@args) % 2) ? (@args, undef) : @args}));
 }
 
 sub is_false ($) {

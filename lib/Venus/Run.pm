@@ -9,7 +9,7 @@ use Venus::Class 'base';
 
 base 'Venus::Task';
 
-require Venus;
+use Venus;
 
 our $NAME = __PACKAGE__;
 
@@ -160,10 +160,12 @@ sub handler_for_exec {
 
     my $error = $self->catch('system', $command);
 
-    $self->log_error("Error running command! $command") if $error;
+    $self->log_error("Error running command! $command") if $ENV{ECHO} && $error;
+
+    return $error ? false : true;
   };
 
-  return $self->okay(sub{_exec($code, $self->conf, @{$self->data})});
+  return $self->exit(undef, sub{_exec($code, $self->conf, @{$self->data})});
 }
 
 sub handler_for_help {
@@ -202,18 +204,18 @@ state $init = {
     eval => '$PERL -MVenus=true,false,log -E',
     exec => '$PERL',
     info => '$PERL -V',
+    lint => 'perlcritic',
     okay => '$PERL -c',
     repl => '$PERL -dE0',
-    says => 'eval "map log($_), map eval, @ARGV"',
+    reup => 'cpan Venus',
+    says => 'eval "map log(eval), @ARGV"',
+    step => 'eval "while(<>){log(eval)}"',
+    tidy => 'perltidy',
     test => '$PROVE'
-  },
-  find => {
   },
   libs => [
     '-Ilib',
     '-Ilocal/lib/perl5',
-  ],
-  load => [
   ],
   path => [
     './bin',
@@ -223,10 +225,6 @@ state $init = {
   perl => {
     perl => 'perl',
     prove => 'prove',
-    'perl-5.18.0' => 'perlbrew exec --with perl-5.18.0 perl',
-    'prove-5.18.0' => 'perlbrew exec --with perl-5.18.0 prove'
-  },
-  task => {
   },
   vars => {
     PERL => 'perl',
@@ -272,15 +270,17 @@ sub _exec {
 
   _set_libs($conf);
 
+  my $result;
+
   for my $step (_flow($conf, @data)) {
     my ($prog, @args) = @{$step};
 
-    $code->($prog, @args) if $prog;
+    ($result = $code->($prog, @args)) ? next : last if $prog;
   }
 
   %ENV = %ORIG_ENV;
 
-  return (@data);
+  return $result;
 }
 
 sub _find {

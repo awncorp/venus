@@ -59,6 +59,38 @@ This package provides the following methods:
 
 =cut
 
+=head2 edit_file
+
+  edit_file(Str $file, Str | CodeRef $code) (Config)
+
+The edit_file method does an in-place edit, i.e. it loads a Perl, YAML, or JSON
+configuration file, passes the decoded data to the method or callback provided,
+and writes the results of the method or callback to the file.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item edit_file example 1
+
+  package main;
+
+  use Venus::Config;
+
+  my $config = Venus::Config->edit_file('t/conf/edit.perl', sub {
+    my ($self, $data) = @_;
+
+    $data->{edited} = 1;
+
+    return $data;
+  });
+
+  # bless(..., 'Venus::Config')
+
+=back
+
+=cut
+
 =head2 metadata
 
   metadata(Str $name) (Any)

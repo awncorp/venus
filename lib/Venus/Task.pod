@@ -410,7 +410,8 @@ I<Since C<2.91>>
 
 The exit method exits the program using the exit code provided. The exit code
 defaults to C<0>. Optionally, you can dispatch before exiting by providing a
-method name or coderef, and arguments.
+method name or coderef, and arguments. If an exit code of C<undef> is provided,
+the exit code will be determined by the result of the dispatching.
 
 I<Since C<2.91>>
 
@@ -1047,6 +1048,45 @@ I<Since C<2.91>>
 
 =cut
 
+=head2 pass
+
+  pass(Str|CodeRef $code, Any @args) (Any)
+
+The pass method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item pass example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $task->pass;
+
+  # ()
+
+=back
+
+=over 4
+
+=item pass example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $task->pass('log_info', 'yatta');
+
+  # ()
+
+=back
+
+=cut
+
 =head2 prepare
 
   prepare() (Task)
@@ -1321,6 +1361,76 @@ I<Since C<2.91>>
   my $system = $task->system('/path/to/nowhere');
 
   # Exception! (isa Example::Error) (see error_on_system_call)
+
+=back
+
+=cut
+
+=head2 test
+
+  test(Str $type, Str $name) (Any)
+
+The test method validates the values for the C<arg> or C<opt> specified and
+returns the value(s) associated. This method dispatches to L<Venus::Cli/test>.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item test example 1
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my ($help) = $task->prepare->test('opt', 'help');
+
+  # true
+
+=back
+
+=over 4
+
+=item test example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        type => 'string',
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my ($help) = $task->prepare->test('opt', 'help');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
+
+  # Invalid option: help: received (undef), expected (string)
 
 =back
 

@@ -1,18 +1,15 @@
 # Release
 
-## Version: 3.10
+## Version: 3.18
 
-- [feature] Implement Venus#render, Venus::String#template
-- [feature] Implement Venus::Run "from" ability
-- [feature] Implement Venus::Run "asks" ability
-- [feature] Implement Venus::Run "flow" ability
-- [feature] Implement Venus::Run "with" ability
-- [feature] Implement Venus#{list,pairs}
-- [feature] Support environment variable based paths in "vns" config
-- [feature] Implement Venus::Run "func" ability
-- [feature] Implement Venus#syscall
-- [feature] Implement Venus#{is_true,is_false}
-- [update] Enhance "vns" and Venus::Run documentation
-- [update] Update documentation in Venus
+- [feature] Implement Venus#{arrayref,hashref}
+- [feature] Implement Venus#clargs
+- [feature] Implement Venus::{Cli,Task}#pass
+- [feature] Implement Venus::Config#edit_file
+- [update] Address issue validating CLI args and opts
+- [update] Update Venus::Run "Error running command" if "ECHO" is off
+- [update] Update Venus::Run "flow" feature to exit on first error
+- [update] Update default "vns" config
+- [update] Update Venus synopsis
 
 

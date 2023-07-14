@@ -36,6 +36,7 @@ $test->for('abstract');
 
 =includes
 
+method: edit_file
 method: read_file
 method: read_json
 method: read_json_file
@@ -109,6 +110,60 @@ Venus::Role::Valuable
 =cut
 
 $test->for('integrates');
+
+=method edit_file
+
+The edit_file method does an in-place edit, i.e. it loads a Perl, YAML, or JSON
+configuration file, passes the decoded data to the method or callback provided,
+and writes the results of the method or callback to the file.
+
+=signature edit_file
+
+  edit_file(Str $file, Str | CodeRef $code) (Config)
+
+=metadata edit_file
+
+{
+  since => '3.10',
+}
+
+=cut
+
+=example-1 edit_file
+
+  package main;
+
+  use Venus::Config;
+
+  my $config = Venus::Config->edit_file('t/conf/edit.perl', sub {
+    my ($self, $data) = @_;
+
+    $data->{edited} = 1;
+
+    return $data;
+  });
+
+  # bless(..., 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'edit_file', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Config');
+  ok $result->value;
+  my $data = {name => 'test', edited => 1};
+  is_deeply $result->value, $data;
+  my $read = Venus::Config->read_file('t/conf/edit.perl')->value;
+  is_deeply $read, $data;
+  Venus::Config->edit_file('t/conf/edit.perl', sub {
+    my ($self, $data) = @_;
+    delete $data->{edited};
+    return $data;
+  });
+
+  $result
+});
 
 =method read_file
 

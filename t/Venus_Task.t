@@ -104,10 +104,12 @@ method: okay
 method: opts
 method: output
 method: prepare
+method: pass
 method: run
 method: startup
 method: shutdown
 method: system
+method: test
 method: usage
 
 =cut
@@ -684,7 +686,8 @@ $test->for('example', 3, 'execute', sub {
 
 The exit method exits the program using the exit code provided. The exit code
 defaults to C<0>. Optionally, you can dispatch before exiting by providing a
-method name or coderef, and arguments.
+method name or coderef, and arguments. If an exit code of C<undef> is provided,
+the exit code will be determined by the result of the dispatching.
 
 =signature exit
 
@@ -1933,6 +1936,65 @@ $test->for('example', 3, 'prepare', sub {
   $result
 });
 
+=method pass
+
+The pass method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+=signature pass
+
+  pass(Str|CodeRef $code, Any @args) (Any)
+
+=metadata pass
+
+{
+  since => '3.10',
+}
+
+=example-1 pass
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $task->pass;
+
+  # ()
+
+=cut
+
+$test->for('example', 1, 'pass', sub {
+  local $TEST_VENUS_TASK_EXIT = 1;
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $TEST_VENUS_TASK_EXIT, 0;
+
+  Venus::Space->new('Example')->unload;
+  !$result
+});
+
+=example-2 pass
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $task->pass('log_info', 'yatta');
+
+  # ()
+
+=cut
+
+$test->for('example', 2, 'pass', sub {
+  local $TEST_VENUS_TASK_EXIT = 1;
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $TEST_VENUS_TASK_EXIT, 0;
+
+  Venus::Space->new('Example')->unload;
+  !$result
+});
+
 =method run
 
 The run class method will automatically execute the task class by instansiating
@@ -2165,6 +2227,98 @@ $test->for('example', 2, 'system', sub {
   isa_ok $result, 'Example::Error';
   is $result->name, 'on_system_call';
 
+  $result
+});
+
+=method test
+
+The test method validates the values for the C<arg> or C<opt> specified and
+returns the value(s) associated. This method dispatches to L<Venus::Cli/test>.
+
+=signature test
+
+  test(Str $type, Str $name) (Any)
+
+=metadata test
+
+{
+  since => '3.10',
+}
+
+=cut
+
+=example-1 test
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my ($help) = $task->prepare->test('opt', 'help');
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, 1;
+
+  Venus::Space->new('Example')->unload;
+  $result
+});
+
+=example-2 test
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        type => 'string',
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my ($help) = $task->prepare->test('opt', 'help');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
+
+  # Invalid option: help: received (undef), expected (string)
+
+=cut
+
+$test->for('example', 2, 'test', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  isa_ok $result, 'Venus::Cli::Error';
+  ok $result->is('on.opt.validation');
+  like $result->message, qr/Invalid option: help/;
+
+  Venus::Space->new('Example')->unload;
   $result
 });
 

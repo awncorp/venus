@@ -226,29 +226,6 @@ I<Since C<2.55>>
 
 =back
 
-=over 4
-
-=item arg example 7
-
-  package main;
-
-  use Venus::Cli;
-
-  my $cli = Venus::Cli->new(['--help']);
-
-  $cli->set('arg', 'name', {
-    type => 'string',
-    range => '0',
-  });
-
-  my ($name) = $cli->arg('name');
-
-  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
-
-  # Invalid argument: name: received (undef), expected (string)
-
-=back
-
 =cut
 
 =head2 cmd
@@ -1059,29 +1036,6 @@ I<Since C<2.55>>
 
 =back
 
-=over 4
-
-=item opt example 7
-
-  package main;
-
-  use Venus::Cli;
-
-  my $cli = Venus::Cli->new(['example', '--name', 'example']);
-
-  $cli->set('opt', 'name', {
-    type => 'number',
-    multi => 1,
-  });
-
-  my ($name) = $cli->opt('name');
-
-  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
-
-  # Invalid option: name: received (undef), expected (number)
-
-=back
-
 =cut
 
 =head2 parsed
@@ -1146,6 +1100,45 @@ I<Since C<2.55>>
   my $parser = $cli->parser;
 
   # bless({...}, 'Venus::Opts')
+
+=back
+
+=cut
+
+=head2 pass
+
+  pass(Str|CodeRef $code, Any @args) (Any)
+
+The pass method exits the program with the exit code C<0>. Optionally, you can
+dispatch before exiting by providing a method name or coderef, and arguments.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item pass example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $cli->pass;
+
+  # ()
+
+=back
+
+=over 4
+
+=item pass example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $pass = $cli->pass('stash', 'executed', 1);
+
+  # ()
 
 =back
 
@@ -1373,6 +1366,105 @@ I<Since C<2.55>>
   my $str = $cli->str('name');
 
   # "program"
+
+=back
+
+=cut
+
+=head2 test
+
+  test(Str $type, Str $name) (Any)
+
+The test method validates the values for the C<arg> or C<opt> specified and
+returns the value(s) associated. If validation failed an exception is thrown.
+
+I<Since C<3.10>>
+
+=over 4
+
+=item test example 1
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->test('arg', 'name');
+
+  # "help"
+
+=back
+
+=over 4
+
+=item test example 2
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['--help']);
+
+  $cli->set('arg', 'name', {
+    type => 'string',
+    range => '0',
+  });
+
+  my ($name) = $cli->test('arg', 'name');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_arg_validation)
+
+  # Invalid argument: name: received (undef), expected (string)
+
+=back
+
+=over 4
+
+=item test example 3
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'string',
+    multi => 1,
+  });
+
+  my ($name) = $cli->test('opt', 'name');
+
+  # "example"
+
+=back
+
+=over 4
+
+=item test example 4
+
+  package main;
+
+  use Venus::Cli;
+
+  my $cli = Venus::Cli->new(['example', '--name', 'example']);
+
+  $cli->set('opt', 'name', {
+    type => 'number',
+    multi => 1,
+  });
+
+  my ($name) = $cli->test('opt', 'name');
+
+  # Exception! (isa Venus::Cli::Error) (see error_on_opt_validation)
+
+  # Invalid option: name: received (undef), expected (number)
 
 =back
 
