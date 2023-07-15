@@ -1,3 +1,9 @@
+3.20 2023-07-15
+
+- [feature] Implement Venus#is_bool
+- [update] Update Venus::Run quoting and variable expansion
+- [update] Update Venus::Run default config and variable expansion issue
+
 3.18 2023-07-14
 
 - [feature] Implement Venus#{arrayref,hashref}

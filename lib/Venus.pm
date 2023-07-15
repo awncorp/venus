@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.18';
+our $VERSION = '3.20';
 
 # AUTHORITY
 
@@ -49,6 +49,7 @@ sub import {
     gather => 1,
     hash => 1,
     hashref => 1,
+    is_bool => 1,
     is_false => 1,
     is_true => 1,
     json => 1,
@@ -426,6 +427,12 @@ sub hashref (@) {
     : ((ref $args[0] eq 'HASH')
     ? ($args[0])
     : ({(scalar(@args) % 2) ? (@args, undef) : @args}));
+}
+
+sub is_bool ($) {
+  my ($data) = @_;
+
+  return type($data, 'coded', 'BOOLEAN') ? true() : false();
 }
 
 sub is_false ($) {

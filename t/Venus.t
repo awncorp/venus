@@ -83,6 +83,7 @@ function: float
 function: gather
 function: hash
 function: hashref
+function: is_bool
 function: is_false
 function: is_true
 function: json
@@ -134,12 +135,7 @@ $test->for('includes');
 
   package main;
 
-  use Venus qw(
-    catch
-    error
-    is_true
-    raise
-  );
+  use Venus 'catch', 'error', 'raise';
 
   # error handling
   my ($error, $result) = catch {
@@ -147,12 +143,12 @@ $test->for('includes');
   };
 
   # boolean keywords
-  if (is_true $result) {
+  if ($result) {
     error;
   }
 
   # raise exceptions
-  if (is_true $result) {
+  if ($result) {
     raise 'MyApp::Error';
   }
 
@@ -2281,6 +2277,107 @@ $test->for('example', 4, 'hashref', sub {
   is_deeply $result, {content => "example", algorithm => undef};
 
   $result
+});
+
+=function is_bool
+
+The is_bool function returns L</true> if the value provided is a boolean value,
+not merely truthy, and L</false> otherwise.
+
+=signature is_bool
+
+  is_bool(Any $arg) (Bool)
+
+=metadata is_bool
+
+{
+  since => '3.18',
+}
+
+=cut
+
+=example-1 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool true;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-2 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool false;
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
+=example-3 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 1;
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-4 is_bool
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 0;
+
+  # false
+
+=cut
+
+$test->for('example', 4, 'is_bool', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
 });
 
 =function is_false

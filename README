@@ -8,18 +8,13 @@ ABSTRACT
 
 VERSION
 
-    3.18
+    3.20
 
 SYNOPSIS
 
       package main;
     
-      use Venus qw(
-        catch
-        error
-        is_true
-        raise
-      );
+      use Venus 'catch', 'error', 'raise';
     
       # error handling
       my ($error, $result) = catch {
@@ -27,12 +22,12 @@ SYNOPSIS
       };
     
       # boolean keywords
-      if (is_true $result) {
+      if ($result) {
         error;
       }
     
       # raise exceptions
-      if (is_true $result) {
+      if ($result) {
         raise 'MyApp::Error';
       }
     
@@ -1148,6 +1143,55 @@ FUNCTIONS
         my $hashref = hashref('content', 'example', 'algorithm');
       
         # {content => "example", algorithm => undef}
+
+ is_bool
+
+      is_bool(Any $arg) (Bool)
+
+    The is_bool function returns "true" if the value provided is a boolean
+    value, not merely truthy, and "false" otherwise.
+
+    Since 3.18
+
+    is_bool example 1
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool true;
+      
+        # true
+
+    is_bool example 2
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool false;
+      
+        # true
+
+    is_bool example 3
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool 1;
+      
+        # false
+
+    is_bool example 4
+
+        package main;
+      
+        use Venus 'is_bool';
+      
+        my $is_bool = is_bool 0;
+      
+        # false
 
  is_false
 

@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-3.18
+3.20
 
 =cut
 
@@ -21,12 +21,7 @@ OO Standard Library for Perl 5
 
   package main;
 
-  use Venus qw(
-    catch
-    error
-    is_true
-    raise
-  );
+  use Venus 'catch', 'error', 'raise';
 
   # error handling
   my ($error, $result) = catch {
@@ -34,12 +29,12 @@ OO Standard Library for Perl 5
   };
 
   # boolean keywords
-  if (is_true $result) {
+  if ($result) {
     error;
   }
 
   # raise exceptions
-  if (is_true $result) {
+  if ($result) {
     raise 'MyApp::Error';
   }
 
@@ -1537,6 +1532,73 @@ I<Since C<3.10>>
   my $hashref = hashref('content', 'example', 'algorithm');
 
   # {content => "example", algorithm => undef}
+
+=back
+
+=cut
+
+=head2 is_bool
+
+  is_bool(Any $arg) (Bool)
+
+The is_bool function returns L</true> if the value provided is a boolean value,
+not merely truthy, and L</false> otherwise.
+
+I<Since C<3.18>>
+
+=over 4
+
+=item is_bool example 1
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool true;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_bool example 2
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool false;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_bool example 3
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 1;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_bool example 4
+
+  package main;
+
+  use Venus 'is_bool';
+
+  my $is_bool = is_bool 0;
+
+  # false
 
 =back
 

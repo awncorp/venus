@@ -25,19 +25,36 @@ my $init = {
   exec => {
     brew => 'perlbrew',
     cpan => 'cpanm -llocal -qn',
-    deps => 'cpan --installdeps .',
-    each => '$PERL -MVenus=true,false,log -nE',
-    eval => '$PERL -MVenus=true,false,log -E',
+    docs => 'perldoc',
+    each => 'shim -nE',
+    edit => '$EDITOR $VENUS_FILE',
+    eval => 'shim -E',
     exec => '$PERL',
     info => '$PERL -V',
     lint => 'perlcritic',
     okay => '$PERL -c',
     repl => '$PERL -dE0',
-    reup => 'cpan Venus',
+    reup => 'cpanm -qn Venus',
     says => 'eval "map log(eval), @ARGV"',
-    step => 'eval "while(<>){log(eval)}"',
+    shim => '$PERL -MVenus=true,false,log',
+    test => '$PROVE',
     tidy => 'perltidy',
-    test => '$PROVE'
+  },
+  flow => {
+    deps => [
+      'cpan Perl::Critic',
+      'cpan Perl::Tidy',
+      'cpan Pod::Perldoc',
+    ],
+    prep => [
+      'deps',
+      'reqs',
+    ],
+    reqs => [
+      'which perlcritic',
+      'which perldoc',
+      'which perltidy',
+    ],
   },
   libs => [
     '-Ilib',
@@ -1085,7 +1102,7 @@ $test->for('example', 6, 'handler', sub {
   #
   # ...
 
-  my $run = Venus::Run->new(['deps']);
+  my $run = Venus::Run->new(['cpan', '--installdeps', '.']);
 
   $run->execute;
 
@@ -1833,23 +1850,40 @@ the system with a new configuration file.
   #   exec => {
   #     brew => 'perlbrew',
   #     cpan => 'cpanm -llocal -qn',
-  #     deps => 'cpan --installdeps .',
-  #     each => '$PERL -MVenus=true,false,log -nE',
-  #     eval => '$PERL -MVenus=true,false,log -E',
+  #     docs => 'perldoc',
+  #     each => 'shim -nE',
+  #     edit => '$EDITOR $VENUS_FILE',
+  #     eval => 'shim -E',
   #     exec => '$PERL',
   #     info => '$PERL -V',
+  #     lint => 'perlcritic',
   #     okay => '$PERL -c',
   #     repl => '$PERL -dE0',
-  #     says => 'eval "map log($_), map eval, @ARGV"',
-  #     test => '$PROVE'
+  #     reup => 'cpanm -qn Venus',
+  #     says => 'eval "map log(eval), @ARGV"',
+  #     shim => '$PERL -MVenus=true,false,log',
+  #     test => '$PROVE',
+  #     tidy => 'perltidy',
   #   },
-  #   find => {
+  #   flow => {
+  #     deps => [
+  #       'cpan Perl::Critic',
+  #       'cpan Perl::Tidy',
+  #       'cpan Pod::Perldoc',
+  #     ],
+  #     prep => [
+  #       'deps',
+  #       'reqs',
+  #     ],
+  #     reqs => [
+  #       'which perlcritic',
+  #       'which perldoc',
+  #       'which perltidy',
+  #     ],
   #   },
   #   libs => [
   #     '-Ilib',
   #     '-Ilocal/lib/perl5',
-  #   ],
-  #   load => [
   #   ],
   #   path => [
   #     './bin',
@@ -1859,10 +1893,6 @@ the system with a new configuration file.
   #   perl => {
   #     perl => 'perl',
   #     prove => 'prove',
-  #     'perl-5.18.0' => 'perlbrew exec --with perl-5.18.0 perl',
-  #     'prove-5.18.0' => 'perlbrew exec --with perl-5.18.0 prove'
-  #   },
-  #   task => {
   #   },
   #   vars => {
   #     PERL => 'perl',
@@ -2021,13 +2051,10 @@ C<.vns.yaml>.
   data:
     ECHO: true
   exec:
-    okay: $PERL -c
     cpan: cpanm -llocal -qn
-    deps: cpan --installdeps .
-    each: $PERL -MVenus=log -nE
-    exec: $PERL -MVenus=log -E
+    okay: $PERL -c
     repl: $PERL -dE0
-    says: exec "map log(\$_), map eval, \@ARGV"
+    says: $PERL -E "map log(eval), @ARGV"
     test: $PROVE
   libs:
   - -Ilib
@@ -2272,32 +2299,38 @@ L<vns> CLI, which is simply an executable file which loads this package.
   # Install a distribution
   vns cpan $DIST
 
-  i.e. cpanm --llocal -qn $DIST
+  # i.e.
+  # cpanm --llocal -qn $DIST
 
   # Install dependencies in the CWD
   vns deps
 
-  i.e. cpanm --llocal -qn --installdeps .
+  # i.e.
+  # cpanm --llocal -qn --installdeps .
 
   # Check that a package can be compiled
   vns okay $FILE
 
-  i.e. perl -Ilib -Ilocal/lib/perl5 -c $FILE
+  # i.e.
+  # perl -Ilib -Ilocal/lib/perl5 -c $FILE
 
   # Use the Perl debugger as a REPL
   vns repl
 
-  i.e. perl -Ilib -Ilocal/lib/perl5 -dE0
+  # i.e.
+  # perl -Ilib -Ilocal/lib/perl5 -dE0
 
   # Evaluate arbitrary Perl expressions
   vns exec ...
 
-  i.e. perl -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
+  # i.e.
+  # perl -Ilib -Ilocal/lib/perl5 -MVenus=log -E $@
 
   # Test the Perl project in the CWD
   vns test t
 
-  i.e. prove -Ilib -Ilocal/lib/perl5 t
+  # i.e.
+  # prove -Ilib -Ilocal/lib/perl5 t
 
 =cut
 

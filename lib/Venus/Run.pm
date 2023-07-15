@@ -199,19 +199,36 @@ state $init = {
   exec => {
     brew => 'perlbrew',
     cpan => 'cpanm -llocal -qn',
-    deps => 'cpan --installdeps .',
-    each => '$PERL -MVenus=true,false,log -nE',
-    eval => '$PERL -MVenus=true,false,log -E',
+    docs => 'perldoc',
+    each => 'shim -nE',
+    edit => '$EDITOR $VENUS_FILE',
+    eval => 'shim -E',
     exec => '$PERL',
     info => '$PERL -V',
     lint => 'perlcritic',
     okay => '$PERL -c',
     repl => '$PERL -dE0',
-    reup => 'cpan Venus',
+    reup => 'cpanm -qn Venus',
     says => 'eval "map log(eval), @ARGV"',
-    step => 'eval "while(<>){log(eval)}"',
+    shim => '$PERL -MVenus=true,false,log',
+    test => '$PROVE',
     tidy => 'perltidy',
-    test => '$PROVE'
+  },
+  flow => {
+    deps => [
+      'cpan Perl::Critic',
+      'cpan Perl::Tidy',
+      'cpan Pod::Perldoc',
+    ],
+    prep => [
+      'deps',
+      'reqs',
+    ],
+    reqs => [
+      'which perlcritic',
+      'which perldoc',
+      'which perltidy',
+    ],
   },
   libs => [
     '-Ilib',
@@ -290,7 +307,7 @@ sub _find {
 
   @data = map _split($_), @data;
 
-  my @item = map {s/^\$//r} shift @data;
+  my @item = shift @data;
 
   @item = (_find_in_exec($seen, $conf, @item));
 
@@ -537,9 +554,9 @@ sub _make {
 sub _prep {
   my ($conf, @data) = @_;
 
-  my @args = map _vars($_), grep defined, _make($conf, shift(@data)), @data;
+  my @args = grep defined, _make($conf, shift(@data)), @data;
 
-  my $prog = shift @args;
+  my $prog = _vars(shift(@args));
 
   require Venus::Os;
 
@@ -559,7 +576,8 @@ sub _prep {
     if ($args[$i] =~ /^\d[<>&]+\d?$/) {
       next;
     }
-    if ($args[$i] =~ /\$[A-Z]\w+/) {
+    if ($args[$i] =~ /^\$[A-Z]\w+$/) {
+      $args[$i] = _vars($args[$i]);
       next;
     }
     if ($args[$i] =~ /^\$\((.*)\)$/) {
@@ -628,7 +646,7 @@ sub _set_vars {
   }
 
   if (my $vars = $conf->{vars}) {
-    $ENV{$_} = join(' ', grep defined, _find({}, $conf, $_)) for keys %{$vars};
+    $ENV{$_} = join(' ', grep defined, @{_prep($conf, $_)}) for keys %{$vars};
   }
 
   if (my $asks = $conf->{asks}) {
