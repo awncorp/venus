@@ -1,9 +1,12 @@
 # Release
 
-## Version: 3.20
+## Version: 3.30
 
-- [feature] Implement Venus#is_bool
-- [update] Update Venus::Run quoting and variable expansion
-- [update] Update Venus::Run default config and variable expansion issue
+- [feature] Implement Venus::Container
+- [feature] Implement Venus#puts for destructuring
+- [feature] Implement "help" ability in Venus::Run
+- [feature] Implement "when" ability in Venus::Run
+- [update] Implement {Venus,Venus::Array}#range
+- [update] Slim down the default Venus::Run config
 
 

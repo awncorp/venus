@@ -75,23 +75,21 @@ Here is an example configuration in YAML (e.g. in .vns.yaml).
   data:
     ECHO: true
   exec:
-    okay: \$PERL -c
     cpan: cpanm -llocal -qn
     deps: cpan --installdeps .
     each: \$PERL -MVenus=log -nE
     exec: \$PERL -MVenus=log -E
+    okay: \$PERL -c
     repl: \$PERL -dE0
-    says: exec "map log(\$_), map eval, \@ARGV"
+    says: exec "map log(eval), \@ARGV"
     test: \$PROVE
   libs:
   - -Ilib
   - -Ilocal/lib/perl5
-  load:
-  - -MVenus=true,false
   path:
-  - ./bin
-  - ./dev
-  - -Ilocal/bin
+  - bin
+  - dev
+  - local/bin
   perl:
     perl: perl
     prove: prove
@@ -154,7 +152,7 @@ sub handler_for_exec {
   my ($self, $data) = @_;
 
   my $code = sub {
-    my $command = join ' ', @_;
+    my $command = _vars(join ' ', @_);
 
     $self->log_info('Using:', $command) if $ENV{ECHO};
 
@@ -171,7 +169,15 @@ sub handler_for_exec {
 sub handler_for_help {
   my ($self, $data) = @_;
 
-  return $self->fail(sub{$self->log_info($self->help)});
+  my $conf = $self->conf;
+  my $type = $self->data->[1];
+
+  if (exists $conf->{help} && exists $conf->{help}{$type}) {
+    return $self->fail(sub{$self->log_info($conf->{help}{$type})})
+  }
+  else {
+    return $self->fail(sub{$self->log_info($self->help)});
+  }
 }
 
 sub handler_for_init {
@@ -207,37 +213,21 @@ state $init = {
     info => '$PERL -V',
     lint => 'perlcritic',
     okay => '$PERL -c',
-    repl => '$PERL -dE0',
+    repl => '$REPL',
     reup => 'cpanm -qn Venus',
     says => 'eval "map log(eval), @ARGV"',
     shim => '$PERL -MVenus=true,false,log',
     test => '$PROVE',
     tidy => 'perltidy',
   },
-  flow => {
-    deps => [
-      'cpan Perl::Critic',
-      'cpan Perl::Tidy',
-      'cpan Pod::Perldoc',
-    ],
-    prep => [
-      'deps',
-      'reqs',
-    ],
-    reqs => [
-      'which perlcritic',
-      'which perldoc',
-      'which perltidy',
-    ],
-  },
   libs => [
     '-Ilib',
     '-Ilocal/lib/perl5',
   ],
   path => [
-    './bin',
-    './dev',
-    './local/bin',
+    'bin',
+    'dev',
+    'local/bin',
   ],
   perl => {
     perl => 'perl',
@@ -245,7 +235,8 @@ state $init = {
   },
   vars => {
     PERL => 'perl',
-    PROVE => 'prove'
+    PROVE => 'prove',
+    REPL => '$PERL -dE0',
   },
 };
 
@@ -608,6 +599,16 @@ sub _set_conf {
       : ()
     );
 
+  if (exists $conf->{when}) {
+    require Venus::Os;
+
+    my $type = Venus::Os->type;
+
+    if (exists $conf->{when}{$type}) {
+      $conf = Venus::merge($conf, $conf->{when}{$type});
+    }
+  }
+
   return $conf;
 }
 
@@ -641,8 +642,8 @@ sub _set_path {
 sub _set_vars {
   my ($conf) = @_;
 
-  if (my $vars = $conf->{data}) {
-    $ENV{$_} = join(' ', grep defined, $vars->{$_}) for keys %{$vars};
+  if (my $data = $conf->{data}) {
+    $ENV{$_} = join(' ', grep defined, $data->{$_}) for keys %{$data};
   }
 
   if (my $vars = $conf->{vars}) {

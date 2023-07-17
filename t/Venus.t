@@ -73,6 +73,7 @@ function: clargs
 function: cli
 function: code
 function: config
+function: container
 function: cop
 function: data
 function: date
@@ -104,6 +105,7 @@ function: process
 function: proto
 function: raise
 function: random
+function: range
 function: regexp
 function: render
 function: replace
@@ -1556,6 +1558,79 @@ $test->for('example', 2, 'config', sub {
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Config';
   is_deeply $result->get, {data => 1};
+
+  $result
+});
+
+=function container
+
+The container function builds and returns a L<Venus::Container> object, or
+dispatches to the coderef or method provided.
+
+=signature container
+
+  container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+=metadata container
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 container
+
+  package main;
+
+  use Venus 'container';
+
+  my $container = container {};
+
+  # bless({...}, 'Venus::Config')
+
+=cut
+
+$test->for('example', 1, 'container', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Container';
+  is_deeply $result->get, {};
+
+  $result
+});
+
+=example-2 container
+
+  package main;
+
+  use Venus 'container';
+
+  my $data = {
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+        argument => {
+          '$metadata' => "tmplog"
+        }
+      }
+    }
+  };
+
+  my $log = container $data, 'resolve', 'log';
+
+  # bless({value => '/tmp/log'}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 2, 'container', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
+  ok $result->value eq '/tmp/log';
 
   $result
 });
@@ -3800,6 +3875,62 @@ $test->for('example', 2, 'random', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok $result;
+
+  $result
+});
+
+=function range
+
+The range function returns the result of a L<Venus::Array/range> operation.
+
+=signature range
+
+  range(Int | Str @args) (ArrayRef)
+
+=metadata range
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 range
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], ':4';
+
+  # [1..5]
+
+=cut
+
+$test->for('example', 1, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..5];
+
+  $result
+});
+
+=example-2 range
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], '-4:-1';
+
+  # [6..9]
+
+=cut
+
+$test->for('example', 2, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [6..9];
 
   $result
 });

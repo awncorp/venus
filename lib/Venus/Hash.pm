@@ -362,6 +362,36 @@ sub path {
   return wantarray ? ($self->find(@path)) : $self->find(@path);
 }
 
+sub puts {
+  my ($self, @args) = @_;
+
+  my $result = [];
+
+  require Venus::Array;
+
+  for (my $i = 0; $i < @args; $i += 2) {
+    my ($into, $path) = @args[$i, $i+1];
+
+    next if !defined $path;
+
+    my $value;
+    my @range;
+
+    ($path, @range) = @{$path} if ref $path eq 'ARRAY';
+
+    $value = $self->path($path);
+    $value = Venus::Array->new($value)->range(@range) if ref $value eq 'ARRAY';
+
+    if (ref $into eq 'SCALAR') {
+      $$into = $value;
+    }
+
+    CORE::push @{$result}, $value;
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub random {
   my ($self) = @_;
 

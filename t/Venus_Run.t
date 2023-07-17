@@ -33,37 +33,21 @@ my $init = {
     info => '$PERL -V',
     lint => 'perlcritic',
     okay => '$PERL -c',
-    repl => '$PERL -dE0',
+    repl => '$REPL',
     reup => 'cpanm -qn Venus',
     says => 'eval "map log(eval), @ARGV"',
     shim => '$PERL -MVenus=true,false,log',
     test => '$PROVE',
     tidy => 'perltidy',
   },
-  flow => {
-    deps => [
-      'cpan Perl::Critic',
-      'cpan Perl::Tidy',
-      'cpan Pod::Perldoc',
-    ],
-    prep => [
-      'deps',
-      'reqs',
-    ],
-    reqs => [
-      'which perlcritic',
-      'which perldoc',
-      'which perltidy',
-    ],
-  },
   libs => [
     '-Ilib',
     '-Ilocal/lib/perl5',
   ],
   path => [
-    './bin',
-    './dev',
-    './local/bin',
+    'bin',
+    'dev',
+    'local/bin',
   ],
   perl => {
     perl => 'perl',
@@ -71,7 +55,8 @@ my $init = {
   },
   vars => {
     PERL => 'perl',
-    PROVE => 'prove'
+    PROVE => 'prove',
+    REPL => '$PERL -dE0',
   },
 };
 
@@ -840,17 +825,15 @@ $test->for('example', 1, 'footer', sub {
   like $result, qr|each: \$PERL -MVenus=log -nE|;
   like $result, qr|exec: \$PERL -MVenus=log -E|;
   like $result, qr|repl: \$PERL -dE0|;
-  like $result, qr|says: exec "map log\(\$_\), map eval, \@ARGV"|;
+  like $result, qr|says: exec "map log\(eval\), \@ARGV"|;
   like $result, qr|test: \$PROVE|;
   like $result, qr|libs:|;
   like $result, qr|- -Ilib|;
   like $result, qr|- -Ilocal/lib/perl5|;
-  like $result, qr|load:|;
-  like $result, qr|- -MVenus=true,false|;
   like $result, qr|path:|;
-  like $result, qr|- ./bin|;
-  like $result, qr|- ./dev|;
-  like $result, qr|- -Ilocal/bin|;
+  like $result, qr|- bin|;
+  like $result, qr|- dev|;
+  like $result, qr|- local/bin|;
   like $result, qr|perl:|;
   like $result, qr|perl: perl|;
   like $result, qr|prove: prove|;
@@ -1197,7 +1180,7 @@ $test->for('example', 8, 'handler', sub {
   #
   # ---
   # exec:
-  #   repl: $PERL -dE0
+  #   repl: $REPL
   #
   # ...
   #
@@ -1209,6 +1192,7 @@ $test->for('example', 8, 'handler', sub {
   #
   # vars:
   #   PERL: perl
+  #   REPL: $PERL -dE0
   #
   # ...
 
@@ -1818,6 +1802,170 @@ $test->for('example', 19, 'handler', sub {
   1
 });
 
+=example-20 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  local $ENV{VENUS_FILE} = 't/conf/when.perl';
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   name: echo $OSNAME
+  #
+  # ...
+  # when:
+  #   is_lin:
+  #     data:
+  #       OSNAME: LINUX
+  #   is_win:
+  #     data:
+  #       OSNAME: WINDOW
+  #
+  # ...
+
+  my $run = Venus::Run->new(['name']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. echo $OSNAME
+
+  # i.e. echo LINUX
+
+=cut
+
+$test->for('example', 20, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo LINUX$|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo LINUX|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-21 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on mswin32
+
+  local $ENV{VENUS_FILE} = 't/conf/when.perl';
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   name: echo $OSNAME
+  #
+  # ...
+  # when:
+  #   is_lin:
+  #     data:
+  #       OSNAME: LINUX
+  #   is_win:
+  #     data:
+  #       OSNAME: WINDOW
+  #
+  # ...
+
+  my $run = Venus::Run->new(['name']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. echo $OSNAME
+
+  # i.e. echo WINDOWS
+
+=cut
+
+$test->for('example', 21, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'mswin32';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  like $$TEST_VENUS_RUN_SYSTEM[1], qr|echo WINDOWS$|;
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Using:.*echo WINDOWS|;
+  like $$TEST_VENUS_RUN_OUTPUT[1], qr|info|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-22 handler
+
+  package main;
+
+  use Venus::Run;
+
+  # on linux
+
+  local $ENV{VENUS_FILE} = 't/conf/help.perl';
+
+  # in config
+  #
+  # ---
+  # exec:
+  #   exec: perl -c
+  #
+  # ...
+  # help:
+  #   exec: Usage: perl -c <FILE>
+  #
+  # ...
+
+  my $run = Venus::Run->new(['help', 'exec']);
+
+  $run->execute;
+
+  # ()
+
+  # i.e. Usage: perl -c <FILE>
+
+=cut
+
+$test->for('example', 22, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  ok -f '.vns.pl';
+  require Venus::Os;
+  $Venus::Os::TYPES{$^O} = 'linux';
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 1;
+  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
+  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: perl -c \<FILE\>|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
 =method init
 
 The init method returns the default configuration to be used when initializing
@@ -2175,6 +2323,20 @@ an array reference to the arguments provided.
 
 $test->for('feature', 'config-func');
 
+=feature config-help
+
+  ---
+  help:
+    build: Usage: vns build [<option>]
+
+The configuration file's C<help> section provides a list of static key/value
+pairs where the key is the "subcommand" to display help text for, and the value
+is the help text to be displayed.
+
+=cut
+
+$test->for('feature', 'config-help');
+
 =feature config-libs
 
   ---
@@ -2262,6 +2424,26 @@ environment variables.
 =back
 
 $test->for('feature', 'config-vars');
+
+=feature config-when
+
+  ---
+  when:
+    is_lin:
+      data:
+        OSNAME: LINUX
+    is_win:
+      data:
+        OSNAME: WINDOWS
+
+The configuration file's C<when> section provides a configuration tree to be
+merged with the existing configuration based on the name current operating
+system. The C<is_$name> key should correspond to one of the types specified by
+L<Venus::Os/type>.
+
+=back
+
+$test->for('feature', 'config-when');
 
 =feature config-with
 

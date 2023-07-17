@@ -20,7 +20,7 @@ resources:
   homepage: https://metacpan.org/dist/Venus
   license: https://opensource.org/licenses/apache-2.0
   repository: git://github.com/awncorp/venus.git
-version: '3.20'
+version: '3.30'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.74'

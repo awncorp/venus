@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-3.20
+3.30
 
 =cut
 
@@ -1029,6 +1029,59 @@ I<Since C<2.55>>
   my $config = config {}, 'read_perl', '{"data"=>1}';
 
   # bless({...}, 'Venus::Config')
+
+=back
+
+=cut
+
+=head2 container
+
+  container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+The container function builds and returns a L<Venus::Container> object, or
+dispatches to the coderef or method provided.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item container example 1
+
+  package main;
+
+  use Venus 'container';
+
+  my $container = container {};
+
+  # bless({...}, 'Venus::Config')
+
+=back
+
+=over 4
+
+=item container example 2
+
+  package main;
+
+  use Venus 'container';
+
+  my $data = {
+    '$metadata' => {
+      tmplog => "/tmp/log"
+    },
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+        argument => {
+          '$metadata' => "tmplog"
+        }
+      }
+    }
+  };
+
+  my $log = container $data, 'resolve', 'log';
+
+  # bless({value => '/tmp/log'}, 'Venus::Path')
 
 =back
 
@@ -2564,6 +2617,44 @@ I<Since C<2.55>>
   my $random = random 'collect', 10, 'letter';
 
   # "ryKUPbJHYT"
+
+=back
+
+=cut
+
+=head2 range
+
+  range(Int | Str @args) (ArrayRef)
+
+The range function returns the result of a L<Venus::Array/range> operation.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item range example 1
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], ':4';
+
+  # [1..5]
+
+=back
+
+=over 4
+
+=item range example 2
+
+  package main;
+
+  use Venus 'range';
+
+  my $range = range [1..9], '-4:-1';
+
+  # [6..9]
 
 =back
 

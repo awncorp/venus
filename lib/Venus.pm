@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.20';
+our $VERSION = '3.30';
 
 # AUTHORITY
 
@@ -39,6 +39,7 @@ sub import {
     cli => 1,
     code => 1,
     config => 1,
+    container => 1,
     cop => 1,
     data => 1,
     date => 1,
@@ -68,8 +69,10 @@ sub import {
     perl => 1,
     process => 1,
     proto => 1,
+    puts => 1,
     raise => 1,
     random => 1,
+    range => 1,
     regexp => 1,
     replace => 1,
     render => 1,
@@ -313,6 +316,18 @@ sub config ($;$@) {
   }
 
   return Venus::Config->new($data)->$code(@args);
+}
+
+sub container ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Container;
+
+  if (!$code) {
+    return Venus::Container->new($data);
+  }
+
+  return Venus::Container->new($data)->$code(@args);
 }
 
 sub cop (@) {
@@ -641,6 +656,23 @@ sub proto ($;$@) {
   return Venus::Prototype->new($data)->$code(@args);
 }
 
+sub puts ($;@) {
+  my ($data, @args) = @_;
+
+  $data = cast($data);
+
+  my $result = [];
+
+  if ($data->isa('Venus::Hash')) {
+    $result = $data->puts(@args);
+  }
+  elsif ($data->isa('Venus::Array')) {
+    $result = $data->puts(@args);
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub raise ($;$) {
   my ($self, $data) = @_;
 
@@ -668,6 +700,12 @@ sub random (;$@) {
   }
 
   return $random->$code(@args);
+}
+
+sub range ($;@) {
+  my ($data, @args) = @_;
+
+  return array($data, 'range', @args);
 }
 
 sub regexp ($;$@) {

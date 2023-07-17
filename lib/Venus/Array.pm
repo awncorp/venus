@@ -408,6 +408,34 @@ sub push {
   return $data;
 }
 
+sub puts {
+  my ($self, @args) = @_;
+
+  my $result = [];
+
+  for (my $i = 0; $i < @args; $i += 2) {
+    my ($into, $path) = @args[$i, $i+1];
+
+    next if !defined $path;
+
+    my $value;
+    my @range;
+
+    ($path, @range) = @{$path} if ref $path eq 'ARRAY';
+
+    $value = $self->path($path);
+    $value = Venus::Array->new($value)->range(@range) if ref $value eq 'ARRAY';
+
+    if (ref $into eq 'SCALAR') {
+      $$into = $value;
+    }
+
+    CORE::push @{$result}, $value;
+  }
+
+  return wantarray ? (@{$result}) : $result;
+}
+
 sub random {
   my ($self) = @_;
 
@@ -427,14 +455,18 @@ sub range {
 
   my ($f, $l) = split /:/, $note, 2;
 
-  $l = $f if !defined $l;
-
   my $data = $self->get;
 
   $f = 0 if !defined $f || $f eq '';
+  $l = $f if !defined $l;
   $l = $#$data if !defined $l || $l eq '';
 
-  return $self->slice((0+$f)..(0+$l));
+  $f = 0+$f;
+  $l = 0+$l;
+
+  $l = $#$data + $l if $f > -1 && $l < 0;
+
+  return $self->slice($f..$l);
 }
 
 sub reverse {

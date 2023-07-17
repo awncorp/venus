@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    3.20
+    3.30
 
 SYNOPSIS
 
@@ -763,6 +763,49 @@ FUNCTIONS
         my $config = config {}, 'read_perl', '{"data"=>1}';
       
         # bless({...}, 'Venus::Config')
+
+ container
+
+      container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+
+    The container function builds and returns a Venus::Container object, or
+    dispatches to the coderef or method provided.
+
+    Since 3.20
+
+    container example 1
+
+        package main;
+      
+        use Venus 'container';
+      
+        my $container = container {};
+      
+        # bless({...}, 'Venus::Config')
+
+    container example 2
+
+        package main;
+      
+        use Venus 'container';
+      
+        my $data = {
+          '$metadata' => {
+            tmplog => "/tmp/log"
+          },
+          '$services' => {
+            log => {
+              package => "Venus/Path",
+              argument => {
+                '$metadata' => "tmplog"
+              }
+            }
+          }
+        };
+      
+        my $log = container $data, 'resolve', 'log';
+      
+        # bless({value => '/tmp/log'}, 'Venus::Path')
 
  cop
 
@@ -1919,6 +1962,35 @@ FUNCTIONS
         my $random = random 'collect', 10, 'letter';
       
         # "ryKUPbJHYT"
+
+ range
+
+      range(Int | Str @args) (ArrayRef)
+
+    The range function returns the result of a "range" in Venus::Array
+    operation.
+
+    Since 3.20
+
+    range example 1
+
+        package main;
+      
+        use Venus 'range';
+      
+        my $range = range [1..9], ':4';
+      
+        # [1..5]
+
+    range example 2
+
+        package main;
+      
+        use Venus 'range';
+      
+        my $range = range [1..9], '-4:-1';
+      
+        # [6..9]
 
  regexp
 

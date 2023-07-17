@@ -73,6 +73,7 @@ method: part
 method: path
 method: pop
 method: push
+method: puts
 method: random
 method: range
 method: reverse
@@ -3765,6 +3766,161 @@ $test->for('example', 1, 'push', sub {
   $result
 });
 
+=method puts
+
+The puts method select values from within the underlying data structure using
+L<Venus::Array/path>, optionally assigning the value to the preceeding scalar
+reference and returns all the values selected.
+
+=signature puts
+
+  puts(Any @args) (ArrayRef)
+
+=metadata puts
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 puts
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  my $puts = $array->puts(undef, '0.fruit', undef, '1.fruit');
+
+  # ["apple", "lemon"]
+
+=cut
+
+$test->for('example', 1, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "lemon"];
+
+  $result
+});
+
+=example-2 puts
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  $array->puts(\my $fruit1, '0.fruit', \my $fruit2, '1.fruit');
+
+  my $puts = [$fruit1, $fruit2];
+
+  # ["apple", "lemon"]
+
+=cut
+
+$test->for('example', 2, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "lemon"];
+
+  $result
+});
+
+=example-3 puts
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  $array->puts(
+    \my $fruit1, '0.fruit',
+    \my $fruit2, '1.fruit',
+    \my $fruit3, '2.fruit',
+  );
+
+  my $puts = [$fruit1, $fruit2, $fruit3];
+
+  # ["apple", "lemon", undef]
+
+=cut
+
+$test->for('example', 3, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "lemon", undef];
+
+  $result
+});
+
+=example-4 puts
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..20]);
+
+  $array->puts(
+    \my $a, '0',
+    \my $b, '1',
+    \my $m, ['', '2:-2'],
+    \my $x, '18',
+    \my $y, '19',
+  );
+
+  my $puts = [$a, $b, $m, $x, $y];
+
+  # [1, 2, [3..18], 19, 20]
+
+=cut
+
+$test->for('example', 4, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1, 2, [3..18], 19, 20];
+
+  $result
+});
+
 =method random
 
 The random method returns a random element from the array.
@@ -3993,6 +4149,206 @@ $test->for('example', 9, 'range', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is_deeply $result, [1..4];
+
+  $result
+});
+
+=example-10 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-1:8');
+
+  # [9,1..9]
+
+=cut
+
+$test->for('example', 10, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [9,1..9];
+
+  $result
+});
+
+=example-11 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:8');
+
+  # [1..9]
+
+=cut
+
+$test->for('example', 11, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..9];
+
+  $result
+});
+
+=example-12 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:-2');
+
+  # [1..7]
+
+=cut
+
+$test->for('example', 12, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [1..7];
+
+  $result
+});
+
+=example-13 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-2');
+
+  # [8]
+
+=cut
+
+$test->for('example', 13, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [8];
+
+  $result
+});
+
+=example-14 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:-20');
+
+  # []
+
+=cut
+
+$test->for('example', 14, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-15 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-20');
+
+  # []
+
+=cut
+
+$test->for('example', 15, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-16 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-6');
+
+  # []
+
+=cut
+
+$test->for('example', 16, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-17 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-8');
+
+  # []
+
+=cut
+
+$test->for('example', 17, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-18 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-9');
+
+  # []
+
+=cut
+
+$test->for('example', 18, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [];
+
+  $result
+});
+
+=example-19 range
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-5:-1');
+
+  # [5..9]
+
+=cut
+
+$test->for('example', 19, 'range', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, [5..9];
 
   $result
 });

@@ -2598,6 +2598,131 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 puts
+
+  puts(Any @args) (ArrayRef)
+
+The puts method select values from within the underlying data structure using
+L<Venus::Array/path>, optionally assigning the value to the preceeding scalar
+reference and returns all the values selected.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item puts example 1
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  my $puts = $array->puts(undef, '0.fruit', undef, '1.fruit');
+
+  # ["apple", "lemon"]
+
+=back
+
+=over 4
+
+=item puts example 2
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  $array->puts(\my $fruit1, '0.fruit', \my $fruit2, '1.fruit');
+
+  my $puts = [$fruit1, $fruit2];
+
+  # ["apple", "lemon"]
+
+=back
+
+=over 4
+
+=item puts example 3
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([
+    {
+      fruit => "apple",
+      size => "small",
+      color => "red",
+    },
+    {
+      fruit => "lemon",
+      size => "large",
+      color => "yellow",
+    },
+  ]);
+
+  $array->puts(
+    \my $fruit1, '0.fruit',
+    \my $fruit2, '1.fruit',
+    \my $fruit3, '2.fruit',
+  );
+
+  my $puts = [$fruit1, $fruit2, $fruit3];
+
+  # ["apple", "lemon", undef]
+
+=back
+
+=over 4
+
+=item puts example 4
+
+  package main;
+
+  use Venus::Array;
+
+  my $array = Venus::Array->new([1..20]);
+
+  $array->puts(
+    \my $a, '0',
+    \my $b, '1',
+    \my $m, ['', '2:-2'],
+    \my $x, '18',
+    \my $y, '19',
+  );
+
+  my $puts = [$a, $b, $m, $x, $y];
+
+  # [1, 2, [3..18], 19, 20]
+
+=back
+
+=cut
+
 =head2 random
 
   random() (Any)
@@ -2756,6 +2881,146 @@ I<Since C<2.55>>
   my $range = $array->range(0..3);
 
   # [1..4]
+
+=back
+
+=over 4
+
+=item range example 10
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-1:8');
+
+  # [9,1..9]
+
+=back
+
+=over 4
+
+=item range example 11
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:8');
+
+  # [1..9]
+
+=back
+
+=over 4
+
+=item range example 12
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:-2');
+
+  # [1..7]
+
+=back
+
+=over 4
+
+=item range example 13
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-2');
+
+  # [8]
+
+=back
+
+=over 4
+
+=item range example 14
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('0:-20');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 15
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-20');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 16
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-6');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 17
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-8');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 18
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-2:-9');
+
+  # []
+
+=back
+
+=over 4
+
+=item range example 19
+
+  # given: synopsis
+
+  package main;
+
+  my $range = $array->range('-5:-1');
+
+  # [5..9]
 
 =back
 
