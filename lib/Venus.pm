@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.30';
+our $VERSION = '3.40';
 
 # AUTHORITY
 
@@ -43,6 +43,7 @@ sub import {
     cop => 1,
     data => 1,
     date => 1,
+    docs => 1,
     error => 1,
     false => 1,
     fault => 1,
@@ -76,6 +77,7 @@ sub import {
     regexp => 1,
     replace => 1,
     render => 1,
+    resolve => 1,
     roll => 1,
     search => 1,
     space => 1,
@@ -84,6 +86,7 @@ sub import {
     syscall => 1,
     template => 1,
     test => 1,
+    text => 1,
     then => 1,
     throw => 1,
     true => 1,
@@ -366,6 +369,16 @@ sub date ($;$@) {
   return Venus::Date->new($data)->$code(@args);
 }
 
+sub docs {
+  my (@args) = @_;
+
+  my $file = (grep -f, (caller(0))[1], $0)[0];
+
+  my $data = data($file);
+
+  return $data->docs->string(@args > 1 ? @args : (undef, @args));
+}
+
 sub error (;$) {
   my ($data) = @_;
 
@@ -531,12 +544,65 @@ sub match ($;&) {
   return $match->result;
 }
 
-sub merge (@) {
-  my (@args) = @_;
+sub merge {
+  my ($lvalue, @rvalues) = @_;
 
-  require Venus::Hash;
+  if (!$lvalue) {
+    return {};
+  }
 
-  return Venus::Hash->new({})->merge(@args);
+  my $rvalue;
+
+  if (@rvalues > 1) {
+    my $result = $lvalue;
+    $result = merge($result, $_) for @rvalues;
+    return $result;
+  }
+  else {
+    $rvalue = $rvalues[0];
+  }
+
+  if (!$rvalue) {
+    return $lvalue;
+  }
+
+  if (ref $lvalue eq 'HASH') {
+    if (ref $rvalue eq 'HASH') {
+      for my $index (keys %{$rvalue}) {
+        my $lprop = $lvalue->{$index};
+        my $rprop = $rvalue->{$index};
+        $lvalue->{$index} = (
+            ((ref($lprop) eq 'HASH') && (ref($rprop) eq 'HASH'))
+            || ((ref($lprop) eq 'ARRAY') && (ref($rprop) eq 'ARRAY'))
+          )
+          ? merge($lprop, $rprop)
+          : $rprop;
+      }
+    }
+    else {
+      $lvalue = $rvalue;
+    }
+  }
+
+  if (ref $lvalue eq 'ARRAY') {
+    if (ref $rvalue eq 'ARRAY') {
+      for my $index (0..$#{$rvalue}) {
+        my $lprop = $lvalue->[$index];
+        my $rprop = $rvalue->[$index];
+        $lvalue->[$index] = (
+            ((ref($lprop) eq 'HASH') && (ref($rprop) eq 'HASH'))
+            || ((ref($lprop) eq 'ARRAY') && (ref($rprop) eq 'ARRAY'))
+          )
+          ? merge($lprop, $rprop)
+          : $rprop;
+      }
+    }
+    else {
+      $lvalue = $rvalue;
+    }
+  }
+
+  return $lvalue;
 }
 
 sub meta ($;$@) {
@@ -746,6 +812,12 @@ sub replace ($;$@) {
   return Venus::Replace->new(@data)->$code(@args);
 }
 
+sub resolve ($;@) {
+  my ($data, @args) = @_;
+
+  return container($data, 'resolve', @args);
+}
+
 sub roll (@) {
 
   return (@_[1,0,2..$#_]);
@@ -863,6 +935,16 @@ sub test ($;$@) {
   }
 
   return Venus::Test->new($data)->$code(@args);
+}
+
+sub text {
+  my (@args) = @_;
+
+  my $file = (grep -f, (caller(0))[1], $0)[0];
+
+  my $data = data($file);
+
+  return $data->text->string(@args > 1 ? @args : (undef, @args));
 }
 
 sub then (@) {

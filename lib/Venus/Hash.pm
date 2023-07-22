@@ -183,7 +183,7 @@ sub find {
 sub get {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
 
   my ($index) = @args;
 
@@ -264,42 +264,13 @@ sub map {
 }
 
 sub merge {
-  my ($self, $lvalue, @rvalue) = @_;
+  my ($self, @rvalues) = @_;
 
-  if (!$lvalue) {
-    return $self->get;
-  }
+  require Venus;
 
-  if (!@rvalue) {
-    @rvalue = ($lvalue);
-    $lvalue = $self->get;
-  }
+  my $lvalue = {%{$self->get}};
 
-  if (@rvalue > 1) {
-    @rvalue = ($lvalue, @rvalue);
-    $lvalue = $self->get;
-  }
-
-  my $result = {%{$lvalue}};
-
-  for my $rvalue (@rvalue) {
-    for my $index (CORE::keys(%$rvalue)) {
-      my $lprop = $$lvalue{$index};
-      my $rprop = $$rvalue{$index};
-
-      $result->{$index}
-        = ((ref($rprop) eq 'HASH') and (ref($lprop) eq 'HASH'))
-        ? merge($self, $lprop, $rprop)
-        : $rprop;
-    }
-  }
-
-  if (!$self->{merge}++) {
-    $result = merge($self, $self->get, $result);
-    CORE::delete($self->{merge});
-  }
-
-  return $result;
+  return Venus::merge($lvalue, @rvalues);
 }
 
 sub none {
@@ -428,9 +399,13 @@ sub reverse {
 sub set {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
+
+  return $self->value(@args) if @args == 1 && ref $args[0] eq 'HASH';
 
   my ($index, $value) = @args;
+
+  return if not defined $index;
 
   return $self->value->{$index} = $value;
 }

@@ -50,6 +50,7 @@ method: ge
 method: gele
 method: gt
 method: gtlt
+method: format
 method: hex
 method: index
 method: kebabcase
@@ -1866,6 +1867,67 @@ $test->for('example', 9, 'gtlt', sub {
   is $result, 0;
 
   !$result
+});
+
+=method format
+
+The format method performs a L<perlfunc/sprintf> operation using the underlying
+string and arguments provided and returns the result.
+
+=signature format
+
+  format(Any @args) (Str)
+
+=metadata format
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 format
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello %s');
+
+  my $format = $string->format('world');
+
+  # "hello world"
+
+=cut
+
+$test->for('example', 1, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'hello world';
+
+  $result
+});
+
+=example-2 format
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('id number %08d');
+
+  my $format = $string->format(10);
+
+  # "id number 00000010"
+
+=cut
+
+$test->for('example', 2, 'format', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is $result, 'id number 00000010';
+
+  $result
 });
 
 =method hex

@@ -2099,6 +2099,42 @@ I<Since C<0.01>>
 
 =cut
 
+=head2 merge
+
+  merge(ArrayRef @data) (ArrayRef)
+
+The merge method returns an array reference where the elements in the array and
+the elements in the argument(s) are merged. This operation performs a deep
+merge and clones the datasets to ensure no side-effects.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item merge example 1
+
+  # given: synopsis;
+
+  my $merge = $array->merge([10..15]);
+
+  # [10..15,7,8,9]
+
+=back
+
+=over 4
+
+=item merge example 2
+
+  # given: synopsis;
+
+  my $merge = $array->merge([1,2,{1..4},4..9]);
+
+  # [1,2,{1..4},4..9]
+
+=back
+
+=cut
+
 =head2 ne
 
   ne(Any $arg) (Bool)

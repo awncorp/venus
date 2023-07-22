@@ -213,11 +213,17 @@ sub reset {
 }
 
 sub set {
-  my ($self, $name, $data) = @_;
+  my ($self, @args) = @_;
 
-  return if !defined $name;
+  return $self->{args} if !@args;
 
-  return $self->{args}->[$name] = $data;
+  return $self->{args} = $args[0] if @args == 1 && ref $args[0] eq 'HASH';
+
+  my ($index, $value) = @args;
+
+  return if not defined $index;
+
+  return $self->{args}->[$index] = $value;
 }
 
 sub signature {

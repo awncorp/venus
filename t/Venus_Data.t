@@ -205,7 +205,7 @@ number of blocks found.
 $test->for('example', 1, 'count', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
-  ok $result == 6;
+  ok $result == 7;
 
   $result
 });
@@ -327,8 +327,8 @@ $test->for('example', 1, 'find', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [
-    { data => ["Example #1"], index => 4, list => undef, name => "name" },
-    { data => ["Example #2"], index => 5, list => undef, name => "name" },
+    { data => ["Example #1"], index => 5, list => undef, name => "name" },
+    { data => ["Example #2"], index => 6, list => undef, name => "name" },
   ];
 
   $result
@@ -434,8 +434,8 @@ $test->for('example', 1, 'search', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, [
-    { data => ["Example #1"], index => 4, list => undef, name => "name" },
-    { data => ["Example #2"], index => 5, list => undef, name => "name" },
+    { data => ["Example #1"], index => 5, list => undef, name => "name" },
+    { data => ["Example #2"], index => 6, list => undef, name => "name" },
   ];
 
   $result

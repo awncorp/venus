@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-3.30
+3.40
 
 =cut
 
@@ -1224,6 +1224,64 @@ I<Since C<2.40>>
 
 =cut
 
+=head2 docs
+
+  docs(Any @args) (Any)
+
+The docs function builds a L<Venus::Data> object using L<Venus::Data/docs> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item docs example 1
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 ABSTRACT
+  #
+  # Example Abstract
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'ABSTRACT';
+
+  # "Example Abstract"
+
+=back
+
+=over 4
+
+=item docs example 2
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'NAME';
+
+  # "Example #1\nExample #2"
+
+=back
+
+=cut
+
 =head2 error
 
   error(Maybe[HashRef] $args) (Error)
@@ -2072,10 +2130,10 @@ I<Since C<2.50>>
 
 =head2 merge
 
-  merge(HashRef @args) (HashRef)
+  merge(Any @args) (Any)
 
-The merge function returns a hash reference which is a merger of all of the
-hashref arguments provided.
+The merge function returns a value which is a merger of all of the arguments
+provided.
 
 I<Since C<2.32>>
 
@@ -2527,6 +2585,46 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 puts
+
+  puts(Any @args) (ArrayRef)
+
+The puts function select values from within the underlying data structure using
+L<Venus::Array/path> or L<Venus::Hash/path>, optionally assigning the value to
+the preceeding scalar reference and returns all the values selected.
+
+I<Since C<3.20>>
+
+=over 4
+
+=item puts example 1
+
+  package main;
+
+  use Venus 'puts';
+
+  my $data = {
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  };
+
+  puts $data, (
+    \my $fruit, 'fruit',
+    \my $expiry, 'meta.expiry'
+  );
+
+  my $puts = [$fruit, $expiry];
+
+  # ["apple", "5d"]
+
+=back
+
+=cut
+
 =head2 raise
 
   raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -2764,6 +2862,52 @@ I<Since C<2.55>>
   my $replace = replace ['hello world', 'world', 'universe'], 'get';
 
   # "hello universe"
+
+=back
+
+=cut
+
+=head2 resolve
+
+  resolve(HashRef $value, Any @args) (Any)
+
+The resolve function builds and returns an object via L<Venus::Container/resolve>.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item resolve example 1
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $resolve = resolve {};
+
+  # undef
+
+=back
+
+=over 4
+
+=item resolve example 2
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $data = {
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+      }
+    }
+  };
+
+  my $log = resolve $data, 'log';
+
+  # bless({...}, 'Venus::Path')
 
 =back
 
@@ -3094,6 +3238,114 @@ I<Since C<2.55>>
   my $test = test 't/Venus.t', 'for', 'synopsis';
 
   # bless({...}, 'Venus::Test')
+
+=back
+
+=cut
+
+=head2 text
+
+  text(Any @args) (Any)
+
+The text function builds a L<Venus::Data> object using L<Venus::Data/text> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item text example 1
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'name';
+
+  # "Example Name"
+
+=back
+
+=over 4
+
+=item text example 2
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'titles', '#1';
+
+  # "Example Title #1"
+
+=back
+
+=over 4
+
+=item text example 3
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text undef, 'name';
+
+  # "Example Name"
 
 =back
 

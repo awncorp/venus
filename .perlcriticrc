@@ -1,5 +1,5 @@
 color=1
-severity=5
+severity=1
 theme=risky + (pbp * security) - cosmetic
 verbose=4
 exclude=ClassHierarchies NamingConventions RequireTestLabels

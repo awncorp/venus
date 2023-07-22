@@ -14,9 +14,9 @@ with 'Venus::Role::Stashable';
 
 use overload (
   '""' => 'explain',
-  'eq' => sub{$_[0]->message eq "$_[1]"},
-  'ne' => sub{$_[0]->message ne "$_[1]"},
-  'qr' => sub{qr/@{[quotemeta($_[0]->message)]}/},
+  'eq' => sub{$_[0]->render eq "$_[1]"},
+  'ne' => sub{$_[0]->render ne "$_[1]"},
+  'qr' => sub{qr/@{[quotemeta($_[0]->render)]}/},
   '~~' => 'explain',
   fallback => 1,
 );
@@ -131,7 +131,7 @@ sub explain {
   $self->trace(1, 1) if !@{$self->frames};
 
   my $frames = $self->{'$frames'};
-  my $message = $self->message;
+  my $message = $self->render;
 
   my @stacktrace = "$message" =~ s/^\s+|\s+$//gr;
 
@@ -250,6 +250,20 @@ sub frame {
     bitmask => $frames->[$index][9],
     hinthash => $frames->[$index][10],
   };
+}
+
+sub render {
+  my ($self) = @_;
+
+  my $message = $self->message;
+  my $stashed = $self->stash;
+
+  while (my($key, $value) = each(%$stashed)) {
+    my $token = quotemeta $key;
+    $message =~ s/\{\{\s*$token\s*\}\}/$value/g;
+  }
+
+  return $message;
 }
 
 sub throw {

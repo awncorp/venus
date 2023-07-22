@@ -1336,16 +1336,16 @@ the value.
 
   my $set = $unpack->set;
 
-  # undef
+  # ["hello", 123, 1.23]
 
 =cut
 
 $test->for('example', 1, 'set', sub {
   my ($tryable) = @_;
-  ok !(my $result = $tryable->result);
-  ok !defined $result;
+  my $result = $tryable->result;
+  is_deeply $result, ["hello", 123, 1.23];
 
-  !$result
+  $result
 });
 
 =example-2 set

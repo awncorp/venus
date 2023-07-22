@@ -46,6 +46,7 @@ method: frame
 method: frames
 method: is
 method: of
+method: render
 method: throw
 method: trace
 
@@ -1069,6 +1070,48 @@ $test->for('example', 5, 'of', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
+
+  $result
+});
+
+=method render
+
+The render method replaces tokens in the message with values from the stash and
+returns the formatted string. The token style and formatting operation is
+equivalent to the L<Venus::String/render> operation.
+
+=signature render
+
+  render() (Str)
+
+=metadata render
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 render
+
+  # given: synopsis
+
+  package main;
+
+  $error->message('Signal received: {{signal}}');
+
+  $error->stash(signal => 'SIGKILL');
+
+  my $render = $error->render;
+
+  # "Signal received: SIGKILL"
+
+=cut
+
+$test->for('example', 1, 'render', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is $result, "Signal received: SIGKILL";
 
   $result
 });

@@ -875,7 +875,7 @@ I<Since C<2.01>>
 
   my $set = $unpack->set;
 
-  # undef
+  # ["hello", 123, 1.23]
 
 =back
 

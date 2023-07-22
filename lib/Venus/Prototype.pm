@@ -123,7 +123,7 @@ sub extend {
 sub get {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
 
   my ($index) = @args;
 
@@ -133,9 +133,13 @@ sub get {
 sub set {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
+
+  return $self->value(@args) if @args == 1 && ref $args[0] eq 'HASH';
 
   my ($index, $value) = @args;
+
+  return if not defined $index;
 
   return $self->value->{$index} = $value;
 }

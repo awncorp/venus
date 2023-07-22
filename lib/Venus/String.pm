@@ -111,6 +111,14 @@ sub default {
   return '';
 }
 
+sub format {
+  my ($self, @args) = @_;
+
+  my $data = $self->get;
+
+  return CORE::sprintf($data, @args);
+}
+
 sub hex {
   my ($self) = @_;
 
@@ -232,7 +240,6 @@ sub render {
 
   while (my($key, $value) = each(%$tokens)) {
     my $token = quotemeta $key;
-
     $data =~ s/\{\{\s*$token\s*\}\}/$value/g;
   }
 

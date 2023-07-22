@@ -179,7 +179,7 @@ sub first {
 sub get {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
 
   my ($index) = @args;
 
@@ -293,6 +293,16 @@ sub map {
   }
 
   return wantarray ? (@$result) : $result;
+}
+
+sub merge {
+  my ($self, @rvalues) = @_;
+
+  require Venus;
+
+  my $lvalue = [@{$self->get}];
+
+  return Venus::merge($lvalue, @rvalues);
 }
 
 sub none {
@@ -498,9 +508,13 @@ sub rsort {
 sub set {
   my ($self, @args) = @_;
 
-  return $self->value if !int@args;
+  return $self->value if !@args;
+
+  return $self->value(@args) if @args == 1 && ref $args[0] eq 'ARRAY';
 
   my ($index, $value) = @args;
+
+  return if not defined $index;
 
   return $self->value->[$index] = $value;
 }

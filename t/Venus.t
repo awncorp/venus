@@ -77,6 +77,7 @@ function: container
 function: cop
 function: data
 function: date
+function: docs
 function: error
 function: false
 function: fault
@@ -103,12 +104,14 @@ function: path
 function: perl
 function: process
 function: proto
+function: puts
 function: raise
 function: random
 function: range
 function: regexp
 function: render
 function: replace
+function: resolve
 function: roll
 function: search
 function: space
@@ -117,6 +120,7 @@ function: string
 function: syscall
 function: template
 function: test
+function: text
 function: then
 function: throw
 function: true
@@ -1831,6 +1835,84 @@ $test->for('example', 3, 'date', sub {
   $result
 });
 
+=function docs
+
+The docs function builds a L<Venus::Data> object using L<Venus::Data/docs> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+=signature docs
+
+  docs(Any @args) (Any)
+
+=metadata docs
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 docs
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 ABSTRACT
+  #
+  # Example Abstract
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'ABSTRACT';
+
+  # "Example Abstract"
+
+=cut
+
+$test->for('example', 1, 'docs', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Abstract";
+
+  $result
+});
+
+=example-2 docs
+
+  package main;
+
+  use Venus 'docs';
+
+  # =head1 NAME
+  #
+  # Example #1
+  #
+  # =cut
+  #
+  # =head1 NAME
+  #
+  # Example #2
+  #
+  # =cut
+
+  my $docs = docs 'head1', 'NAME';
+
+  # "Example #1\nExample #2"
+
+=cut
+
+$test->for('example', 2, 'docs', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example #1\nExample #2";
+
+  $result
+});
+
 =function error
 
 The error function throws a L<Venus::Error> exception object using the
@@ -3059,12 +3141,12 @@ $test->for('example', 6, 'match', sub {
 
 =function merge
 
-The merge function returns a hash reference which is a merger of all of the
-hashref arguments provided.
+The merge function returns a value which is a merger of all of the arguments
+provided.
 
 =signature merge
 
-  merge(HashRef @args) (HashRef)
+  merge(Any @args) (Any)
 
 =metadata merge
 
@@ -3729,6 +3811,58 @@ $test->for('example', 2, 'proto', sub {
   $result
 });
 
+=function puts
+
+The puts function select values from within the underlying data structure using
+L<Venus::Array/path> or L<Venus::Hash/path>, optionally assigning the value to
+the preceeding scalar reference and returns all the values selected.
+
+=signature puts
+
+  puts(Any @args) (ArrayRef)
+
+=metadata puts
+
+{
+  since => '3.20',
+}
+
+=cut
+
+=example-1 puts
+
+  package main;
+
+  use Venus 'puts';
+
+  my $data = {
+    size => "small",
+    fruit => "apple",
+    meta => {
+      expiry => '5d',
+    },
+    color => "red",
+  };
+
+  puts $data, (
+    \my $fruit, 'fruit',
+    \my $expiry, 'meta.expiry'
+  );
+
+  my $puts = [$fruit, $expiry];
+
+  # ["apple", "5d"]
+
+=cut
+
+$test->for('example', 1, 'puts', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  is_deeply $result, ["apple", "5d"];
+
+  $result
+});
+
 =function raise
 
 The raise function generates and throws a named exception object derived from
@@ -4092,6 +4226,70 @@ $test->for('example', 2, 'replace', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is $result, "hello universe";
+
+  $result
+});
+
+=function resolve
+
+The resolve function builds and returns an object via L<Venus::Container/resolve>.
+
+=signature resolve
+
+  resolve(HashRef $value, Any @args) (Any)
+
+=metadata resolve
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 resolve
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $resolve = resolve {};
+
+  # undef
+
+=cut
+
+$test->for('example', 1, 'resolve', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok !defined $result;
+
+  !$result
+});
+
+=example-2 resolve
+
+  package main;
+
+  use Venus 'resolve';
+
+  my $data = {
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+      }
+    }
+  };
+
+  my $log = resolve $data, 'log';
+
+  # bless({...}, 'Venus::Path')
+
+=cut
+
+$test->for('example', 2, 'resolve', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Path');
 
   $result
 });
@@ -4591,6 +4789,141 @@ $test->for('example', 2, 'test', sub {
   my $result = $tryable->result;
   isa_ok $result, "Venus::Test";
   is $result->file, 't/Venus.t';
+
+  $result
+});
+
+=function text
+
+The text function builds a L<Venus::Data> object using L<Venus::Data/text> for
+the current file, i.e. L<perlfunc/__FILE__> or script, i.e. C<$0>, and returns
+the result of a L<Venus::Data/string> operation using the arguments provided.
+
+=signature text
+
+  text(Any @args) (Any)
+
+=metadata text
+
+{
+  since => '3.30',
+}
+
+=cut
+
+=example-1 text
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'name';
+
+  # "Example Name"
+
+=cut
+
+$test->for('example', 1, 'text', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Name";
+
+  $result
+});
+
+=example-2 text
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text 'titles', '#1';
+
+  # "Example Title #1"
+
+=cut
+
+$test->for('example', 2, 'text', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Title #1";
+
+  $result
+});
+
+=example-3 text
+
+  package main;
+
+  use Venus 'text';
+
+  # @@ name
+  #
+  # Example Name
+  #
+  # @@ end
+  #
+  # @@ titles #1
+  #
+  # Example Title #1
+  #
+  # @@ end
+  #
+  # @@ titles #2
+  #
+  # Example Title #2
+  #
+  # @@ end
+
+  my $text = text undef, 'name';
+
+  # "Example Name"
+
+=cut
+
+$test->for('example', 3, 'text', sub {
+  my ($tryable) = @_;
+  local $0 = 't/data/sections';
+  my $result = $tryable->result;
+  is $result, "Example Name";
 
   $result
 });

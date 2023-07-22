@@ -1145,28 +1145,12 @@ I<Since C<2.91>>
   #     info => '$PERL -V',
   #     lint => 'perlcritic',
   #     okay => '$PERL -c',
-  #     repl => '$PERL -dE0',
+  #     repl => '$REPL',
   #     reup => 'cpanm -qn Venus',
   #     says => 'eval "map log(eval), @ARGV"',
   #     shim => '$PERL -MVenus=true,false,log',
   #     test => '$PROVE',
   #     tidy => 'perltidy',
-  #   },
-  #   flow => {
-  #     deps => [
-  #       'cpan Perl::Critic',
-  #       'cpan Perl::Tidy',
-  #       'cpan Pod::Perldoc',
-  #     ],
-  #     prep => [
-  #       'deps',
-  #       'reqs',
-  #     ],
-  #     reqs => [
-  #       'which perlcritic',
-  #       'which perldoc',
-  #       'which perltidy',
-  #     ],
   #   },
   #   libs => [
   #     '-Ilib',
@@ -1184,6 +1168,7 @@ I<Since C<2.91>>
   #   vars => {
   #     PERL => 'perl',
   #     PROVE => 'prove'
+  #     REPL => '$PERL -dE0'
   #   },
   # }
 

@@ -64,6 +64,7 @@ method: length
 method: list
 method: lt
 method: map
+method: merge
 method: ne
 method: none
 method: one
@@ -3065,6 +3066,58 @@ $test->for('example', 2, 'map', sub {
     [7, 16],
     [8, 18],
   ];
+
+  $result
+});
+
+=method merge
+
+The merge method returns an array reference where the elements in the array and
+the elements in the argument(s) are merged. This operation performs a deep
+merge and clones the datasets to ensure no side-effects.
+
+=signature merge
+
+  merge(ArrayRef @data) (ArrayRef)
+
+=metadata merge
+
+{
+  since => '3.30',
+}
+
+=example-1 merge
+
+  # given: synopsis;
+
+  my $merge = $array->merge([10..15]);
+
+  # [10..15,7,8,9]
+
+=cut
+
+$test->for('example', 1, 'merge', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [10..15,7,8,9];
+
+  $result
+});
+
+=example-2 merge
+
+  # given: synopsis;
+
+  my $merge = $array->merge([1,2,{1..4},4..9]);
+
+  # [1,2,{1..4},4..9]
+
+=cut
+
+$test->for('example', 2, 'merge', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  is_deeply $result, [1,2,{1..4},4..9];
 
   $result
 });

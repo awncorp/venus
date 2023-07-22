@@ -629,6 +629,49 @@ I<Since C<0.08>>
 
 =cut
 
+=head2 format
+
+  format(Any @args) (Str)
+
+The format method performs a L<perlfunc/sprintf> operation using the underlying
+string and arguments provided and returns the result.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item format example 1
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('hello %s');
+
+  my $format = $string->format('world');
+
+  # "hello world"
+
+=back
+
+=over 4
+
+=item format example 2
+
+  package main;
+
+  use Venus::String;
+
+  my $string = Venus::String->new('id number %08d');
+
+  my $format = $string->format(10);
+
+  # "id number 00000010"
+
+=back
+
+=cut
+
 =head2 ge
 
   ge(Any $arg) (Bool)

@@ -278,6 +278,8 @@ sub _exec {
 
   _set_libs($conf);
 
+  _set_vars($conf);
+
   my $result;
 
   for my $step (_flow($conf, @data)) {
@@ -456,14 +458,16 @@ sub _find_in_task {
 sub _find_in_vars {
   my ($seen, $conf, $item) = @_;
 
+  my ($name) = $item =~ /\$?(.*)/;
+
   return $conf->{vars}
     ? (
-    $conf->{vars}{$item}
+    $conf->{vars}{$name}
     ? (do {
-      my $value = $conf->{vars}{$item};
-      ($value eq $item)
+      my $value = $conf->{vars}{$name};
+      ($value eq $name)
         ? ($value)
-        : (_find_in_seen($seen, $conf, 'vars', $item, $value));
+        : (_find_in_seen($seen, $conf, 'vars', $name, $value));
     })
     : ($item)
     )
@@ -643,11 +647,15 @@ sub _set_vars {
   my ($conf) = @_;
 
   if (my $data = $conf->{data}) {
-    $ENV{$_} = join(' ', grep defined, $data->{$_}) for keys %{$data};
+    for my $key (sort keys %{$data}) {
+      $ENV{$key} = join(' ', grep defined, $data->{$key});
+    }
   }
 
   if (my $vars = $conf->{vars}) {
-    $ENV{$_} = join(' ', grep defined, @{_prep($conf, $_)}) for keys %{$vars};
+    for my $key (sort keys %{$vars}) {
+      $ENV{$key} = join(' ', grep defined, @{_prep($conf, $vars->{$key})});
+    }
   }
 
   if (my $asks = $conf->{asks}) {
@@ -660,7 +668,7 @@ sub _set_vars {
 }
 
 sub _vars {
-  (($_[0] // '') =~ s{\$([A-Z]+)}{$ENV{$1}//"\$".$1}egr)
+  (($_[0] // '') =~ s{\$([A-Z_]+)}{$ENV{$1}//"\$".$1}egr)
 }
 
 # AUTORUN

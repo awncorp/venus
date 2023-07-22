@@ -834,6 +834,36 @@ I<Since C<1.11>>
 
 =cut
 
+=head2 render
+
+  render() (Str)
+
+The render method replaces tokens in the message with values from the stash and
+returns the formatted string. The token style and formatting operation is
+equivalent to the L<Venus::String/render> operation.
+
+I<Since C<3.30>>
+
+=over 4
+
+=item render example 1
+
+  # given: synopsis
+
+  package main;
+
+  $error->message('Signal received: {{signal}}');
+
+  $error->stash(signal => 'SIGKILL');
+
+  my $render = $error->render;
+
+  # "Signal received: SIGKILL"
+
+=back
+
+=cut
+
 =head2 throw
 
   throw(Any @data) (Error)

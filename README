@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    3.30
+    3.40
 
 SYNOPSIS
 
@@ -910,6 +910,55 @@ FUNCTIONS
       
         # bless({...}, 'Venus::Date')
 
+ docs
+
+      docs(Any @args) (Any)
+
+    The docs function builds a Venus::Data object using "docs" in
+    Venus::Data for the current file, i.e. "__FILE__" in perlfunc or
+    script, i.e. $0, and returns the result of a "string" in Venus::Data
+    operation using the arguments provided.
+
+    Since 3.30
+
+    docs example 1
+
+        package main;
+      
+        use Venus 'docs';
+      
+        # =head1 ABSTRACT
+        #
+        # Example Abstract
+        #
+        # =cut
+      
+        my $docs = docs 'head1', 'ABSTRACT';
+      
+        # "Example Abstract"
+
+    docs example 2
+
+        package main;
+      
+        use Venus 'docs';
+      
+        # =head1 NAME
+        #
+        # Example #1
+        #
+        # =cut
+        #
+        # =head1 NAME
+        #
+        # Example #2
+        #
+        # =cut
+      
+        my $docs = docs 'head1', 'NAME';
+      
+        # "Example #1\nExample #2"
+
  error
 
       error(Maybe[HashRef] $args) (Error)
@@ -1552,10 +1601,10 @@ FUNCTIONS
 
  merge
 
-      merge(HashRef @args) (HashRef)
+      merge(Any @args) (Any)
 
-    The merge function returns a hash reference which is a merger of all of
-    the hashref arguments provided.
+    The merge function returns a value which is a merger of all of the
+    arguments provided.
 
     Since 2.32
 
@@ -1892,6 +1941,41 @@ FUNCTIONS
       
         # bless({...}, 'Venus::Prototype')
 
+ puts
+
+      puts(Any @args) (ArrayRef)
+
+    The puts function select values from within the underlying data
+    structure using "path" in Venus::Array or "path" in Venus::Hash,
+    optionally assigning the value to the preceeding scalar reference and
+    returns all the values selected.
+
+    Since 3.20
+
+    puts example 1
+
+        package main;
+      
+        use Venus 'puts';
+      
+        my $data = {
+          size => "small",
+          fruit => "apple",
+          meta => {
+            expiry => '5d',
+          },
+          color => "red",
+        };
+      
+        puts $data, (
+          \my $fruit, 'fruit',
+          \my $expiry, 'meta.expiry'
+        );
+      
+        my $puts = [$fruit, $expiry];
+      
+        # ["apple", "5d"]
+
  raise
 
       raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
@@ -2074,6 +2158,43 @@ FUNCTIONS
         my $replace = replace ['hello world', 'world', 'universe'], 'get';
       
         # "hello universe"
+
+ resolve
+
+      resolve(HashRef $value, Any @args) (Any)
+
+    The resolve function builds and returns an object via "resolve" in
+    Venus::Container.
+
+    Since 3.30
+
+    resolve example 1
+
+        package main;
+      
+        use Venus 'resolve';
+      
+        my $resolve = resolve {};
+      
+        # undef
+
+    resolve example 2
+
+        package main;
+      
+        use Venus 'resolve';
+      
+        my $data = {
+          '$services' => {
+            log => {
+              package => "Venus/Path",
+            }
+          }
+        };
+      
+        my $log = resolve $data, 'log';
+      
+        # bless({...}, 'Venus::Path')
 
  roll
 
@@ -2322,6 +2443,101 @@ FUNCTIONS
         my $test = test 't/Venus.t', 'for', 'synopsis';
       
         # bless({...}, 'Venus::Test')
+
+ text
+
+      text(Any @args) (Any)
+
+    The text function builds a Venus::Data object using "text" in
+    Venus::Data for the current file, i.e. "__FILE__" in perlfunc or
+    script, i.e. $0, and returns the result of a "string" in Venus::Data
+    operation using the arguments provided.
+
+    Since 3.30
+
+    text example 1
+
+        package main;
+      
+        use Venus 'text';
+      
+        # @@ name
+        #
+        # Example Name
+        #
+        # @@ end
+        #
+        # @@ titles #1
+        #
+        # Example Title #1
+        #
+        # @@ end
+        #
+        # @@ titles #2
+        #
+        # Example Title #2
+        #
+        # @@ end
+      
+        my $text = text 'name';
+      
+        # "Example Name"
+
+    text example 2
+
+        package main;
+      
+        use Venus 'text';
+      
+        # @@ name
+        #
+        # Example Name
+        #
+        # @@ end
+        #
+        # @@ titles #1
+        #
+        # Example Title #1
+        #
+        # @@ end
+        #
+        # @@ titles #2
+        #
+        # Example Title #2
+        #
+        # @@ end
+      
+        my $text = text 'titles', '#1';
+      
+        # "Example Title #1"
+
+    text example 3
+
+        package main;
+      
+        use Venus 'text';
+      
+        # @@ name
+        #
+        # Example Name
+        #
+        # @@ end
+        #
+        # @@ titles #1
+        #
+        # Example Title #1
+        #
+        # @@ end
+        #
+        # @@ titles #2
+        #
+        # Example Title #2
+        #
+        # @@ end
+      
+        my $text = text undef, 'name';
+      
+        # "Example Name"
 
  then
 

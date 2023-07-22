@@ -2806,9 +2806,7 @@ $test->for('example', 2, 'map', sub {
 
 The merge method returns a hash reference where the elements in the hash and
 the elements in the argument(s) are merged. This operation performs a deep
-merge and clones the datasets to ensure no side-effects. The merge behavior
-merges hash references only, all other data types are assigned with precendence
-given to the value being merged.
+merge and clones the datasets to ensure no side-effects.
 
 =signature merge
 

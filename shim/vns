@@ -10,7 +10,7 @@ use warnings;
 use Cwd ();
 use File::Spec ();
 
-our $LLIB;
+our $REPO;
 our @PATH;
 
 BEGIN {
@@ -20,10 +20,10 @@ BEGIN {
 
 BEGIN {
   @PATH = File::Spec->splitdir(Cwd::realpath($0));
-  $LLIB = File::Spec->catfile(@PATH[0..$#PATH-2], 'lib');
+  $REPO = File::Spec->catfile(splice(@PATH, 0, -2), 'lib');
 }
 
-use lib "$LLIB";
+use lib "$REPO";
 
 use Venus::Run;
 
