@@ -294,6 +294,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Core/Class.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Core/Class.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

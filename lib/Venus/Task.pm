@@ -246,7 +246,7 @@ sub run {
 
   my $CAN_RUN = not(caller(1)) || scalar(caller(1)) eq 'main';
 
-  $self->class->new(@args)->maybe('execute') if $ENV{VENUS_TASK_RUN} && $CAN_RUN;
+  $self->class->new(@args)->maybe('execute') if $ENV{VENUS_TASK_AUTO} && $CAN_RUN;
 
   return $self;
 }
@@ -266,7 +266,11 @@ sub shutdown {
 sub system {
   my ($self, @args) = @_;
 
-  (_system(@args) == 0) or $self->throw('error_on_system_call', \@args, $?)->error;
+  (_system(@args) == 0) or $self->error({
+    throw => 'error_on_system_call',
+    args => [@args],
+    error => $?
+  });
 
   return $self;
 }
@@ -288,17 +292,24 @@ sub usage {
 # ERRORS
 
 sub error_on_system_call {
-  my ($self, $args, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t make system call "{{command}}": {{error}}';
 
-  return {
-    name => 'on.system.call',
-    message => "Can't make system call \"@$args\": $err",
-    stash => {
-      args => $args,
-    }
+  my $stash = {
+    args => $data->{args},
+    command => (join ' ', @{$data->{args}}),
+    error => $data->{error},
   };
+
+  my $result = {
+    name => 'on.system.call',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;

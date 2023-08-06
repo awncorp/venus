@@ -856,15 +856,18 @@ B<example 1>
 
   # given: synopsis;
 
-  @args = ("Example", "execute");
+  my $input = {
+    invocant => 'Example',
+    callback => 'execute',
+  };
 
-  my $error = $try->throw('error_on_callback', @args)->catch('error');
+  my $error = $try->throw('error_on_callback', $input)->catch('error');
 
   # my $name = $error->name;
 
   # "on_callback"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't locate object method \"execute\" on package \"Example\""
 

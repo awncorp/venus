@@ -1113,7 +1113,7 @@ e.g. C<year>, C<quarter>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
 
 $test->for('example', 1, 'restart', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1137,7 +1137,7 @@ $test->for('example', 1, 'restart', sub {
 
 $test->for('example', 2, 'restart', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1161,7 +1161,7 @@ $test->for('example', 2, 'restart', sub {
 
 $test->for('example', 3, 'restart', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1199,7 +1199,7 @@ The restart_day method truncates the date and time to the C<day>.
 
 $test->for('example', 1, 'restart_day', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_day requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_day requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1237,7 +1237,7 @@ The restart_hour method truncates the date and time to the C<hour>.
 
 $test->for('example', 1, 'restart_hour', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_hour requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_hour requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1275,7 +1275,7 @@ The restart_minute method truncates the date and time to the C<minute>.
 
 $test->for('example', 1, 'restart_minute', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_minute requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_minute requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1313,7 +1313,7 @@ The restart_month method truncates the date and time to the C<month>.
 
 $test->for('example', 1, 'restart_month', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_month requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_month requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1351,7 +1351,7 @@ The restart_quarter method truncates the date and time to the C<quarter>.
 
 $test->for('example', 1, 'restart_quarter', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_quarter requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_quarter requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1389,7 +1389,7 @@ The restart_second method truncates the date and time to the C<second>.
 
 $test->for('example', 1, 'restart_second', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_second requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_second requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -1427,7 +1427,7 @@ The restart_year method truncates the date and time to the C<year>.
 
 $test->for('example', 1, 'restart_year', sub {
   if ($] < 5.28000) {
-    diag 'Venus::Date#restart_year requires Perl 5.28+' if $ENV{DEBUG};
+    diag 'Venus::Date#restart_year requires Perl 5.28+' if $ENV{VENUS_DEBUG};
     return 1;
   }
   my ($tryable) = @_;
@@ -2834,6 +2834,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Date.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Date.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

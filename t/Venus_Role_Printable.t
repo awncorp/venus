@@ -677,6 +677,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Role/Printable.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Role/Printable.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

@@ -1217,7 +1217,7 @@ The run class method will automatically execute the task class by instansiating
 the class and calling the L</execute> method and returns the invocant. This
 method is meant to be used directly in package scope outside of any routine,
 and will only auto-execute under the conditions that the caller is the "main"
-package space and the C<VENUS_TASK_RUN> environment variable is truthy.
+package space and the C<VENUS_TASK_AUTO> environment variable is truthy.
 
 I<Since C<2.91>>
 
@@ -1478,15 +1478,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (['/path/to/nowhere', 'arg1', 'arg2'], $?);
+  my $input = {
+    throw => 'error_on_system_call',
+    args => ['/path/to/nowhere', 'arg1', 'arg2'],
+    error => $?,
+  };
 
-  my $error = $task->throw('error_on_system_call', @args)->catch('error');
+  my $error = $task->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_system_call"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make system call \"/path/to/nowhere arg1 arg2\": $?"
 

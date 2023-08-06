@@ -9,7 +9,7 @@ use Test::More;
 use Venus::Test;
 
 if (require Venus::Random && Venus::Random->new(42)->range(1, 50) != 38) {
-  diag "OS ($^O) rand function is undeterministic";
+  diag "OS ($^O) rand function is undeterministic" if $ENV{VENUS_DEBUG};
   goto SKIP;
 }
 
@@ -3368,6 +3368,6 @@ $test->for('partials');
 # END
 
 SKIP:
-$test->render('lib/Venus/Random.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Random.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

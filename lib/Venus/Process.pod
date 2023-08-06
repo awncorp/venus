@@ -113,6 +113,161 @@ This package provides the following methods:
 
 =cut
 
+=head2 async
+
+  async(CodeRef $code, Any @args) (Process)
+
+The async method creates a new L<Venus::Process> object and asynchronously runs
+the callback provided via the L</work> method. Both process objects are
+configured to be are dyadic, i.e. representing an exclusing bi-directoral
+relationship. Additionally, the callback return value will be automatically
+made available via the L</await> method unless it's undefined. This method
+returns the newly created L<"dyadic"|/is_dyadic> process object.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item async example 1
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 await
+
+  await(Int $timeout) (Any)
+
+The await method expects to operate on a L<"dyadic"|/is_dyadic> process object
+and blocks the execution of the current process until a value is received from
+its couterpart. If a timeout is provided, execution will be blocked until a
+value is received or the wait time expires. If a timeout of C<0> is provided,
+execution will not be blocked. If no timeout is provided at all, execution will
+block indefinitely.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item await example 1
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  my $await = $async->await;
+
+  # ['done']
+
+=back
+
+=over 4
+
+=item await example 2
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  my $await = $async->await;
+
+  # [{status => 'done'}]
+
+=back
+
+=over 4
+
+=item await example 3
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  my ($await) = $async->await;
+
+  # 'done'
+
+=back
+
+=over 4
+
+=item await example 4
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  my ($await) = $async->await;
+
+  # {status => 'done'}
+
+=back
+
+=over 4
+
+=item await example 5
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    $process->sendall('send 1');
+    $process->sendall('send 2');
+    $process->sendall('send 3');
+    return;
+  });
+
+  my $await;
+
+  my $results = [];
+
+  push @$results, $async->await;
+
+  # 'send 1'
+
+  push @$results, $async->await;
+
+  # 'send 2'
+
+  push @$results, $async->await;
+
+  # 'send 3'
+
+  $results;
+
+  # ['send 1', 'send 2', 'send 3']
+
+=back
+
+=cut
+
 =head2 chdir
 
   chdir(Str $path) (Process)
@@ -1430,6 +1585,63 @@ I<Since C<2.91>>
 
 =cut
 
+=head2 limit
+
+  limit(Int $count) (Bool)
+
+The limit method blocks the execution of the current process until the number
+of processes in the L</watchlist> falls bellow the count specified. The method
+returns true once execution continues if execution was blocked, and false if
+the limit has yet to be reached.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item limit example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->work(sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  my $limit = $parent->limit(2);
+
+  # false
+
+=back
+
+=over 4
+
+=item limit example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->works(2, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  my $limit = $parent->limit(2);
+
+  # true
+
+=back
+
+=cut
+
 =head2 others
 
   others() (ArrayRef)
@@ -2360,6 +2572,63 @@ I<Since C<2.91>>
   });
 
   # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 serve
+
+  serve(Int $count, CodeRef $callback) (Process)
+
+The serve method executes the callback using L</work> until L</limit> blocks
+the execution of the current process, indefinitely. It has the effect of
+serving the callback and maintaining the desired number of forks until killed
+or gracefully shutdown.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item serve example 1
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->serve(2, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # ...
+
+  # bless({...}, "Venus::Process")
+
+=back
+
+=over 4
+
+=item serve example 2
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->serve(10, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # ...
+
+  # bless({...}, "Venus::Process")
 
 =back
 
@@ -3305,15 +3574,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my $input = {
+    throw => 'error_on_chdir',
+    error => $!,
+    path => '/nowhere',
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_chdir', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_chdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't chdir \"$path\": $!"
 
@@ -3337,15 +3611,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_fork_process',
+    error => $!,
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_fork_process', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_fork_process"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't fork process $pid: $!"
 
@@ -3365,15 +3643,18 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_fork_support',
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_fork_support', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_fork_support"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't fork process $pid: Fork emulation not supported"
 
@@ -3393,15 +3674,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_setid',
+    error => $!,
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_setid', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_setid"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't start a new session: $!"
 
@@ -3421,15 +3706,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere", 123);
+  my $input = {
+    throw => 'error_on_stderr',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stderr', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stderr"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDERR to \"/nowhere\": $!"
 
@@ -3453,15 +3743,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my $input = {
+    throw => 'error_on_stdin',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stdin', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stdin"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDIN to \"$path\": $!"
 
@@ -3485,15 +3780,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ( '/nowhere', 123);
+  my $input = {
+    throw => 'error_on_stdout',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stdout', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stdout"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDOUT to \"$path\": $!"
 
@@ -3517,15 +3817,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (0, sub{});
+  my $input = {
+    throw => 'error_on_timeout_poll',
+    code => sub{},
+    timeout => 0,
+  };
 
-  my $error = $parent->throw('error_on_timeout_poll', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_timeout_poll"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Timed out after 0 seconds in process 12345 while polling __ANON__"
 
@@ -3557,15 +3861,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (0, 2);
+  my $input = {
+    throw => 'error_on_timeout_pool',
+    pool_size => 2,
+    timeout => 0,
+  };
 
-  my $error = $parent->throw('error_on_timeout_pool', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_timeout_pool"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Timed out after 0 seconds in process 12345 while pooling"
 
@@ -3597,15 +3905,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = (0, 2);
+  my $input = {
+    throw => 'error_on_timeout_sync',
+    pool_size => 2,
+    timeout => 0,
+  };
 
-  my $error = $parent->throw('error_on_timeout_sync', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_timeout_sync"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Timed out after 0 seconds in process 12345 while syncing"
 

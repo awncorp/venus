@@ -147,7 +147,11 @@ B<example 1>
 
   # given: synopsis;
 
-  my $error = $yaml->throw('error_on_config')->catch('error');
+  my $input = {
+    throw => 'error_on_config',
+  };
+
+  my $error = $yaml->catch('error', $input);
 
   # my $name = $error->name;
 

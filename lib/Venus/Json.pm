@@ -76,7 +76,7 @@ sub config {
   my ($self, $package) = @_;
 
   $package ||= $self->package
-    or $self->throw('error_on_config')->error;
+    or $self->error({throw => 'error_on_config'});
 
   $package = $package->new
     ->canonical
@@ -238,6 +238,7 @@ sub error_on_config {
   return {
     name => 'on.config',
     message => 'No suitable JSON package',
+    raise => true,
   };
 }
 

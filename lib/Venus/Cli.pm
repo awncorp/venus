@@ -1156,8 +1156,12 @@ sub test {
         $type_map{$type}
       );
       if (my $caught = $assert->catch('validate', $values[$i])) {
-        my $error = "error_on_${key}_validation";
-        $self->throw($error, $caught->message, $name, $type)->error;
+        $self->error({
+          throw => "error_on_${key}_validation",
+          error => $caught->message,
+          name => $name,
+          type => $type,
+        });
       }
     }
   }
@@ -1196,29 +1200,45 @@ sub _wrap_text {
 # ERRORS
 
 sub error_on_arg_validation {
-  my ($self, $error, $name, $type) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.arg.validation',
-    message => (join ': ', 'Invalid argument', $name, $error),
-    stash => {
-      name => $name,
-      type => $type,
-    },
+  my $message = 'Invalid argument: {{name}}: {{error}}';
+
+  my $stash = {
+    name => $data->{name},
+    type => $data->{type},
+    error => $data->{error},
   };
+
+  my $result = {
+    name => 'on.arg.validation',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_opt_validation {
-  my ($self, $error, $name, $type) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.opt.validation',
-    message => (join ': ', 'Invalid option', $name, $error),
-    stash => {
-      name => $name,
-      type => $type,
-    },
+  my $message = 'Invalid option: {{name}}: {{error}}';
+
+  my $stash = {
+    name => $data->{name},
+    type => $data->{type},
+    error => $data->{error},
   };
+
+  my $result = {
+    name => 'on.opt.validation',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;

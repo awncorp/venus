@@ -103,7 +103,7 @@ sub copy {
   require File::Copy;
 
   File::Copy::copy("$self", "$path")
-    or $self->throw('error_on_copy', $path, $!)->error;
+    or $self->error({throw => 'error_on_copy', error => $!, path => $path});
 
   return $self;
 }
@@ -135,13 +135,15 @@ sub explain {
 }
 
 sub extension {
-  my ($self, $name) = @_;
+  my ($self, $value) = @_;
 
   my $basename = $self->basename;
 
-  return ($basename =~ /\.?.+\.([^\.]+)$/)[0] || undef if !$name;
+  my ($filename, $suffix) = $basename =~ /^([^\.]+)\.?(.*)$/;
 
-  return $self->sibling(join '.', $basename, $name);
+  return $suffix || undef if !$value;
+
+  return $self->sibling(join '.', $filename, $value);
 }
 
 sub find {
@@ -246,7 +248,7 @@ sub open {
   my $handle = IO::File->new;
 
   $handle->open($path, @args)
-    or $self->throw('error_on_open', $path, $!)->error;
+    or $self->error({throw => 'error_on_open', path => $path, error => $!});
 
   return $handle;
 }
@@ -265,7 +267,12 @@ sub mkcall {
   my $args = join ' ', map Venus::Os->quote($_), grep defined, @args;
 
   (defined($result = ($args ? qx($path $args) : qx($path))))
-    or $self->throw('error_on_mkcall', $path, $!)->error;
+    or $self->error({
+      throw => 'error_on_mkcall',
+      error => $!,
+      exit_code => _exitcode(),
+      path => $path,
+    });
 
   chomp $result;
 
@@ -278,7 +285,11 @@ sub mkdir {
   my $path = $self->get;
 
   ($mode ? CORE::mkdir($path, $mode) : CORE::mkdir($path))
-    or $self->throw('error_on_mkdir', $path, $!)->error;
+    or $self->error({
+      throw => 'error_on_mkdir',
+      error => $!,
+      path => $path,
+    });
 
   return $self;
 }
@@ -329,7 +340,7 @@ sub mkfile {
   $self->open('>');
 
   CORE::utime(undef, undef, $path)
-    or $self->throw('error_on_mkfile', $path, $!)->error;
+    or $self->error({throw => 'error_on_mkfile', path => $path, error => $!});
 
   return $self;
 }
@@ -340,7 +351,7 @@ sub move {
   require File::Copy;
 
   File::Copy::move("$self", "$path")
-    or $self->throw('error_on_move', $path, $!)->error;
+    or $self->error({throw => 'error_on_move', path => $path, error => $!});
 
   return $self->class->make($path)->absolute;
 }
@@ -387,10 +398,15 @@ sub read {
   my $path = $self->get;
 
   CORE::open(my $handle, '<', $path)
-    or $self->throw('error_on_read_open', $path, $!)->error;
+    or $self->error({throw => 'error_on_read_open', path => $path, error => $!});
 
   CORE::binmode($handle, $binmode) or do {
-    $self->throw('error_on_read_binmode', $path, $binmode, $!)->error;
+    $self->error({
+      throw => 'error_on_read_binmode',
+      path => $path,
+      error => $!,
+      binmode => $binmode,
+    });
   } if defined($binmode);
 
   my $result = my $content = '';
@@ -399,7 +415,7 @@ sub read {
     $content .= $buffer;
   }
 
-  $self->throw('error_on_read_error', $path, $!)->error if !defined $result;
+  $self->error({throw => 'error_on_read_error', path => $path, error => $!}) if !defined $result;
 
   require Venus::Os;
   $content =~ s/\015\012/\012/g if Venus::Os->is_win;
@@ -433,7 +449,7 @@ sub rmdir {
   my $path = $self->get;
 
   CORE::rmdir($path)
-    or $self->throw('error_on_rmdir', $path, $!)->error;
+    or $self->error({throw => 'error_on_rmdir', path => $path, error => $!});
 
   return $self;
 }
@@ -540,7 +556,7 @@ sub unlink {
   my $path = $self->get;
 
   CORE::unlink($path)
-    or $self->throw('error_on_unlink', $path, $!)->error;
+    or $self->error({throw => 'error_on_unlink', path => $path, error => $!});
 
   return $self;
 }
@@ -551,14 +567,19 @@ sub write {
   my $path = $self->get;
 
   CORE::open(my $handle, '>', $path)
-    or $self->throw('error_on_write_open', $path, $!)->error;
+    or $self->error({throw => 'error_on_write_open', path => $path, error => $!});
 
   CORE::binmode($handle, $binmode) or do {
-    $self->throw('error_on_write_binmode', $path, $binmode, $!)->error;
+    $self->error({
+      throw => 'error_on_write_binmode',
+      path => $path,
+      error => $!,
+      binmode => $binmode,
+    });
   } if defined($binmode);
 
   (($handle->syswrite($data) // -1) == length($data))
-    or $self->throw('error_on_write_error', $path, $!)->error;
+    or $self->error({throw => 'error_on_write_error', path => $path, error => $!});
 
   return $self;
 }
@@ -566,204 +587,292 @@ sub write {
 # ERRORS
 
 sub error_on_copy {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t copy "{{self}}" to "{{path}}": {{error}}';
 
-  return {
-    name => 'on.copy',
-    message => "Can't copy \"$self\" to \"$path\": $err",
-    stash => {
-      path => $path,
-      self => $self,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    self => $self,
   };
+
+  my $result = {
+    name => 'on.copy',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_mkcall {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $error = $data->{error};
+  my $exit_code = $data->{exit_code} || 0;
 
-  return {
-    name => 'on.mkcall',
-    message => ("Can't make system call to \"$path\": "
-        . ($err ? "$err" : sprintf("exit code (%s)", _exitcode()))),
-    stash => {
-      path => $path,
-    },
+  my $message = ("Can't make system call to \"{{path}}\": "
+    . ($error ? "$error" : sprintf("exit code (%s)", $exit_code)));
+
+  my $stash = {
+    error => $error,
+    exit_code => $exit_code,
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.mkcall',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_mkdir {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t make directory "{{path}}": {{error}}';
 
-  return {
-    name => 'on.mkdir',
-    message => "Can't make directory \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.mkdir',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_mkfile {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t make file "{{path}}": {{error}}';
 
-  return {
-    name => 'on.mkfile',
-    message => "Can't make file \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.mkfile',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_move {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t move "{{self}}" to "{{path}}": {{error}}';
 
-  return {
-    name => 'on.move',
-    message => "Can't move \"$self\" to \"$path\": $err",
-    stash => {
-      path => $path,
-      self => $self,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    self => $self,
   };
+
+  my $result = {
+    name => 'on.move',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_open {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t open "{{path}}": {{error}}';
 
-  return {
-    name => 'on.open',
-    message => "Can't open \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.open',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_read_binmode {
-  my ($self, $path, $binmode, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t binmode "{{path}}": {{error}}';
 
-  return {
-    name => 'on.read.binmode',
-    message => "Can't binmode \"$path\": $err",
-    stash => {
-      binmode => $binmode,
-      path => $path,
-    },
+  my $stash = {
+    binmode => $data->{binmode},
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.read.binmode',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_read_error {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t read from file "{{path}}": {{error}}';
 
-  return {
-    name => 'on.read.error',
-    message => "Can't read from file \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.read.error',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_read_open {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t read "{{path}}": {{error}}';
 
-  return {
-    name => 'on.read.open',
-    message => "Can't read \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.read.open',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_rmdir {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t rmdir "{{path}}": {{error}}';
 
-  return {
-    name => 'on.rmdir',
-    message => "Can't rmdir \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.rmdir',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_write_binmode {
-  my ($self, $path, $binmode, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t binmode "{{path}}": {{error}}';
 
-  return {
-    name => 'on.write.binmode',
-    message => "Can't binmode \"$path\": $err",
-    stash => {
-      binmode => $binmode,
-      path => $path,
-    },
+  my $stash = {
+    binmode => $data->{binmode},
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.write.binmode',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_write_error {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t write to file "{{path}}": {{error}}';
 
-  return {
-    name => 'on.write.error',
-    message => "Can't write to file \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.write.error',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_write_open {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t write "{{path}}": {{error}}';
 
-  return {
-    name => 'on.write.open',
-    message => "Can't write \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.write.open',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_unlink {
-  my ($self, $path, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t unlink "{{path}}": {{error}}';
 
-  return {
-    name => 'on.unlink',
-    message => "Can't unlink \"$path\": $err",
-    stash => {
-      path => $path,
-    },
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
   };
+
+  my $result = {
+    name => 'on.unlink',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;

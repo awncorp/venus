@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.40';
+our $VERSION = '3.55';
 
 # AUTHORITY
 
@@ -27,6 +27,8 @@ sub import {
     array => 1,
     arrayref => 1,
     assert => 1,
+    async => 1,
+    await => 1,
     bool => 1,
     box => 1,
     call => 1,
@@ -161,6 +163,22 @@ sub assert ($$) {
   my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
 
   return $assert->validate($data);
+}
+
+sub async ($) {
+  my ($code) = @_;
+
+  require Venus::Process;
+
+  return Venus::Process->new->async($code);
+}
+
+sub await ($;$) {
+  my ($process, $timeout) = @_;
+
+  require Venus::Process;
+
+  return $process->await($timeout);
 }
 
 sub bool (;$) {
@@ -514,9 +532,26 @@ sub load ($) {
 sub log (@) {
   my (@args) = @_;
 
+  state $codes = {
+    debug => 'debug',
+    error => 'error',
+    fatal => 'fatal',
+    info => 'info',
+    trace => 'trace',
+    warn => 'warn',
+  };
+
+  unshift @args, 'debug' if @args && !$codes->{$args[0]};
+
   require Venus::Log;
 
-  return Venus::Log->new->debug(@args);
+  my $log = Venus::Log->new($ENV{VENUS_LOG_LEVEL});
+
+  return $log if !@args;
+
+  my $code = shift @args;
+
+  return $log->$code(@args);
 }
 
 sub make (@) {

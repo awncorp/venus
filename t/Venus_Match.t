@@ -1174,6 +1174,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Match.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Match.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

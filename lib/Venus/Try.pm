@@ -71,7 +71,10 @@ sub callback {
     }
 
     if (!$method) {
-      $self->throw('error_on_callback', $invocant, $callback)->error;
+      $self->throw('error_on_callback', {
+        invocant => $invocant,
+        callback => $callback,
+      });
     }
 
     $callback = sub {goto $method};
@@ -237,13 +240,29 @@ sub result {
 # ERRORS
 
 sub error_on_callback {
-  my ($self, $invocant, $callback) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.callback',
-    message => sprintf(qq(Can't locate object method "%s" on package "%s"),
-      ($callback, $invocant ? (ref($invocant) || $invocant) : (ref($self) || $self))),
+  my $callback = $data->{callback};
+  my $invocant = $data->{invocant};
+
+  my $message = sprintf(
+    qq(Can't locate object method "%s" on package "%s"), ($callback,
+      $invocant ? (ref($invocant) || $invocant) : (ref($self) || $self))
+  );
+
+  my $stash = {
+    invocant => $invocant,
+    callback => $callback,
   };
+
+  my $result = {
+    name => 'on.callback',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;

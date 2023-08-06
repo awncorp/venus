@@ -9,6 +9,18 @@ use Venus::Role 'with';
 
 # METHODS
 
+sub error {
+  my ($self, $data) = @_;
+
+  my @args = $data;
+
+  unshift @args, delete $data->{throw} if $data->{throw};
+
+  @_ = ($self, @args);
+
+  goto $self->can('throw');
+}
+
 sub throw {
   my ($self, $data, @args) = @_;
 
@@ -70,6 +82,10 @@ sub throw {
   if (exists $data->{on}) {
     $throw->on($data->{on});
   }
+  if (exists $data->{raise}) {
+    @_ = ($throw);
+    goto $throw->can('error');
+  }
 
   return $throw;
 }
@@ -77,7 +93,7 @@ sub throw {
 # EXPORTS
 
 sub EXPORT {
-  ['throw']
+  ['error', 'throw']
 }
 
 1;

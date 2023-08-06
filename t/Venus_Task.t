@@ -2001,7 +2001,7 @@ The run class method will automatically execute the task class by instansiating
 the class and calling the L</execute> method and returns the invocant. This
 method is meant to be used directly in package scope outside of any routine,
 and will only auto-execute under the conditions that the caller is the "main"
-package space and the C<VENUS_TASK_RUN> environment variable is truthy.
+package space and the C<VENUS_TASK_AUTO> environment variable is truthy.
 
 =signature run
 
@@ -2043,7 +2043,7 @@ package space and the C<VENUS_TASK_RUN> environment variable is truthy.
 
 $test->for('example', 1, 'run', sub {
   local $TEST_VENUS_TASK_PRINT = [];
-  local $ENV{VENUS_TASK_RUN} = 1;
+  local $ENV{VENUS_TASK_AUTO} = 1;
   my ($tryable) = @_;
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Task';
@@ -2078,7 +2078,7 @@ $test->for('example', 1, 'run', sub {
 
 $test->for('example', 2, 'run', sub {
   local $TEST_VENUS_TASK_PRINT = [];
-  local $ENV{VENUS_TASK_RUN} = 1;
+  local $ENV{VENUS_TASK_AUTO} = 1;
   my ($tryable) = @_;
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Task';
@@ -2316,7 +2316,7 @@ $test->for('example', 2, 'test', sub {
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Cli::Error';
   ok $result->is('on.opt.validation');
-  like $result->message, qr/Invalid option: help/;
+  like $result->render, qr/Invalid option: help/;
 
   Venus::Space->new('Example')->unload;
   $result
@@ -2375,15 +2375,19 @@ $test->for('error', 'error_on_system_call');
 
   # given: synopsis;
 
-  my @args = (['/path/to/nowhere', 'arg1', 'arg2'], $?);
+  my $input = {
+    throw => 'error_on_system_call',
+    args => ['/path/to/nowhere', 'arg1', 'arg2'],
+    error => $?,
+  };
 
-  my $error = $task->throw('error_on_system_call', @args)->catch('error');
+  my $error = $task->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_system_call"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make system call \"/path/to/nowhere arg1 arg2\": $?"
 
@@ -2399,7 +2403,7 @@ $test->for('example', 1, 'error_on_system_call', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_system_call";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't make system call \"/path/to/nowhere arg1 arg2\": $?";
   my $args = $result->stash('args');
   is_deeply $args, ['/path/to/nowhere', 'arg1', 'arg2'];
@@ -2418,6 +2422,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Task.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Task.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

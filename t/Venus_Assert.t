@@ -3575,9 +3575,12 @@ $test->for('error', 'error_on_validate');
 
   # given: synopsis;
 
-  my @args = ("...");
+  my $input = {
+    throw => 'error_on_validate',
+    value => '...',
+  };
 
-  my $error = $assert->throw('error_on_validate', @args)->catch('error');
+  my $error = $assert->catch('error', $input);
 
   # my $name = $error->name;
 
@@ -3590,6 +3593,10 @@ $test->for('error', 'error_on_validate');
   # my $identity = $error->stash('identity');
 
   # "string"
+
+  # my $variable = $error->stash('variable');
+
+  # "..."
 
 =cut
 
@@ -3621,15 +3628,19 @@ $test->for('error', 'error_on_within');
 
   # given: synopsis;
 
-  my @args = ('coderef', 'string');
+  my $input = {
+    throw => 'error_on_within',
+    type => 'coderef',
+    args => ['string'],
+  };
 
-  my $error = $assert->throw('error_on_within', @args)->catch('error');
+  my $error = $assert->catch('error', $input);
 
   # my $ = $error->name;
 
   # "on_within"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid type (\"$type\") palid ed to the \"within\" method"
 
@@ -3637,7 +3648,7 @@ $test->for('error', 'error_on_within');
 
   # $assert
 
-  # my $type = $error->stash('type'
+  # my $type = $error->stash('type');
 
   # "coderef"
 
@@ -3653,7 +3664,7 @@ $test->for('example', 1, 'error_on_within', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_within";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Invalid type (\"coderef\") provided to the \"within\" method";
   my $self = $result->stash('self');
   isa_ok $self, "Venus::Assert";
@@ -4012,6 +4023,6 @@ EOF
 
 # END
 
-$test->render('lib/Venus/Assert.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Assert.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

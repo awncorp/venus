@@ -87,7 +87,9 @@ $test->for('synopsis', sub {
 =description
 
 This package provides methods for logging information using various log levels.
-The default log level is L<trace>.
+The default log level is L<trace>. Acceptable log levels are C<trace>,
+C<debug>, C<info>, C<warn>, C<error>, and C<fatal>, and the set log level will
+handle events for its level and any preceding levels in the order specified.
 
 =cut
 
@@ -933,6 +935,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Log.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Log.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

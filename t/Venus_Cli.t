@@ -2101,7 +2101,7 @@ $test->for('example', 2, 'test', sub {
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Cli::Error';
   ok $result->is('on.arg.validation');
-  like $result->message, qr/Invalid argument: name/;
+  like $result->render, qr/Invalid argument: name/;
 
   $result
 });
@@ -2159,7 +2159,7 @@ $test->for('example', 4, 'test', sub {
   my $result = $tryable->error->result;
   isa_ok $result, 'Venus::Cli::Error';
   ok $result->is('on.opt.validation');
-  like $result->message, qr/Invalid option: name/;
+  like $result->render, qr/Invalid option: name/;
 
   $result
 });
@@ -2176,15 +2176,20 @@ $test->for('error', 'error_on_arg_validation');
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_arg_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_arg_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid argument: example: ..."
 
@@ -2204,7 +2209,7 @@ $test->for('example', 1, 'error_on_arg_validation', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_arg_validation";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Invalid argument: example: ...";
   $name = $result->stash('name');
   is $name, "example";
@@ -2226,15 +2231,20 @@ $test->for('error', 'error_on_opt_validation');
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_opt_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_opt_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid option: example: ..."
 
@@ -2254,7 +2264,7 @@ $test->for('example', 1, 'error_on_opt_validation', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_opt_validation";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Invalid option: example: ...";
   $name = $result->stash('name');
   is $name, "example";
@@ -2275,6 +2285,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Cli.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Cli.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

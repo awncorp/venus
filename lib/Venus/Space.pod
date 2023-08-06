@@ -2479,15 +2479,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_call_missing',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_call_missing', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_call_missing"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Unable to locate class method \"execute\" via package \"Example\""
 
@@ -2511,15 +2515,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_call_undefined',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_call_undefined', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_call_undefined"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Attempt to call undefined class method in package \"Example\""
 
@@ -2543,15 +2551,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_cop_missing',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_cop_missing', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_cop_missing"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Unable to locate object method \"execute\" via package \"Example\""
 
@@ -2575,15 +2587,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_cop_undefined',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_cop_undefined', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_cop_undefined"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Attempt to cop undefined object method from package \"$class\""
 
@@ -2607,15 +2623,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "Exception!");
+  my $input = {
+    throw => 'error_on_eval',
+    error => 'Exception!',
+    package => 'Example',
+  };
 
-  my $error = $space->throw('error_on_eval', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_eval"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Exception!"
 
@@ -2635,15 +2655,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "cause unknown");
+  my $input = {
+    throw => 'error_on_load',
+    package => 'Example',
+    error => 'cause unknown',
+  };
 
-  my $error = $space->throw('error_on_load', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_load"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Error attempting to load Example: \"cause unknown\""
 
@@ -2663,15 +2687,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_swap',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_swap', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_swap"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Attempt to swap undefined subroutine in package \"$class\""
 

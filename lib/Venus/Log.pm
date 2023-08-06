@@ -28,21 +28,14 @@ sub build_arg {
   my ($self, $data) = @_;
 
   return {
-    level => $self->level_name($data) || $self->level_name(1),
+    level => $data,
   };
-}
-
-sub build_args {
-  my ($self, $data) = @_;
-
-  $data->{level} ||= $self->level_name(1);
-
-  return $data;
 }
 
 sub build_self {
   my ($self, $data) = @_;
 
+  $self->level($self->level_name($self->level) || $self->level_name(1));
   $self->handler(sub{shift; CORE::print(STDOUT @_, "\n")}) if !$self->handler;
   $self->separator(" ") if !$self->separator;
 
@@ -97,6 +90,8 @@ sub level_code {
 
   $data = $data ? lc $data : $self->level;
 
+  return undef if !defined $data;
+
   return $$NAME{$data} || ($$CODE{$data} && $$NAME{$$CODE{$data}});
 }
 
@@ -104,6 +99,8 @@ sub level_name {
   my ($self, $data) = @_;
 
   $data = $data ? lc $data : $self->level;
+
+  return undef if !defined $data;
 
   return $$CODE{$data} || ($$NAME{$data} && $$CODE{$$NAME{$data}});
 }

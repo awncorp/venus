@@ -1634,15 +1634,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_copy',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_copy', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_copy"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
 
@@ -1666,15 +1670,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_mkcall',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_mkcall', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_mkcall"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make system call to \"/nowhere\": $!"
 
@@ -1694,15 +1702,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_mkdir',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_mkdir', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_mkdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make directory \"/nowhere\": $!"
 
@@ -1722,15 +1734,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_mkfile',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_mkfile', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_mkfile"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make file \"/nowhere\": $!"
 
@@ -1750,15 +1766,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_move',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_move', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_move"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
 
@@ -1782,15 +1802,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_open',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_open', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_open"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't open \"/nowhere\": $!"
 
@@ -1810,15 +1834,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_read_binmode',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_read_binmode', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_read_binmode"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't binmode \"/nowhere\": $!"
 
@@ -1838,15 +1866,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_read_error',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_read_error', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_read_error"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't read from file \"/nowhere\": $!"
 
@@ -1866,15 +1898,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_read_open',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_read_open', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_read_open"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't read \"/nowhere\": $!"
 
@@ -1894,15 +1930,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_rmdir',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_rmdir', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_rmdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't rmdir \"/nowhere\": $!"
 
@@ -1922,15 +1962,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere", ":utf8");
+  my $input = {
+    throw => 'error_on_write_binmode',
+    error => $!,
+    path => '/nowhere',
+    binmode => ':utf8',
+  };
 
-  my $error = $path->throw('error_on_write_binmode', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_write_binmode"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't binmode \"/nowhere\": $!"
 
@@ -1954,15 +1999,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_write_error',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_write_error', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_write_error"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't write to file \"/nowhere\": $!"
 
@@ -1982,15 +2031,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_write_open',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_write_open', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_write_open"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't write \"/nowhere\": $!"
 
@@ -2010,15 +2063,19 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_unlink',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_unlink', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_unlink"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't unlink \"/nowhere\": $!"
 

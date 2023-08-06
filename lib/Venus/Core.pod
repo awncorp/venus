@@ -1007,6 +1007,44 @@ I<Since C<1.00>>
 
 =cut
 
+=head2 mixin
+
+  MIXIN(Str $name) (Str | Object)
+
+The MIXIN method is a class building lifecycle hook which consumes the mixin
+provided, automatically invoking the mixin's L</IMPORT> hook. The role
+composition semantics are as follows: Routines to be consumed must be
+explicitly declared via the L</EXPORT> hook. Routines will be copied to the
+consumer even if they already exist. If multiple roles are consumed having
+routines with the same name (i.e. naming collisions) the last routine copied
+wins.
+
+I<Since C<1.02>>
+
+=over 4
+
+=item mixin example 1
+
+  package Action;
+
+  use base 'Venus::Core';
+
+  package User;
+
+  use base 'Venus::Core';
+
+  User->MIXIN('Action');
+
+  package main;
+
+  my $admin = User->DOES('Action');
+
+  # 0
+
+=back
+
+=cut
+
 =head2 name
 
   NAME() (Str)

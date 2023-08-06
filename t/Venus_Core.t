@@ -52,6 +52,7 @@ method: get
 method: import
 method: item
 method: meta
+method: mixin
 method: name
 method: role
 method: set
@@ -1821,6 +1822,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Core.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Core.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

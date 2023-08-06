@@ -444,9 +444,12 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("Exception!");
+  my $input = {
+    throw => 'error_on_evaluate',
+    error => 'Exception!',
+  };
 
-  my $error = $search->throw('error_on_evaluate', @args)->catch('error');
+  my $error = $search->catch('error', $input);
 
   # my $name = $error->name;
 

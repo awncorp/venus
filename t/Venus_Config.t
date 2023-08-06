@@ -212,7 +212,7 @@ $test->for('example', 2, 'read_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
-    diag 'No suitable JSON library found';
+    diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -243,7 +243,7 @@ $test->for('example', 3, 'read_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
-    diag 'No suitable YAML library found';
+    diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -298,7 +298,7 @@ $test->for('example', 1, 'read_json', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
-    diag 'No suitable JSON library found';
+    diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -344,7 +344,7 @@ $test->for('example', 1, 'read_json_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
-    diag 'No suitable JSON library found';
+    diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -484,7 +484,7 @@ $test->for('example', 1, 'read_yaml', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
-    diag 'No suitable YAML library found';
+    diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -530,7 +530,7 @@ $test->for('example', 1, 'read_yaml_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
-    diag 'No suitable YAML library found';
+    diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -610,7 +610,7 @@ $test->for('example', 2, 'write_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
-    diag 'No suitable JSON library found';
+    diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -649,7 +649,7 @@ $test->for('example', 3, 'write_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
-    diag 'No suitable YAML library found';
+    diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -700,7 +700,7 @@ $test->for('example', 1, 'write_json', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
-    diag 'No suitable JSON library found';
+    diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -748,7 +748,7 @@ $test->for('example', 1, 'write_json_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Json && not Venus::Json->package) {
-    diag 'No suitable JSON library found';
+    diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -880,7 +880,7 @@ $test->for('example', 1, 'write_yaml', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
-    diag 'No suitable YAML library found';
+    diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -928,7 +928,7 @@ $test->for('example', 1, 'write_yaml_file', sub {
   my ($tryable) = @_;
   my $result;
   if (require Venus::Yaml && not Venus::Yaml->package) {
-    diag 'No suitable YAML library found';
+    diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
     $result = Venus::Config->new;
     ok 1;
   }
@@ -954,6 +954,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Config.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Config.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

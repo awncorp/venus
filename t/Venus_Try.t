@@ -1079,15 +1079,18 @@ $test->for('error', 'error_on_callback');
 
   # given: synopsis;
 
-  @args = ("Example", "execute");
+  my $input = {
+    invocant => 'Example',
+    callback => 'execute',
+  };
 
-  my $error = $try->throw('error_on_callback', @args)->catch('error');
+  my $error = $try->throw('error_on_callback', $input)->catch('error');
 
   # my $name = $error->name;
 
   # "on_callback"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't locate object method \"execute\" on package \"Example\""
 
@@ -1095,16 +1098,15 @@ $test->for('error', 'error_on_callback');
 
 $test->for('example', 1, 'error_on_callback', sub {
   my ($tryable) = @_;
-  my $result = $tryable->result;
-  isa_ok $result, 'Venus::Error';
-  my $name = $result->name;
+  my $result = $tryable->error(\my $error)->result;
+  isa_ok $error, 'Venus::Error';
+  my $name = $error->name;
   is $name, "on_callback";
-  my $message = $result->message;
+  my $message = $error->render;
   is $message, "Can't locate object method \"execute\" on package \"Example\"";
 
   $result
 });
-
 
 =partials
 
@@ -1117,6 +1119,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Try.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Try.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

@@ -5,9 +5,12 @@ use 5.018;
 use strict;
 use warnings;
 
-use Config;
 use Test::More;
 use Venus::Test;
+
+use Config;
+use Venus::Process;
+use Venus::Path;
 
 use_ok "Venus";
 
@@ -30,6 +33,165 @@ our $TEST_VENUS_QX_CODE = 0;
     )
   };
 }
+
+our @TEST_VENUS_PROCESS_PIDS;
+our $TEST_VENUS_PROCESS_ALARM = 0;
+our $TEST_VENUS_PROCESS_CHDIR = 1;
+our $TEST_VENUS_PROCESS_EXIT = 0;
+our $TEST_VENUS_PROCESS_EXITCODE = 0;
+our $TEST_VENUS_PROCESS_FORK = undef;
+our $TEST_VENUS_PROCESS_FORKABLE = 1;
+our $TEST_VENUS_PROCESS_SERVE = 0;
+our $TEST_VENUS_PROCESS_KILL = 0;
+our $TEST_VENUS_PROCESS_OPEN = 1;
+our $TEST_VENUS_PROCESS_PID = 12345;
+our $TEST_VENUS_PROCESS_PPID = undef;
+our $TEST_VENUS_PROCESS_PING = 1;
+our $TEST_VENUS_PROCESS_SETSID = 1;
+our $TEST_VENUS_PROCESS_TIME = 0;
+our $TEST_VENUS_PROCESS_WAITPID = undef;
+
+$Venus::Process::PATH = Venus::Path->mktemp_dir;
+$Venus::Process::PID = $TEST_VENUS_PROCESS_PID;
+
+# _alarm
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_alarm"} = sub {
+    $TEST_VENUS_PROCESS_ALARM = $_[0]
+  };
+}
+
+# _chdir
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_chdir"} = sub {
+    $TEST_VENUS_PROCESS_CHDIR
+  };
+}
+
+# _exit
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_exit"} = sub {
+    $TEST_VENUS_PROCESS_EXIT
+  };
+}
+
+# _exitcode
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_exitcode"} = sub {
+    $TEST_VENUS_PROCESS_EXITCODE
+  };
+}
+
+# _fork
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_fork"} = sub {
+    if (defined $TEST_VENUS_PROCESS_FORK) {
+      return $TEST_VENUS_PROCESS_FORK;
+    }
+    else {
+      push @TEST_VENUS_PROCESS_PIDS,
+        $TEST_VENUS_PROCESS_PID+@TEST_VENUS_PROCESS_PIDS;
+      return $TEST_VENUS_PROCESS_PIDS[-1];
+    }
+  };
+}
+
+# _forkable
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_forkable"} = sub {
+    return $TEST_VENUS_PROCESS_FORKABLE;
+  };
+}
+
+# _serve
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_serve"} = sub {
+    return $TEST_VENUS_PROCESS_SERVE;
+  };
+}
+
+# _kill
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_kill"} = sub {
+    $TEST_VENUS_PROCESS_KILL;
+  };
+}
+
+# _open
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_open"} = sub {
+    $TEST_VENUS_PROCESS_OPEN
+  };
+}
+
+# _ping
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_ping"} = sub {
+    $TEST_VENUS_PROCESS_PING
+  };
+}
+
+# _setsid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_setsid"} = sub {
+    $TEST_VENUS_PROCESS_SETSID
+  };
+}
+
+# _time
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_time"} = sub {
+    $TEST_VENUS_PROCESS_TIME || time
+  };
+}
+
+# _waitpid
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_waitpid"} = sub {
+    if (defined $TEST_VENUS_PROCESS_WAITPID) {
+      return $TEST_VENUS_PROCESS_WAITPID;
+    }
+    else {
+      return pop @TEST_VENUS_PROCESS_PIDS;
+    }
+  };
+}
+
+# default
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::default"} = sub {
+    $TEST_VENUS_PROCESS_PID
+  };
+}
+
 
 =name
 
@@ -61,6 +223,8 @@ function: args
 function: array
 function: arrayref
 function: assert
+function: async
+function: await
 function: bool
 function: box
 function: call
@@ -509,6 +673,109 @@ $test->for('example', 2, 'assert', sub {
   my $result = $tryable->error->result;
   ok defined $result;
   isa_ok $result, 'Venus::Assert::Error';
+
+  $result
+});
+
+=function async
+
+The async function accepts a callback and executes it asynchronously via
+L<Venus::Process/async>. This function returns a
+L<"dyadic"|Venus::Process/is_dyadic> L<Venus::Process> object which can be used
+with L</await>.
+
+=signature async
+
+  async(CodeRef $code, Any @args) (Process)
+
+=metadata async
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 async
+
+  package main;
+
+  use Venus 'async';
+
+  my $async = async sub{
+    'done'
+  };
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'async', sub {
+  no warnings 'once';
+  if ($Config{d_pseudofork}) {
+    plan skip_all => 'Fork emulation not supported';
+    return 1;
+  }
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  ok my $result = $tryable->result;
+  ok $result->{directory};
+
+  $result
+});
+
+=function await
+
+The await function accepts a L<"dyadic"|Venus::Process/is_dyadic>
+L<Venus::Process> object and eventually returns a value (or values) for it. The
+value(s) returned are the return values or emissions from the asychronous
+callback executed with L</async> which produced the process object.
+
+=signature await
+
+  await(Process $process, Int $timeout) (Any)
+
+=metadata await
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 await
+
+  package main;
+
+  use Venus 'async', 'await';
+
+  my $process;
+
+  my $async = async sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  };
+
+  my $await = await $async;
+
+  # ['done']
+
+=cut
+
+$test->for('example', 1, 'await', sub {
+  no warnings 'once';
+  if ($Config{d_pseudofork}) {
+    plan skip_all => 'Fork emulation not supported';
+    return 1;
+  }
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['done'];
 
   $result
 });
@@ -2882,7 +3149,10 @@ $test->for('example', 1, 'load', sub {
 =function log
 
 The log function prints the arguments provided to STDOUT, stringifying complex
-values, and returns a L<Venus::Log> object.
+values, and returns a L<Venus::Log> object. If the first argument is a log
+level name, e.g. C<debug>, C<error>, C<fatal>, C<info>, C<trace>, or C<warn>,
+it will be used when emitting the event. The desired log level is specified by
+the C<VENUS_LOG_LEVEL> environment variable and defaults to C<trace>.
 
 =signature log
 
@@ -5507,132 +5777,11 @@ returns an instance of L<Venus::Process> representing the current process.
 
 =cut
 
-our $TEST_VENUS_PROCESS_ALARM = 0;
-our $TEST_VENUS_PROCESS_CHDIR = 1;
-our $TEST_VENUS_PROCESS_EXIT = 0;
-our $TEST_VENUS_PROCESS_EXITCODE = 0;
-our $TEST_VENUS_PROCESS_FORK = undef;
-our $TEST_VENUS_PROCESS_FORKABLE = 1;
-our $TEST_VENUS_PROCESS_KILL = 0;
-our $TEST_VENUS_PROCESS_OPEN = 1;
-our $TEST_VENUS_PROCESS_PID = 12345;
-our $TEST_VENUS_PROCESS_SETSID = 1;
-our $TEST_VENUS_PROCESS_WAITPID = undef;
-
-# _alarm
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_alarm"} = sub {
-    $TEST_VENUS_PROCESS_ALARM = $_[0]
-  };
-}
-
-# _chdir
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_chdir"} = sub {
-    $TEST_VENUS_PROCESS_CHDIR
-  };
-}
-
-# _exit
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_exit"} = sub {
-    $TEST_VENUS_PROCESS_EXIT
-  };
-}
-
-# _exitcode
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_exitcode"} = sub {
-    $TEST_VENUS_PROCESS_EXITCODE
-  };
-}
-
-# _fork
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_fork"} = sub {
-    if (defined $TEST_VENUS_PROCESS_FORK) {
-      return $TEST_VENUS_PROCESS_FORK;
-    }
-    else {
-      return $TEST_VENUS_PROCESS_PID++;
-    }
-  };
-}
-
-# _forkable
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_forkable"} = sub {
-    return $TEST_VENUS_PROCESS_FORKABLE;
-  };
-}
-
-# _kill
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_kill"} = sub {
-    $TEST_VENUS_PROCESS_KILL;
-  };
-}
-
-# _open
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_open"} = sub {
-    $TEST_VENUS_PROCESS_OPEN
-  };
-}
-
-# _pid
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_pid"} = sub {
-    $TEST_VENUS_PROCESS_PID
-  };
-}
-
-# _setsid
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_setsid"} = sub {
-    $TEST_VENUS_PROCESS_SETSID
-  };
-}
-
-# _waitpid
-{
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"Venus::Process::_waitpid"} = sub {
-    if (defined $TEST_VENUS_PROCESS_WAITPID) {
-      return $TEST_VENUS_PROCESS_WAITPID;
-    }
-    else {
-      return --$TEST_VENUS_PROCESS_PID;
-    }
-  };
-}
-
 $test->for('example', 1, 'work', sub {
   if ($Config{d_pseudofork}) {
     plan skip_all => 'Fork emulation not supported';
+    return 1;
   }
-  return 1;
   my ($tryable) = @_;
   local $TEST_VENUS_PROCESS_FORK = 0;
   ok my $result = $tryable->result;
@@ -6284,6 +6433,6 @@ $test->for('license');
 
 # END
 
-$test->render('lib/Venus.pod') if $ENV{RENDER};
+$test->render('lib/Venus.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

@@ -2776,15 +2776,19 @@ $test->for('error', 'error_on_copy');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_copy',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_copy', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_copy"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
 
@@ -2804,7 +2808,7 @@ $test->for('example', 1, 'error_on_copy', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_copy";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't copy "([^"]+)" to "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -2826,15 +2830,19 @@ $test->for('error', 'error_on_mkcall');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_mkcall',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_mkcall', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_mkcall"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make system call to \"/nowhere\": $!"
 
@@ -2850,7 +2858,7 @@ $test->for('example', 1, 'error_on_mkcall', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_mkcall";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't make system call to "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -2870,15 +2878,19 @@ $test->for('error', 'error_on_mkdir');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_mkdir',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_mkdir', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_mkdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make directory \"/nowhere\": $!"
 
@@ -2894,7 +2906,7 @@ $test->for('example', 1, 'error_on_mkdir', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_mkdir";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't make directory "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -2914,15 +2926,19 @@ $test->for('error', 'error_on_mkfile');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_mkfile',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_mkfile', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_mkfile"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't make file \"/nowhere\": $!"
 
@@ -2938,7 +2954,7 @@ $test->for('example', 1, 'error_on_mkfile', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_mkfile";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't make file "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -2958,15 +2974,19 @@ $test->for('error', 'error_on_move');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_move',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_move', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_move"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't copy \"t\/data\/planets\" to \"/nowhere\": $!"
 
@@ -2986,7 +3006,7 @@ $test->for('example', 1, 'error_on_move', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_move";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't move "([^"]+)" to "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3008,15 +3028,19 @@ $test->for('error', 'error_on_open');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_open',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_open', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_open"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't open \"/nowhere\": $!"
 
@@ -3032,7 +3056,7 @@ $test->for('example', 1, 'error_on_open', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_open";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't open "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3052,15 +3076,19 @@ $test->for('error', 'error_on_read_binmode');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_read_binmode',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_read_binmode', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_read_binmode"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't binmode \"/nowhere\": $!"
 
@@ -3076,7 +3104,7 @@ $test->for('example', 1, 'error_on_read_binmode', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_read_binmode";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't binmode "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3096,15 +3124,19 @@ $test->for('error', 'error_on_read_error');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_read_error',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_read_error', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_read_error"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't read from file \"/nowhere\": $!"
 
@@ -3120,7 +3152,7 @@ $test->for('example', 1, 'error_on_read_error', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_read_error";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't read from file "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3140,15 +3172,19 @@ $test->for('error', 'error_on_read_open');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_read_open',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_read_open', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_read_open"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't read \"/nowhere\": $!"
 
@@ -3164,7 +3200,7 @@ $test->for('example', 1, 'error_on_read_open', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_read_open";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't read "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3184,15 +3220,19 @@ $test->for('error', 'error_on_rmdir');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_rmdir',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_rmdir', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_rmdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't rmdir \"/nowhere\": $!"
 
@@ -3208,7 +3248,7 @@ $test->for('example', 1, 'error_on_rmdir', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_rmdir";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't rmdir "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3228,15 +3268,20 @@ $test->for('error', 'error_on_write_binmode');
 
   # given: synopsis;
 
-  my @args = ("/nowhere", ":utf8");
+  my $input = {
+    throw => 'error_on_write_binmode',
+    error => $!,
+    path => '/nowhere',
+    binmode => ':utf8',
+  };
 
-  my $error = $path->throw('error_on_write_binmode', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_write_binmode"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't binmode \"/nowhere\": $!"
 
@@ -3256,7 +3301,7 @@ $test->for('example', 1, 'error_on_write_binmode', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_write_binmode";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't binmode "\/nowhere"/;
   my $binmode = $result->stash('binmode');
   is $binmode, ":utf8";
@@ -3278,15 +3323,19 @@ $test->for('error', 'error_on_write_error');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_write_error',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_write_error', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_write_error"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't write to file \"/nowhere\": $!"
 
@@ -3302,7 +3351,7 @@ $test->for('example', 1, 'error_on_write_error', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_write_error";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't write to file "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3322,15 +3371,19 @@ $test->for('error', 'error_on_write_open');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_write_open',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_write_open', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_write_open"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't write \"/nowhere\": $!"
 
@@ -3346,7 +3399,7 @@ $test->for('example', 1, 'error_on_write_open', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_write_open";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't write "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3366,15 +3419,19 @@ $test->for('error', 'error_on_unlink');
 
   # given: synopsis;
 
-  my @args = ("/nowhere");
+  my $input = {
+    throw => 'error_on_unlink',
+    error => $!,
+    path => '/nowhere',
+  };
 
-  my $error = $path->throw('error_on_unlink', @args)->catch('error');
+  my $error = $path->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_unlink"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't unlink \"/nowhere\": $!"
 
@@ -3390,7 +3447,7 @@ $test->for('example', 1, 'error_on_unlink', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_unlink";
-  my $message = $result->message;
+  my $message = $result->render;
   like $message, qr/Can't unlink "\/nowhere"/;
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -3409,6 +3466,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Path.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Path.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

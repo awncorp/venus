@@ -778,9 +778,12 @@ $test->for('error', 'error_on_evaluate');
 
   # given: synopsis;
 
-  my @args = ("Exception!");
+  my $input = {
+    throw => 'error_on_evaluate',
+    error => 'Exception!',
+  };
 
-  my $error = $search->throw('error_on_evaluate', @args)->catch('error');
+  my $error = $search->catch('error', $input);
 
   # my $name = $error->name;
 
@@ -815,6 +818,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Search.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Search.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

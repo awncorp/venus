@@ -81,7 +81,7 @@ sub evaluate {
   my $error = $@;
 
   if ($error) {
-    $self->throw('error_on_evaluate', $error)->error;
+    $self->error({throw => 'error_on_evaluate', error => $error});
   }
 
   return $self->stash(evaluation => [
@@ -205,12 +205,15 @@ sub set {
 # ERRORS
 
 sub error_on_evaluate {
-  my ($self, $error) = @_;
+  my ($self, $data) = @_;
 
-  return {
+  my $result = {
     name => 'on.evaluate',
-    message => $error,
+    raise => true,
+    message => $data->{error},
   };
+
+  return $result;
 }
 
 1;

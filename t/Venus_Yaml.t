@@ -9,7 +9,7 @@ use Test::More;
 use Venus::Test;
 
 if (require Venus::Yaml && not Venus::Yaml->package) {
-  diag 'No suitable YAML library found';
+  diag 'No suitable YAML library found' if $ENV{VENUS_DEBUG};
   goto SKIP;
 }
 
@@ -188,7 +188,11 @@ $test->for('error', 'error_on_config');
 
   # given: synopsis;
 
-  my $error = $yaml->throw('error_on_config')->catch('error');
+  my $input = {
+    throw => 'error_on_config',
+  };
+
+  my $error = $yaml->catch('error', $input);
 
   # my $name = $error->name;
 
@@ -223,7 +227,7 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Yaml.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Yaml.pod') if $ENV{VENUS_RENDER};
 
 SKIP:
 ok 1 and done_testing;

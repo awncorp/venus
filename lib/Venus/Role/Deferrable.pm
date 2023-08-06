@@ -12,7 +12,7 @@ use Venus::Role 'fault';
 sub defer {
   my ($self, $name, @args) = @_;
 
-  return sub {} if !$name;
+  return sub {$self} if !$name;
 
   my $code = $self->can($name)
     or fault "Unable to defer $name: can't find $name in @{[ref $self]}";

@@ -122,7 +122,7 @@ dispatches to the method call specified.
 
   $example = Example->new;
 
-  # bless({}, 'Example1')
+  # bless({}, 'Example')
 
   # my $result = $example->defer('test', 1..4);
 
@@ -150,7 +150,7 @@ $test->for('example', 1, 'defer', sub {
 
   $example = Example->new;
 
-  # bless({}, 'Example1')
+  # bless({}, 'Example')
 
   # my $result = $example->defer('test', 1..4);
 
@@ -170,6 +170,34 @@ $test->for('example', 1, 'defer', sub {
   $result
 });
 
+=example-3 defer
+
+  # given: synopsis
+
+  package main;
+
+  $example = Example->new;
+
+  # bless({}, 'Example')
+
+  # my $result = $example->defer;
+
+  # $result->();
+
+  # bless({}, 'Example')
+
+=cut
+
+$test->for('example', 3, 'defer', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Example');
+  ok $result->does('Venus::Role::Deferrable');
+  is $result->defer->(), $result;
+
+  $result
+});
+
 =partials
 
 t/Venus.t: pdml: authors
@@ -181,6 +209,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Role/Deferrable.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Role/Deferrable.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

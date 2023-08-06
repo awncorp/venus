@@ -1181,7 +1181,7 @@ I<Since C<2.91>>
   name() (Str)
 
 The name method returns the default name for the task. This is used in usage
-text and can be controlled via the C<VENUS_RUN_NAME> environment variable, or
+text and can be controlled via the C<VENUS_TASK_NAME> environment variable, or
 the C<NAME> package variable.
 
 I<Since C<2.91>>
@@ -1208,7 +1208,7 @@ I<Since C<2.91>>
 
   package main;
 
-  local $ENV{VENUS_RUN_NAME} = 'venus-runner';
+  local $ENV{VENUS_TASK_NAME} = 'venus-runner';
 
   my $name = $run->name;
 
@@ -1565,12 +1565,6 @@ L<vns> CLI, which is simply an executable file which loads this package.
 
   # i.e.
   # cpanm --llocal -qn $DIST
-
-  # Install dependencies in the CWD
-  vns deps
-
-  # i.e.
-  # cpanm --llocal -qn --installdeps .
 
   # Check that a package can be compiled
   vns okay $FILE

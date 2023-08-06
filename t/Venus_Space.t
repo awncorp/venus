@@ -3597,15 +3597,19 @@ $test->for('error', 'error_on_call_missing');
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_call_missing',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_call_missing', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_call_missing"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Unable to locate class method \"execute\" via package \"Example\""
 
@@ -3625,7 +3629,7 @@ $test->for('example', 1, 'error_on_call_missing', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_call_missing";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Unable to locate class method \"execute\" via package \"Example\"";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3647,15 +3651,19 @@ $test->for('error', 'error_on_call_undefined');
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_call_undefined',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_call_undefined', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_call_undefined"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Attempt to call undefined class method in package \"Example\""
 
@@ -3675,7 +3683,7 @@ $test->for('example', 1, 'error_on_call_undefined', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_call_undefined";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Attempt to call undefined class method in package \"Example\"";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3697,15 +3705,19 @@ $test->for('error', 'error_on_cop_missing');
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_cop_missing',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_cop_missing', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_cop_missing"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Unable to locate object method \"execute\" via package \"Example\""
 
@@ -3725,7 +3737,7 @@ $test->for('example', 1, 'error_on_cop_missing', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_cop_missing";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Unable to locate object method \"execute\" via package \"Example\"";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3747,15 +3759,19 @@ $test->for('error', 'error_on_cop_undefined');
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_cop_undefined',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_cop_undefined', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_cop_undefined"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Attempt to cop undefined object method from package \"$class\""
 
@@ -3775,7 +3791,7 @@ $test->for('example', 1, 'error_on_cop_undefined', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_cop_undefined";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Attempt to cop undefined object method from package \"Example\"";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3797,15 +3813,19 @@ $test->for('error', 'error_on_eval');
 
   # given: synopsis;
 
-  my @args = ("Example", "Exception!");
+  my $input = {
+    throw => 'error_on_eval',
+    error => 'Exception!',
+    package => 'Example',
+  };
 
-  my $error = $space->throw('error_on_eval', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_eval"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Exception!"
 
@@ -3821,7 +3841,7 @@ $test->for('example', 1, 'error_on_eval', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_eval";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Exception!";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3841,15 +3861,19 @@ $test->for('error', 'error_on_load');
 
   # given: synopsis;
 
-  my @args = ("Example", "cause unknown");
+  my $input = {
+    throw => 'error_on_load',
+    package => 'Example',
+    error => 'cause unknown',
+  };
 
-  my $error = $space->throw('error_on_load', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_load"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Error attempting to load Example: \"cause unknown\""
 
@@ -3865,7 +3889,7 @@ $test->for('example', 1, 'error_on_load', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_load";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Error attempting to load Example: \"cause unknown\"";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3885,15 +3909,19 @@ $test->for('error', 'error_on_swap');
 
   # given: synopsis;
 
-  my @args = ("Example", "execute");
+  my $input = {
+    throw => 'error_on_swap',
+    package => 'Example',
+    routine => 'execute',
+  };
 
-  my $error = $space->throw('error_on_swap', @args)->catch('error');
+  my $error = $space->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_swap"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Attempt to swap undefined subroutine in package \"$class\""
 
@@ -3913,7 +3941,7 @@ $test->for('example', 1, 'error_on_swap', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_swap";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Attempt to swap undefined subroutine in package \"Example\"";
   my $package = $result->stash('package');
   is $package, "Example";
@@ -3934,6 +3962,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Space.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Space.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

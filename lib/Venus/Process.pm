@@ -61,6 +61,10 @@ sub _forkable {
   $Config::Config{d_pseudofork} ? 0 : 1;
 }
 
+sub _serve {
+  true;
+}
+
 sub _kill {
   CORE::kill(@_);
 }
@@ -107,12 +111,82 @@ sub assertion {
   return $assert;
 }
 
+sub async {
+  my ($self, $code, @args) = @_;
+
+  require Venus::Path;
+
+  my $path = $PATH;
+
+  $PATH = Venus::Path->mktemp_dir->absolute->value;
+
+  my $parent = $self->class->new;
+
+  $parent->{directory} = $PATH;
+
+  $parent->register;
+
+  $parent->work(sub{
+    my ($process) = @_;
+
+    $process->untrap;
+
+    $process->{directory} = $PATH;
+
+    $process->register;
+
+    my $result = $process->try($code, @args)->any->result;
+
+    $process->sendall($result) if defined $result;
+
+    return;
+  });
+
+  $parent->trap(INT => sub {
+    $parent->killall;
+  });
+
+  $parent->trap(TERM => sub {
+    $parent->killall;
+  });
+
+  $PATH = $path;
+
+  return $parent;
+}
+
+sub await {
+  my ($self, $timeout) = @_;
+
+  my $path = $PATH;
+
+  $PATH = $self->{directory};
+
+  my $result;
+
+  if (defined $timeout) {
+    (my $error, $result) = $self->catch('poll', $timeout, 'recvall');
+  }
+  else {
+    do{$result = $self->recvall} while !@{$result};
+  }
+
+  $PATH = $path;
+
+  return wantarray ? ($result ? (@{$result}) : ()) : $result;
+}
+
 sub chdir {
   my ($self, $path) = @_;
 
   $path ||= $CWD;
 
-  _chdir($path) or $self->throw('error_on_chdir', $path, $PID, $!)->error;
+  _chdir($path) or $self->error({
+    throw => 'error_on_chdir',
+    path => $path,
+    pid => $PID,
+    error => $!
+  });
 
   return $self;
 }
@@ -244,7 +318,7 @@ sub fork {
   my ($self, $code, @args) = @_;
 
   if (not(_forkable())) {
-    $self->throw('error_on_fork_support', $PID)->error;
+    $self->error({throw => 'error_on_fork_support', pid => $PID});
   }
   if (defined(my $pid = _fork())) {
     if ($pid) {
@@ -270,7 +344,7 @@ sub fork {
     return wantarray ? ($process, $PID) : $process;
   }
   else {
-    $self->throw('error_on_fork_process', $PID, $!)->error;
+    $self->error({throw => 'error_on_fork_process', error => $!, pid => $PID});
   }
 }
 
@@ -292,6 +366,23 @@ sub forks {
   }
 
   return wantarray ? ($process ? ($process, []) : ($process, [@pids]) ) : $process;
+}
+
+sub is_dyadic {
+  my ($self) = @_;
+
+  my $directory = $self->{directory};
+
+  my $path = $PATH;
+
+  my $temporary = $PATH = $directory if $directory;
+
+  my $is_dyadic = $directory && ($temporary) && $self->is_registered && ($self->ppid || $self->count == 1)
+    ? true : false;
+
+  $PATH = $path;
+
+  return $is_dyadic;
 }
 
 sub is_leader {
@@ -363,6 +454,18 @@ sub leave {
   delete $self->{watchlist};
 
   return $self;
+}
+
+sub limit {
+  my ($self, $count) = @_;
+
+  if ($self->count >= $count) {
+    $self->prune while $self->count >= $count;
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 sub others {
@@ -447,7 +550,11 @@ sub poll {
   }
 
   if (!$seen) {
-    $self->throw('error_on_timeout_poll', $timeout, $code)->error;
+    $self->error({
+      throw => 'error_on_timeout_poll',
+      timeout => $timeout,
+      code => $code
+    });
   }
 
   return wantarray ? @{$result} : $result;
@@ -474,7 +581,11 @@ sub pool {
   }
 
   if ($seen < $count) {
-    $self->throw('error_on_timeout_pool', $timeout, $count)->error;
+    $self->error({
+      throw => 'error_on_timeout_pool',
+      timeout => $timeout,
+      pool_size => $count
+    });
   }
 
   @{$self->watchlist} = @pids;
@@ -658,10 +769,19 @@ sub send_key {
   return CORE::join '.', $self->pid, $pid;
 }
 
+sub serve {
+  my ($self, $count, $code) = @_;
+
+  do {$self->work($code) until $self->limit($count)} while _serve;
+
+  return $self;
+}
+
 sub setsid {
   my ($self) = @_;
 
-  return _setsid != -1 || $self->throw('error_on_setid', $PID, $!)->error;
+  return _setsid != -1
+    || $self->error({throw => 'error_on_setid', pid => $PID, error => $!});
 }
 
 sub started {
@@ -702,8 +822,12 @@ sub stderr {
     _open(\*STDERR, '>&', $STDERR);
   }
   else {
-    _open(\*STDERR, '>&', IO::File->new($path, 'w'))
-      or $self->throw('error_on_stderr', $path, $PID, $!)->error;
+    _open(\*STDERR, '>&', IO::File->new($path, 'w')) or $self->error({
+      throw => 'error_on_stderr',
+      path => $path,
+      pid => $PID,
+      error => $!
+    });
   }
 
   return $self;
@@ -721,8 +845,12 @@ sub stdin {
     _open(\*STDIN, '<&', $STDIN);
   }
   else {
-    _open(\*STDIN, '<&', IO::File->new($path, 'r'))
-      or $self->throw('error_on_stdin', $path, $PID, $!)->error;
+    _open(\*STDIN, '<&', IO::File->new($path, 'r')) or $self->error({
+      throw => 'error_on_stdin',
+      path => $path,
+      pid => $PID,
+      error => $!
+    });
   }
 
   return $self;
@@ -740,8 +868,12 @@ sub stdout {
     _open(\*STDOUT, '>&', $STDOUT);
   }
   else {
-    _open(\*STDOUT, '>&', IO::File->new($path, 'w'))
-      or $self->throw('error_on_stdout', $path, $PID, $!)->error;
+    _open(\*STDOUT, '>&', IO::File->new($path, 'w')) or $self->error({
+      throw => 'error_on_stdout',
+      path => $path,
+      pid => $PID,
+      error => $!
+    });
   }
 
   return $self;
@@ -779,7 +911,11 @@ sub sync {
   }
 
   if ($msgs < $count) {
-    $self->throw('error_on_timeout_sync', $timeout, $count)->error;
+    $self->error({
+      throw => 'error_on_timeout_sync',
+      timeout => $timeout,
+      pool_size => $count
+    });
   }
 
   return $self;
@@ -790,7 +926,7 @@ sub trap {
 
   $SIG{uc($name)} = !ref($expr) ? uc($expr) : sub {
     local($!, $?);
-    return $expr->(@_);
+    return $self->$expr->(uc($name), @_);
   };
 
   return $self;
@@ -920,161 +1056,233 @@ sub unwatch {
   return wantarray ? @{$watchlist} : $watchlist;
 }
 
+# DESTROY
+
+sub DESTROY {
+  my ($self, @data) = @_;
+
+  $self->SUPER::DESTROY(@data);
+
+  require Venus::Path;
+
+  Venus::Path->new($self->{directory})->rmdirs if $self->is_dyadic && $self->is_leader;
+
+  return $self;
+}
+
 # ERRORS
 
 sub error_on_chdir {
-  my ($self, $path, $pid, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t chdir "{{path}}": {{error}}';
 
-  return {
-    name => 'on.chdir',
-    message => "Can't chdir \"$path\": $err",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.chdir',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_fork_process {
-  my ($self, $pid, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t fork process {{pid}}: {{error}}';
 
-  return {
-    name => 'on.fork.process',
-    message => "Can't fork process $pid: $err",
-    stash => {
-      pid => $pid,
-    }
+  my $stash = {
+    error => $data->{error},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.fork.process',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_fork_support {
-  my ($self, $pid) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.fork.support',
-    message => "Can't fork process $pid: Fork emulation not supported",
-    stash => {
-      pid => $pid,
-    }
+  my $message = 'Can\'t fork process {{pid}}: Fork emulation not supported';
+
+  my $stash = {
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.fork.support',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_setid {
-  my ($self, $pid, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t start a new session: {{error}}';
 
-  return {
-    name => 'on.setid',
-    message => "Can't start a new session: $err",
-    stash => {
-      pid => $pid,
-    }
+  my $stash = {
+    error => $data->{error},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.setid',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_stderr {
-  my ($self, $path, $pid, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t redirect STDERR to "{{path}}": {{error}}';
 
-  return {
-    name => 'on.stderr',
-    message => "Can't redirect STDERR to \"$path\": $err",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.stderr',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_stdin {
-  my ($self, $path, $pid, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t redirect STDIN to "{{path}}": {{error}}';
 
-  return {
-    name => 'on.stdin',
-    message => "Can't redirect STDIN to \"$path\": $err",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.stdin',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_stdout {
-  my ($self, $path, $pid, $err) = @_;
+  my ($self, $data) = @_;
 
-  $err = "" if !defined $err;
+  my $message = 'Can\'t redirect STDOUT to "{{path}}": {{error}}';
 
-  return {
-    name => 'on.stdout',
-    message => "Can't redirect STDOUT to \"$path\": $err",
-    stash => {
-      path => $path,
-      pid => $pid,
-    }
+  my $stash = {
+    error => $data->{error},
+    path => $data->{path},
+    pid => $data->{pid},
   };
+
+  my $result = {
+    name => 'on.stdout',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_timeout_poll {
-  my ($self, $timeout, $code) = @_;
+  my ($self, $data) = @_;
 
-  my $name = ref $code eq 'CODE' ? '__ANON__' : "\"$code\"";
-  my $exchange = $self->exchange;
-  my $pid = $self->pid;
+  my $message = CORE::join ' ', 'Timed out after {{timeout}} seconds',
+    'in process {{pid}} while polling {{name}}';
 
-  return {
-    name => 'on.timeout.poll',
-    message => "Timed out after $timeout seconds in process $pid while polling $name",
-    stash => {
-      exchange => $exchange,
-      pid => $pid,
-      code => $code,
-      timeout => $timeout,
-    }
+  my $stash = {
+    code => $data->{code},
+    exchange => $self->exchange,
+    name => (ref $data->{code} eq 'CODE' ? '__ANON__' : $data->{code}),
+    pid => $self->pid,
+    timeout => $data->{timeout},
   };
+
+  my $result = {
+    name => 'on.timeout.poll',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_timeout_pool {
-  my ($self, $timeout, $pool_size) = @_;
+  my ($self, $data) = @_;
 
-  my $exchange = $self->exchange;
-  my $pid = $self->pid;
+  my $message = CORE::join ' ', 'Timed out after {{timeout}} seconds',
+    'in process {{pid}} while pooling';
 
-  return {
-    name => 'on.timeout.pool',
-    message => "Timed out after $timeout seconds in process $pid while pooling",
-    stash => {
-      exchange => $exchange,
-      pid => $pid,
-      pool_size => $pool_size,
-      timeout => $timeout,
-    }
+  my $stash = {
+    pool_size => $data->{pool_size},
+    exchange => $self->exchange,
+    pid => $self->pid,
+    timeout => $data->{timeout},
   };
+
+  my $result = {
+    name => 'on.timeout.pool',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_timeout_sync {
-  my ($self, $timeout, $pool_size) = @_;
+  my ($self, $data) = @_;
 
-  my $exchange = $self->exchange;
-  my $pid = $self->pid;
+  my $message = CORE::join ' ', 'Timed out after {{timeout}} seconds',
+    'in process {{pid}} while syncing';
 
-  return {
-    name => 'on.timeout.sync',
-    message => "Timed out after $timeout seconds in process $pid while syncing",
-    stash => {
-      exchange => $exchange,
-      pid => $pid,
-      pool_size => $pool_size,
-      timeout => $timeout,
-    }
+  my $stash = {
+    pool_size => $data->{pool_size},
+    exchange => $self->exchange,
+    pid => $self->pid,
+    timeout => $data->{timeout},
   };
+
+  my $result = {
+    name => 'on.timeout.sync',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;

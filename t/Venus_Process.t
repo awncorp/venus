@@ -13,7 +13,7 @@ use Venus::Process;
 use Venus::Path;
 
 if ($Config{d_pseudofork}) {
-  diag 'Fork emulation not supported';
+  diag 'Fork emulation not supported' if $ENV{VENUS_DEBUG};
   goto SKIP;
 }
 
@@ -24,6 +24,7 @@ our $TEST_VENUS_PROCESS_EXIT = 0;
 our $TEST_VENUS_PROCESS_EXITCODE = 0;
 our $TEST_VENUS_PROCESS_FORK = undef;
 our $TEST_VENUS_PROCESS_FORKABLE = 1;
+our $TEST_VENUS_PROCESS_SERVE = 0;
 our $TEST_VENUS_PROCESS_KILL = 0;
 our $TEST_VENUS_PROCESS_OPEN = 1;
 our $TEST_VENUS_PROCESS_PID = 12345;
@@ -94,6 +95,15 @@ $Venus::Process::PID = $TEST_VENUS_PROCESS_PID;
   no warnings 'redefine';
   *{"Venus::Process::_forkable"} = sub {
     return $TEST_VENUS_PROCESS_FORKABLE;
+  };
+}
+
+# _serve
+{
+  no strict 'refs';
+  no warnings 'redefine';
+  *{"Venus::Process::_serve"} = sub {
+    return $TEST_VENUS_PROCESS_SERVE;
   };
 }
 
@@ -193,6 +203,8 @@ $test->for('abstract');
 
 =includes
 
+method: async
+method: await
 method: chdir
 method: check
 method: count
@@ -216,6 +228,7 @@ method: kill
 method: killall
 method: leader
 method: leave
+method: limit
 method: others
 method: others_active
 method: others_inactive
@@ -235,6 +248,7 @@ method: registrants
 method: restart
 method: send
 method: sendall
+method: serve
 method: setsid
 method: started
 method: status
@@ -367,6 +381,230 @@ $test->for('example', 2, 'alarm', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   is_deeply $result, 10;
+
+  $result
+});
+
+=method async
+
+The async method creates a new L<Venus::Process> object and asynchronously runs
+the callback provided via the L</work> method. Both process objects are
+configured to be are dyadic, i.e. representing an exclusing bi-directoral
+relationship. Additionally, the callback return value will be automatically
+made available via the L</await> method unless it's undefined. This method
+returns the newly created L<"dyadic"|/is_dyadic> process object.
+
+=signature async
+
+  async(CodeRef $code, Any @args) (Process)
+
+=metadata async
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 async
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # bless({...}, 'Venus::Process')
+
+=cut
+
+$test->for('example', 1, 'async', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  ok my $result = $tryable->result;
+  ok $result->{directory};
+
+  $result
+});
+
+=method await
+
+The await method expects to operate on a L<"dyadic"|/is_dyadic> process object
+and blocks the execution of the current process until a value is received from
+its couterpart. If a timeout is provided, execution will be blocked until a
+value is received or the wait time expires. If a timeout of C<0> is provided,
+execution will not be blocked. If no timeout is provided at all, execution will
+block indefinitely.
+
+=signature await
+
+  await(Int $timeout) (Any)
+
+=metadata await
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 await
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  my $await = $async->await;
+
+  # ['done']
+
+=cut
+
+$test->for('example', 1, 'await', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['done'];
+
+  $result
+});
+
+=example-2 await
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  my $await = $async->await;
+
+  # [{status => 'done'}]
+
+=cut
+
+$test->for('example', 2, 'await', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is_deeply $result, [{status => 'done'}];
+
+  $result
+});
+
+=example-3 await
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  my ($await) = $async->await;
+
+  # 'done'
+
+=cut
+
+$test->for('example', 3, 'await', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is $result, 'done';
+
+  $result
+});
+
+=example-4 await
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  my ($await) = $async->await;
+
+  # {status => 'done'}
+
+=cut
+
+$test->for('example', 4, 'await', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is_deeply $result, {status => 'done'};
+
+  $result
+});
+
+=example-5 await
+
+  # given: synopsis;
+
+  my $async = $parent->async(sub{
+    ($process) = @_;
+    # in forked process ...
+    $process->sendall('send 1');
+    $process->sendall('send 2');
+    $process->sendall('send 3');
+    return;
+  });
+
+  my $await;
+
+  my $results = [];
+
+  push @$results, $async->await;
+
+  # 'send 1'
+
+  push @$results, $async->await;
+
+  # 'send 2'
+
+  push @$results, $async->await;
+
+  # 'send 3'
+
+  $results;
+
+  # ['send 1', 'send 2', 'send 3']
+
+=cut
+
+$test->for('example', 5, 'await', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is_deeply $result, ['send 1', 'send 2', 'send 3'];
 
   $result
 });
@@ -2257,6 +2495,88 @@ $test->for('example', 2, 'leave', sub {
   $result
 });
 
+=method limit
+
+The limit method blocks the execution of the current process until the number
+of processes in the L</watchlist> falls bellow the count specified. The method
+returns true once execution continues if execution was blocked, and false if
+the limit has yet to be reached.
+
+=signature limit
+
+  limit(Int $count) (Bool)
+
+=metadata limit
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 limit
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->work(sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  my $limit = $parent->limit(2);
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'limit', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 1;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 limit
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->works(2, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  my $limit = $parent->limit(2);
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'limit', sub {
+  my ($tryable) = @_;
+  local @TEST_VENUS_PROCESS_PIDS = ();
+  local $TEST_VENUS_PROCESS_FORK = undef;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 1;
+
+  $result
+});
+
 =method others
 
 The others method returns all L</registrants> other than the current process,
@@ -3569,6 +3889,89 @@ $test->for('example', 1, 'sendall', sub {
   my $process_3 = Venus::Process->new(12347);
   is_deeply $process_3->recv(12345), {from => 12345, said => 'hello'};
   $process_3->unregister;
+
+  $result
+});
+
+=method serve
+
+The serve method executes the callback using L</work> until L</limit> blocks
+the execution of the current process, indefinitely. It has the effect of
+serving the callback and maintaining the desired number of forks until killed
+or gracefully shutdown.
+
+=signature serve
+
+  serve(Int $count, CodeRef $callback) (Process)
+
+=metadata serve
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 serve
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->serve(2, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # ...
+
+  # bless({...}, "Venus::Process")
+
+=cut
+
+$test->for('example', 1, 'serve', sub {
+  my ($tryable) = @_;
+  local @TEST_VENUS_PROCESS_PIDS = ();
+  local $TEST_VENUS_PROCESS_FORK = undef;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  local $TEST_VENUS_PROCESS_SERVE = 0;
+  my $result = $tryable->result;
+  is scalar(@TEST_VENUS_PROCESS_PIDS), 2;
+
+  $result
+});
+
+=example-2 serve
+
+  package main;
+
+  use Venus::Process;
+
+  my $parent = Venus::Process->new;
+
+  $parent->serve(10, sub {
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # ...
+
+  # bless({...}, "Venus::Process")
+
+=cut
+
+$test->for('example', 2, 'serve', sub {
+  my ($tryable) = @_;
+  local @TEST_VENUS_PROCESS_PIDS = ();
+  local $TEST_VENUS_PROCESS_FORK = undef;
+  local $TEST_VENUS_PROCESS_WAITPID = -1;
+  local $TEST_VENUS_PROCESS_SERVE = 0;
+  my $result = $tryable->result;
+  is scalar(@TEST_VENUS_PROCESS_PIDS), 10;
 
   $result
 });
@@ -4946,15 +5349,20 @@ $test->for('error', 'error_on_chdir');
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my $input = {
+    throw => 'error_on_chdir',
+    error => $!,
+    path => '/nowhere',
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_chdir', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_chdir"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't chdir \"$path\": $!"
 
@@ -4974,7 +5382,7 @@ $test->for('example', 1, 'error_on_chdir', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_chdir";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't chdir \"/nowhere\": $!";
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -4996,15 +5404,19 @@ $test->for('error', 'error_on_fork_process');
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_fork_process',
+    error => $!,
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_fork_process', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_fork_process"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't fork process $pid: $!"
 
@@ -5020,7 +5432,7 @@ $test->for('example', 1, 'error_on_fork_process', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_fork_process";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't fork process 123: $!";
   my $pid = $result->stash('pid');
   is $pid, "123";
@@ -5040,15 +5452,18 @@ $test->for('error', 'error_on_fork_support');
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_fork_support',
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_fork_support', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_fork_support"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't fork process $pid: Fork emulation not supported"
 
@@ -5064,7 +5479,7 @@ $test->for('example', 1, 'error_on_fork_support', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_fork_support";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't fork process 123: Fork emulation not supported";
   my $pid = $result->stash('pid');
   is $pid, 123;
@@ -5084,15 +5499,19 @@ $test->for('error', 'error_on_setid');
 
   # given: synopsis;
 
-  my @args = (123);
+  my $input = {
+    throw => 'error_on_setid',
+    error => $!,
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_setid', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_setid"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't start a new session: $!"
 
@@ -5108,7 +5527,7 @@ $test->for('example', 1, 'error_on_setid', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_setid";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't start a new session: $!";
   my $pid = $result->stash('pid');
   is $pid, 123;
@@ -5128,15 +5547,20 @@ $test->for('error', 'error_on_stderr');
 
   # given: synopsis;
 
-  my @args = ("/nowhere", 123);
+  my $input = {
+    throw => 'error_on_stderr',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stderr', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stderr"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDERR to \"/nowhere\": $!"
 
@@ -5156,7 +5580,7 @@ $test->for('example', 1, 'error_on_stderr', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_stderr";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't redirect STDERR to \"/nowhere\": $!";
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -5178,15 +5602,20 @@ $test->for('error', 'error_on_stdin');
 
   # given: synopsis;
 
-  my @args = ('/nowhere', 123);
+  my $input = {
+    throw => 'error_on_stdin',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stdin', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stdin"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDIN to \"$path\": $!"
 
@@ -5206,7 +5635,7 @@ $test->for('example', 1, 'error_on_stdin', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_stdin";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't redirect STDIN to \"/nowhere\": $!";
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -5228,15 +5657,20 @@ $test->for('error', 'error_on_stdout');
 
   # given: synopsis;
 
-  my @args = ( '/nowhere', 123);
+  my $input = {
+    throw => 'error_on_stdout',
+    error => $!,
+    path => "/nowhere",
+    pid => 123,
+  };
 
-  my $error = $parent->throw('error_on_stdout', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_stdout"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Can't redirect STDOUT to \"$path\": $!"
 
@@ -5256,7 +5690,7 @@ $test->for('example', 1, 'error_on_stdout', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_stdout";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Can't redirect STDOUT to \"/nowhere\": $!";
   my $path = $result->stash('path');
   is $path, "/nowhere";
@@ -5278,15 +5712,19 @@ $test->for('error', 'error_on_timeout_poll');
 
   # given: synopsis;
 
-  my @args = (0, sub{});
+  my $input = {
+    throw => 'error_on_timeout_poll',
+    code => sub{},
+    timeout => 0,
+  };
 
-  my $error = $parent->throw('error_on_timeout_poll', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_timeout_poll"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Timed out after 0 seconds in process 12345 while polling __ANON__"
 
@@ -5314,7 +5752,7 @@ $test->for('example', 1, 'error_on_timeout_poll', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_timeout_poll";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Timed out after 0 seconds in process 12345 while polling __ANON__";
   my $code = $result->stash('code');
   ok ref $code, 'CODE';
@@ -5340,15 +5778,19 @@ $test->for('error', 'error_on_timeout_pool');
 
   # given: synopsis;
 
-  my @args = (0, 2);
+  my $input = {
+    throw => 'error_on_timeout_pool',
+    pool_size => 2,
+    timeout => 0,
+  };
 
-  my $error = $parent->throw('error_on_timeout_pool', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_timeout_pool"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Timed out after 0 seconds in process 12345 while pooling"
 
@@ -5376,7 +5818,7 @@ $test->for('example', 1, 'error_on_timeout_pool', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_timeout_pool";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Timed out after 0 seconds in process 12345 while pooling";
   my $exchange = $result->stash('exchange');
   is $exchange, undef;
@@ -5402,15 +5844,19 @@ $test->for('error', 'error_on_timeout_sync');
 
   # given: synopsis;
 
-  my @args = (0, 2);
+  my $input = {
+    throw => 'error_on_timeout_sync',
+    pool_size => 2,
+    timeout => 0,
+  };
 
-  my $error = $parent->throw('error_on_timeout_sync', @args)->catch('error');
+  my $error = $parent->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_timeout_sync"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Timed out after 0 seconds in process 12345 while syncing"
 
@@ -5438,7 +5884,7 @@ $test->for('example', 1, 'error_on_timeout_sync', sub {
   isa_ok $result, 'Venus::Error';
   my $name = $result->name;
   is $name, "on_timeout_sync";
-  my $message = $result->message;
+  my $message = $result->render;
   is $message, "Timed out after 0 seconds in process 12345 while syncing";
   my $exchange = $result->stash('exchange');
   is $exchange, undef;
@@ -5465,7 +5911,7 @@ $test->for('partials');
 
 Venus::Path->new($Venus::Process::PATH)->rmdirs;
 
-$test->render('lib/Venus/Process.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Process.pod') if $ENV{VENUS_RENDER};
 
 SKIP:
 ok 1 and done_testing;

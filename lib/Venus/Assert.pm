@@ -38,12 +38,18 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
-  my $name = 'Unknown';
-  my $message = 'Type assertion (%s) failed: received (%s), expected (%s)';
+  if (!$self->name) {
+    $self->name('Unknown')
+  }
 
-  $self->name($name) if !$self->name;
-  $self->message($message) if !$self->message;
-  $self->expects([]) if !$self->expects;
+  if (!$self->message) {
+    $self->message('Type assertion (%s) failed: received (%s), expected (%s)');
+  }
+
+  if (!$self->expects) {
+    $self->expects([])
+  }
+
   $self->conditions;
 
   return $self;
@@ -578,15 +584,7 @@ sub validate {
 
   return $data if $valid;
 
-  require Scalar::Util;
-
-  my $identity = lc(Venus::Type->new(value => $data)->identify);
-  my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
-  my $message = sprintf($self->message, $self->name, $identity, $expected);
-
-  $self->throw('error_on_validate', $data)->error;
-
-  return;
+  return $self->error({throw => 'error_on_validate', value => $data});
 }
 
 sub validator {
@@ -637,7 +635,7 @@ sub within {
     });
   }
   else {
-    $self->throw('error_on_within', $type, @next)->error;
+    $self->error({throw => 'error_on_within', type => $type, args => [@next]});
   }
 
   $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
@@ -671,36 +669,51 @@ sub error_on_validate {
     scalar => 'scalarref',
   };
 
-  my $identity = Venus::Type->new(value => $data)->identify;
-     $identity = $legend->{lc($identity)} || lc($identity);
+  my $value = $data->{value};
 
-  my $expected = (join ' OR ', @{$self->expects}) || 'indescribable constraints';
+  my $identified = Venus::Type->new(value => $value)->identify;
+  my $identity = $legend->{lc($identified)} || lc($identified);
 
-  my $message = sprintf($self->message, $self->name, $identity, $expected);
-     $message .= "\n\nReceived:\n\n\"@{[$self->received($data)]}\"\n\n";
+  my $expected = (join(' OR ', @{$self->expects})) || 'indescribable constraints';
+  my $received = $self->received($value);
 
-  return {
-    name => 'on.validate',
-    message => $message,
-    stash => {
-      identity => $identity,
-      variable => $data,
-    },
+  my $message = join(' ', sprintf($self->message, $self->name, $identity, $expected),
+    join("\n\n", "Received:", $received, ''));
+
+  my $stash = {
+    identity => $identity,
+    variable => $value,
   };
+
+  my $result = {
+    name => 'on.validate',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_within {
-  my ($self, $type, @args) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.within',
-    message => "Invalid type (\"$type\") provided to the \"within\" method",
-    stash => {
-      self => $self,
-      type => $type,
-      args => [@args],
-    },
+  my $message = 'Invalid type ("{{type}}") provided to the "within" method';
+
+  my $stash = {
+    self => $self,
+    type => $data->{type},
+    args => $data->{args},
   };
+
+  my $result = {
+    name => 'on.within',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 # ROUTINES

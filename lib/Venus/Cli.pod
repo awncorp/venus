@@ -1486,15 +1486,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_arg_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_arg_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_arg_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid argument: example: ..."
 
@@ -1518,15 +1523,20 @@ B<example 1>
 
   # given: synopsis;
 
-  my @args = ("...", "example", "string");
+  my $input = {
+    throw => 'error_on_opt_validation',
+    error => "...",
+    name => "example",
+    type => "string",
+  };
 
-  my $error = $cli->throw('error_on_opt_validation', @args)->catch('error');
+  my $error = $cli->catch('error', $input);
 
   # my $name = $error->name;
 
   # "on_opt_validation"
 
-  # my $message = $error->message;
+  # my $message = $error->render;
 
   # "Invalid option: example: ..."
 

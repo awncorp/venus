@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    3.40
+    3.55
 
 SYNOPSIS
 
@@ -215,6 +215,57 @@ FUNCTIONS
         my $assert = assert(1234567890, 'float');
       
         # Exception! (isa Venus::Assert::Error)
+
+ async
+
+      async(CodeRef $code, Any @args) (Process)
+
+    The async function accepts a callback and executes it asynchronously
+    via "async" in Venus::Process. This function returns a "dyadic"
+    Venus::Process object which can be used with "await".
+
+    Since 3.40
+
+    async example 1
+
+        package main;
+      
+        use Venus 'async';
+      
+        my $async = async sub{
+          'done'
+        };
+      
+        # bless({...}, 'Venus::Process')
+
+ await
+
+      await(Process $process, Int $timeout) (Any)
+
+    The await function accepts a "dyadic" Venus::Process object and
+    eventually returns a value (or values) for it. The value(s) returned
+    are the return values or emissions from the asychronous callback
+    executed with "async" which produced the process object.
+
+    Since 3.40
+
+    await example 1
+
+        package main;
+      
+        use Venus 'async', 'await';
+      
+        my $process;
+      
+        my $async = async sub{
+          ($process) = @_;
+          # in forked process ...
+          return 'done';
+        };
+      
+        my $await = await $async;
+      
+        # ['done']
 
  bool
 
@@ -1456,7 +1507,11 @@ FUNCTIONS
       log(Any @args) (Log)
 
     The log function prints the arguments provided to STDOUT, stringifying
-    complex values, and returns a Venus::Log object.
+    complex values, and returns a Venus::Log object. If the first argument
+    is a log level name, e.g. debug, error, fatal, info, trace, or warn, it
+    will be used when emitting the event. The desired log level is
+    specified by the VENUS_LOG_LEVEL environment variable and defaults to
+    trace.
 
     Since 2.40
 

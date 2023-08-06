@@ -13,7 +13,7 @@ OO Standard Library for Perl 5
 
 =head1 VERSION
 
-3.40
+3.55
 
 =cut
 
@@ -307,6 +307,70 @@ I<Since C<2.40>>
   my $assert = assert(1234567890, 'float');
 
   # Exception! (isa Venus::Assert::Error)
+
+=back
+
+=cut
+
+=head2 async
+
+  async(CodeRef $code, Any @args) (Process)
+
+The async function accepts a callback and executes it asynchronously via
+L<Venus::Process/async>. This function returns a
+L<"dyadic"|Venus::Process/is_dyadic> L<Venus::Process> object which can be used
+with L</await>.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item async example 1
+
+  package main;
+
+  use Venus 'async';
+
+  my $async = async sub{
+    'done'
+  };
+
+  # bless({...}, 'Venus::Process')
+
+=back
+
+=cut
+
+=head2 await
+
+  await(Process $process, Int $timeout) (Any)
+
+The await function accepts a L<"dyadic"|Venus::Process/is_dyadic>
+L<Venus::Process> object and eventually returns a value (or values) for it. The
+value(s) returned are the return values or emissions from the asychronous
+callback executed with L</async> which produced the process object.
+
+I<Since C<3.40>>
+
+=over 4
+
+=item await example 1
+
+  package main;
+
+  use Venus 'async', 'await';
+
+  my $process;
+
+  my $async = async sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  };
+
+  my $await = await $async;
+
+  # ['done']
 
 =back
 
@@ -1943,7 +2007,10 @@ I<Since C<2.32>>
   log(Any @args) (Log)
 
 The log function prints the arguments provided to STDOUT, stringifying complex
-values, and returns a L<Venus::Log> object.
+values, and returns a L<Venus::Log> object. If the first argument is a log
+level name, e.g. C<debug>, C<error>, C<fatal>, C<info>, C<trace>, or C<warn>,
+it will be used when emitting the event. The desired log level is specified by
+the C<VENUS_LOG_LEVEL> environment variable and defaults to C<trace>.
 
 I<Since C<2.40>>
 

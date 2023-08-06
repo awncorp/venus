@@ -8,8 +8,8 @@ use strict;
 use warnings;
 
 BEGIN {
-  $ENV{VENUS_TASK_RUN} = 1;
-  $ENV{VENUS_RUN_NAME} = 'vns';
+  $ENV{VENUS_TASK_AUTO} = 1;
+  $ENV{VENUS_TASK_NAME} = 'vns';
 }
 
 use Venus::Run;

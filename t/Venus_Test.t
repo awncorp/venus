@@ -503,6 +503,6 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Test.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Test.pod') if $ENV{VENUS_RENDER};
 
 $test->done;

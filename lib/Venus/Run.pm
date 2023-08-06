@@ -247,7 +247,7 @@ sub init {
 
 sub name {
 
-  return $ENV{VENUS_RUN_NAME} || $NAME;
+  return $ENV{VENUS_TASK_NAME} || $NAME;
 }
 
 state $opts = {
@@ -444,7 +444,7 @@ sub _find_in_task {
     ? (
     $conf->{task}{$item}
     ? (do {
-      $ENV{VENUS_TASK_RUN} = 1;
+      $ENV{VENUS_TASK_AUTO} = 1;
       my $value = $conf->{task}{$item};
       ($value eq $item)
         ? ($value)
@@ -483,7 +483,7 @@ sub _find_in_with {
     ? (do {
       $ENV{ECHO} = 0;
       $ENV{VENUS_FILE} = _vars($conf->{with}{$item});
-      $ENV{VENUS_RUN_NAME} || 'vns';
+      $ENV{VENUS_TASK_NAME} || 'vns';
     })
     : ($item)
     )

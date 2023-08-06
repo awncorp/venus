@@ -9,7 +9,7 @@ use Test::More;
 use Venus::Test;
 
 if (require Venus::Json && not Venus::Json->package) {
-  diag 'No suitable JSON library found';
+  diag 'No suitable JSON library found' if $ENV{VENUS_DEBUG};
   goto SKIP;
 }
 
@@ -188,7 +188,11 @@ $test->for('error', 'error_on_config');
 
   # given: synopsis;
 
-  my $error = $json->throw('error_on_config')->catch('error');
+  my $input = {
+    throw => 'error_on_config',
+  };
+
+  my $error = $json->catch('error', $input);
 
   # my $name = $error->name;
 
@@ -224,6 +228,6 @@ $test->for('partials');
 # END
 
 SKIP:
-$test->render('lib/Venus/Json.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Json.pod') if $ENV{VENUS_RENDER};
 
 ok 1 and done_testing;

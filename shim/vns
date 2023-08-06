@@ -14,16 +14,16 @@ our $REPO;
 our @PATH;
 
 BEGIN {
-  $ENV{VENUS_TASK_RUN} = 1;
-  $ENV{VENUS_RUN_NAME} = 'vns';
+  $ENV{VENUS_TASK_AUTO} = 1;
+  $ENV{VENUS_TASK_NAME} = 'vns';
 }
 
 BEGIN {
   @PATH = File::Spec->splitdir(Cwd::realpath($0));
-  $REPO = File::Spec->catfile(splice(@PATH, 0, -2), 'lib');
+  $HOME = File::Spec->catfile(splice(@PATH, 0, -2), 'lib');
 }
 
-use lib "$REPO";
+use lib "$HOME";
 
 use Venus::Run;
 

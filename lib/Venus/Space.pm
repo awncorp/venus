@@ -116,7 +116,11 @@ sub call {
   my $class = $self->load;
 
   unless ($func) {
-    $self->throw('error_on_call_undefined', $class, $func)->error;
+    $self->error({
+      throw => 'error_on_call_undefined',
+      package => $class,
+      routine => $func,
+    });
   }
 
   my $next = $class->can($func);
@@ -128,7 +132,11 @@ sub call {
   }
 
   unless ($next) {
-    $self->throw('error_on_call_missing', $class, $func)->error;
+    $self->error({
+      throw => 'error_on_call_missing',
+      package => $class,
+      routine => $func,
+    });
   }
 
   @_ = @args; goto $next;
@@ -194,14 +202,22 @@ sub cop {
 
   my $class = $self->load;
 
-  unless ($func) {
-    $self->throw('error_on_cop_undefined', $class, $func)->error;
+  if (!$func) {
+    $self->error({
+      throw => 'error_on_cop_undefined',
+      package => $class,
+      routine => $func,
+    });
   }
 
   my $next = $class->can($func);
 
   unless ($next) {
-    $self->throw('error_on_cop_missing', $class, $func)->error;
+    $self->error({
+      throw => 'error_on_cop_missing',
+      package => $class,
+      routine => $func,
+    });
   }
 
   return sub { $next->(@args ? (@args, @_) : @_) };
@@ -238,7 +254,11 @@ sub eval {
   my $result = eval join ' ', map "$_", "package @{[$self->package]};", @args;
 
   if (my $error = $@) {
-    $self->throw('error_on_eval', $self->package, $error)->error;
+    $self->error({
+      throw => 'error_on_eval',
+      package => $self->package,
+      error => $error,
+    });
   }
 
   return $result;
@@ -338,7 +358,11 @@ sub load {
   my $error = do{local $@; eval "require $class"; $@};
 
   if ($error) {
-    $self->throw('error_on_load', $class, $error || 'cause unknown')->error;
+    $self->error({
+      throw => 'error_on_load',
+      error => $error || 'cause unknown',
+      package => $class,
+    });
   }
 
   return $class;
@@ -604,7 +628,11 @@ sub swap {
   return $orig if !$code;
 
   if (!$orig) {
-    $self->throw('error_on_swap', $package, $name)->error;
+    $self->error({
+      throw => 'error_on_swap',
+      package => $package,
+      routine => $name,
+    });
   }
 
   $self->routine($name, sub {$code->($orig, @_)});
@@ -698,92 +726,146 @@ sub visible {
 # ERRORS
 
 sub error_on_call_missing {
-  my ($self, $class, $routine) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.call.missing',
-    message => "Unable to locate class method \"$routine\" via package \"$class\"",
-    stash => {
-      package => $class,
-      routine => $routine,
-    },
+  my $message = 'Unable to locate class method "{{routine}}" via package "{{package}}"';
+
+  my $stash = {
+    package => $data->{package},
+    routine => $data->{routine},
   };
+
+  my $result = {
+    name => 'on.call.missing',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_call_undefined {
-  my ($self, $class, $routine) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.call.undefined',
-    message => "Attempt to call undefined class method in package \"$class\"",
-    stash => {
-      package => $class,
-      routine => $routine,
-    },
+  my $message = join ' ', 'Attempt to call undefined class method',
+    'in package "{{package}}"';
+
+  my $stash = {
+    package => $data->{package},
+    routine => $data->{routine},
   };
+
+  my $result = {
+    name => 'on.call.undefined',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_cop_missing {
-  my ($self, $class, $routine) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.cop.missing',
-    message => "Unable to locate object method \"$routine\" via package \"$class\"",
-    stash => {
-      package => $class,
-      routine => $routine,
-    },
+  my $message = join ' ', 'Unable to locate object method "{{routine}}"',
+    'via package "{{package}}"';
+
+  my $stash = {
+    package => $data->{package},
+    routine => $data->{routine},
   };
+
+  my $result = {
+    name => 'on.cop.missing',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_cop_undefined {
-  my ($self, $class, $routine) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.cop.undefined',
-    message => "Attempt to cop undefined object method from package \"$class\"",
-    stash => {
-      package => $class,
-      routine => $routine,
-    },
+  my $message = join ' ', 'Attempt to cop undefined object method',
+    'from package "{{package}}"';
+
+  my $stash = {
+    package => $data->{package},
+    routine => $data->{routine},
   };
+
+  my $result = {
+    name => 'on.cop.undefined',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_eval {
-  my ($self, $class, $error) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.eval',
-    message => "$error",
-    stash => {
-      package => $class,
-    },
+  my $message = $data->{error};
+
+  my $stash = {
+    error => $message,
+    package => $data->{package},
   };
+
+  my $result = {
+    name => 'on.eval',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_load {
-  my ($self, $class, $cause) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.load',
-    message => "Error attempting to load $class: \"$cause\"",
-    stash => {
-      package => $class,
-    },
+  my $message = 'Error attempting to load {{package}}: "{{error}}"';
+
+  my $stash = {
+    error => $data->{error},
+    package => $data->{package},
   };
+
+  my $result = {
+    name => 'on.load',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 sub error_on_swap {
-  my ($self, $package, $routine) = @_;
+  my ($self, $data) = @_;
 
-  return {
-    name => 'on.swap',
-    message => "Attempt to swap undefined subroutine in package \"$package\"",
-    stash => {
-      package => $package,
-      routine => $routine,
-    },
+  my $message = 'Attempt to swap undefined subroutine in package "{{package}}"';
+
+  my $stash = {
+    package => $data->{package},
+    routine => $data->{routine},
   };
+
+  my $result = {
+    name => 'on.swap',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
 }
 
 1;

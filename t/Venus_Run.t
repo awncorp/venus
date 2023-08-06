@@ -6,8 +6,8 @@ use strict;
 use warnings;
 
 BEGIN {
-  $ENV{VENUS_TASK_RUN} = 0;
-  undef $ENV{VENUS_RUN_NAME};
+  $ENV{VENUS_TASK_AUTO} = 0;
+  undef $ENV{VENUS_TASK_NAME};
   undef $ENV{VENUS_FILE};
 }
 
@@ -2046,7 +2046,7 @@ $test->for('example', 1, 'init', sub {
 =method name
 
 The name method returns the default name for the task. This is used in usage
-text and can be controlled via the C<VENUS_RUN_NAME> environment variable, or
+text and can be controlled via the C<VENUS_TASK_NAME> environment variable, or
 the C<NAME> package variable.
 
 =signature name
@@ -2087,7 +2087,7 @@ $test->for('example', 1, 'name', sub {
 
   package main;
 
-  local $ENV{VENUS_RUN_NAME} = 'venus-runner';
+  local $ENV{VENUS_TASK_NAME} = 'venus-runner';
 
   my $name = $run->name;
 
@@ -2097,10 +2097,10 @@ $test->for('example', 1, 'name', sub {
 
 $test->for('example', 2, 'name', sub {
   my ($tryable) = @_;
-  my $value = $ENV{VENUS_RUN_NAME};
+  my $value = $ENV{VENUS_TASK_NAME};
   my $result = $tryable->result;
   is $result, "venus-runner";
-  $ENV{VENUS_RUN_NAME} = $value;
+  $ENV{VENUS_TASK_NAME} = $value;
 
   $result
 });
@@ -2469,12 +2469,6 @@ L<vns> CLI, which is simply an executable file which loads this package.
   # i.e.
   # cpanm --llocal -qn $DIST
 
-  # Install dependencies in the CWD
-  vns deps
-
-  # i.e.
-  # cpanm --llocal -qn --installdeps .
-
   # Check that a package can be compiled
   vns okay $FILE
 
@@ -2514,7 +2508,7 @@ $test->for('partials');
 
 # END
 
-$test->render('lib/Venus/Run.pod') if $ENV{RENDER};
+$test->render('lib/Venus/Run.pod') if $ENV{VENUS_RENDER};
 
 unlink '.vns.pl';
 
