@@ -56,7 +56,7 @@ This package provides the following methods:
 
 =head2 b64digest
 
-  b64digest(Str $algo, Str $method, Any @args) (Str)
+  b64digest(string $algo, string $method, any @args) (string)
 
 The b64digest method returns a base64 formatted digest of the object or return
 value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
@@ -111,7 +111,7 @@ I<Since C<0.01>>
 
 =head2 bindigest
 
-  bindigest(Str $algo, Str $method, Any @args) (Str)
+  bindigest(string $algo, string $method, any @args) (string)
 
 The bindigest method returns a binary formatted digest of the object or return
 value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
@@ -166,7 +166,7 @@ I<Since C<0.01>>
 
 =head2 digest
 
-  digest(Str $algo, Str $method, Any @args) (Str)
+  digest(string $algo, string $method, any @args) (string)
 
 The digest method returns a hexadecimal formatted digest of a dump of the
 object or return value of a dispatched method call. The algorithm defaults to
@@ -221,7 +221,7 @@ I<Since C<0.01>>
 
 =head2 digester
 
-  digester(Str $algo, Str $method, Any @args) (Str)
+  digester(string $algo, string $method, any @args) (string)
 
 The digester method returns a L<Digest> object with a dump of the object or
 return value of a dispatched method call as the message. The algorithm defaults
@@ -262,7 +262,7 @@ I<Since C<0.01>>
 
 =head2 hexdigest
 
-  hexdigest(Str $algo, Str $method, Any @args) (Str)
+  hexdigest(string $algo, string $method, any @args) (string)
 
 The hexdigest method returns a ... formatted digest of the object or return
 value of a dispatched method call. The algorithm defaults to C<SHA-1>. This
@@ -323,7 +323,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -84,8 +84,8 @@ $test->for('description');
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -91,7 +91,7 @@ by this method.
 
 =signature unbox
 
-  unbox(Str $method, Any @args) (Any)
+  unbox(string $method, any @args) (any)
 
 =metadata unbox
 
@@ -137,8 +137,8 @@ $test->for('example', 2, 'unbox', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

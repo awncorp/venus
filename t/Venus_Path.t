@@ -142,7 +142,7 @@ The absolute method returns a path object where the value (path) is absolute.
 
 =signature absolute
 
-  absolute() (Path)
+  absolute() (Venus::Path)
 
 =metadata absolute
 
@@ -174,7 +174,7 @@ The basename method returns the path base name.
 
 =signature basename
 
-  basename() (Str)
+  basename() (string)
 
 =metadata basename
 
@@ -206,7 +206,7 @@ The child method returns a path object representing the child path provided.
 
 =signature child
 
-  child(Str $path) (Path)
+  child(string $path) (Venus::Path)
 
 =metadata child
 
@@ -238,7 +238,7 @@ The chmod method changes the file permissions of the file or directory.
 
 =signature chmod
 
-  chmod(Str $mode) (Path)
+  chmod(string $mode) (Venus::Path)
 
 =metadata chmod
 
@@ -270,7 +270,7 @@ The chown method changes the group and/or owner or the file or directory.
 
 =signature chown
 
-  chown(Str @args) (Path)
+  chown(string @args) (Venus::Path)
 
 =metadata chown
 
@@ -303,7 +303,7 @@ method can return a list of values in list-context.
 
 =signature children
 
-  children() (ArrayRef[Path])
+  children() (within[arrayref, Venus::Path])
 
 =metadata children
 
@@ -394,7 +394,7 @@ invocant to the path provided and returns the invocant.
 
 =signature copy
 
-  copy(Str | Path $path) (Path)
+  copy(string | Venus::Path $path) (Venus::Path)
 
 =metadata copy
 
@@ -432,7 +432,7 @@ The default method returns the default value, i.e. C<$ENV{PWD}>.
 
 =signature default
 
-  default() (Str)
+  default() (string)
 
 =metadata default
 
@@ -464,7 +464,7 @@ directories. This method can return a list of values in list-context.
 
 =signature directories
 
-  directories() (ArrayRef[Path])
+  directories() (within[arrayref, Venus::Path])
 
 =metadata directories
 
@@ -496,7 +496,7 @@ The exists method returns truthy or falsy if the path exists.
 
 =signature exists
 
-  exists() (Bool)
+  exists() (boolean)
 
 =metadata exists
 
@@ -547,7 +547,7 @@ operations.
 
 =signature explain
 
-  explain() (Str)
+  explain() (string)
 
 =metadata explain
 
@@ -581,7 +581,7 @@ path represented by the invocant, otherwise returns undefined.
 
 =signature extension
 
-  extension(Str $name) (Str | Path)
+  extension(string $name) (string | Venus::Path)
 
 =metadata extension
 
@@ -689,7 +689,7 @@ can return a list of values in list-context.
 
 =signature find
 
-  find(Str | Regexp $expr) (ArrayRef[Path])
+  find(string | regexp $expr) (within[arrayref, Venus::Path])
 
 =metadata find
 
@@ -836,7 +836,7 @@ This method can return a list of values in list-context.
 
 =signature files
 
-  files() (ArrayRef[Path])
+  files() (within[arrayref, Venus::Path])
 
 =metadata files
 
@@ -928,7 +928,7 @@ values in list-context.
 
 =signature glob
 
-  glob(Str | Regexp $expr) (ArrayRef[Path])
+  glob(string | regexp $expr) (within[arrayref, Venus::Path])
 
 =metadata glob
 
@@ -1018,7 +1018,7 @@ The is_absolute method returns truthy or falsy is the path is absolute.
 
 =signature is_absolute
 
-  is_absolute() (Bool)
+  is_absolute() (boolean)
 
 =metadata is_absolute
 
@@ -1050,7 +1050,7 @@ The is_directory method returns truthy or falsy is the path is a directory.
 
 =signature is_directory
 
-  is_directory() (Bool)
+  is_directory() (boolean)
 
 =metadata is_directory
 
@@ -1082,7 +1082,7 @@ The is_file method returns truthy or falsy is the path is a file.
 
 =signature is_file
 
-  is_file() (Bool)
+  is_file() (boolean)
 
 =metadata is_file
 
@@ -1114,7 +1114,7 @@ The is_relative method returns truthy or falsy is the path is relative.
 
 =signature is_relative
 
-  is_relative() (Bool)
+  is_relative() (boolean)
 
 =metadata is_relative
 
@@ -1147,7 +1147,7 @@ the file contents are separated by newline.
 
 =signature lines
 
-  lines(Str|Regexp $separator, Str $binmode) (ArrayRef[Str])
+  lines(string | regexp $separator, string $binmode) (within[arrayref, string])
 
 =metadata lines
 
@@ -1199,7 +1199,7 @@ method can return a list of values in list-context.
 
 =signature lineage
 
-  lineage() (ArrayRef[Path])
+  lineage() (within[arrayref, Venus::Path])
 
 =metadata lineage
 
@@ -1245,7 +1245,7 @@ The open method creates and returns an open filehandle.
 
 =signature open
 
-  open(Any @data) (FileHandle)
+  open(any @data) (FileHandle)
 
 =metadata open
 
@@ -1349,7 +1349,7 @@ list context returns the call output and exit code.
 
 =signature mkcall
 
-  mkcall(Any @data) (Any)
+  mkcall(any @data) (any)
 
 =metadata mkcall
 
@@ -1431,7 +1431,7 @@ The mkdir method makes the path as a directory.
 
 =signature mkdir
 
-  mkdir(Maybe[Str] $mode) (Path)
+  mkdir(maybe[string] $mode) (Venus::Path)
 
 =metadata mkdir
 
@@ -1494,7 +1494,7 @@ directories. This method can return a list of values in list-context.
 
 =signature mkdirs
 
-  mkdirs(Maybe[Str] $mode) (ArrayRef[Path])
+  mkdirs(maybe[string] $mode) (within[arrayref, Venus::Path])
 
 =metadata mkdirs
 
@@ -1572,7 +1572,7 @@ The mkfile method makes the path as an empty file.
 
 =signature mkfile
 
-  mkfile() (Path)
+  mkfile() (Venus::Path)
 
 =metadata mkfile
 
@@ -1632,7 +1632,7 @@ directory which isn't automatically removed and returns a new path object.
 
 =signature mktemp_dir
 
-  mktemp_dir() (Path)
+  mktemp_dir() (Venus::Path)
 
 =metadata mktemp_dir
 
@@ -1671,7 +1671,7 @@ which isn't automatically removed and returns a new path object.
 
 =signature mktemp_file
 
-  mktemp_file() (Path)
+  mktemp_file() (Venus::Path)
 
 =metadata mktemp_file
 
@@ -1710,7 +1710,7 @@ invocant to the path provided and returns the invocant.
 
 =signature move
 
-  move(Str | Path $path) (Path)
+  move(string | Venus::Path $path) (Venus::Path)
 
 =metadata move
 
@@ -1753,7 +1753,7 @@ The name method returns the path as an absolute path.
 
 =signature name
 
-  name() (Str)
+  name() (string)
 
 =metadata name
 
@@ -1785,7 +1785,7 @@ The parent method returns a path object representing the parent directory.
 
 =signature parent
 
-  parent() (Path)
+  parent() (Venus::Path)
 
 =metadata parent
 
@@ -1819,7 +1819,7 @@ return a list of values in list-context.
 
 =signature parents
 
-  parents() (ArrayRef[Path])
+  parents() (within[arrayref, Venus::Path])
 
 =metadata parents
 
@@ -1860,7 +1860,7 @@ The parts method returns an arrayref of path parts.
 
 =signature parts
 
-  parts() (ArrayRef[Str])
+  parts() (within[arrayref, string])
 
 =metadata parts
 
@@ -1892,7 +1892,7 @@ The read method reads the file and returns its contents.
 
 =signature read
 
-  read(Str $binmode) (Str)
+  read(string $binmode) (string)
 
 =metadata read
 
@@ -1950,7 +1950,7 @@ The relative method returns a path object representing a relative path
 
 =signature relative
 
-  relative(Str $root) (Path)
+  relative(string $root) (Venus::Path)
 
 =metadata relative
 
@@ -2011,7 +2011,7 @@ name, in which case it attempts a rename under the directory of the invocant.
 
 =signature rename
 
-  rename(Str | Path $path) (Path)
+  rename(string | Venus::Path $path) (Venus::Path)
 
 =metadata rename
 
@@ -2054,7 +2054,7 @@ the deleted directory.
 
 =signature rmdir
 
-  rmdir() (Path)
+  rmdir() (Venus::Path)
 
 =metadata rmdir
 
@@ -2115,7 +2115,7 @@ list-context.
 
 =signature rmdirs
 
-  rmdirs() (ArrayRef[Path])
+  rmdirs() (within[arrayref, Venus::Path])
 
 =metadata rmdirs
 
@@ -2164,7 +2164,7 @@ can return a list of values in list-context.
 
 =signature rmfiles
 
-  rmfiles() (ArrayRef[Path])
+  rmfiles() (within[arrayref, Venus::Path])
 
 =metadata rmfiles
 
@@ -2231,7 +2231,7 @@ L</test>. If no path matches are found this method returns underfined.
 
 =signature root
 
-  root(Str $spec, Str $base) (Maybe[Path])
+  root(string $spec, string $base) (maybe[Venus::Path])
 
 =metadata root
 
@@ -2285,7 +2285,7 @@ L</test>. If no path matches are found this method returns underfined.
 
 =signature seek
 
-  seek(Str $spec, Str $base) (Maybe[Path])
+  seek(string $spec, string $base) (maybe[Venus::Path])
 
 =metadata seek
 
@@ -2340,7 +2340,7 @@ The sibling method returns a path object representing the sibling path provided.
 
 =signature sibling
 
-  sibling(Str $path) (Path)
+  sibling(string $path) (Venus::Path)
 
 =metadata sibling
 
@@ -2374,7 +2374,7 @@ path. This method can return a list of values in list-context.
 
 =signature siblings
 
-  siblings() (ArrayRef[Path])
+  siblings() (within[arrayref, Venus::Path])
 
 =metadata siblings
 
@@ -2419,7 +2419,7 @@ operators provided.
 
 =signature test
 
-  test(Str $expr) (Bool)
+  test(string $expr) (boolean)
 
 =metadata test
 
@@ -2478,7 +2478,7 @@ removed file.
 
 =signature unlink
 
-  unlink() (Path)
+  unlink() (Venus::Path)
 
 =metadata unlink
 
@@ -2538,7 +2538,7 @@ The write method write the data provided to the file.
 
 =signature write
 
-  write(Str $data, Str $binmode) (Path)
+  write(string $data, string $binmode) (Venus::Path)
 
 =metadata write
 
@@ -3457,8 +3457,8 @@ $test->for('example', 1, 'error_on_unlink', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

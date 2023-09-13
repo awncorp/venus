@@ -90,7 +90,7 @@ when a single non-hashref is provided.
 
 =signature build_arg
 
-  build_arg(Any $data) (HashRef)
+  build_arg(any $data) (hashref)
 
 =metadata build_arg
 
@@ -144,7 +144,7 @@ hook into the handling of the arguments provided.
 
 =signature build_args
 
-  build_args(HashRef $data) (HashRef)
+  build_args(hashref $data) (hashref)
 
 =metadata build_args
 
@@ -199,7 +199,7 @@ after all arguments have been handled and set.
 
 =signature build_self
 
-  build_self(HashRef $data) (Self)
+  build_self(hashref $data) (object)
 
 =metadata build_self
 
@@ -254,7 +254,7 @@ when a single empty hashref is provided.
 
 =signature build_nil
 
-  build_nil(HashRef $data) (Any)
+  build_nil(hashref $data) (any)
 
 =metadata build_nil
 
@@ -303,8 +303,8 @@ $test->for('example', 1, 'build_nil', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

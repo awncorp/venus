@@ -123,7 +123,7 @@ The clear method resets all match conditions and returns the invocant.
 
 =signature clear
 
-  clear() (Match)
+  clear() (Venus::Match)
 
 =metadata clear
 
@@ -167,7 +167,7 @@ conditions and actions based on the keys and values found.
 
 =signature data
 
-  data(HashRef $data) (Match)
+  data(hashref $data) (Venus::Match)
 
 =metadata data
 
@@ -241,7 +241,7 @@ matches against the topic if the topic is a regular expression.
 
 =signature expr
 
-  expr(Str | RegexpRef $expr) (Match)
+  expr(string | regexp $expr) (Venus::Match)
 
 =metadata expr
 
@@ -304,7 +304,7 @@ an exact string match of the C<$topic> provided.
 
 =signature just
 
-  just(Str $topic) (Match)
+  just(string $topic) (Venus::Match)
 
 =metadata just
 
@@ -479,7 +479,7 @@ no other conditions have been matched.
 
 =signature none
 
-  none(Any | CodeRef $code) (Match)
+  none(any | coderef $code) (Venus::Match)
 
 =metadata none
 
@@ -550,7 +550,7 @@ match value only if the code provided returns truthy.
 
 =signature only
 
-  only(CodeRef $code) (Match)
+  only(coderef $code) (Venus::Match)
 
 =metadata only
 
@@ -622,7 +622,7 @@ method assign the argument as the value/topic and then perform the operation.
 
 =signature result
 
-  result(Any $data) (Any)
+  result(any $data) (any)
 
 =metadata result
 
@@ -771,7 +771,7 @@ code) or the special L</none> condition.
 
 =signature test
 
-  test() (Bool)
+  test() (boolean)
 
 =metadata test
 
@@ -873,7 +873,7 @@ condition returns truthy.
 
 =signature then
 
-  then(Any | CodeRef $code) (Match)
+  then(any | coderef $code) (Venus::Match)
 
 =metadata then
 
@@ -948,7 +948,7 @@ condition.
 
 =signature when
 
-  when(Str | CodeRef $code, Any @args) (Match)
+  when(string | coderef $code, any @args) (Venus::Match)
 
 =metadata when
 
@@ -1053,7 +1053,7 @@ sub-match object.
 
 =signature where
 
-  where() (Match)
+  where() (Venus::Match)
 
 =metadata where
 
@@ -1165,8 +1165,8 @@ $test->for('example', 3, 'where', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

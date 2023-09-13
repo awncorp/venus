@@ -100,7 +100,7 @@ dispatching request, or undef to result in a method not found error.
 
 =signature build_proxy
 
-  build_proxy(Str $package, Str $method, Any @args) (CodeRef | Undef)
+  build_proxy(string $package, string $method, any @args) (coderef | undef)
 
 =metadata build_proxy
 
@@ -158,8 +158,8 @@ $test->for('example', 2, 'build_proxy', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

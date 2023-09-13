@@ -1,0 +1,475 @@
+
+=head1 NAME
+
+Venus::Constraint - Constraint Class
+
+=cut
+
+=head1 ABSTRACT
+
+Constraint Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Constraint;
+
+  my $constraint = Venus::Constraint->new;
+
+  # $constraint->accept('float');
+
+  # $constraint->ensure(sub{$_ > 1});
+
+  # $constraint->result(1.01);
+
+  # true
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a mechanism for evaluating type constraints on data.
+Built-in type constraints are handled via L<Venus::Check>.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 accept
+
+  accept(string $name, any @args) (Venus::Constraint)
+
+The accept method registers a condition via L</check> based on the arguments
+provided. The built-in types are defined as methods in L<Venus::Check>.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item accept example 1
+
+  # given: synopsis
+
+  package main;
+
+  $constraint = $constraint->accept('float');
+
+  # bless(..., "Venus::Constraint")
+
+  # $constraint->result;
+
+  # false
+
+  # $constraint->result(1.01);
+
+  # true
+
+=back
+
+=over 4
+
+=item accept example 2
+
+  # given: synopsis
+
+  package main;
+
+  $constraint = $constraint->accept('number');
+
+  # bless(..., "Venus::Constraint")
+
+  # $constraint->result(1.01);
+
+  # false
+
+  # $constraint->result(1_01);
+
+  # true
+
+=back
+
+=over 4
+
+=item accept example 3
+
+  # given: synopsis
+
+  package Example1;
+
+  sub new {
+    bless {};
+  }
+
+  package Example2;
+
+  sub new {
+    bless {};
+  }
+
+  package main;
+
+  $constraint = $constraint->accept('object');
+
+  # bless(..., "Venus::Constraint")
+
+  # $constraint->result;
+
+  # false
+
+  # $constraint->result(qr//);
+
+  # false
+
+  # $constraint->result(Example1->new);
+
+  # true
+
+  # $constraint->result(Example2->new);
+
+  # true
+
+=back
+
+=over 4
+
+=item accept example 4
+
+  # given: synopsis
+
+  package Example1;
+
+  sub new {
+    bless {};
+  }
+
+  package Example2;
+
+  sub new {
+    bless {};
+  }
+
+  package main;
+
+  $constraint = $constraint->accept('Example1');
+
+  # bless(..., "Venus::Constraint")
+
+  # $constraint->result;
+
+  # false
+
+  # $constraint->result(qr//);
+
+  # false
+
+  # $constraint->result(Example1->new);
+
+  # true
+
+  # $constraint->result(Example2->new);
+
+  # false
+
+=back
+
+=cut
+
+=head2 check
+
+  check(Venus::Check $data) (Venus::Check)
+
+The check method gets or sets the L<Venus::Check> object used for performing
+runtime data type validation.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item check example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $check = $constraint->check(Venus::Check->new);
+
+  # bless(..., 'Venus::Check')
+
+=back
+
+=over 4
+
+=item check example 2
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->check(Venus::Check->new);
+
+  my $check = $constraint->check;
+
+  # bless(..., 'Venus::Check')
+
+=back
+
+=cut
+
+=head2 clear
+
+  clear() (Venus::Constraint)
+
+The clear method resets the L</check> attributes and returns the invocant.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item clear example 1
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('string');
+
+  $constraint = $constraint->clear;
+
+  # bless(..., "Venus::Constraint")
+
+=back
+
+=cut
+
+=head2 ensure
+
+  ensure(coderef $code) (Venus::Constraint)
+
+The ensure method registers a custom (not built-in) constraint condition and
+returns the invocant.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item ensure example 1
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('number');
+
+  my $ensure = $constraint->ensure(sub {
+    $_ >= 0
+  });
+
+  # bless(.., "Venus::Constraint")
+
+=back
+
+=over 4
+
+=item ensure example 2
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('number');
+
+  my $ensure = $constraint->ensure(sub {
+    my ($source, $value) = @_;
+
+    if ($value >= 0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  });
+
+  # bless(..., "Venus::Constraint")
+
+=back
+
+=cut
+
+=head2 eval
+
+  eval(any $data) (boolean)
+
+The eval method dispatches to the L</check> object as well as evaluating any
+custom conditions, and returns true if all conditions pass, and false if any
+condition fails.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item eval example 1
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('float');
+
+  $constraint->ensure(sub{$_ >= 1});
+
+  my $eval = $constraint->eval('1.00');
+
+  # true
+
+=back
+
+=over 4
+
+=item eval example 2
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('float');
+
+  $constraint->ensure(sub{$_ >= 1});
+
+  my $eval = $constraint->eval('0.99');
+
+  # false
+
+=back
+
+=cut
+
+=head2 evaler
+
+  evaler(any @args) (coderef)
+
+The evaler method returns a coderef which calls the L</eval> method with the
+invocant when called.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item evaler example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $evaler = $constraint->evaler;
+
+  # sub{...}
+
+  # my $result = $evaler->();
+
+  # false
+
+=back
+
+=over 4
+
+=item evaler example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $evaler = $constraint->accept('any')->evaler;
+
+  # sub{...}
+
+  # my $result = $evaler->();
+
+  # true
+
+=back
+
+=cut
+
+=head2 result
+
+  result(any $data) (boolean)
+
+The result method dispatches to the L</eval> method and returns the result.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item result example 1
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('float');
+
+  $constraint->ensure(sub{$_ >= 1});
+
+  my $result = $constraint->result('1.00');
+
+  # true
+
+=back
+
+=over 4
+
+=item result example 2
+
+  # given: synopsis
+
+  package main;
+
+  $constraint->accept('float');
+
+  $constraint->ensure(sub{$_ >= 1});
+
+  my $result = $constraint->result('0.99');
+
+  # false
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

@@ -90,7 +90,7 @@ The class method returns the class name for the given class or object.
 
 =signature class
 
-  class() (Str)
+  class() (string)
 
 =metadata class
 
@@ -122,7 +122,7 @@ The meta method returns a L<Venus::Meta> object for the given object.
 
 =signature meta
 
-  meta() (Meta)
+  meta() (Venus::Meta)
 
 =metadata meta
 
@@ -155,7 +155,7 @@ returns the result as a value object.
 
 =signature reify
 
-  reify(Str | CodeRef $code, Any @args) (Object)
+  reify(string | coderef $code, any @args) (object)
 
 =metadata reify
 
@@ -231,7 +231,7 @@ The space method returns a L<Venus::Space> object for the given object.
 
 =signature space
 
-  space() (Space)
+  space() (Venus::Space)
 
 =metadata space
 
@@ -264,7 +264,7 @@ the result as a L<Venus::Type> object.
 
 =signature type
 
-  type(Str | CodeRef $code, Any @args) (Type)
+  type(string | coderef $code, any @args) (Venus::Type)
 
 =metadata type
 
@@ -312,8 +312,8 @@ $test->for('example', 2, 'type', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

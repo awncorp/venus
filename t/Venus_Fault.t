@@ -80,7 +80,7 @@ operations.
 
 =signature explain
 
-  explain() (Str)
+  explain() (string)
 
 =metadata explain
 
@@ -112,7 +112,7 @@ The frames method returns the compiled and stashed stack trace data.
 
 =signature frames
 
-  frames() (ArrayRef)
+  frames() (arrayref)
 
 =metadata frames
 
@@ -154,7 +154,7 @@ error object using the arguments provided and throws the created object.
 
 =signature throw
 
-  throw(Str $message) (Fault)
+  throw(string $message) (Venus::Fault)
 
 =metadata throw
 
@@ -187,7 +187,7 @@ skips the first frame.
 
 =signature trace
 
-  trace(Int $offset, Int $limit) (Fault)
+  trace(number $offset, number $limit) (Venus::Fault)
 
 =metadata trace
 
@@ -380,8 +380,8 @@ $test->for('example', 1, '(~~)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

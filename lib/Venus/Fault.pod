@@ -37,7 +37,7 @@ This package provides the following methods:
 
 =head2 explain
 
-  explain() (Str)
+  explain() (string)
 
 The explain method returns the error message and is used in stringification
 operations.
@@ -60,7 +60,7 @@ I<Since C<1.80>>
 
 =head2 frames
 
-  frames() (ArrayRef)
+  frames() (arrayref)
 
 The frames method returns the compiled and stashed stack trace data.
 
@@ -89,7 +89,7 @@ I<Since C<1.80>>
 
 =head2 throw
 
-  throw(Str $message) (Fault)
+  throw(string $message) (Venus::Fault)
 
 The throw method throws an error if the invocant is an object, or creates an
 error object using the arguments provided and throws the created object.
@@ -112,7 +112,7 @@ I<Since C<1.80>>
 
 =head2 trace
 
-  trace(Int $offset, Int $limit) (Fault)
+  trace(number $offset, number $limit) (Venus::Fault)
 
 The trace method compiles a stack trace and returns the object. By default it
 skips the first frame.
@@ -165,6 +165,22 @@ This package overloads the following operators:
 
 =over 4
 
+=item operation: C<("")>
+
+This package overloads the C<""> operator.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $result = "$fault";
+
+  # "Exception!"
+
+=back
+
+=over 4
+
 =item operation: C<(eq)>
 
 This package overloads the C<eq> operator.
@@ -213,22 +229,6 @@ B<example 1>
 
 =over 4
 
-=item operation: C<("")>
-
-This package overloads the C<""> operator.
-
-B<example 1>
-
-  # given: synopsis;
-
-  my $result = "$fault";
-
-  # "Exception!"
-
-=back
-
-=over 4
-
 =item operation: C<(~~)>
 
 This package overloads the C<~~> operator.
@@ -251,7 +251,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

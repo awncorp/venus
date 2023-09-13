@@ -101,7 +101,7 @@ L</comparer> method) of the invocant.
 
 =signature eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 =metadata eq
 
@@ -178,7 +178,7 @@ value of the L</comparer> method) of the invocant.
 
 =signature ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 =metadata ge
 
@@ -256,7 +256,7 @@ invocant.
 
 =signature gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 =metadata gele
 
@@ -333,7 +333,7 @@ L</comparer> method) of the invocant.
 
 =signature gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 =metadata gt
 
@@ -410,7 +410,7 @@ the return value of the L</comparer> method) of the invocant.
 
 =signature gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 =metadata gtlt
 
@@ -487,7 +487,7 @@ truthy.
 
 =signature is
 
-  is(Any $arg) (Bool)
+  is(any $arg) (boolean)
 
 =metadata is
 
@@ -564,7 +564,7 @@ value of the L</comparer> method) of the invocant.
 
 =signature le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 =metadata le
 
@@ -641,7 +641,7 @@ L</comparer> method) of the invocant.
 
 =signature lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 =metadata lt
 
@@ -718,7 +718,7 @@ L</comparer> method) of the invocant.
 
 =signature ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 =metadata ne
 
@@ -794,7 +794,7 @@ a subclass, the operation will return truthy.
 
 =signature st
 
-  st(Object $arg) (Bool)
+  st(object $arg) (boolean)
 
 =metadata st
 
@@ -901,7 +901,7 @@ value of the L</comparer> method) of the invocant.
 
 =signature tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 =metadata tv
 
@@ -997,8 +997,8 @@ $test->for('example', 4, 'tv', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -107,7 +107,7 @@ The default method returns the default value, i.e. C<'Venus'>.
 
 =signature default
 
-  default() (Str)
+  default() (string)
 
 =metadata default
 
@@ -139,7 +139,7 @@ The dist method returns a package distribution representation of the name.
 
 =signature dist
 
-  dist() (Str)
+  dist() (string)
 
 =metadata dist
 
@@ -172,7 +172,7 @@ operations.
 
 =signature explain
 
-  explain() (Str)
+  explain() (string)
 
 =metadata explain
 
@@ -204,7 +204,7 @@ The file method returns a file representation of the name.
 
 =signature file
 
-  file() (Str)
+  file() (string)
 
 =metadata file
 
@@ -239,7 +239,7 @@ be acted on by this method.
 
 =signature format
 
-  format(Str $method, Str $format) (Str)
+  format(string $method, string $format) (string)
 
 =metadata format
 
@@ -271,7 +271,7 @@ The label method returns a label (or constant) representation of the name.
 
 =signature label
 
-  label() (Str)
+  label() (string)
 
 =metadata label
 
@@ -303,7 +303,7 @@ The lookslike_a_file method returns truthy if its state resembles a filename.
 
 =signature lookslike_a_file
 
-  lookslike_a_file() (Str)
+  lookslike_a_file() (string)
 
 =metadata lookslike_a_file
 
@@ -335,7 +335,7 @@ constant).
 
 =signature lookslike_a_label
 
-  lookslike_a_label() (Str)
+  lookslike_a_label() (string)
 
 =metadata lookslike_a_label
 
@@ -367,7 +367,7 @@ name.
 
 =signature lookslike_a_package
 
-  lookslike_a_package() (Str)
+  lookslike_a_package() (string)
 
 =metadata lookslike_a_package
 
@@ -398,7 +398,7 @@ The lookslike_a_path method returns truthy if its state resembles a file path.
 
 =signature lookslike_a_path
 
-  lookslike_a_path() (Str)
+  lookslike_a_path() (string)
 
 =metadata lookslike_a_path
 
@@ -429,7 +429,7 @@ The lookslike_a_pragma method returns truthy if its state resembles a pragma.
 
 =signature lookslike_a_pragma
 
-  lookslike_a_pragma() (Str)
+  lookslike_a_pragma() (string)
 
 =metadata lookslike_a_pragma
 
@@ -460,7 +460,7 @@ The package method returns a package name representation of the name given.
 
 =signature package
 
-  package() (Str)
+  package() (string)
 
 =metadata package
 
@@ -492,7 +492,7 @@ The path method returns a path representation of the name.
 
 =signature path
 
-  path() (Str)
+  path() (string)
 
 =metadata path
 
@@ -736,8 +736,8 @@ $test->for('example', 1, '(~~)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

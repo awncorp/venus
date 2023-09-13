@@ -1,0 +1,1507 @@
+
+=head1 NAME
+
+Venus::Future - Future Class
+
+=cut
+
+=head1 ABSTRACT
+
+Future Class for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Venus::Future;
+
+  my $future = Venus::Future->new;
+
+  # bless({...}, 'Venus::Future')
+
+  # $future->promise(sub{
+  #   my ($resolve, $reject) = @_;
+  #   $resolve->result(1);
+  # });
+
+  # bless({...}, 'Venus::Future')
+
+  # $future->fulfill;
+
+  # true
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides a framework-agnostic "Future" and implementation of the
+"Promise/A+" pattern for asynchronous programming. The futures are non-blocking
+and support "suspend" and "resume" allowing them to be used in any asynchronous
+operating environment.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Venus::Kind::Utility>
+
+=cut
+
+=head1 INTEGRATES
+
+This package integrates behaviors from:
+
+L<Venus::Role::Buildable>
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 catch
+
+  catch(coderef $on_reject) (Venus::Future)
+
+The catch method registers a rejection handler and returns the future that
+invokes the handlers.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item catch example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $catch = $future->catch(sub{
+    my ($issue) = @_;
+
+    return $issue;
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $catch->then(sub{...});
+
+  # bless(..., "Venus::Future")
+
+=back
+
+=over 4
+
+=item catch example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $catch = $future->catch(sub{
+    my ($issue) = @_;
+
+    return $issue;
+  });
+
+  # bless(..., "Venus::Future")
+
+  $future = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $future->reject('Oops!');
+
+  # bless(..., "Venus::Future")
+
+=back
+
+=cut
+
+=head2 finally
+
+  finally(coderef $on_finally) (Venus::Future)
+
+The finally method registers a finally handler and returns the future that
+invokes the handlers.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item finally example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $finally = $future->finally(sub{
+    my ($data) = @_;
+
+    return $data;
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $finally->then(sub{...});
+
+  # bless(..., "Venus::Future")
+
+=back
+
+=over 4
+
+=item finally example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->then(sub{
+    $_
+  });
+
+  my $finally = $future->finally(sub{
+    my ($data) = @_;
+
+    $future->{stash} = $data;
+
+    return $data;
+  });
+
+  # bless(..., "Venus::Future")
+
+  $future = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $future->resolve('Hello.');
+
+  # bless(..., "Venus::Future")
+
+=back
+
+=over 4
+
+=item finally example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->then(sub{
+    $_
+  });
+
+  my $finally = $future->finally(sub{
+    my ($data) = @_;
+
+    $future->{stash} = $data;
+
+    return $data;
+  });
+
+  # bless(..., "Venus::Future")
+
+  $future = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $future->reject('Oops!');
+
+  # bless(..., "Venus::Future")
+
+=back
+
+=cut
+
+=head2 fulfill
+
+  fulfill() (Venus::Future)
+
+The fulfill method attempts to fulfill the L<promise|/promise> by actuating it,
+or resuming a previously actuated promise, and returns true if the future has
+been resolved, i.e. the future is either L<is_fulfilled> or L<is_rejected>, and
+otherwise returns false.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item fulfill example 1
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result;
+  });
+
+  my $fulfilled = $future->fulfill;
+
+  # true
+
+=back
+
+=over 4
+
+=item fulfill example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result;
+  });
+
+  $future->fulfill;
+
+  my $result = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $result->is_fulfilled;
+
+  # true
+
+  # $result->value;
+
+  # undef
+
+=back
+
+=over 4
+
+=item fulfill example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[1]->result;
+  });
+
+  my $fulfilled = $future->fulfill;
+
+  # true
+
+=back
+
+=over 4
+
+=item fulfill example 4
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[1]->result;
+  });
+
+  $future->fulfill;
+
+  my $result = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $result->is_rejected;
+
+  # true
+
+  # $result->issue;
+
+  # undef
+
+=back
+
+=over 4
+
+=item fulfill example 5
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result(1);
+  })->then(sub{
+    return $future->{stash} = $_ * 2; # 2
+  })->then(sub{
+    return $future->{stash} = $_ * 2; # 4
+  })->then(sub{
+    return $future->{stash} = $_ * 2; # 8
+  });
+
+  $future->fulfill;
+
+  my $result = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $result->is_fulfilled;
+
+  # true
+
+  # $result->value;
+
+  # 1
+
+=back
+
+=over 4
+
+=item fulfill example 6
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result(1);
+  });
+
+  $future->then(sub{
+    return $future->{stash} = $_ * 2; # 2
+  });
+
+  $future->then(sub{
+    return $future->{stash} = $_ * 2; # 2
+  });
+
+  $future->then(sub{
+    return $future->{stash} = $_ * 2; # 2
+  });
+
+  $future->fulfill;
+
+  my $result = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $result->is_fulfilled;
+
+  # true
+
+  # $result->value;
+
+  # 1
+
+=back
+
+=over 4
+
+=item fulfill example 7
+
+  # given: synopsis
+
+  package main;
+
+  my $pending_future = Venus::Future->new;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result(1);
+  })->then(sub{
+    return $_
+  })->then(sub{
+    return $pending_future;
+  })->then(sub{
+    return $_
+  });
+
+  $future->fulfill;
+
+  my @results = ($future, $pending_future);
+
+  # my $result = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $result->is_fulfilled;
+
+  # false
+
+  # $result->is_pending;
+
+  # true
+
+  # $result->value;
+
+  # undef
+
+  # $pending_future->resolve(0);
+
+  # bless(..., "Venus::Future")
+
+  # $pending_future->is_fulfilled;
+
+  # true
+
+  # $result->fulfill;
+
+  # true
+
+  # $result->is_fulfilled;
+
+  # true
+
+=back
+
+=over 4
+
+=item fulfill example 8
+
+  # given: synopsis
+
+  package Thenable;
+
+  use Venus::Class;
+
+  sub then {
+    my ($self, $resolve, $reject) = @_;
+
+    $resolve->(100);
+  }
+
+  package main;
+
+  my $thenable_object = Thenable->new;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result(1);
+  })->then(sub{
+    return $_
+  })->then(sub{
+    return $thenable_object;
+  })->then(sub{
+    return $future->{stash} = $_
+  });
+
+  $future->fulfill;
+
+  my @results = ($future, $thenable_object);
+
+  # my $result = $future;
+
+  # bless(..., "Venus::Future")
+
+  # $result->is_fulfilled;
+
+  # true
+
+  # $result->value;
+
+  # 1
+
+=back
+
+=cut
+
+=head2 is
+
+  is(string $name) (boolean)
+
+The is method take a name and dispatches to the corresponding C<is_$name>
+method and returns the result.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item is example 1
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve;
+
+  my $is_fulfilled = $future->is('fulfilled');
+
+  # true
+
+=back
+
+=over 4
+
+=item is example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $is_pending = $future->is('pending');
+
+  # true
+
+=back
+
+=over 4
+
+=item is example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject;
+
+  my $is_rejected = $future->is('rejected');
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_fulfilled
+
+  is_fulfilled() (boolean)
+
+The is_fulfilled method returns true if the future has been fulfilled,
+otherwise returns false.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item is_fulfilled example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $is_fulfilled = $future->is_fulfilled;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_fulfilled example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve;
+
+  my $is_fulfilled = $future->is_fulfilled;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_fulfilled example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject;
+
+  my $is_fulfilled = $future->is_fulfilled;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_pending
+
+  is_pending() (boolean)
+
+The is_pending method returns true if the future has remained pending,
+otherwise returns false.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item is_pending example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $is_pending = $future->is_pending;
+
+  # true
+
+=back
+
+=over 4
+
+=item is_pending example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve;
+
+  my $is_pending = $future->is_pending;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_pending example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject;
+
+  my $is_pending = $future->is_pending;
+
+  # false
+
+=back
+
+=cut
+
+=head2 is_promised
+
+  is_promised() (boolean)
+
+The is_promised method returns true if the future a registered promise,
+otherwise returns false.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item is_promised example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $is_promised = $future->is_promised;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_promised example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise;
+
+  my $is_promised = $future->is_promised;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_promised example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{$_[0]->result});
+
+  my $is_promised = $future->is_promised;
+
+  # true
+
+=back
+
+=cut
+
+=head2 is_rejected
+
+  is_rejected() (boolean)
+
+The is_rejected method returns true if the future has been rejected, otherwise
+returns false.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item is_rejected example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $is_rejected = $future->is_rejected;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_rejected example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve;
+
+  my $is_rejected = $future->is_rejected;
+
+  # false
+
+=back
+
+=over 4
+
+=item is_rejected example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject;
+
+  my $is_rejected = $future->is_rejected;
+
+  # true
+
+=back
+
+=cut
+
+=head2 issue
+
+  issue() (any)
+
+The issue method returns the result of the L</reject> operation once the future
+has been rejected.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item issue example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $issue = $future->issue;
+
+  # undef
+
+  # $future->is_pending
+
+  # true
+
+=back
+
+=over 4
+
+=item issue example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject(0);
+
+  my $issue = $future->issue;
+
+  # 0
+
+  # $future->is_rejected
+
+  # true
+
+=back
+
+=over 4
+
+=item issue example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject({fail => 1});
+
+  my $issue = $future->issue;
+
+  # {fail => 1}
+
+  # $future->is_rejected
+
+  # true
+
+=back
+
+=cut
+
+=head2 new
+
+  new(any @args) (Venus::Future)
+
+The new method instantiates this package and returns a new instance.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item new example 1
+
+  package main;
+
+  my $future = Venus::Future->new;
+
+  # bless(..., "Venus::Future")
+
+=back
+
+=over 4
+
+=item new example 2
+
+  package main;
+
+  my $future = Venus::Future->new(sub{
+    my ($resolve, $reject) = @_;
+    $resolve->result('okay');
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $future->is('fulfilled');
+
+  # true
+
+  # $future->value;
+
+  # 'okay'
+
+=back
+
+=over 4
+
+=item new example 3
+
+  package main;
+
+  my $future = Venus::Future->new(promise => sub{
+    my ($resolve, $reject) = @_;
+    $reject->result('boom');
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $future->is('rejected');
+
+  # true
+
+  # $future->issue;
+
+  # 'boom'
+
+=back
+
+=cut
+
+=head2 promise
+
+  promise(coderef $code) (Venus::Future)
+
+The promise method registers a callback executed by the L</fulfill> method,
+which is provided two arguments; the first argument being a L<Venus::Try>
+instance representing a C<resolve> operaiton; the second argument being a
+L<Venus::Try> instance representing a C<reject> operaiton; and returns the
+invocant.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item promise example 1
+
+  # given: synopsis
+
+  package main;
+
+  $future = $future->promise(sub{
+    my ($resolve, $reject) = @_;
+
+    $resolve->result('pass');
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $future->fulfill;
+
+  # true
+
+=back
+
+=over 4
+
+=item promise example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future = $future->promise(sub{
+    my ($resolve, $reject) = @_;
+
+    $reject->result('fail');
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $future->fulfill;
+
+  # true
+
+=back
+
+=cut
+
+=head2 reject
+
+  reject(any $issue) (Venus::Future)
+
+The reject method cascades a rejection operation causes the future to be
+rejected, and returns the invocant.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item reject example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $rejected = $future->reject;
+
+  # bless(..., "Venus::Future")
+
+  # $rejected->status
+
+  # "rejected"
+
+  # $rejected->issue
+
+  # undef
+
+=back
+
+=over 4
+
+=item reject example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $rejected = $future->reject('Oops!');
+
+  # bless(..., "Venus::Future")
+
+  # $rejected->status
+
+  # "rejected"
+
+  # $rejected->issue
+
+  # "Oops!"
+
+=back
+
+=cut
+
+=head2 resolve
+
+  resolve(any $value) (Venus::Future)
+
+The resolve method cascades a rejection operation causes the future to be
+rejected, and returns the invocant.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item resolve example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $fulfilled = $future->resolve;
+
+  # bless(..., "Venus::Future")
+
+  # $fulfilled->status
+
+  # "fulfilled"
+
+  # $fulfilled->value
+
+  # undef
+
+=back
+
+=over 4
+
+=item resolve example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $fulfilled = $future->resolve('Great!');
+
+  # bless(..., "Venus::Future")
+
+  # $fulfilled->status
+
+  # "fulfilled"
+
+  # $fulfilled->value
+
+  # "Great!"
+
+=back
+
+=cut
+
+=head2 status
+
+  status() (any)
+
+The status method returns the status of the future. Valid statuses are
+C<fulfilled>, C<pending>, and C<rejected>.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item status example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $status = $future->status;
+
+  # "pending"
+
+=back
+
+=over 4
+
+=item status example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve(0);
+
+  my $status = $future->status;
+
+  # "fulfilled"
+
+=back
+
+=over 4
+
+=item status example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->reject(0);
+
+  my $status = $future->status;
+
+  # "rejected"
+
+=back
+
+=cut
+
+=head2 then
+
+  then(coderef $fulfill, coderef $reject) (Venus::Future)
+
+The then method registers fulfillment and rejection handlers and returns the
+future that invokes the handlers.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item then example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $new_future = $future->then(sub{
+    # fulfillment handler
+    $_
+  });
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+=back
+
+=over 4
+
+=item then example 2
+
+  # given: synopsis
+
+  package main;
+
+  my $new_future = $future->then(sub{
+    # fulfillment handler
+    $_
+  },
+  sub{
+    # rejection handler
+    $_
+  });
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+=back
+
+=over 4
+
+=item then example 3
+
+  # given: synopsis
+
+  package main;
+
+  my $new_future = $future->then(undef, sub{
+    # rejection handler
+    $_
+  });
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+=back
+
+=over 4
+
+=item then example 4
+
+  # given: synopsis
+
+  package main;
+
+  my $new_future = $future->then(sub{
+    # fulfillment handler
+    $_
+  });
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+  $future = $future;
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+=back
+
+=over 4
+
+=item then example 5
+
+  # given: synopsis
+
+  package main;
+
+  my $new_future = $future->then(sub{
+    # fulfillment handler
+    $_
+  },
+  sub{
+    # rejection handler
+    $_
+  });
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+  $future = $future;
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+=back
+
+=over 4
+
+=item then example 6
+
+  # given: synopsis
+
+  package main;
+
+  my $new_future = $future->then(undef, sub{
+    # rejection handler
+    $_
+  });
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+  $future = $future;
+
+  # "Venus::Future"
+
+  # $new_future->is_pending;
+
+  # true
+
+=back
+
+=cut
+
+=head2 value
+
+  value() (any)
+
+The value method returns the result of the L</resolve> operation once the
+future has been fulfilled.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item value example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $value = $future->value;
+
+  # undef
+
+  # $future->is_pending
+
+  # true
+
+=back
+
+=over 4
+
+=item value example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve(1);
+
+  my $value = $future->value;
+
+  # 1
+
+  # $future->is_fulfilled
+
+  # true
+
+=back
+
+=over 4
+
+=item value example 3
+
+  # given: synopsis
+
+  package main;
+
+  $future->resolve({pass => 1});
+
+  my $value = $future->value;
+
+  # {pass => 1}
+
+  # $future->is_fulfilled
+
+  # true
+
+=back
+
+=cut
+
+=head2 wait
+
+  wait(number $timeout) (Venus::Future)
+
+The wait method blocks the execution of the current process until a value is
+received. If a timeout is provided, execution will be blocked until a value is
+received or the wait time expires. If a timeout of C<0> is provided, execution
+will not be blocked. If no timeout is provided at all, execution will block
+indefinitely.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item wait example 1
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # resolve
+    $_[0]->result;
+  });
+
+  $future = $future->wait(0);
+
+  # bless(..., "Venus::Future")
+
+  # $future->is_fulfilled;
+
+  # true
+
+=back
+
+=over 4
+
+=item wait example 2
+
+  # given: synopsis
+
+  package main;
+
+  $future->promise(sub{
+    # never fulfilled
+  });
+
+  $future->wait(1);
+
+  # Exception! (isa Venus::Future::Error) (see error_on_timeout)
+
+=back
+
+=cut
+
+=head1 ERRORS
+
+This package may raise the following errors:
+
+=cut
+
+=over 4
+
+=item error: C<error_on_timeout>
+
+This package may raise an error_on_timeout exception.
+
+B<example 1>
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_timeout',
+    timeout => 10,
+  };
+
+  my $error = $future->try('error', $input)->error->result;
+
+  # my $name = $error->name;
+
+  # "on_timeout"
+
+  # my $message = $error->render;
+
+  # "Future timed-out after 10 seconds"
+
+  # my $timeout = $error->stash('timeout');
+
+  # 10
+
+=back
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

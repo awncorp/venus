@@ -26,11 +26,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('undef');
+  $assertion->match('undef')->format(sub{
+    (ref $self || $self)->new
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub comparer {

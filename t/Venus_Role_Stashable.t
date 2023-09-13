@@ -85,7 +85,7 @@ object. Calling this method without arguments returns all values.
 
 =signature stash
 
-  stash(Any $key, Any $value) (Any)
+  stash(any $key, any $value) (any)
 
 =metadata stash
 
@@ -155,8 +155,8 @@ $test->for('example', 3, 'stash', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

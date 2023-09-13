@@ -42,13 +42,13 @@ This package provides the following methods:
 
 =head2 error
 
-  error(HashRef $data) (Any)
+  error(hashref $data) (any)
 
 The error method dispatches to the L</throw> method, excepts a hashref of
 options to be provided to the L</throw> method, and returns the result unless
-an exception is raised automatically. If the C<throw> argument
-is provided it is excepte to be the name of a method used as a callback to
-provide arguments to the thrower.
+an exception is raised automatically. If the C<throw> option is provided it is
+excepted to be the name of a method used as a callback to provide arguments to
+the thrower.
 
 I<Since C<3.40>>
 
@@ -173,7 +173,7 @@ I<Since C<3.40>>
 
 =head2 throw
 
-  throw(Maybe[Str | HashRef] $data, Any @args) (Any)
+  throw(maybe[string | hashref] $data, any @args) (any)
 
 The throw method builds a L<Venus::Throw> object, which can raise errors
 (exceptions). If passed a string representing a package name, the throw object
@@ -317,7 +317,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

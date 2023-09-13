@@ -1,0 +1,101 @@
+
+=head1 NAME
+
+Venus::Role::Patchable - Patchable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Patchable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Patchable';
+
+  package main;
+
+  my $example = Example->new;
+
+  # my $patch = $example->patch;
+
+  # bless(.., "Venus::Space")
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for patching
+(or monkey-patching) routines in the calling package using
+L<Venus::Space/patch>.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 patch
+
+  patch(string $name, coderef $code) (Venus::Space)
+
+The patch method overwrites the named subroutine in the calling package using
+L<Venus::Space/patch> returning a L<Venus::Space> object that can be used to
+restore the original subroutine when L<Venus::Space/unpatch> is called.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item patch example 1
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Patchable';
+
+  sub test {
+    my ($self, @args) = @_;
+
+    return [$self, @args];
+  }
+
+  package main;
+
+  my $example = Example->new;
+
+  my $patch = $example->patch('test', sub {
+    my ($next, @args) = @_;
+
+    return ['patched', @{$next->(@args)}];
+  });
+
+  # bless(.., "Venus::Space")
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

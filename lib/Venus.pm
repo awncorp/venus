@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '3.55';
+our $VERSION = '4.11';
 
 # AUTHORITY
 
@@ -28,6 +28,7 @@ sub import {
     arrayref => 1,
     assert => 1,
     async => 1,
+    atom => 1,
     await => 1,
     bool => 1,
     box => 1,
@@ -39,6 +40,7 @@ sub import {
     check => 1,
     clargs => 1,
     cli => 1,
+    clone => 1,
     code => 1,
     config => 1,
     container => 1,
@@ -46,10 +48,12 @@ sub import {
     data => 1,
     date => 1,
     docs => 1,
+    enum => 1,
     error => 1,
     false => 1,
     fault => 1,
     float => 1,
+    future => 1,
     gather => 1,
     hash => 1,
     hashref => 1,
@@ -160,7 +164,7 @@ sub assert ($$) {
 
   require Venus::Assert;
 
-  my $assert = Venus::Assert->new('name', 'assert(?, ?)')->expression($expr);
+  my $assert = Venus::Assert->new->expression($expr);
 
   return $assert->validate($data);
 }
@@ -170,15 +174,23 @@ sub async ($) {
 
   require Venus::Process;
 
-  return Venus::Process->new->async($code);
+  return Venus::Process->new->future($code);
+}
+
+sub atom (;$) {
+  my ($data) = @_;
+
+  require Venus::Atom;
+
+  return Venus::Atom->new($data);
 }
 
 sub await ($;$) {
-  my ($process, $timeout) = @_;
+  my ($future, $timeout) = @_;
 
-  require Venus::Process;
+  require Venus::Future;
 
-  return $process->await($timeout);
+  return $future->wait($timeout);
 }
 
 sub bool (;$) {
@@ -290,7 +302,7 @@ sub check ($$) {
 
   require Venus::Assert;
 
-  return Venus::Assert->new->expression($expr)->check($data);
+  return Venus::Assert->new->expression($expr)->valid($data);
 }
 
 sub clargs (@) {
@@ -313,6 +325,14 @@ sub cli (;$) {
   my $cli = Venus::Cli->new($data || [@ARGV]);
 
   return $cli;
+}
+
+sub clone ($) {
+  my ($data) = @_;
+
+  require Storable;
+
+  return Storable::dclone($data);
 }
 
 sub code ($;$@) {
@@ -397,6 +417,14 @@ sub docs {
   return $data->docs->string(@args > 1 ? @args : (undef, @args));
 }
 
+sub enum {
+  my (@data) = @_;
+
+  require Venus::Enum;
+
+  return Venus::Enum->new(@data);
+}
+
 sub error (;$) {
   my ($data) = @_;
 
@@ -433,6 +461,14 @@ sub float ($;$@) {
   }
 
   return Venus::Float->new($data)->$code(@args);
+}
+
+sub future {
+  my (@data) = @_;
+
+  require Venus::Future;
+
+  return Venus::Future->new(@data);
 }
 
 sub gather ($;&) {

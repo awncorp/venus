@@ -158,7 +158,7 @@ and the values are L<Venus::Space> compatible package names.
 
 =signature coerce_args
 
-  coerce_args(HashRef $data, HashRef $spec) (HashRef)
+  coerce_args(hashref $data, hashref $spec) (hashref)
 
 =metadata coerce_args
 
@@ -204,7 +204,7 @@ attribute based on the coercion rules, returning the coerced value.
 
 =signature coerce_attr
 
-  coerce_attr(Str $name, Any $value) (Any)
+  coerce_attr(string $name, any $value) (any)
 
 =metadata coerce_attr
 
@@ -270,7 +270,7 @@ derived from the specified class.
 
 =signature coerce_into
 
-  coerce_into(Str $class, Any $value) (Object)
+  coerce_into(string $class, any $value) (object)
 
 =metadata coerce_into
 
@@ -311,7 +311,7 @@ corresponding to the name in the C<$data> will be used.
 
 =signature coerce_onto
 
-  coerce_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+  coerce_onto(hashref $data, string $name, string $class, any $value) (object)
 
 =metadata coerce_onto
 
@@ -422,7 +422,7 @@ package names.
 
 =signature coercers
 
-  coercers() (HashRef)
+  coercers() (hashref)
 
 =metadata coercers
 
@@ -469,7 +469,7 @@ be called manually as well, and is passed a hashref to coerce and return.
 
 =signature coercion
 
-  coercion(HashRef $data) (HashRef)
+  coercion(hashref $data) (hashref)
 
 =metadata coercion
 
@@ -587,8 +587,8 @@ $test->for('example', 2, 'coercion', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

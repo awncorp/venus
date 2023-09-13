@@ -94,7 +94,7 @@ The access method gets or sets the class attribute specified.
 
 =signature access
 
-  access(Str $name, Any $value) (Any)
+  access(string $name, any $value) (any)
 
 =metadata access
 
@@ -200,7 +200,7 @@ class attribute specified to the result, and returns the result.
 
 =signature assign
 
-  assign(Str $name, Str | CodeRef $code, Any @args) (Any)
+  assign(string $name, string | coderef $code, any @args) (any)
 
 =metadata assign
 
@@ -281,8 +281,8 @@ $test->for('example', 3, 'assign', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

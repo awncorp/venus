@@ -96,7 +96,7 @@ This package provides the following methods:
 
 =head2 make_args
 
-  make_args(HashRef $data, HashRef $spec) (HashRef)
+  make_args(hashref $data, hashref $spec) (hashref)
 
 The make_args method replaces values in the data provided with objects
 corresponding to the specification provided. The specification should contains
@@ -132,7 +132,7 @@ I<Since C<1.30>>
 
 =head2 make_attr
 
-  make_attr(Str $name, Any $value) (Any)
+  make_attr(string $name, any $value) (any)
 
 The make_attr method is a surrogate accessor and gets and/or sets an instance
 attribute based on the C<makers> rules, returning the made value.
@@ -179,7 +179,7 @@ I<Since C<1.30>>
 
 =head2 make_into
 
-  make_into(Str $class, Any $value) (Object)
+  make_into(string $class, any $value) (object)
 
 The make_into method attempts to build and return an object based on the
 class name and value provided, unless the value provided is already an object
@@ -207,7 +207,7 @@ I<Since C<1.30>>
 
 =head2 make_onto
 
-  make_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+  make_onto(hashref $data, string $name, string $class, any $value) (object)
 
 The make_onto method attempts to build and assign an object based on the
 class name and value provided, as the value corresponding to the name
@@ -297,7 +297,7 @@ I<Since C<1.30>>
 
 =head2 makers
 
-  makers() (HashRef)
+  makers() (hashref)
 
 The makers method, if defined, is called during object construction, or by the
 L</making> method, and returns key/value pairs where the keys map to class
@@ -331,7 +331,7 @@ I<Since C<1.30>>
 
 =head2 making
 
-  making(HashRef $data) (HashRef)
+  making(hashref $data) (hashref)
 
 The making method is called automatically during object construction but can
 be called manually as well, and is passed a hashref to make and return.
@@ -408,7 +408,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

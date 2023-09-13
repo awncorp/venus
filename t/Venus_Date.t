@@ -149,7 +149,7 @@ The add method increments the date and time attributes specified.
 
 =signature add
 
-  add(HashRef $data) (Date)
+  add(hashref $data) (Venus::Date)
 
 =metadata add
 
@@ -214,7 +214,7 @@ The add_days method increments the C<day> attribute.
 
 =signature add_days
 
-  add_days(Int $days) (Any)
+  add_days(number $days) (any)
 
 =metadata add_days
 
@@ -288,7 +288,7 @@ The add_hours method increments the C<hour> attribute.
 
 =signature add_hours
 
-  add_hours(Int $hours) (Any)
+  add_hours(number $hours) (any)
 
 =metadata add_hours
 
@@ -362,7 +362,7 @@ The add_hms method increments the C<hour>, C<minute>, and C<second> attributes.
 
 =signature add_hms
 
-  add_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+  add_hms(maybe[number] $hours, maybe[number] $minutes, maybe[number] $seconds) (Venus::Date)
 
 =metadata add_hms
 
@@ -436,7 +436,7 @@ The add_mdy method increments the C<month>, C<day>, and C<years> attributes.
 
 =signature add_mdy
 
-  add_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+  add_mdy(maybe[number] $months, maybe[number] $days, maybe[number] $years) (Venus::Date)
 
 =metadata add_mdy
 
@@ -510,7 +510,7 @@ The add_minutes method increments the C<minute> attribute.
 
 =signature add_minutes
 
-  add_minutes(Int $minutes) (Date)
+  add_minutes(number $minutes) (Venus::Date)
 
 =metadata add_minutes
 
@@ -584,7 +584,7 @@ The add_months method increments the C<month> attribute.
 
 =signature add_months
 
-  add_months(Int $months) (Date)
+  add_months(number $months) (Venus::Date)
 
 =metadata add_months
 
@@ -658,7 +658,7 @@ The add_seconds method increments the C<second> attribute.
 
 =signature add_seconds
 
-  add_seconds(Int $seconds) (Date)
+  add_seconds(number $seconds) (Venus::Date)
 
 =metadata add_seconds
 
@@ -732,7 +732,7 @@ The add_years method increments the C<year> attribute.
 
 =signature add_years
 
-  add_years(Int $years) (Date)
+  add_years(number $years) (Venus::Date)
 
 =metadata add_years
 
@@ -806,7 +806,7 @@ The epoch method returns the epoch.
 
 =signature epoch
 
-  epoch() (Int)
+  epoch() (number)
 
 =metadata epoch
 
@@ -838,7 +838,7 @@ The explain method returns the epoch and is used in stringification operations.
 
 =signature explain
 
-  explain() (Int)
+  explain() (number)
 
 =metadata explain
 
@@ -872,7 +872,7 @@ rules.
 
 =signature format
 
-  format(Str $format) (Str)
+  format(string $format) (string)
 
 =metadata format
 
@@ -924,7 +924,7 @@ The hms method returns the time formatted as C<hh:mm:ss>.
 
 =signature hms
 
-  hms() (Str)
+  hms() (string)
 
 =metadata hms
 
@@ -956,7 +956,7 @@ The iso8601 method returns the date and time formatted as an ISO8601 string.
 
 =signature iso8601
 
-  iso8601() (Str)
+  iso8601() (string)
 
 =metadata iso8601
 
@@ -988,7 +988,7 @@ The mdy method returns the date formatted as C<mm-dd-yyyy>.
 
 =signature mdy
 
-  mdy() (Str)
+  mdy() (string)
 
 =metadata mdy
 
@@ -1022,7 +1022,7 @@ parsing rules.
 
 =signature parse
 
-  parse(Any @data) (Date)
+  parse(any @data) (Venus::Date)
 
 =metadata parse
 
@@ -1056,7 +1056,7 @@ The reset method resets all attributes to correspond with the epoch provided.
 
 =signature reset
 
-  reset(Int $time) (Date)
+  reset(number $time) (Venus::Date)
 
 =metadata reset
 
@@ -1091,7 +1091,7 @@ e.g. C<year>, C<quarter>, C<month>, C<day>, C<hour>, C<minute>, C<second>.
 
 =signature restart
 
-  restart(Str $interval) (Date)
+  restart(string $interval) (Venus::Date)
 
 =metadata restart
 
@@ -1177,7 +1177,7 @@ The restart_day method truncates the date and time to the C<day>.
 
 =signature restart_day
 
-  restart_day() (Date)
+  restart_day() (Venus::Date)
 
 =metadata restart_day
 
@@ -1215,7 +1215,7 @@ The restart_hour method truncates the date and time to the C<hour>.
 
 =signature restart_hour
 
-  restart_hour() (Date)
+  restart_hour() (Venus::Date)
 
 =metadata restart_hour
 
@@ -1253,7 +1253,7 @@ The restart_minute method truncates the date and time to the C<minute>.
 
 =signature restart_minute
 
-  restart_minute() (Date)
+  restart_minute() (Venus::Date)
 
 =metadata restart_minute
 
@@ -1291,7 +1291,7 @@ The restart_month method truncates the date and time to the C<month>.
 
 =signature restart_month
 
-  restart_month() (Date)
+  restart_month() (Venus::Date)
 
 =metadata restart_month
 
@@ -1329,7 +1329,7 @@ The restart_quarter method truncates the date and time to the C<quarter>.
 
 =signature restart_quarter
 
-  restart_quarter() (Date)
+  restart_quarter() (Venus::Date)
 
 =metadata restart_quarter
 
@@ -1367,7 +1367,7 @@ The restart_second method truncates the date and time to the C<second>.
 
 =signature restart_second
 
-  restart_second() (Date)
+  restart_second() (Venus::Date)
 
 =metadata restart_second
 
@@ -1405,7 +1405,7 @@ The restart_year method truncates the date and time to the C<year>.
 
 =signature restart_year
 
-  restart_year() (Date)
+  restart_year() (Venus::Date)
 
 =metadata restart_year
 
@@ -1443,7 +1443,7 @@ The rfc822 method returns the date and time formatted as an RFC822 string.
 
 =signature rfc822
 
-  rfc822() (Str)
+  rfc822() (string)
 
 =metadata rfc822
 
@@ -1477,7 +1477,7 @@ The rfc1123 method returns the date and time formatted as an RFC1123 string.
 
 =signature rfc1123
 
-  rfc1123() (Str)
+  rfc1123() (string)
 
 =metadata rfc1123
 
@@ -1510,7 +1510,7 @@ The rfc3339 method returns the date and time formatted as an RFC3339 string.
 
 =signature rfc3339
 
-  rfc3339() (Str)
+  rfc3339() (string)
 
 =metadata rfc3339
 
@@ -1542,7 +1542,7 @@ The rfc7231 method returns the date and time formatted as an RFC7231 string.
 
 =signature rfc7231
 
-  rfc7231() (Str)
+  rfc7231() (string)
 
 =metadata rfc7231
 
@@ -1574,7 +1574,7 @@ The set method sets the date and time attributes specified.
 
 =signature set
 
-  set(HashRef $data) (Date)
+  set(hashref $data) (Venus::Date)
 
 =metadata set
 
@@ -1659,7 +1659,7 @@ The set_hms method sets the C<hour>, C<minute>, and C<second> attributes.
 
 =signature set_hms
 
-  set_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+  set_hms(maybe[number] $hours, maybe[number] $minutes, maybe[number] $seconds) (Venus::Date)
 
 =metadata set_hms
 
@@ -1734,7 +1734,7 @@ The set_mdy method sets the C<month>, C<day>, and C<year> attributes.
 
 =signature set_mdy
 
-  set_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+  set_mdy(maybe[number] $months, maybe[number] $days, maybe[number] $years) (Venus::Date)
 
 =metadata set_mdy
 
@@ -1809,7 +1809,7 @@ L</rfc3339>.
 
 =signature string
 
-  string() (Str)
+  string() (string)
 
 =metadata string
 
@@ -1841,7 +1841,7 @@ The sub method method decrements the date and time attributes specified.
 
 =signature sub
 
-  sub(HashRef $data) (Date)
+  sub(hashref $data) (Venus::Date)
 
 =metadata sub
 
@@ -1903,7 +1903,7 @@ The sub_days method decrements the C<day> attribute.
 
 =signature sub_days
 
-  sub_days(Int $days) (Date)
+  sub_days(number $days) (Venus::Date)
 
 =metadata sub_days
 
@@ -1977,7 +1977,7 @@ The sub_hours method decrements the C<hour> attribute.
 
 =signature sub_hours
 
-  sub_hours(Int $hours) (Any)
+  sub_hours(number $hours) (any)
 
 =metadata sub_hours
 
@@ -2051,7 +2051,7 @@ The sub_hms method decrements the C<hour>, C<minute>, and C<second> attributes.
 
 =signature sub_hms
 
-  sub_hms(Maybe[Int] $hours, Maybe[Int] $minutes, Maybe[Int] $seconds) (Date)
+  sub_hms(maybe[number] $hours, maybe[number] $minutes, maybe[number] $seconds) (Venus::Date)
 
 =metadata sub_hms
 
@@ -2125,7 +2125,7 @@ The sub_mdy method decrements the C<month>, C<day>, and C<year> attributes.
 
 =signature sub_mdy
 
-  sub_mdy(Maybe[Int] $months, Maybe[Int] $days, Maybe[Int] $years) (Date)
+  sub_mdy(maybe[number] $months, maybe[number] $days, maybe[number] $years) (Venus::Date)
 
 =metadata sub_mdy
 
@@ -2199,7 +2199,7 @@ The sub_minutes method decrements the C<minute> attribute.
 
 =signature sub_minutes
 
-  sub_minutes(Int $minutes) (Date)
+  sub_minutes(number $minutes) (Venus::Date)
 
 =metadata sub_minutes
 
@@ -2273,7 +2273,7 @@ The sub_months method decrements the C<month> attribute.
 
 =signature sub_months
 
-  sub_months(Int $months) (Date)
+  sub_months(number $months) (Venus::Date)
 
 =metadata sub_months
 
@@ -2347,7 +2347,7 @@ The sub_seconds method decrements the C<second> attribute.
 
 =signature sub_seconds
 
-  sub_seconds(Int $seconds) (Date)
+  sub_seconds(number $seconds) (Venus::Date)
 
 =metadata sub_seconds
 
@@ -2421,7 +2421,7 @@ The sub_years method decrements the C<years> attribute.
 
 =signature sub_years
 
-  sub_years(Int $years) (Date)
+  sub_years(number $years) (Venus::Date)
 
 =metadata sub_years
 
@@ -2825,8 +2825,8 @@ $test->for('example', 1, '(~~)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

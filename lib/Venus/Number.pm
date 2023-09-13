@@ -66,11 +66,17 @@ sub append_with {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('number | float');
+  $assertion->match('float')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  $assertion->match('number')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  return $assertion;
 }
 
 sub atan2 {

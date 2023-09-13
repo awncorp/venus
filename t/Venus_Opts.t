@@ -125,7 +125,7 @@ The default method returns the default value, i.e. C<[@ARGV]>.
 
 =signature default
 
-  default() (ArrayRef)
+  default() (arrayref)
 
 =metadata default
 
@@ -158,7 +158,7 @@ value exists.
 
 =signature exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 =metadata exists
 
@@ -226,7 +226,7 @@ The get method takes a name or index and returns the associated value.
 
 =signature get
 
-  get(Str $key) (Any)
+  get(string $key) (any)
 
 =metadata get
 
@@ -296,7 +296,7 @@ and C<spec> values.
 
 =signature parse
 
-  parse(ArrayRef $args) (Opts)
+  parse(arrayref $args) (Venus::Opts)
 
 =metadata parse
 
@@ -349,7 +349,7 @@ the result.
 
 =signature reparse
 
-  reparse(ArrayRef $specs, ArrayRef $args) (Opts)
+  reparse(arrayref $specs, arrayref $args) (Venus::Opts)
 
 =metadata reparse
 
@@ -404,7 +404,7 @@ value exists.
 
 =signature name
 
-  name(Str $key) (Str | Undef)
+  name(string $key) (string | undef)
 
 =metadata name
 
@@ -473,7 +473,7 @@ associated argument exists.
 
 =signature set
 
-  set(Str $key, Any $data) (Any)
+  set(string $key, any $data) (any)
 
 =metadata set
 
@@ -542,7 +542,7 @@ using the C<named> attribute.
 
 =signature unnamed
 
-  unnamed() (ArrayRef)
+  unnamed() (arrayref)
 
 =metadata unnamed
 
@@ -570,8 +570,8 @@ $test->for('example', 1, 'unnamed', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

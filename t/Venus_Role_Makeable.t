@@ -168,7 +168,7 @@ and the values are L<Venus::Space> compatible package names.
 
 =signature make_args
 
-  make_args(HashRef $data, HashRef $spec) (HashRef)
+  make_args(hashref $data, hashref $spec) (hashref)
 
 =metadata make_args
 
@@ -214,7 +214,7 @@ attribute based on the C<makers> rules, returning the made value.
 
 =signature make_attr
 
-  make_attr(Str $name, Any $value) (Any)
+  make_attr(string $name, any $value) (any)
 
 =metadata make_attr
 
@@ -280,7 +280,7 @@ derived from the specified class.
 
 =signature make_into
 
-  make_into(Str $class, Any $value) (Object)
+  make_into(string $class, any $value) (object)
 
 =metadata make_into
 
@@ -321,7 +321,7 @@ corresponding to the name in the C<$data> will be used.
 
 =signature make_onto
 
-  make_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+  make_onto(hashref $data, string $name, string $class, any $value) (object)
 
 =metadata make_onto
 
@@ -432,7 +432,7 @@ package names.
 
 =signature makers
 
-  makers() (HashRef)
+  makers() (hashref)
 
 =metadata makers
 
@@ -479,7 +479,7 @@ be called manually as well, and is passed a hashref to make and return.
 
 =signature making
 
-  making(HashRef $data) (HashRef)
+  making(hashref $data) (hashref)
 
 =metadata making
 
@@ -597,8 +597,8 @@ $test->for('example', 2, 'making', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

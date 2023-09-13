@@ -44,7 +44,7 @@ This package provides the following methods:
 
 =head2 stash
 
-  stash(Any $key, Any $value) (Any)
+  stash(any $key, any $value) (any)
 
 The stash method is used to fetch and stash named values associated with the
 object. Calling this method without arguments returns all values.
@@ -103,7 +103,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

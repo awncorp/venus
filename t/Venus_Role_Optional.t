@@ -99,7 +99,7 @@ The clear method deletes an attribute and returns the removed value.
 
 =signature clear
 
-  clear(Str $name) (Any)
+  clear(string $name) (any)
 
 =metadata clear
 
@@ -181,7 +181,7 @@ returns falsy.
 
 =signature has
 
-  has(Str $name) (Boolean)
+  has(string $name) (boolean)
 
 =metadata has
 
@@ -233,7 +233,7 @@ The reset method rebuilds an attribute and returns the deleted value.
 
 =signature reset
 
-  reset(Str $name) (Any)
+  reset(string $name) (any)
 
 =metadata reset
 
@@ -402,7 +402,7 @@ $test->for('example', 1, 'asserting', sub {
     lname => 1234567890,
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
@@ -410,10 +410,10 @@ $pkgs->unload;
 
 $test->for('example', 2, 'asserting', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->error(\my $error)->result;
-  ok $error->is('on.validate');
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /attribute "lname" in Person/i;
+  ok my $result = $tryable->error->result;
+  ok $result->is('on.coded');
+  ok $result->isa('Venus::Check::Error');
+  ok $result->render =~ /attribute "lname" in Person/im;
 
   $result
 });
@@ -445,7 +445,7 @@ $test->for('example', 2, 'asserting', sub {
     lname => 'Alderson',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
@@ -455,9 +455,9 @@ $test->for('example', 3, 'asserting', sub {
   my ($tryable) = @_;
   my $error;
   ok my $result = $tryable->error(\$error)->result;
-  ok $error->is('on.validate');
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /attribute "fname" in Person/i;
+  ok $error->is('on.coded');
+  ok $error->isa('Venus::Check::Error');
+  ok $error->render =~ /attribute "fname" in Person/im;
 
   $result
 });
@@ -494,7 +494,7 @@ $test->for('example', 3, 'asserting', sub {
   #   progress => '1',
   # );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
@@ -514,10 +514,11 @@ $test->for('example', 4, 'asserting', sub {
   ok $person->progress eq 7.89;
   my $error = catch { Person->new(progress => '1') };
   ok $error;
-  ok $error->is('on.validate');
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ /attribute "progress" in Person/i;
-  ok $error->message =~ /received \(string\), expected \(number | float\)/i;
+  ok $error->is('on.either');
+  ok $error->isa('Venus::Check::Error');
+  ok $error->render =~ /attribute "progress" in Person/im;
+  ok $error->render =~ /expected number, received string/im;
+  ok $error->render =~ /expected float, received string/im;
 
   $result
 });
@@ -2280,8 +2281,8 @@ $test->for('example', 3, 'requiring', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

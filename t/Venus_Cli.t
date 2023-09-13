@@ -140,7 +140,7 @@ C<@ARGV>.
 
 =signature data
 
-  data(ArrayRef $data) (ArrayRef)
+  data(arrayref $data) (arrayref)
 
 =metadata data
 
@@ -175,7 +175,7 @@ registered argument using the name provided.
 
 =signature arg
 
-  arg(Str $name) (Any)
+  arg(string $name) (any)
 
 =metadata arg
 
@@ -354,7 +354,7 @@ command using the name provided.
 
 =signature cmd
 
-  cmd(Str $name) (Any)
+  cmd(string $name) (any)
 
 =metadata cmd
 
@@ -584,7 +584,7 @@ method name or coderef, and arguments.
 
 =signature exit
 
-  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+  exit(number $code, string | coderef $code, any @args) (any)
 
 =metadata exit
 
@@ -683,7 +683,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 
 =signature fail
 
-  fail(Str|CodeRef $code, Any @args) (Any)
+  fail(string | coderef $code, any @args) (any)
 
 =metadata fail
 
@@ -740,7 +740,7 @@ from the configuration database.
 
 =signature get
 
-  get(Str $type, Str $name) (Any)
+  get(string $type, string $name) (any)
 
 =metadata get
 
@@ -853,7 +853,7 @@ the configuration of the CLI.
 
 =signature help
 
-  help() (Str)
+  help() (string)
 
 =metadata help
 
@@ -1267,7 +1267,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 
 =signature okay
 
-  okay(Str|CodeRef $code, Any @args) (Any)
+  okay(string | coderef $code, any @args) (any)
 
 =metadata okay
 
@@ -1324,7 +1324,7 @@ registered option using the name provided.
 
 =signature opt
 
-  opt(Str $name) (Any)
+  opt(string $name) (any)
 
 =metadata opt
 
@@ -1502,7 +1502,7 @@ arguments and options as a hashref.
 
 =signature parsed
 
-  parsed() (HashRef)
+  parsed() (hashref)
 
 =metadata parsed
 
@@ -1549,7 +1549,7 @@ based on the CLI configuration.
 
 =signature parser
 
-  parser() (Opts)
+  parser() (Venus::Opts)
 
 =metadata parser
 
@@ -1594,7 +1594,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 
 =signature pass
 
-  pass(Str|CodeRef $code, Any @args) (Any)
+  pass(string | coderef $code, any @args) (any)
 
 =metadata pass
 
@@ -1769,7 +1769,7 @@ string. Otherwise, the type will default to C<boolean>.
 
 =signature set
 
-  set(Str $type, Str $name, Str|HashRef $data) (Any)
+  set(string $type, string $name, string | hashref $data) (any)
 
 =metadata set
 
@@ -1881,7 +1881,7 @@ Specifications"> for use with L<Getopt::Long>.
 
 =signature spec
 
-  spec() (ArrayRef)
+  spec() (arrayref)
 
 =metadata spec
 
@@ -1997,7 +1997,7 @@ C<"description">, C<"header">, and C<"footer"> strings.
 
 =signature str
 
-  str(Str $name) (Any)
+  str(string $name) (any)
 
 =metadata str
 
@@ -2038,7 +2038,7 @@ returns the value(s) associated. If validation failed an exception is thrown.
 
 =signature test
 
-  test(Str $type, Str $name) (Any)
+  test(string $type, string $name) (any)
 
 =metadata test
 
@@ -2276,8 +2276,8 @@ $test->for('example', 1, 'error_on_opt_validation', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

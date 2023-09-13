@@ -113,7 +113,7 @@ method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
 
 =signature cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 =metadata cast
 
@@ -195,7 +195,7 @@ L</defined>.
 
 =signature defined
 
-  defined() (Int)
+  defined() (number)
 
 =metadata defined
 
@@ -249,7 +249,7 @@ operations.
 
 =signature explain
 
-  explain() (Any)
+  explain() (any)
 
 =metadata explain
 
@@ -285,7 +285,7 @@ data type will update the object's internal state or will throw an exception.
 
 =signature mutate
 
-  mutate(Str | CodeRef $code, Any @args) (Object)
+  mutate(string | coderef $code, any @args) (object)
 
 =metadata mutate
 
@@ -324,8 +324,8 @@ $test->for('example', 1, 'mutate', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

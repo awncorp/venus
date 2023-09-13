@@ -72,7 +72,7 @@ This package provides the following methods:
 
 =head2 cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 The cast method converts L<"value"|Venus::Kind::Value> objects between
 different I<"value"> object types, based on the name of the type provided. This
@@ -130,7 +130,7 @@ I<Since C<0.08>>
 
 =head2 defined
 
-  defined() (Int)
+  defined() (number)
 
 The defined method returns truthy or falsy if the underlying value is
 L</defined>.
@@ -169,7 +169,7 @@ I<Since C<0.01>>
 
 =head2 explain
 
-  explain() (Any)
+  explain() (any)
 
 The explain method returns the value set and is used in stringification
 operations.
@@ -194,7 +194,7 @@ I<Since C<0.01>>
 
 =head2 mutate
 
-  mutate(Str | CodeRef $code, Any @args) (Object)
+  mutate(string | coderef $code, any @args) (object)
 
 The mutate method dispatches the method call or executes the callback and
 returns the result, which if is of the same type as the invocant's underlying
@@ -228,7 +228,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

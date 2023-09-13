@@ -54,6 +54,8 @@ sub array {
 
   my $class = $self->package;
 
+  no warnings 'once';
+
   @{"${class}::${name}"} = @data if @data;
 
   return [@{"${class}::${name}"}];
@@ -277,6 +279,8 @@ sub hash {
 
   my $class = $self->package;
 
+  no warnings 'once';
+
   %{"${class}::${name}"} = (@data) if @data;
 
   return {%{"${class}::${name}"}};
@@ -443,6 +447,28 @@ sub parts {
   return $self->parse;
 }
 
+sub patch {
+  my ($self, $name, $code) = @_;
+
+  my $patched = $self->{'$patched'} ||= {};
+
+  my $orig = $self->swap($name, $code);
+
+  $patched->{$name} = $orig;
+
+  return $self;
+}
+
+sub patched {
+  my ($self, $name) = @_;
+
+  my $patched = $self->{'$patched'};
+
+  return false if !$patched;
+
+  return $name ? ($patched->{$name} ? true : false) : true;
+}
+
 sub pfile {
   my ($self) = @_;
 
@@ -517,6 +543,8 @@ sub routine {
 
   my $class = $self->package;
 
+  no warnings 'redefine';
+
   *{"${class}::${name}"} = $code if $code;
 
   return *{"${class}::${name}"}{"CODE"};
@@ -541,6 +569,8 @@ sub scalar {
   no strict 'refs';
 
   my $class = $self->package;
+
+  no warnings 'once';
 
   ${"${class}::${name}"} = $data[0] if @data;
 
@@ -711,6 +741,23 @@ sub unloaded {
   my ($self) = @_;
 
   return $self->loaded ? false : true;
+}
+
+sub unpatch {
+  my ($self, @names) = @_;
+
+  my $patched = $self->{'$patched'} ||= {};
+
+  @names = keys %{$patched} if !@names;
+
+  for my $name (@names) {
+    my $orig = delete $patched->{$name} or next;
+    $self->routine($name, $orig);
+  }
+
+  delete $self->{'$patched'} if !keys %{$patched};
+
+  return $self;
 }
 
 sub visible {

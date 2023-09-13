@@ -202,7 +202,7 @@ The args method returns the task argument declarations.
 
 =signature args
 
-  args() (HashRef)
+  args() (hashref)
 
 =metadata args
 
@@ -248,7 +248,7 @@ The cmds method returns the task command declarations.
 
 =signature cmds
 
-  cmds() (HashRef)
+  cmds() (hashref)
 
 =metadata cmds
 
@@ -303,7 +303,7 @@ and returns the information as a hashref.
 
 =signature conf
 
-  conf() (HashRef)
+  conf() (hashref)
 
 =metadata conf
 
@@ -563,7 +563,7 @@ Valid file extensions are C<yaml>, C<yml>, C<json>, C<js>, C<perl>, and C<pl>.
 
 =signature file
 
-  file() (Str)
+  file() (string)
 
 =metadata file
 
@@ -790,7 +790,7 @@ The footer method returns examples and usage information used in usage text.
 
 =signature footer
 
-  footer() (Str)
+  footer() (string)
 
 =metadata footer
 
@@ -860,7 +860,7 @@ returns the invocant unless the program is exited.
 
 =signature handler
 
-  handler(HashRef $data) (Any)
+  handler(hashref $data) (any)
 
 =metadata handler
 
@@ -1973,7 +1973,7 @@ the system with a new configuration file.
 
 =signature init
 
-  init() (HashRef)
+  init() (hashref)
 
 =metadata init
 
@@ -2051,7 +2051,7 @@ the C<NAME> package variable.
 
 =signature name
 
-  name() (Str)
+  name() (string)
 
 =metadata name
 
@@ -2135,7 +2135,7 @@ The opts method returns the task options declarations.
 
 =signature opts
 
-  opts() (HashRef)
+  opts() (hashref)
 
 =metadata opts
 
@@ -2499,8 +2499,8 @@ $test->for('feature', 'vns-cli');
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

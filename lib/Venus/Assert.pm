@@ -7,9 +7,6 @@ use warnings;
 
 use Venus::Class 'attr', 'base', 'with';
 
-use Venus::Match;
-use Venus::Type;
-
 base 'Venus::Kind::Utility';
 
 with 'Venus::Role::Buildable';
@@ -21,8 +18,6 @@ use overload (
 
 # ATTRIBUTES
 
-attr 'expects';
-attr 'message';
 attr 'name';
 
 # BUILDERS
@@ -38,18 +33,6 @@ sub build_arg {
 sub build_self {
   my ($self, $data) = @_;
 
-  if (!$self->name) {
-    $self->name('Unknown')
-  }
-
-  if (!$self->message) {
-    $self->message('Type assertion (%s) failed: received (%s), expected (%s)');
-  }
-
-  if (!$self->expects) {
-    $self->expects([])
-  }
-
   $self->conditions;
 
   return $self;
@@ -57,146 +40,54 @@ sub build_self {
 
 # METHODS
 
-sub any {
-  my ($self) = @_;
-
-  $self->constraints->when(sub{true})->then(sub{true});
-
-  return $self;
-}
-
 sub accept {
   my ($self, $name, @args) = @_;
 
-  if (!$name) {
-    return $self;
-  }
-  if ($self->can($name)) {
-    return $self->$name(@args);
-  }
-  else {
-    return $self->identity($name, @args);
-  }
-}
+  return $self if !$name;
 
-sub array {
-  my ($self, @code) = @_;
-
-  $self->constraint('array', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub arrayref {
-  my ($self, @code) = @_;
-
-  return $self->array(@code);
-}
-
-sub attributes {
-  my ($self, @pairs) = @_;
-
-  $self->object(sub{
-    my $check = 0;
-    my $value = $_->value;
-    return false if @pairs % 2;
-    for (my $i = 0; $i < @pairs;) {
-      my ($key, $data) = (map $pairs[$_], $i++, $i++);
-      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
-      $check++ if $value->can($key)
-        && $self->new->do($match, @args)->check($value->$key);
-    }
-    ((@pairs / 2) == $check) ? true : false
-  });
-
-  return $self;
-}
-
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('string');
-
-  return $assert;
-}
-
-sub boolean {
-  my ($self, @code) = @_;
-
-  $self->constraint('boolean', @code ? @code : sub{true});
+  $self->check->accept($name, @args);
 
   return $self;
 }
 
 sub check {
-  my ($self, $data) = @_;
+  my ($self, @args) = @_;
 
-  my $value = Venus::Type->new(value => $data);
+  require Venus::Check;
 
-  my @args = (value => $value, on_none => sub{false});
+  $self->{check} = $args[0] if @args;
 
-  return $self->constraints->renew(@args)->result;
-}
+  $self->{check} ||= Venus::Check->new;
 
-sub checker {
-  my ($self, $data) = @_;
-
-  $self->expression($data) if $data;
-
-  return $self->defer('check');
+  return $self->{check};
 }
 
 sub clear {
   my ($self) = @_;
 
-  $self->constraints->clear;
-  $self->coercions->clear;
+  $self->check->clear;
+  $self->constraint->clear;
+  $self->coercion->clear;
 
   return $self;
-}
-
-sub code {
-  my ($self, @code) = @_;
-
-  $self->constraint('code', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub coderef {
-  my ($self, @code) = @_;
-
-  return $self->code(@code);
 }
 
 sub coerce {
   my ($self, $data) = @_;
 
-  my $value = Venus::Type->new(value => $data);
-
-  my @args = (value => $value, on_none => sub{$data});
-
-  return $self->coercions->renew(@args)->result;
+  return $self->coercion->result($self->value($data));
 }
 
 sub coercion {
-  my ($self, $type, $code) = @_;
+  my ($self, @args) = @_;
 
-  $self->coercions->when('coded', $type)->then($code);
+  require Venus::Coercion;
 
-  return $self;
-}
+  $self->{coercion} = $args[0] if @args;
 
-sub coercions {
-  my ($self) = @_;
+  $self->{coercion} ||= Venus::Coercion->new->do('check', $self->check);
 
-  my $match = Venus::Match->new;
-
-  return $self->{coercions} ||= $match if ref $self;
-
-  return $match;
+  return $self->{coercion};
 }
 
 sub conditions {
@@ -206,60 +97,21 @@ sub conditions {
 }
 
 sub constraint {
-  my ($self, $type, $code) = @_;
+  my ($self, @args) = @_;
 
-  $self->constraints->when('coded', $type)->then($code);
+  require Venus::Constraint;
 
-  return $self;
+  $self->{constraint} = $args[0] if @args;
+
+  $self->{constraint} ||= Venus::Constraint->new->do('check', $self->check);
+
+  return $self->{constraint};
 }
 
-sub constraints {
-  my ($self) = @_;
-
-  my $match = Venus::Match->new;
-
-  return $self->{constraints} ||= $match if ref $self;
-
-  return $match;
-}
-
-sub consumes {
-  my ($self, $role) = @_;
-
-  my $where = $self->constraint('object', sub{true})->constraints->where;
-
-  $where->when(sub{$_->value->DOES($role)})->then(sub{true});
-
-  return $self;
-}
-
-sub defined {
+sub ensure {
   my ($self, @code) = @_;
 
-  $self->constraints->when(sub{CORE::defined($_->value)})
-    ->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-sub either {
-  my ($self, @data) = @_;
-
-  for (my $i = 0; $i < @data; $i++) {
-    my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
-    $self->accept($match, @args);
-  }
-
-  return $self;
-}
-
-sub enum {
-  my ($self, @data) = @_;
-
-  for my $item (@data) {
-    $self->constraints->when(sub{CORE::defined($_->value) && $_->value eq $item})
-      ->then(sub{true});
-  }
+  $self->constraint->ensure(@code);
 
   return $self;
 }
@@ -272,169 +124,48 @@ sub expression {
   $data =
   $data =~ s/\s*\n+\s*/ /gr =~ s/^\s+|\s+$//gr =~ s/\[\s+/[/gr =~ s/\s+\]/]/gr;
 
-  $self->expects([$data]);
+  $self->name($data) if !$self->name;
 
-  my @parsed = $self->parse($data);
+  my $parsed = $self->parse($data);
 
-  $self->either(@parsed);
-
-  return $self;
-}
-
-sub float {
-  my ($self, @code) = @_;
-
-  $self->constraint('float', @code ? @code : sub{true});
+  $self->accept(
+    @{$parsed} > 0
+    ? ((ref $parsed->[0] eq 'ARRAY') ? @{$parsed->[0]} : @{$parsed})
+    : @{$parsed}
+  );
 
   return $self;
 }
 
 sub format {
-  my ($self, $name, @code) = @_;
-
-  if (!$name) {
-    return $self;
-  }
-  if (lc($name) eq 'array') {
-    return $self->coercion('array', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'boolean') {
-    return $self->coercion('boolean', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'code') {
-    return $self->coercion('code', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'float') {
-    return $self->coercion('float', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'hash') {
-    return $self->coercion('hash', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'number') {
-    return $self->coercion('number', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'object') {
-    return $self->coercion('object', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'regexp') {
-    return $self->coercion('regexp', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'scalar') {
-    return $self->coercion('scalar', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'string') {
-    return $self->coercion('string', @code ? (@code) : sub{$_->value});
-  }
-  elsif (lc($name) eq 'undef') {
-    return $self->coercion('undef', @code ? (@code) : sub{$_->value});
-  }
-  else {
-    return $self->coercion('object', sub {
-      UNIVERSAL::isa($_->value, $name)
-        ? (@code ? $code[0]->($_->value) : $_->value)
-        : $_->value;
-    });
-  }
-}
-
-sub hash {
   my ($self, @code) = @_;
 
-  $self->constraint('hash', @code ? @code : sub{true});
+  $self->coercion->format(@code);
 
   return $self;
 }
 
-sub hashkeys {
-  my ($self, @pairs) = @_;
+sub match {
+  my ($self, @args) = @_;
 
-  $self->constraints->when(sub{
-    CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-      && (keys %{$_->value}) > 0
-  })->then(sub{
-    my $check = 0;
-    my $value = $_->value;
-    return false if @pairs % 2;
-    for (my $i = 0; $i < @pairs;) {
-      my ($key, $data) = (map $pairs[$_], $i++, $i++);
-      my ($match, @args) = (ref $data) ? (@{$data}) : ($data);
-      $check++ if $self->new->do($match, @args)->check($value->{$key});
-    }
-    ((@pairs / 2) == $check) ? true : false
-  });
+  require Venus::Coercion;
+  my $match = Venus::Coercion->new->accept(@args);
 
-  return $self;
+  push @{$self->matches}, sub {
+    my ($source, $value) = @_;
+    local $_ = $value;
+    return $match->result($value);
+  };
+
+  return $match;
 }
 
-sub hashref {
-  my ($self, @code) = @_;
-
-  return $self->hash(@code);
-}
-
-sub identity {
-  my ($self, $name) = @_;
-
-  $self->constraint('object', sub {$_->value->isa($name) ? true : false});
-
-  return $self;
-}
-
-sub inherits {
-  my ($self, $name) = @_;
-
-  $self->constraint('object', sub {$_->value->isa($name) ? true : false});
-
-  return $self;
-}
-
-sub integrates {
-  my ($self, $name) = @_;
-
-  $self->constraint('object', sub {
-    $_->value->can('does') ? ($_->value->does($name) ? true : false) : false
-  });
-
-  return $self;
-}
-
-sub maybe {
-  my ($self, $match, @args) = @_;
-
-  $self->$match(@args) if $match;
-  $self->undef;
-
-  return $self;
-}
-
-sub number {
-  my ($self, @code) = @_;
-
-  $self->constraint('number', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub object {
-  my ($self, @code) = @_;
-
-  $self->constraint('object', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub package {
+sub matches {
   my ($self) = @_;
 
-  my $where = $self->constraint('string', sub{true})->constraints->where;
+  my $matches = $self->{'matches'} ||= [];
 
-  $where->when(sub{$_->value =~ /^[A-Z](?:(?:\w|::)*[a-zA-Z0-9])?$/})->then(sub{
-    require Venus::Space;
-
-    Venus::Space->new($_->value)->loaded
-  });
-
-  return $self;
+  return wantarray ? (@{$matches}) : $matches;
 }
 
 sub parse {
@@ -492,226 +223,63 @@ sub received {
   }
 }
 
-sub reference {
-  my ($self, @code) = @_;
-
-  $self->constraints
-    ->when(sub{CORE::defined($_->value) && ref($_->value)})
-    ->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-sub regexp {
-  my ($self, @code) = @_;
-
-  $self->constraint('regexp', @code ? @code : sub{true});
-
-  return $self;
-}
-
 sub render {
   my ($self, $into, $data) = @_;
 
   return _type_render($into, $data);
 }
 
-sub routines {
-  my ($self, @data) = @_;
+sub result {
+  my ($self, $data) = @_;
 
-  $self->object->constraints->then(sub{
-    my $value = $_->value;
-    (@data == grep $value->can($_), @data) ? true : false
-  });
-
-  return $self;
+  return $self->coerce($self->validate($self->value($data)));
 }
 
-sub scalar {
-  my ($self, @code) = @_;
+sub valid {
+  my ($self, $data) = @_;
 
-  $self->constraint('scalar', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub scalarref {
-  my ($self, @code) = @_;
-
-  return $self->scalar(@code);
-}
-
-sub string {
-  my ($self, @code) = @_;
-
-  $self->constraint('string', @code ? @code : sub{true});
-
-  return $self;
-}
-
-sub tuple {
-  my ($self, @data) = @_;
-
-  $self->constraints->when(sub{
-    CORE::defined($_->value) && CORE::ref($_->value) eq 'ARRAY'
-      && @data == @{$_->value}
-  })->then(sub{
-    my $check = 0;
-    my $value = $_->value;
-    return false if @data != @$value;
-    for (my $i = 0; $i < @data; $i++) {
-      my ($match, @args) = (ref $data[$i]) ? (@{$data[$i]}) : ($data[$i]);
-      $check++ if $self->new->do($match, @args)->check($value->[$i]);
-    }
-    (@data == $check) ? true : false
-  });
-
-  return $self;
-}
-
-sub undef {
-  my ($self, @code) = @_;
-
-  $self->constraint('undef', @code ? @code : sub{true});
-
-  return $self;
+  return $self->constraint->result($self->value($data));
 }
 
 sub validate {
   my ($self, $data) = @_;
 
-  my $valid = $self->check($data);
+  my $valid = $self->valid($data);
 
   return $data if $valid;
 
-  return $self->error({throw => 'error_on_validate', value => $data});
+  my $error = $self->check->catch('result');
+
+  my $received = $self->received($data);
+
+  my $message = join("\n\n",
+    'Type:',
+    ($self->name || 'Unknown'),
+    'Failure:',
+    $error->message,
+    'Received:',
+    (defined $data ? ($received eq '' ? '""' : $received) : ('(undefined)')),
+  );
+
+  $error->message($message);
+
+  return $error->throw;
 }
 
 sub validator {
-  my ($self, $data) = @_;
-
-  $self->expression($data) if $data;
+  my ($self) = @_;
 
   return $self->defer('validate');
 }
 
 sub value {
-  my ($self, @code) = @_;
-
-  $self->constraints
-    ->when(sub{CORE::defined($_->value) && !ref($_->value)})
-    ->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-sub within {
-  my ($self, $type, @next) = @_;
-
-  if (!$type) {
-    return $self;
-  }
-
-  my $where = $self->new;
-
-  if (lc($type) eq 'hash' || lc($type) eq 'hashref') {
-    $self->constraints->when(sub{
-      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'HASH')
-        && (keys %{$_->value}) > 0
-    })->then(sub{
-      my $value = $_->value;
-      UNIVERSAL::isa($value, 'HASH')
-        && CORE::values(%$value) == grep $where->check($_), CORE::values(%$value)
-    });
-  }
-  elsif (lc($type) eq 'array' || lc($type) eq 'arrayref') {
-    $self->constraints->when(sub{
-      CORE::defined($_->value) && UNIVERSAL::isa($_->value, 'ARRAY')
-        && @{$_->value} > 0
-    })->then(sub{
-      my $value = $_->value;
-      UNIVERSAL::isa($value, 'ARRAY')
-        && @$value == grep $where->check($_), @$value
-    });
-  }
-  else {
-    $self->error({throw => 'error_on_within', type => $type, args => [@next]});
-  }
-
-  $where->accept(map +(ref($_) ? @$_ : $_), $next[0]) if @next;
-
-  return $where;
-}
-
-sub yesno {
-  my ($self, @code) = @_;
-
-  $self->constraints->when(sub{
-    CORE::defined($_->value) && $_->value =~ /^(?:1|y(?:es)?|0|n(?:o)?)$/i
-  })->then(@code ? @code : sub{true});
-
-  return $self;
-}
-
-# ERRORS
-
-sub error_on_validate {
   my ($self, $data) = @_;
 
-  require Venus::Type;
+  my $result = $data;
 
-  my $legend = {
-    array => 'arrayref',
-    code => 'coderef',
-    hash => 'hashref',
-    regexp => 'regexpref',
-    scalar => 'scalarref',
-    scalar => 'scalarref',
-  };
-
-  my $value = $data->{value};
-
-  my $identified = Venus::Type->new(value => $value)->identify;
-  my $identity = $legend->{lc($identified)} || lc($identified);
-
-  my $expected = (join(' OR ', @{$self->expects})) || 'indescribable constraints';
-  my $received = $self->received($value);
-
-  my $message = join(' ', sprintf($self->message, $self->name, $identity, $expected),
-    join("\n\n", "Received:", $received, ''));
-
-  my $stash = {
-    identity => $identity,
-    variable => $value,
-  };
-
-  my $result = {
-    name => 'on.validate',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
-
-  return $result;
-}
-
-sub error_on_within {
-  my ($self, $data) = @_;
-
-  my $message = 'Invalid type ("{{type}}") provided to the "within" method';
-
-  my $stash = {
-    self => $self,
-    type => $data->{type},
-    args => $data->{args},
-  };
-
-  my $result = {
-    name => 'on.within',
-    raise => true,
-    stash => $stash,
-    message => $message,
-  };
+  for my $match ($self->matches) {
+    $result = $match->($self, $result);
+  }
 
   return $result;
 }
@@ -725,7 +293,7 @@ sub _type_parse {
 
   @items = map _type_parse_nested($_), @items;
 
-  return wantarray && !$either ? @items : [$either ? ("either") : (), @items];
+  return wantarray && !$either ? (@items) : [$either ? ("either") : (), @items];
 }
 
 sub _type_parse_lists {

@@ -145,7 +145,7 @@ value was encoutered on error and returns it as a result.
 
 =signature any
 
-  any() (Try)
+  any() (Venus::Try)
 
 =metadata any
 
@@ -220,7 +220,7 @@ the invocant.
 
 =signature call
 
-  call(Str | CodeRef $method) (Try)
+  call(string | coderef $method) (Venus::Try)
 
 =metadata call
 
@@ -262,7 +262,7 @@ registration. If a coderef is provided this method is mostly a passthrough.
 
 =signature callback
 
-  callback(Str | CodeRef $method) (CodeRef)
+  callback(string | coderef $method) (coderef)
 
 =metadata callback
 
@@ -366,7 +366,7 @@ operation and returned as a result.
 
 =signature catch
 
-  catch(Str $isa, Str | CodeRef $method) (Try)
+  catch(string $isa, string | coderef $method) (Venus::Try)
 
 =metadata catch
 
@@ -474,7 +474,7 @@ C<catch> conditions match the exception thrown.
 
 =signature default
 
-  default(Str | CodeRef $method) (Try)
+  default(string | coderef $method) (Venus::Try)
 
 =metadata default
 
@@ -523,7 +523,7 @@ be registered to capture all L<Venus::Error> exceptions.
 
 =signature error
 
-  error(Ref $variable) (Try)
+  error(Ref $variable) (Venus::Try)
 
 =metadata error
 
@@ -599,7 +599,7 @@ method can return a list of values in list-context.
 
 =signature execute
 
-  execute(CodeRef $code, Any @args) (Any)
+  execute(coderef $code, any @args) (any)
 
 =metadata execute
 
@@ -655,7 +655,7 @@ arguments were provided by the invocant.
 
 =signature finally
 
-  finally(Str | CodeRef $method) (Try)
+  finally(string | coderef $method) (Venus::Try)
 
 =metadata finally
 
@@ -718,7 +718,7 @@ i.e. an undefined value, if an exception is encountered.
 
 =signature maybe
 
-  maybe() (Try)
+  maybe() (Venus::Try)
 
 =metadata maybe
 
@@ -762,7 +762,7 @@ object.
 
 =signature no_catch
 
-  no_catch() (Try)
+  no_catch() (Venus::Try)
 
 =metadata no_catch
 
@@ -814,7 +814,7 @@ object.
 
 =signature no_default
 
-  no_default() (Try)
+  no_default() (Venus::Try)
 
 =metadata no_default
 
@@ -866,7 +866,7 @@ object.
 
 =signature no_finally
 
-  no_finally() (Try)
+  no_finally() (Venus::Try)
 
 =metadata no_finally
 
@@ -927,7 +927,7 @@ object.
 
 =signature no_try
 
-  no_try() (Try)
+  no_try() (Venus::Try)
 
 =metadata no_try
 
@@ -978,7 +978,7 @@ values in list-context.
 
 =signature result
 
-  result(Any @args) (Any)
+  result(any @args) (any)
 
 =metadata result
 
@@ -1110,8 +1110,8 @@ $test->for('example', 1, 'error_on_callback', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

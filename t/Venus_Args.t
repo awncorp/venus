@@ -120,7 +120,7 @@ The default method returns the default value, i.e. C<@ARGV>.
 
 =signature default
 
-  default() (ArrayRef)
+  default() (arrayref)
 
 =metadata default
 
@@ -154,7 +154,7 @@ The exists method returns truthy or falsy if an index or alias value exists.
 
 =signature exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 =metadata exists
 
@@ -222,7 +222,7 @@ The get method returns the value of the index or alias.
 
 =signature get
 
-  get(Str $key) (Any)
+  get(string $key) (any)
 
 =metadata get
 
@@ -290,7 +290,7 @@ The indexed method returns a set of indices and values.
 
 =signature indexed
 
-  indexed() (HashRef)
+  indexed() (hashref)
 
 =metadata indexed
 
@@ -323,7 +323,7 @@ returns undefined if not found.
 
 =signature name
 
-  name(Str $key) (Str | Undef)
+  name(string $key) (string | undef)
 
 =metadata name
 
@@ -353,7 +353,7 @@ The set method sets and returns the value of an index or alias.
 
 =signature set
 
-  set(Str $key, Any $data) (Any)
+  set(string $key, any $data) (any)
 
 =metadata set
 
@@ -421,7 +421,7 @@ The unnamed method returns a list of unaliases indices.
 
 =signature unnamed
 
-  unnamed() (ArrayRef)
+  unnamed() (arrayref)
 
 =metadata unnamed
 
@@ -481,8 +481,8 @@ $test->for('example', 2, 'unnamed', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -106,7 +106,7 @@ This package provides the following functions:
 
 =head2 attr
 
-  attr(Str $name) (Str)
+  attr(string $name) (string)
 
 The attr function creates attribute accessors for the calling package. This
 function is always exported unless a routine of the same name already exists.
@@ -131,7 +131,7 @@ I<Since C<1.00>>
 
 =head2 base
 
-  base(Str $name) (Str)
+  base(string $name) (string)
 
 The base function registers one or more base classes for the calling package.
 This function is always exported unless a routine of the same name already
@@ -165,7 +165,7 @@ I<Since C<1.00>>
 
 =head2 catch
 
-  catch(CodeRef $block) (Error, Any)
+  catch(coderef $block) (Venus::Error, any)
 
 The catch function executes the code block trapping errors and returning the
 caught exception in scalar context, and also returning the result as a second
@@ -211,7 +211,7 @@ I<Since C<1.01>>
 
 =head2 error
 
-  error(Maybe[HashRef] $args) (Error)
+  error(maybe[hashref] $args) (Venus::Error)
 
 The error function throws a L<Venus::Error> exception object using the
 exception object arguments provided. This function isn't export unless requested.
@@ -254,7 +254,7 @@ I<Since C<1.01>>
 
 =head2 false
 
-  false() (Bool)
+  false() (boolean)
 
 The false function returns a falsy boolean value which is designed to be
 practically indistinguishable from the conventional numerical C<0> value. This
@@ -294,7 +294,7 @@ I<Since C<1.00>>
 
 =head2 from
 
-  from(Str $name) (Str)
+  from(string $name) (string)
 
 The from function registers one or more base classes for the calling package
 and performs an L<"audit"|Venus::Core/AUDIT>. This function is always exported
@@ -343,7 +343,7 @@ I<Since C<1.00>>
 
 =head2 mixin
 
-  mixin(Str $name) (Str)
+  mixin(string $name) (string)
 
 The mixin function registers and consumes mixins for the calling package. This
 function is always exported unless a routine of the same name already exists.
@@ -424,7 +424,7 @@ I<Since C<1.02>>
 
 =head2 raise
 
-  raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+  raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
 
 The raise function generates and throws a named exception object derived from
 L<Venus::Error>, or provided base class, using the exception object arguments
@@ -468,7 +468,7 @@ I<Since C<1.01>>
 
 =head2 role
 
-  role(Str $name) (Str)
+  role(string $name) (string)
 
 The role function registers and consumes roles for the calling package. This
 function is always exported unless a routine of the same name already exists.
@@ -527,7 +527,7 @@ I<Since C<1.00>>
 
 =head2 test
 
-  test(Str $name) (Str)
+  test(string $name) (string)
 
 The test function registers and consumes roles for the calling package and
 performs an L<"audit"|Venus::Core/AUDIT>, effectively allowing a role to act as
@@ -580,7 +580,7 @@ I<Since C<1.00>>
 
 =head2 true
 
-  true() (Bool)
+  true() (boolean)
 
 The true function returns a truthy boolean value which is designed to be
 practically indistinguishable from the conventional numerical C<1> value. This
@@ -620,7 +620,7 @@ I<Since C<1.00>>
 
 =head2 with
 
-  with(Str $name) (Str)
+  with(string $name) (string)
 
 The with function registers and consumes roles for the calling package. This
 function is an alias of the L</test> function and will perform an
@@ -687,7 +687,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

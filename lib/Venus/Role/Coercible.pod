@@ -86,7 +86,7 @@ This package provides the following methods:
 
 =head2 coerce_args
 
-  coerce_args(HashRef $data, HashRef $spec) (HashRef)
+  coerce_args(hashref $data, hashref $spec) (hashref)
 
 The coerce_args method replaces values in the data provided with objects
 corresponding to the specification provided. The specification should contains
@@ -122,7 +122,7 @@ I<Since C<0.07>>
 
 =head2 coerce_attr
 
-  coerce_attr(Str $name, Any $value) (Any)
+  coerce_attr(string $name, any $value) (any)
 
 The coerce_attr method is a surrogate accessor and gets and/or sets an instance
 attribute based on the coercion rules, returning the coerced value.
@@ -169,7 +169,7 @@ I<Since C<1.23>>
 
 =head2 coerce_into
 
-  coerce_into(Str $class, Any $value) (Object)
+  coerce_into(string $class, any $value) (object)
 
 The coerce_into method attempts to build and return an object based on the
 class name and value provided, unless the value provided is already an object
@@ -197,7 +197,7 @@ I<Since C<0.07>>
 
 =head2 coerce_onto
 
-  coerce_onto(HashRef $data, Str $name, Str $class, Any $value) (Object)
+  coerce_onto(hashref $data, string $name, string $class, any $value) (object)
 
 The coerce_onto method attempts to build and assign an object based on the
 class name and value provided, as the value corresponding to the name
@@ -287,7 +287,7 @@ I<Since C<0.07>>
 
 =head2 coercers
 
-  coercers() (HashRef)
+  coercers() (hashref)
 
 The coercers method, if defined, is called during object construction, or by the
 L</coercion> method, and returns key/value pairs where the keys map to class
@@ -321,7 +321,7 @@ I<Since C<0.02>>
 
 =head2 coercion
 
-  coercion(HashRef $data) (HashRef)
+  coercion(hashref $data) (hashref)
 
 The coercion method is called automatically during object construction but can
 be called manually as well, and is passed a hashref to coerce and return.
@@ -398,7 +398,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

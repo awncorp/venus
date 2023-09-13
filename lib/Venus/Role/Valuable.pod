@@ -57,7 +57,7 @@ This package provides the following methods:
 
 =head2 default
 
-  default() (Any)
+  default() (any)
 
 The default method returns the default value, i.e. C<undef>.
 
@@ -81,7 +81,7 @@ I<Since C<0.01>>
 
 =head2 get
 
-  get() (Any)
+  get() (any)
 
 The get method gets and returns the value.
 
@@ -105,7 +105,7 @@ I<Since C<0.01>>
 
 =head2 set
 
-  set(Any $value) (Any)
+  set(any $value) (any)
 
 The set method set the value and returns the value set.
 
@@ -135,7 +135,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

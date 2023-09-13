@@ -234,7 +234,7 @@ The append method appends arugments to the number.
 
 =signature append
 
-  append(Str @parts) (Str)
+  append(string @parts) (string)
 
 =metadata append
 
@@ -267,7 +267,7 @@ provided.
 
 =signature append_with
 
-  append_with(Str $delimiter, Str @parts) (Str)
+  append_with(string $delimiter, string @parts) (string)
 
 =metadata append_with
 
@@ -337,7 +337,7 @@ method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
 
 =signature cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 =metadata cast
 
@@ -590,7 +590,7 @@ The concat method returns the number with the argument list appended to it.
 
 =signature concat
 
-  concat(Str @parts) (Str)
+  concat(string @parts) (string)
 
 =metadata concat
 
@@ -627,7 +627,7 @@ true or false if found.
 
 =signature contains
 
-  contains(Str $expr) (Bool)
+  contains(string $expr) (boolean)
 
 =metadata contains
 
@@ -866,7 +866,7 @@ The eq method performs an I<"equals"> operation using the argument provided.
 
 =signature eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 =metadata eq
 
@@ -1177,7 +1177,7 @@ argument provided.
 
 =signature ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 =metadata ge
 
@@ -1407,7 +1407,7 @@ argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
 
 =signature gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 =metadata gele
 
@@ -1636,7 +1636,7 @@ The gt method performs a I<"greater-than"> operation using the argument provided
 
 =signature gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 =metadata gt
 
@@ -1866,7 +1866,7 @@ I<"lesser-than"> operation on the 2nd argument.
 
 =signature gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 =metadata gtlt
 
@@ -2095,7 +2095,7 @@ The hex method returns a hex string representing the value of the number.
 
 =signature hex
 
-  hex() (Str)
+  hex() (string)
 
 =metadata hex
 
@@ -2190,7 +2190,7 @@ position of the first occurrence of the argument.
 
 =signature index
 
-  index(Str $substr, Int $start) (Num)
+  index(string $substr, number $start) (Num)
 
 =metadata index
 
@@ -2308,7 +2308,7 @@ argument provided.
 
 =signature le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 =metadata le
 
@@ -2638,7 +2638,7 @@ The lt method performs a I<"lesser-than"> operation using the argument provided.
 
 =signature lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 =metadata lt
 
@@ -2981,7 +2981,7 @@ The ne method performs a I<"not-equal-to"> operation using the argument provided
 
 =signature ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 =metadata ne
 
@@ -3323,7 +3323,7 @@ The prepend method prepends arugments to the number.
 
 =signature prepend
 
-  prepend(Str @parts) (Str)
+  prepend(string @parts) (string)
 
 =metadata prepend
 
@@ -3356,7 +3356,7 @@ provided.
 
 =signature prepend_with
 
-  prepend_with(Str $delimiter, Str @parts) (Str)
+  prepend_with(string $delimiter, string @parts) (string)
 
 =metadata prepend_with
 
@@ -3426,7 +3426,7 @@ up-to or down-to the limit specified.
 
 =signature range
 
-  range() (ArrayRef)
+  range() (arrayref)
 
 =metadata range
 
@@ -3486,7 +3486,7 @@ and be place between the occurences.
 
 =signature repeat
 
-  repeat(Num $number, Str $delimiter) (Str)
+  repeat(Num $number, string $delimiter) (string)
 
 =metadata repeat
 
@@ -3683,7 +3683,7 @@ value. In list context returns the result and the subject.
 
 =signature substr
 
-  substr(Num $offset, Num $length, Str $replace) (Str)
+  substr(Num $offset, Num $length, string $replace) (string)
 
 =metadata substr
 
@@ -3787,7 +3787,7 @@ provided.
 
 =signature tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 =metadata tv
 
@@ -4012,8 +4012,8 @@ $test->for('example', 9, 'tv', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

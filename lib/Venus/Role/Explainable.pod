@@ -48,7 +48,7 @@ This package provides the following methods:
 
 =head2 explain
 
-  explain() (Any)
+  explain() (any)
 
 The explain method takes no arguments and returns the value to be used in
 stringification operations.
@@ -79,7 +79,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

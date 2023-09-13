@@ -59,7 +59,7 @@ sub explain {
 sub mutate {
   my ($self, $code, @args) = @_;
 
-  return $self->set($self->assert($self->coerce($self->$code(@args))));
+  return $self->set($self->$code(@args));
 }
 
 sub TO_JSON {

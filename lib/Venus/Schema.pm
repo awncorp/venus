@@ -33,7 +33,7 @@ sub assert {
 
   require Venus::Assert;
 
-  my $assert = Venus::Assert->new('schema');
+  my $assert = Venus::Assert->new;
 
   return $assert->expression($assert->render('hashkeys', $self->definition));
 }
@@ -43,7 +43,7 @@ sub check {
 
   my $assert = $self->assert;
 
-  return $assert->check($data);
+  return $assert->valid($data);
 }
 
 sub deduce {
@@ -61,7 +61,7 @@ sub error {
 
   my $error = $self->catch('validate', $data);
 
-  die $error if $error && !$error->isa('Venus::Assert::Error');
+  die $error if $error && !$error->isa('Venus::Check::Error');
 
   return $error;
 }

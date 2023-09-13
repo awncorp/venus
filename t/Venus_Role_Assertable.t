@@ -56,9 +56,7 @@ $test->for('includes');
   with 'Venus::Role::Assertable';
 
   sub assertion {
-    Venus::Assert->new('Example')->constraint('object', sub{
-      $_->value->isa('Example')
-    })
+    Venus::Assert->new('Example')->accept('Example')
   }
 
   package main;
@@ -94,7 +92,7 @@ constraints, or throws an exception.
 
 =signature assert
 
-  assert(Any $data) (Any)
+  assert(any $data) (any)
 
 =metadata assert
 
@@ -110,14 +108,14 @@ constraints, or throws an exception.
 
   my $assert = $example->assert;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 1, 'assert', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->error(\my $error)->result;
-  ok $result->isa('Venus::Assert::Error');
+  ok my $result = $tryable->error->result;
+  ok $result->isa('Venus::Check::Error');
 
   $result
 });
@@ -130,14 +128,14 @@ $test->for('example', 1, 'assert', sub {
 
   my $assert = $example->assert({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 2, 'assert', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $result->isa('Venus::Assert::Error');
+  ok $result->isa('Venus::Check::Error');
 
   $result
 });
@@ -169,7 +167,7 @@ L<Venus::Assert> object.
 
 =signature assertion
 
-  assertion() (Assert)
+  assertion() (Venus::Assert)
 
 =metadata assertion
 
@@ -204,7 +202,7 @@ constraints, or returns false.
 
 =signature check
 
-  check(Any $data) (Bool)
+  check(any $data) (boolean)
 
 =metadata check
 
@@ -279,7 +277,7 @@ the registered type coercions, or returns the data provided.
 
 =signature coerce
 
-  coerce(Any $data) (Any)
+  coerce(any $data) (any)
 
 =metadata coerce
 
@@ -295,7 +293,7 @@ the registered type coercions, or returns the data provided.
 
   my $assertion = $example->assertion;
 
-  $assertion->coercion('string', sub{ucfirst(lc($_->value))});
+  $assertion->match('string')->format(sub{ucfirst(lc($_))});
 
   my $coerce = $assertion->coerce;
 
@@ -318,7 +316,7 @@ $test->for('example', 1, 'coerce', sub {
 
   my $assertion = $example->assertion;
 
-  $assertion->coercion('string', sub{ucfirst(lc($_->value))});
+  $assertion->match('string')->format(sub{ucfirst(lc($_))});
 
   my $coerce = $assertion->coerce({});
 
@@ -342,7 +340,7 @@ $test->for('example', 2, 'coerce', sub {
 
   my $assertion = $example->assertion;
 
-  $assertion->coercion('string', sub{ucfirst(lc($_->value))});
+  $assertion->match('string')->format(sub{ucfirst(lc($_))});
 
   my $coerce = $assertion->coerce('hello');
 
@@ -367,7 +365,7 @@ be returned unaltered.
 
 =signature make
 
-  make(Any $data) (Object)
+  make(any $data) (object)
 
 =metadata make
 
@@ -383,14 +381,14 @@ be returned unaltered.
 
   my $make = $example->make;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 1, 'make', sub {
   my ($tryable) = @_;
-  ok my $result = $tryable->error(\my $error)->result;
-  ok $result->isa('Venus::Assert::Error');
+  ok my $result = $tryable->error->result;
+  ok $result->isa('Venus::Check::Error');
 
   $result
 });
@@ -423,22 +421,22 @@ $test->for('example', 2, 'make', sub {
 
   my $make = $example->make({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 3, 'make', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $result->isa('Venus::Assert::Error');
+  ok $result->isa('Venus::Check::Error');
 
   $result
 });
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

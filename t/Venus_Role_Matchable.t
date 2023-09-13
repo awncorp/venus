@@ -96,7 +96,7 @@ by this method.
 
 =signature match
 
-  match(Str | CodeRef $method, Any @args) (Match)
+  match(string | coderef $method, any @args) (Venus::Match)
 
 =metadata match
 
@@ -169,8 +169,8 @@ $test->for('example', 3, 'match', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -115,7 +115,7 @@ exception throw is supressed and will return undefined if encountered.
 
 =signature call
 
-  call(Str $name, Str @args) (Any)
+  call(string $name, string @args) (any)
 
 =metadata call
 
@@ -242,7 +242,7 @@ context.
 
 =signature find
 
-  find(Str $name, Str @paths) (ArrayRef)
+  find(string $name, string @paths) (arrayref)
 
 =metadata find
 
@@ -326,7 +326,7 @@ C<"openbsd">, and otherwise returns false.
 
 =signature is_bsd
 
-  is_bsd() (Bool)
+  is_bsd() (boolean)
 
 =metadata is_bsd
 
@@ -414,7 +414,7 @@ and otherwise returns false.
 
 =signature is_cyg
 
-  is_cyg() (Bool)
+  is_cyg() (boolean)
 
 =metadata is_cyg
 
@@ -502,7 +502,7 @@ C<"os2">, and otherwise returns false.
 
 =signature is_dos
 
-  is_dos() (Bool)
+  is_dos() (boolean)
 
 =metadata is_dos
 
@@ -614,7 +614,7 @@ false.
 
 =signature is_lin
 
-  is_lin() (Bool)
+  is_lin() (boolean)
 
 =metadata is_lin
 
@@ -702,7 +702,7 @@ and otherwise returns false.
 
 =signature is_mac
 
-  is_mac() (Bool)
+  is_mac() (boolean)
 
 =metadata is_mac
 
@@ -790,7 +790,7 @@ returns false.
 
 =signature is_non
 
-  is_non() (Bool)
+  is_non() (boolean)
 
 =metadata is_non
 
@@ -854,7 +854,7 @@ and otherwise returns false.
 
 =signature is_sun
 
-  is_sun() (Bool)
+  is_sun() (boolean)
 
 =metadata is_sun
 
@@ -942,7 +942,7 @@ false.
 
 =signature is_vms
 
-  is_vms() (Bool)
+  is_vms() (boolean)
 
 =metadata is_vms
 
@@ -1006,7 +1006,7 @@ C<"os2">, and otherwise returns false.
 
 =signature is_win
 
-  is_win() (Bool)
+  is_win() (boolean)
 
 =metadata is_win
 
@@ -1117,7 +1117,7 @@ The name method returns the OS name.
 
 =signature name
 
-  name() (Str)
+  name() (string)
 
 =metadata name
 
@@ -1170,7 +1170,7 @@ variable as an arrayref of unique paths. Returns a list in list context.
 
 =signature paths
 
-  paths() (ArrayRef)
+  paths() (arrayref)
 
 =metadata paths
 
@@ -1216,7 +1216,7 @@ the string.
 
 =signature quote
 
-  quote(Str $data) (Str)
+  quote(string $data) (string)
 
 =metadata quote
 
@@ -1326,7 +1326,7 @@ OS.
 
 =signature type
 
-  type() (Str)
+  type() (string)
 
 =metadata type
 
@@ -1536,7 +1536,7 @@ if the files found are actually executable.
 
 =signature where
 
-  where(Str $file) (ArrayRef)
+  where(string $file) (arrayref)
 
 =metadata where
 
@@ -1716,7 +1716,7 @@ L</where> method with the arguments provided.
 
 =signature which
 
-  which(Str $file) (Str)
+  which(string $file) (string)
 
 =metadata which
 
@@ -1854,8 +1854,8 @@ $test->for('example', 6, 'which', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

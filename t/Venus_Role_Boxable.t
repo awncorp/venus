@@ -88,7 +88,7 @@ and arguments whose return value will be acted on by this method.
 
 =signature box
 
-  box(Str | CodeRef $method, Any @args) (Self)
+  box(string | coderef $method, any @args) (object)
 
 =metadata box
 
@@ -144,8 +144,8 @@ $test->for('example', 2, 'box', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -95,6 +95,7 @@ Venus::Role::Doable
 Venus::Role::Dumpable
 Venus::Role::Matchable
 Venus::Role::Mockable
+Venus::Role::Patchable
 Venus::Role::Printable
 Venus::Role::Reflectable
 Venus::Role::Serializable
@@ -112,7 +113,7 @@ The assertion method returns a L<Venus::Assert> object based on the invocant.
 
 =signature assertion
 
-  assertion() (Assert)
+  assertion() (Venus::Assert)
 
 =metadata assertion
 
@@ -137,8 +138,6 @@ $test->for('example', 1, 'assertion', sub {
   ok my $result = $tryable->result;
   ok $result->isa('Venus::Assert');
   ok $result->name eq 'Example';
-  ok $result->message
-    eq 'Type assertion (%s) failed: received (%s), expected (%s)';
 
   $result
 });
@@ -150,7 +149,7 @@ object value (or the object itself).
 
 =signature checksum
 
-  checksum() (Str)
+  checksum() (string)
 
 =metadata checksum
 
@@ -211,7 +210,7 @@ typically the length (or character count) of the stringified object.
 
 =signature numified
 
-  numified() (Int)
+  numified() (number)
 
 =metadata numified
 
@@ -274,7 +273,7 @@ references will be passed to the new object as references.
 
 =signature renew
 
-  renew(Any @args) (Object)
+  renew(any @args) (object)
 
 =metadata renew
 
@@ -389,7 +388,7 @@ method name and arguments whose return value will be acted on by this method.
 
 =signature safe
 
-  safe(Str | CodeRef $code, Any @args) (Any)
+  safe(string | coderef $code, any @args) (any)
 
 =metadata safe
 
@@ -462,7 +461,7 @@ The self method returns the invocant.
 
 =signature self
 
-  self() (Any)
+  self() (any)
 
 =metadata self
 
@@ -500,7 +499,7 @@ object's value).
 
 =signature stringified
 
-  stringified() (Str)
+  stringified() (string)
 
 =metadata stringified
 
@@ -566,7 +565,7 @@ this method.
 
 =signature trap
 
-  trap(Str | CodeRef $code, Any @args) (Tuple[ArrayRef, ArrayRef, ArrayRef])
+  trap(string | coderef $code, any @args) (tuple[arrayref, arrayref, arrayref])
 
 =metadata trap
 
@@ -698,8 +697,8 @@ $test->for('example', 6, 'trap', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

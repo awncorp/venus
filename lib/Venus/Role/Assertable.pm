@@ -7,32 +7,36 @@ use warnings;
 
 use Venus::Role 'fault';
 
-# AUDIT
-
-sub AUDIT {
-  my ($self, $from) = @_;
-
-  my $name = ref $self || $self;
-
-  if (!$from->can('assertion')) {
-    fault "${from} requires 'assertion' to consume ${name}";
-  }
-
-  return $self;
-}
-
 # METHODS
 
 sub assert {
   my ($self, $data) = @_;
 
-  return $self->assertion->validate($data);
+  return $self->assertion->result($data);
+}
+
+sub assertion {
+  my ($self) = @_;
+
+  require Venus::Assert;
+
+  my $class = ref $self || $self;
+
+  my $assert = Venus::Assert->new($class);
+
+  $assert->match('hashref')->format(sub{
+    $class->new($_)
+  });
+
+  $assert->accept($class);
+
+  return $assert;
 }
 
 sub check {
   my ($self, $data) = @_;
 
-  return $self->assertion->check($data);
+  return $self->assertion->valid($data);
 }
 
 sub coerce {
@@ -46,13 +50,13 @@ sub make {
 
   return UNIVERSAL::isa($data, ref $self || $self)
     ? $data
-    : $self->new($self->assert($self->coerce($data)));
+    : $self->assert($data);
 }
 
 # EXPORTS
 
 sub EXPORT {
-  ['assert', 'check', 'coerce', 'make']
+  ['assert', 'assertion', 'check', 'coerce', 'make']
 }
 
 1;

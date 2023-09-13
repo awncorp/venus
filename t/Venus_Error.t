@@ -122,7 +122,7 @@ method will set the L</name> attribute to the value provided.
 
 =signature as
 
-  as(Str $name) (Error)
+  as(string $name) (Venus::Error)
 
 =metadata as
 
@@ -301,7 +301,7 @@ specific argument if an index is provided.
 
 =signature arguments
 
-  arguments(Int $index) (Any)
+  arguments(number $index) (any)
 
 =metadata arguments
 
@@ -380,7 +380,7 @@ specific argument if an index is provided.
 
 =signature callframe
 
-  callframe(Int $index) (Any)
+  callframe(number $index) (any)
 
 =metadata callframe
 
@@ -458,7 +458,7 @@ The captured method returns the value stashed as C<"captured">.
 
 =signature captured
 
-  captured() (HashRef)
+  captured() (hashref)
 
 =metadata captured
 
@@ -493,7 +493,7 @@ operations.
 
 =signature explain
 
-  explain() (Str)
+  explain() (string)
 
 =metadata explain
 
@@ -527,7 +527,7 @@ L<perlfunc/caller>.
 
 =signature frame
 
-  frame(Int $index) (HashRef)
+  frame(number $index) (hashref)
 
 =metadata frame
 
@@ -621,7 +621,7 @@ The frames method returns the compiled and stashed stack trace data.
 
 =signature frames
 
-  frames() (ArrayRef)
+  frames() (arrayref)
 
 =metadata frames
 
@@ -665,7 +665,7 @@ method will check if the L</name> attribute is equal to the value provided.
 
 =signature is
 
-  is(Str $name) (Bool)
+  is(string $name) (boolean)
 
 =metadata is
 
@@ -874,7 +874,7 @@ method will check if the L</name> attribute contains the value provided.
 
 =signature of
 
-  of(Str $name) (Bool)
+  of(string $name) (boolean)
 
 =metadata of
 
@@ -1082,7 +1082,7 @@ equivalent to the L<Venus::String/render> operation.
 
 =signature render
 
-  render() (Str)
+  render() (string)
 
 =metadata render
 
@@ -1123,7 +1123,7 @@ error object using the arguments provided and throws the created object.
 
 =signature throw
 
-  throw(Any @data) (Error)
+  throw(any @data) (Venus::Error)
 
 =metadata throw
 
@@ -1156,7 +1156,7 @@ skips the first frame.
 
 =signature trace
 
-  trace(Int $offset, Int $limit) (Error)
+  trace(number $offset, number $limit) (Venus::Error)
 
 =metadata trace
 
@@ -1349,8 +1349,8 @@ $test->for('example', 1, '(~~)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

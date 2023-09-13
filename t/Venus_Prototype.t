@@ -117,7 +117,7 @@ provided, and then returns the invocant.
 
 =signature apply
 
-  apply(HashRef $data) (Prototype)
+  apply(hashref $data) (Venus::Prototype)
 
 =metadata apply
 
@@ -214,7 +214,7 @@ with the L<Venus::Prototype> methods.
 
 =signature call
 
-  call(Str $method, Any @args) (Any)
+  call(string $method, any @args) (any)
 
 =metadata call
 
@@ -273,7 +273,7 @@ provided if any, and then returns a new prototype object.
 
 =signature extend
 
-  extend(HashRef $data) (Prototype)
+  extend(hashref $data) (Venus::Prototype)
 
 =metadata extend
 
@@ -368,8 +368,8 @@ $test->for('example', 3, 'extend', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

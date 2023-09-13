@@ -102,7 +102,7 @@ The print method prints a stringified representation of the underlying data.
 
 =signature print
 
-  print(Any @data) (Any)
+  print(any @data) (any)
 
 =metadata print
 
@@ -162,7 +162,7 @@ return value will be acted on by this method.
 
 =signature print_json
 
-  print_json(Str | CodeRef $method, Any @args) (Any)
+  print_json(string | coderef $method, any @args) (any)
 
 =metadata print_json
 
@@ -223,7 +223,7 @@ the underlying data.
 
 =signature print_pretty
 
-  print_pretty(Any @data) (Any)
+  print_pretty(any @data) (any)
 
 =metadata print_pretty
 
@@ -288,7 +288,7 @@ method name and arguments whose return value will be acted on by this method.
 
 =signature print_string
 
-  print_string(Str | CodeRef $method, Any @args) (Any)
+  print_string(string | coderef $method, any @args) (any)
 
 =metadata print_string
 
@@ -326,7 +326,7 @@ return value will be acted on by this method.
 
 =signature print_yaml
 
-  print_yaml(Str | CodeRef $method, Any @args) (Any)
+  print_yaml(string | coderef $method, any @args) (any)
 
 =metadata print_yaml
 
@@ -387,7 +387,7 @@ a trailing newline.
 
 =signature say
 
-  say(Any @data) (Any)
+  say(any @data) (any)
 
 =metadata say
 
@@ -447,7 +447,7 @@ return value will be acted on by this method, with a trailing newline.
 
 =signature say_json
 
-  say_json(Str | CodeRef $method, Any @args) (Any)
+  say_json(string | coderef $method, any @args) (any)
 
 =metadata say_json
 
@@ -508,7 +508,7 @@ underlying data, with a trailing newline.
 
 =signature say_pretty
 
-  say_pretty(Any @data) (Any)
+  say_pretty(any @data) (any)
 
 =metadata say_pretty
 
@@ -574,7 +574,7 @@ be acted on by this method.
 
 =signature say_string
 
-  say_string(Str | CodeRef $method, Any @args) (Any)
+  say_string(string | coderef $method, any @args) (any)
 
 =metadata say_string
 
@@ -612,7 +612,7 @@ return value will be acted on by this method, with a trailing newline.
 
 =signature say_yaml
 
-  say_yaml(Str | CodeRef $method, Any @args) (Any)
+  say_yaml(string | coderef $method, any @args) (any)
 
 =metadata say_yaml
 
@@ -668,8 +668,8 @@ $test->for('example', 2, 'say_yaml', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

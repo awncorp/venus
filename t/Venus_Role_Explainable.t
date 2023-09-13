@@ -89,7 +89,7 @@ stringification operations.
 
 =signature explain
 
-  explain() (Any)
+  explain() (any)
 
 =metadata explain
 
@@ -119,8 +119,8 @@ $test->for('example', 1, 'explain', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

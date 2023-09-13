@@ -7,6 +7,7 @@ use warnings;
 
 use Test::More;
 use Venus::Test;
+use Venus;
 
 my $test = test(__FILE__);
 
@@ -90,7 +91,7 @@ optional.
 
 =signature definition
 
-  definition(HashRef $data) (HashRef)
+  definition(hashref $data) (hashref)
 
 =metadata definition
 
@@ -149,7 +150,7 @@ L</definition>.
 
 =signature assert
 
-  assert() (Assert)
+  assert() (Venus::Assert)
 
 =metadata assert
 
@@ -175,7 +176,7 @@ $test->for('example', 1, 'assert', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Assert';
-  is_deeply $result->expects, ['hashkeys[]'];
+  is $result->name, 'hashkeys[]';
 
   $result
 });
@@ -200,7 +201,7 @@ $test->for('example', 2, 'assert', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   isa_ok $result, 'Venus::Assert';
-  is_deeply $result->expects, ['hashkeys["name", string]'];
+  is $result->name, 'hashkeys["name", string]';
 
   $result
 });
@@ -212,7 +213,7 @@ result of the L<Venus::Assert/check> method.
 
 =signature check
 
-  check(HashRef $data) (Bool)
+  check(hashref $data) (boolean)
 
 =metadata check
 
@@ -230,7 +231,7 @@ result of the L<Venus::Assert/check> method.
 
   my $check = $schema->check;
 
-  # 0
+  # false
 
 =cut
 
@@ -238,7 +239,7 @@ $test->for('example', 1, 'check', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok defined $result;
-  is $result, 0;
+  is $result, false;
 
   !$result
 });
@@ -259,7 +260,7 @@ $test->for('example', 1, 'check', sub {
 
   my $check = $schema->check({});
 
-  # 0
+  # false
 
 =cut
 
@@ -267,7 +268,7 @@ $test->for('example', 2, 'check', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok defined $result;
-  is $result, 0;
+  is $result, false;
 
   !$result
 });
@@ -291,7 +292,7 @@ $test->for('example', 2, 'check', sub {
     role => {},
   });
 
-  # 0
+  # false
 
 =cut
 
@@ -299,7 +300,7 @@ $test->for('example', 3, 'check', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok defined $result;
-  is $result, 0;
+  is $result, false;
 
   !$result
 });
@@ -326,7 +327,7 @@ $test->for('example', 3, 'check', sub {
     },
   });
 
-  # 1
+  # true
 
 =cut
 
@@ -334,7 +335,7 @@ $test->for('example', 4, 'check', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   ok defined $result;
-  is $result, 1;
+  is $result, true;
 
   $result
 });
@@ -347,7 +348,7 @@ L<Venus::Type/deduce_deep> unless the validation throws an exception.
 
 =signature deduce
 
-  deduce(HashRef $data) (Hash)
+  deduce(hashref $data) (Venus::Hash)
 
 =metadata deduce
 
@@ -365,14 +366,14 @@ L<Venus::Type/deduce_deep> unless the validation throws an exception.
 
   my $deduce = $schema->deduce;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 1, 'deduce', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -393,14 +394,14 @@ $test->for('example', 1, 'deduce', sub {
 
   my $deduce = $schema->deduce({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 2, 'deduce', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -424,14 +425,14 @@ $test->for('example', 2, 'deduce', sub {
     role => {},
   });
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 3, 'deduce', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -478,7 +479,7 @@ returning it, otherwise returning undefined.
 
 =signature error
 
-  error(HashRef $data) (Error)
+  error(hashref $data) (Venus::Error)
 
 =metadata error
 
@@ -496,14 +497,14 @@ returning it, otherwise returning undefined.
 
   my $error = $schema->error;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 1, 'error', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -524,14 +525,14 @@ $test->for('example', 1, 'error', sub {
 
   my $error = $schema->error({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 2, 'error', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -555,14 +556,14 @@ $test->for('example', 2, 'error', sub {
     role => {},
   });
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 3, 'error', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -609,7 +610,7 @@ validation throws an exception.
 
 =signature validate
 
-  validate(HashRef $data) (HashRef)
+  validate(hashref $data) (hashref)
 
 =metadata validate
 
@@ -627,14 +628,14 @@ validation throws an exception.
 
   my $validate = $schema->validate;
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 1, 'validate', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -655,14 +656,14 @@ $test->for('example', 1, 'validate', sub {
 
   my $validate = $schema->validate({});
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 2, 'validate', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -686,14 +687,14 @@ $test->for('example', 2, 'validate', sub {
     role => {},
   });
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 3, 'validate', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
 
   $result
 });
@@ -740,8 +741,8 @@ $test->for('example', 4, 'validate', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

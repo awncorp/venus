@@ -95,7 +95,7 @@ method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
 
 =signature cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 =metadata cast
 
@@ -380,7 +380,7 @@ The eq method performs an I<"equals"> operation using the argument provided.
 
 =signature eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 =metadata eq
 
@@ -610,7 +610,7 @@ argument provided.
 
 =signature ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 =metadata ge
 
@@ -840,7 +840,7 @@ argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
 
 =signature gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 =metadata gele
 
@@ -1069,7 +1069,7 @@ The gt method performs a I<"greater-than"> operation using the argument provided
 
 =signature gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 =metadata gt
 
@@ -1299,7 +1299,7 @@ I<"lesser-than"> operation on the 2nd argument.
 
 =signature gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 =metadata gtlt
 
@@ -1529,7 +1529,7 @@ argument provided.
 
 =signature le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 =metadata le
 
@@ -1758,7 +1758,7 @@ The lt method performs a I<"lesser-than"> operation using the argument provided.
 
 =signature lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 =metadata lt
 
@@ -1987,7 +1987,7 @@ The ne method performs a I<"not-equal-to"> operation using the argument provided
 
 =signature ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 =metadata ne
 
@@ -2217,7 +2217,7 @@ provided.
 
 =signature tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 =metadata tv
 
@@ -2502,8 +2502,8 @@ $test->for('example', 1, '(*{})', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

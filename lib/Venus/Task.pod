@@ -40,7 +40,7 @@ This package has the following attributes:
 
 =head2 data
 
-  data(ArrayRef $data) (ArrayRef)
+  data(arrayref $data) (arrayref)
 
 The data attribute is read-write, accepts C<(ArrayRef)> values, and is
 optional.
@@ -103,7 +103,7 @@ This package provides the following methods:
 
 =head2 args
 
-  args() (HashRef)
+  args() (hashref)
 
 The args method can be overridden and returns a hashref suitable to be passed
 to the L<Venus::Cli/set> method as type C<"arg">. An C<"arg"> is a CLI
@@ -160,7 +160,7 @@ I<Since C<2.91>>
 
 =head2 cmds
 
-  cmds() (HashRef)
+  cmds() (hashref)
 
 The cmds method can be overridden and returns a hashref suitable to be passed
 to the L<Venus::Cli/set> method as type C<"cmd">. A C<"cmd"> is a CLI command
@@ -228,7 +228,7 @@ I<Since C<2.91>>
 
 =head2 description
 
-  description() (Task)
+  description() (Venus::Task)
 
 The description method doesn't exist on the L<Venus::Task> superclass but if
 defined returns a string that will be used as the CLI "description" (before the
@@ -263,7 +263,7 @@ I<Since C<2.91>>
 
 =head2 execute
 
-  execute() (Task)
+  execute() (Venus::Task)
 
 The execute method can be overridden and returns the invocant. This method
 prepares the L<Venus::Cli> via L</prepare>, and runs the L</startup>,
@@ -406,7 +406,7 @@ I<Since C<2.91>>
 
 =head2 exit
 
-  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+  exit(number $code, string | coderef $code, any @args) (any)
 
 The exit method exits the program using the exit code provided. The exit code
 defaults to C<0>. Optionally, you can dispatch before exiting by providing a
@@ -475,7 +475,7 @@ I<Since C<2.91>>
 
 =head2 fail
 
-  fail(Str|CodeRef $code, Any @args) (Any)
+  fail(string | coderef $code, any @args) (any)
 
 The fail method exits the program with the exit code C<1>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
@@ -514,7 +514,7 @@ I<Since C<2.91>>
 
 =head2 footer
 
-  footer() (Task)
+  footer() (Venus::Task)
 
 The footer method doesn't exist on the L<Venus::Task> superclass but if defined
 returns a string that will be used as the CLI "footer" (after the arguments,
@@ -549,7 +549,7 @@ I<Since C<2.91>>
 
 =head2 handler
 
-  handler(HashRef $data) (Task)
+  handler(hashref $data) (Venus::Task)
 
 The handler method can and should be overridden and returns the invocant. This
 method is where the central task operations are meant to happen. By default, if
@@ -616,7 +616,7 @@ I<Since C<2.91>>
 
 =head2 header
 
-  header() (Task)
+  header() (Venus::Task)
 
 The header method doesn't exist on the L<Venus::Task> superclass but if defined
 returns a string that will be used as the CLI "header" (after the title, before
@@ -651,7 +651,7 @@ I<Since C<2.91>>
 
 =head2 help
 
-  help() (Str)
+  help() (string)
 
 The help method can be overridden and returns a string representing "help" text
 for the CLI. By default this method returns the result of L<Venus::Cli/help>,
@@ -702,7 +702,7 @@ I<Since C<2.91>>
 
 =head2 log_debug
 
-  log_debug(Any @log_debug) (Log)
+  log_debug(any @log_debug) (Venus::Log)
 
 The log_debug method dispatches to the L<Venus::Log/debug> method and returns the
 result.
@@ -727,7 +727,7 @@ I<Since C<2.91>>
 
 =head2 log_error
 
-  log_error(Any @log_error) (Log)
+  log_error(any @log_error) (Venus::Log)
 
 The log_error method dispatches to the L<Venus::Log/error> method and returns the
 result.
@@ -752,7 +752,7 @@ I<Since C<2.91>>
 
 =head2 log_fatal
 
-  log_fatal(Any @log_fatal) (Log)
+  log_fatal(any @log_fatal) (Venus::Log)
 
 The log_fatal method dispatches to the L<Venus::Log/fatal> method and returns the
 result.
@@ -777,7 +777,7 @@ I<Since C<2.91>>
 
 =head2 log_info
 
-  log_info(Any @log_info) (Log)
+  log_info(any @log_info) (Venus::Log)
 
 The log_info method dispatches to the L<Venus::Log/info> method and returns the
 result.
@@ -802,7 +802,7 @@ I<Since C<2.91>>
 
 =head2 log_level
 
-  log_level() (Str)
+  log_level() (string)
 
 The log_level method can be overridden and returns a valid L<Venus::Log/level>
 value. This method defaults to returning L<info>.
@@ -827,7 +827,7 @@ I<Since C<2.91>>
 
 =head2 log_trace
 
-  log_trace(Any @log_trace) (Log)
+  log_trace(any @log_trace) (Venus::Log)
 
 The log_trace method dispatches to the L<Venus::Log/trace> method and returns the
 result.
@@ -852,7 +852,7 @@ I<Since C<2.91>>
 
 =head2 log_warn
 
-  log_warn(Any @log_warn) (Log)
+  log_warn(any @log_warn) (Venus::Log)
 
 The log_warn method dispatches to the L<Venus::Log/warn> method and returns the
 result.
@@ -877,7 +877,7 @@ I<Since C<2.91>>
 
 =head2 name
 
-  name() (Task)
+  name() (Venus::Task)
 
 The name method can be overridden and returns the name of the task (and
 application). This method defaults to C<$0> if not overridden.
@@ -925,7 +925,7 @@ I<Since C<2.91>>
 
 =head2 okay
 
-  okay(Str|CodeRef $code, Any @args) (Any)
+  okay(string | coderef $code, any @args) (any)
 
 The okay method exits the program with the exit code C<0>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
@@ -964,7 +964,7 @@ I<Since C<2.91>>
 
 =head2 opts
 
-  opts() (HashRef)
+  opts() (hashref)
 
 The opts method can be overridden and returns a hashref suitable to be passed
 to the L<Venus::Cli/set> method as type C<"opt">. An C<"opt"> is a CLI option
@@ -1023,7 +1023,7 @@ I<Since C<2.91>>
 
 =head2 output
 
-  output(Str $level, Str @messages) (Task)
+  output(string $level, string @messages) (Venus::Task)
 
 The output method is configured as the L<Venus::Log/handler> by L</prepare>,
 can be overridden and returns the invocant.
@@ -1050,7 +1050,7 @@ I<Since C<2.91>>
 
 =head2 pass
 
-  pass(Str|CodeRef $code, Any @args) (Any)
+  pass(string | coderef $code, any @args) (any)
 
 The pass method exits the program with the exit code C<0>. Optionally, you can
 dispatch before exiting by providing a method name or coderef, and arguments.
@@ -1089,7 +1089,7 @@ I<Since C<3.10>>
 
 =head2 prepare
 
-  prepare() (Task)
+  prepare() (Venus::Task)
 
 The prepare method can be overridden, but typically shouldn't, is responsible
 for configuring the L</cli> and L</log> objects, parsing the arguments, and
@@ -1211,7 +1211,7 @@ I<Since C<2.91>>
 
 =head2 run
 
-  run(Any @args) (Task)
+  run(any @args) (Venus::Task)
 
 The run class method will automatically execute the task class by instansiating
 the class and calling the L</execute> method and returns the invocant. This
@@ -1277,7 +1277,7 @@ I<Since C<2.91>>
 
 =head2 shutdown
 
-  shutdown(HashRef $data) (Task)
+  shutdown(hashref $data) (Venus::Task)
 
 The shutdown method can be overridden and returns the invocant. This method is
 called by L</execute> automatically after L</handler> and is passed the result
@@ -1303,7 +1303,7 @@ I<Since C<2.91>>
 
 =head2 startup
 
-  startup(HashRef $data) (Task)
+  startup(hashref $data) (Venus::Task)
 
 The startup method can be overridden and returns the invocant. This method is
 called by L</execute> automatically after L</prepare> and before L</handler>,
@@ -1329,7 +1329,7 @@ I<Since C<2.91>>
 
 =head2 system
 
-  system(Str @args) (Task)
+  system(string @args) (Venus::Task)
 
 The system method attempts to make a L<perlfunc/system> call and returns the
 invocant. If the system call is unsuccessful an error is thrown.
@@ -1368,7 +1368,7 @@ I<Since C<2.91>>
 
 =head2 test
 
-  test(Str $type, Str $name) (Any)
+  test(string $type, string $name) (any)
 
 The test method validates the values for the C<arg> or C<opt> specified and
 returns the value(s) associated. This method dispatches to L<Venus::Cli/test>.
@@ -1438,7 +1438,7 @@ I<Since C<3.10>>
 
 =head2 usage
 
-  usage() (Task)
+  usage() (Venus::Task)
 
 The usage method exits the program with the exit code C<1> after calling
 L</log_info> with the result of L</help>. This method makes it easy to output
@@ -1508,7 +1508,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

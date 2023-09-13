@@ -184,7 +184,7 @@ number of blocks found.
 
 =signature count
 
-  count(HashRef $criteria) (Int)
+  count(hashref $criteria) (number)
 
 =metadata count
 
@@ -235,7 +235,7 @@ Perl package or file.
 
 =signature data
 
-  data() (Str)
+  data() (string)
 
 =metadata data
 
@@ -266,7 +266,7 @@ The docs method configures the instance for parsing POD blocks.
 
 =signature docs
 
-  docs() (Data)
+  docs() (Venus::Data)
 
 =metadata docs
 
@@ -302,7 +302,7 @@ C<list> and C<name>.
 
 =signature find
 
-  find(Maybe[Str] $list, Maybe[Str] $name) (ArrayRef)
+  find(maybe[string] $list, maybe[string] $name) (arrayref)
 
 =metadata find
 
@@ -409,7 +409,7 @@ This method can return a list of values in list-context.
 
 =signature find
 
-  find(HashRef $criteria) (ArrayRef)
+  find(hashref $criteria) (arrayref)
 
 =metadata find
 
@@ -516,7 +516,7 @@ C<list> and C<name>, returning only the strings found.
 
 =signature string
 
-  string(Maybe[Str] $list, Maybe[Str] $name) (Str)
+  string(maybe[string] $list, maybe[string] $name) (string)
 
 =metadata string
 
@@ -620,7 +620,7 @@ The text method configures the instance for parsing DATA blocks.
 
 =signature text
 
-  text() (Data)
+  text() (Venus::Data)
 
 =metadata text
 
@@ -651,8 +651,8 @@ $test->for('example', 1, 'text', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

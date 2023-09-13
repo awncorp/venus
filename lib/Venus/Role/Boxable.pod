@@ -46,7 +46,7 @@ This package provides the following methods:
 
 =head2 box
 
-  box(Str | CodeRef $method, Any @args) (Self)
+  box(string | coderef $method, any @args) (object)
 
 The box method returns the invocant boxed, i.e. encapsulated, using
 L<Venus::Box>. This method supports dispatching, i.e. providing a method name
@@ -94,7 +94,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -77,7 +77,7 @@ The value method returns value representing the global C<true> value.
 
 =signature value
 
-  value() (Bool)
+  value() (boolean)
 
 =metadata value
 
@@ -104,8 +104,8 @@ $test->for('example', 1, 'value', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

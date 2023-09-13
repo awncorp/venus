@@ -41,15 +41,16 @@ sub build_self {
 
 # METHODS
 
-
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('arrayref');
+  $assertion->match('arrayref')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub default {

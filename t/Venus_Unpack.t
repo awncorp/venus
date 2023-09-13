@@ -111,7 +111,7 @@ The all method selects all arguments for processing returns the invocant.
 
 =signature all
 
-  all() (Unpack)
+  all() (Venus::Unpack)
 
 =metadata all
 
@@ -146,7 +146,7 @@ The arg method returns the argument at the index specified.
 
 =signature arg
 
-  arg(Str $index) (Any)
+  arg(string $index) (any)
 
 =metadata arg
 
@@ -221,7 +221,7 @@ If arguments are provided they will overwrite the existing arugment list.
 
 =signature args
 
-  args(Any @args) (ArrayRef)
+  args(any @args) (arrayref)
 
 =metadata args
 
@@ -312,7 +312,7 @@ class name specified, or the L<Venus::Type/cast> method, and returns results.
 
 =signature cast
 
-  cast(Str $name) (ArrayRef)
+  cast(string $name) (arrayref)
 
 =metadata cast
 
@@ -386,7 +386,7 @@ results.
 
 =signature checks
 
-  checks(Str @types) (ArrayRef)
+  checks(string @types) (arrayref)
 
 =metadata checks
 
@@ -501,7 +501,7 @@ underlying object and returns the invocant.
 
 =signature copy
 
-  copy(Str @pairs) (Unpack)
+  copy(string @pairs) (Venus::Unpack)
 
 =metadata copy
 
@@ -588,7 +588,7 @@ invocant.
 
 =signature first
 
-  first() (Unpack)
+  first() (Venus::Unpack)
 
 =metadata first
 
@@ -625,7 +625,7 @@ This method returns the invocant.
 
 =signature from
 
-  from(Str $data) (Unpack)
+  from(string $data) (Venus::Unpack)
 
 =metadata from
 
@@ -681,7 +681,7 @@ The get method returns the argument at the index specified.
 
 =signature get
 
-  get(Str $index) (Any)
+  get(string $index) (any)
 
 =metadata get
 
@@ -796,7 +796,7 @@ class name specified, and returns results.
 
 =signature into
 
-  into(Str @args) (Any)
+  into(string @args) (any)
 
 =metadata into
 
@@ -898,7 +898,7 @@ invocant.
 
 =signature last
 
-  last() (Unpack)
+  last() (Venus::Unpack)
 
 =metadata last
 
@@ -934,7 +934,7 @@ arrayref, or list in list context.
 
 =signature list
 
-  list(Str | CodeRef $code, Any @args) (ArrayRef)
+  list(string | coderef $code, any @args) (arrayref)
 
 =metadata list
 
@@ -1056,7 +1056,7 @@ list, as properties of the underlying object and returns the invocant.
 
 =signature move
 
-  move(Str @pairs) (Unpack)
+  move(string @pairs) (Venus::Unpack)
 
 =metadata move
 
@@ -1144,7 +1144,7 @@ the invocant.
 
 =signature name
 
-  name(Str $data) (Unpack)
+  name(string $data) (Venus::Unpack)
 
 =metadata name
 
@@ -1200,7 +1200,7 @@ The one method returns the first result of the dispatched method call.
 
 =signature one
 
-  one(Str | CodeRef $code, Any @args) (Any)
+  one(string | coderef $code, any @args) (any)
 
 =metadata one
 
@@ -1261,7 +1261,7 @@ arguments (selected for processing) and returns the invocant.
 
 =signature reset
 
-  reset(Any @args) (Unpack)
+  reset(any @args) (Venus::Unpack)
 
 =metadata reset
 
@@ -1320,7 +1320,7 @@ the value.
 
 =signature set
 
-  set(Str $index, Any $value) (Any)
+  set(string $index, any $value) (any)
 
 =metadata set
 
@@ -1437,7 +1437,7 @@ or as a list in list context.
 
 =signature signature
 
-  signature(Str $name, Str @types) (ArrayRef)
+  signature(string $name, string @types) (arrayref)
 
 =metadata signature
 
@@ -1499,15 +1499,15 @@ $test->for('example', 2, 'signature', sub {
     'string', 'number',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 3, 'signature', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'argument #3\ for signature "example-3" in package "main"';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #3\ for signature "example-3" in package "main"/m;
 
   $result
 });
@@ -1522,15 +1522,15 @@ $test->for('example', 3, 'signature', sub {
     'string',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 4, 'signature', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'argument #2\ for signature "example-4" in package "main"';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #2\ for signature "example-4" in package "main"/m;
 
   $result
 });
@@ -1545,15 +1545,15 @@ $test->for('example', 4, 'signature', sub {
     'object',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 5, 'signature', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'argument #1\ for signature "example-5" from "t/Venus_Unpack.t"';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #1\ for signature "example-5" from "t\/Venus_Unpack.t"/m;
 
   $result
 });
@@ -1566,7 +1566,7 @@ the L</validate> method returns the invocant.
 
 =signature types
 
-  types(Str @types) (Unpack)
+  types(string @types) (Venus::Unpack)
 
 =metadata types
 
@@ -1631,8 +1631,8 @@ $test->for('example', 2, 'types', sub {
 $test->for('example', 3, 'types', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'assertion \(argument #3\) failed';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #3/m;
 
   $result
 });
@@ -1654,8 +1654,8 @@ $test->for('example', 3, 'types', sub {
 $test->for('example', 4, 'types', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'assertion \(argument #2\) failed';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #2/m;
 
   $result
 });
@@ -1667,7 +1667,7 @@ returns the invocant.
 
 =signature use
 
-  use(Int @args) (Unpack)
+  use(number @args) (Venus::Unpack)
 
 =metadata use
 
@@ -1743,7 +1743,7 @@ an exception on failure and otherise returns the resuts.
 
 =signature validate
 
-  validate(Str @types) (Unpack)
+  validate(string @types) (Venus::Unpack)
 
 =metadata validate
 
@@ -1799,15 +1799,15 @@ $test->for('example', 2, 'validate', sub {
 
   my $results = $unpack->all->validate('string', 'number');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 3, 'validate', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'assertion \(argument #3\) failed';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #3/m;
 
   $result
 });
@@ -1820,23 +1820,23 @@ $test->for('example', 3, 'validate', sub {
 
   my $results = $unpack->all->validate('string');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
 $test->for('example', 4, 'validate', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->error(\my $error)->result;
-  ok $error->isa('Venus::Assert::Error');
-  ok $error->message =~ 'assertion \(argument #2\) failed';
+  ok $error->isa('Venus::Check::Error');
+  like $error->render, qr/argument #2/m;
 
   $result
 });
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

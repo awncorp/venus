@@ -98,7 +98,7 @@ the L<perlfunc/use> declaration is used.
 
 =signature import
 
-  import(Any @args) (Any)
+  import(any @args) (any)
 
 =metadata import
 
@@ -126,7 +126,7 @@ The does method returns true if the object is composed of the role provided.
 
 =signature does
 
-  does(Str $name) (Bool)
+  does(string $name) (boolean)
 
 =metadata does
 
@@ -159,7 +159,7 @@ configuration.
 
 =signature meta
 
-  meta() (Meta)
+  meta() (Venus::Meta)
 
 =metadata meta
 
@@ -196,7 +196,7 @@ The new method instantiates the class and returns a new object.
 
 =signature new
 
-  new(Any %args | HashRef $args) (Object)
+  new(any %args | hashref $args) (object)
 
 =metadata new
 
@@ -259,7 +259,7 @@ whenever the L<perlfunc/no> declaration is used.
 
 =signature unimport
 
-  unimport(Any @args) (Any)
+  unimport(any @args) (any)
 
 =metadata unimport
 
@@ -285,8 +285,8 @@ $test->for('example', 1, 'unimport', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -98,7 +98,7 @@ this method.
 
 =signature catch
 
-  catch(Str $method, Any @args) (Any)
+  catch(string $method, any @args) (any)
 
 =metadata catch
 
@@ -198,7 +198,7 @@ will be acted on by this method.
 
 =signature maybe
 
-  maybe(Str $method, Any @args) (Any)
+  maybe(string $method, any @args) (any)
 
 =metadata maybe
 
@@ -269,8 +269,8 @@ $test->for('example', 3, 'maybe', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

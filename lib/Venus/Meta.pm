@@ -25,7 +25,7 @@ sub attrs {
   my ($self) = @_;
 
   if ($self->{attrs}) {
-    return $self->{attrs};
+    return wantarray ? (@{$self->{attrs}}) : $self->{attrs};
   }
 
   my $name = $self->{name};
@@ -75,7 +75,7 @@ sub bases {
   my ($self) = @_;
 
   if ($self->{bases}) {
-    return $self->{bases};
+    return wantarray ? (@{$self->{bases}}) : $self->{bases};
   }
 
   my $name = $self->{name};
@@ -167,7 +167,7 @@ sub mixins {
   my ($self) = @_;
 
   if ($self->{mixins}) {
-    return $self->{mixins};
+    return wantarray ? (@{$self->{mixins}}) : $self->{mixins};
   }
 
   my $name = $self->{name};
@@ -222,7 +222,7 @@ sub roles {
   my ($self) = @_;
 
   if ($self->{roles}) {
-    return $self->{roles};
+    return wantarray ? (@{$self->{roles}}) : $self->{roles};
   }
 
   my $name = $self->{name};
@@ -315,7 +315,7 @@ sub subs {
   my ($self) = @_;
 
   if ($self->{subs}) {
-    return $self->{subs};
+    return wantarray ? (@{$self->{subs}}) : $self->{subs};
   }
 
   my $name = $self->{name};

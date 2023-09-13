@@ -53,7 +53,7 @@ This package provides the following methods:
 
 =head2 mock
 
-  mock(Str $name, CodeRef $code) (CodeRef)
+  mock(string $name, coderef $code) (coderef)
 
 The mock method mocks the subroutine specified using the callback given. The
 coderef provided will be passed the original subroutine coderef as its first
@@ -100,7 +100,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -117,7 +117,7 @@ the decoded value.
 
 =signature decode
 
-  decode(Str $yaml) (Any)
+  decode(string $yaml) (any)
 
 =metadata decode
 
@@ -150,7 +150,7 @@ encoded string.
 
 =signature encode
 
-  encode() (Str)
+  encode() (string)
 
 =metadata encode
 
@@ -218,8 +218,8 @@ $test->for('example', 1, 'error_on_config', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

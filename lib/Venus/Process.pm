@@ -104,11 +104,13 @@ sub build_self {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string');
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  return $assertion;
 }
 
 sub async {
@@ -126,7 +128,7 @@ sub async {
 
   $parent->register;
 
-  $parent->work(sub{
+  my $pid = $parent->work(sub{
     my ($process) = @_;
 
     $process->untrap;
@@ -135,18 +137,33 @@ sub async {
 
     $process->register;
 
-    my $result = $process->try($code, @args)->any->result;
+    $process->watch($process->ppid);
+
+    $process->ppid(undef);
+
+    my $error;
+
+    my $result = $process->try($code, @args)->error(\$error)->result;
+
+    if (defined $error) {
+      require Scalar::Util;
+      require Venus::Error;
+      $error = Venus::Error->new($error) if !Scalar::Util::blessed($error);
+      $result = $error;
+    }
 
     $process->sendall($result) if defined $result;
 
     return;
   });
 
-  $parent->trap(INT => sub {
+  $parent->watch($pid);
+
+  $parent->trap(int => sub {
     $parent->killall;
   });
 
-  $parent->trap(TERM => sub {
+  $parent->trap(term => sub {
     $parent->killall;
   });
 
@@ -162,18 +179,25 @@ sub await {
 
   $PATH = $self->{directory};
 
-  my $result;
+  my $result = [];
 
   if (defined $timeout) {
-    (my $error, $result) = $self->catch('poll', $timeout, 'recvall');
+    if ($timeout == 0) {
+      (my $error, @{$result}) = $self->catch('recvall');
+    }
+    else {
+      (my $error, @{$result}) = $self->catch('poll', $timeout, 'recvall');
+    }
   }
   else {
-    do{$result = $self->recvall} while !@{$result};
+    do{@{$result} = $self->recvall} while !@{$result};
   }
+
+  $self->check($_) for ($self->watchlist);
 
   $PATH = $path;
 
-  return wantarray ? ($result ? (@{$result}) : ()) : $result;
+  return wantarray ? (@{$result}) : $result;
 }
 
 sub chdir {
@@ -329,7 +353,6 @@ sub fork {
     $PPID = $PID;
     $PID = $$;
     my $process = $self->class->new;
-
     my $orig_seed = srand;
     my $self_seed = substr(((time ^ $$) ** 2), 0, length($orig_seed));
     srand $self_seed;
@@ -368,6 +391,40 @@ sub forks {
   return wantarray ? ($process ? ($process, []) : ($process, [@pids]) ) : $process;
 }
 
+sub future {
+  my ($self, $code, @args) = @_;
+
+  my $async = $self->async($code, @args);
+
+  require Venus::Future;
+
+  my $retry = 0;
+
+  my $future = Venus::Future->new(sub{
+    my ($resolve, $reject) = @_;
+    my ($result) = $async->try('await', 0)->error(\my $error)->result;
+    if (defined $error) {
+      return $reject->result($error);
+    }
+    if (defined $result) {
+      if (UNIVERSAL::isa($result, 'Venus::Error')) {
+        return $reject->result($result);
+      }
+      else {
+        return $resolve->result($result);
+      }
+    }
+    if ($retry++ > 1 && !$async->ping($async->watchlist)) {
+      return $reject->result($async->catch('error', {
+        throw => 'error_on_ping',
+        pid => ($async->watchlist)[0]
+      }));
+    }
+  });
+
+  return $future;
+}
+
 sub is_dyadic {
   my ($self) = @_;
 
@@ -377,8 +434,7 @@ sub is_dyadic {
 
   my $temporary = $PATH = $directory if $directory;
 
-  my $is_dyadic = $directory && ($temporary) && $self->is_registered && ($self->ppid || $self->count == 1)
-    ? true : false;
+  my $is_dyadic = $directory && ($temporary) && $self->is_registered && ($self->count == 1) ? true : false;
 
   $PATH = $path;
 
@@ -926,7 +982,7 @@ sub trap {
 
   $SIG{uc($name)} = !ref($expr) ? uc($expr) : sub {
     local($!, $?);
-    return $self->$expr->(uc($name), @_);
+    return $self->$expr->(uc($name), @_) if ref $expr eq 'CODE';
   };
 
   return $self;
@@ -1004,9 +1060,14 @@ sub write {
 
   $path->catch('mkdirs') if !$path->exists;
 
-  require Time::HiRes;
+  state $atom = 0;
+  state $time = time;
 
-  $path = $path->child(CORE::join '.', Time::HiRes::gettimeofday(), 'data');
+  ($atom = ($time == time) ? $atom + 1 : 1);
+
+  $path = $path->child(CORE::join '.', time, $atom, 'data');
+
+  $time = time;
 
   $path->write($data);
 
@@ -1063,9 +1124,10 @@ sub DESTROY {
 
   $self->SUPER::DESTROY(@data);
 
-  require Venus::Path;
-
-  Venus::Path->new($self->{directory})->rmdirs if $self->is_dyadic && $self->is_leader;
+  if ($self->is_dyadic && !$self->others) {
+    $self->unregister;
+    require Venus::Path; Venus::Path->new($self->{directory})->rmdirs;
+  }
 
   return $self;
 }
@@ -1124,6 +1186,25 @@ sub error_on_fork_support {
 
   my $result = {
     name => 'on.fork.support',
+    raise => true,
+    stash => $stash,
+    message => $message,
+  };
+
+  return $result;
+}
+
+sub error_on_ping {
+  my ($self, $data) = @_;
+
+  my $message = 'Process {{pid}} not responding to ping';
+
+  my $stash = {
+    pid => $data->{pid},
+  };
+
+  my $result = {
+    name => 'on.ping',
     raise => true,
     stash => $stash,
     message => $message,

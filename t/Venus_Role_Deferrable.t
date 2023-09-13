@@ -106,7 +106,7 @@ dispatches to the method call specified.
 
 =signature defer
 
-  defer(Str $method, Any @args) (CodeRef)
+  defer(string $method, any @args) (coderef)
 
 =metadata defer
 
@@ -200,8 +200,8 @@ $test->for('example', 3, 'defer', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -23,16 +23,9 @@ with 'Venus::Role::Throwable';
 with 'Venus::Role::Assertable';
 with 'Venus::Role::Serializable';
 with 'Venus::Role::Mockable';
+with 'Venus::Role::Patchable';
 
 # METHODS
-
-sub assertion {
-  my ($self) = @_;
-
-  require Venus::Assert;
-
-  return Venus::Assert->new(ref $self || $self)->any;
-}
 
 sub checksum {
   my ($self) = @_;

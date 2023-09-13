@@ -44,7 +44,7 @@ This package provides the following methods:
 
 =head2 dump
 
-  dump(Str | CodeRef $method, Any @args) (Str)
+  dump(string | coderef $method, any @args) (string)
 
 The dump method returns a string representation of the underlying data. This
 method supports dispatching, i.e. providing a method name and arguments whose
@@ -70,7 +70,7 @@ I<Since C<0.01>>
 
 =head2 dump_pretty
 
-  dump_pretty(Str | CodeRef $method, Any @args) (Str)
+  dump_pretty(string | coderef $method, any @args) (string)
 
 The dump_pretty method returns a string representation of the underlying data
 that is human-readable and useful for debugging. This method supports
@@ -105,7 +105,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

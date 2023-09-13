@@ -172,7 +172,7 @@ function is always exported unless a routine of the same name already exists.
 
 =signature attr
 
-  attr(Str $name) (Str)
+  attr(string $name) (string)
 
 =metadata attr
 
@@ -212,7 +212,7 @@ exists.
 
 =signature base
 
-  base(Str $name) (Str)
+  base(string $name) (string)
 
 =metadata base
 
@@ -259,7 +259,7 @@ argument in list context. This function isn't export unless requested.
 
 =signature catch
 
-  catch(CodeRef $block) (Error, Any)
+  catch(coderef $block) (Venus::Error, any)
 
 =metadata catch
 
@@ -314,7 +314,7 @@ exception object arguments provided. This function isn't export unless requested
 
 =signature error
 
-  error(Maybe[HashRef] $args) (Error)
+  error(maybe[hashref] $args) (Venus::Error)
 
 =metadata error
 
@@ -370,7 +370,7 @@ function is always exported unless a routine of the same name already exists.
 
 =signature false
 
-  false() (Bool)
+  false() (boolean)
 
 =metadata false
 
@@ -426,7 +426,7 @@ unless a routine of the same name already exists.
 
 =signature from
 
-  from(Str $name) (Str)
+  from(string $name) (string)
 
 =metadata from
 
@@ -487,7 +487,7 @@ function is always exported unless a routine of the same name already exists.
 
 =signature mixin
 
-  mixin(Str $name) (Str)
+  mixin(string $name) (string)
 
 =metadata mixin
 
@@ -592,7 +592,7 @@ provided. This function isn't export unless requested.
 
 =signature raise
 
-  raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+  raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
 
 =metadata raise
 
@@ -648,7 +648,7 @@ function is always exported unless a routine of the same name already exists.
 
 =signature role
 
-  role(Str $name) (Str)
+  role(string $name) (string)
 
 =metadata role
 
@@ -727,7 +727,7 @@ name already exists.
 
 =signature test
 
-  test(Str $name) (Str)
+  test(string $name) (string)
 
 =metadata test
 
@@ -795,7 +795,7 @@ function is always exported unless a routine of the same name already exists.
 
 =signature true
 
-  true() (Bool)
+  true() (boolean)
 
 =metadata true
 
@@ -852,7 +852,7 @@ unless a routine of the same name already exists.
 
 =signature with
 
-  with(Str $name) (Str)
+  with(string $name) (string)
 
 =metadata with
 
@@ -924,8 +924,8 @@ $test->for('example', 2, 'with', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

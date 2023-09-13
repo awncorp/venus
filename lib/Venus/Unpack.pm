@@ -76,7 +76,7 @@ sub checks {
     my ($self, $data, $expr, $index) = @_;
 
     my $name = 'argument #' . ($index + 1);
-    return scalar Venus::Assert->new($name)->expression($expr)->check($data);
+    return scalar Venus::Assert->new($name)->expression($expr)->valid($data);
   };
 
   return $self->list('foreach', $code, @args);

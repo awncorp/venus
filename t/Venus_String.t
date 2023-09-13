@@ -131,7 +131,7 @@ The append method appends arugments to the string using spaces.
 
 =signature append
 
-  append(Str @parts) (Str)
+  append(string @parts) (string)
 
 =metadata append
 
@@ -164,7 +164,7 @@ provided.
 
 =signature append_with
 
-  append_with(Str $delimiter, Str @parts) (Str)
+  append_with(string $delimiter, string @parts) (string)
 
 =metadata append_with
 
@@ -196,7 +196,7 @@ The camelcase method converts the string to camelcase.
 
 =signature camelcase
 
-  camelcase() (Str)
+  camelcase() (string)
 
 =metadata camelcase
 
@@ -230,7 +230,7 @@ method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
 
 =signature cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 =metadata cast
 
@@ -484,7 +484,7 @@ of the string.
 
 =signature chomp
 
-  chomp() (Str)
+  chomp() (string)
 
 =metadata chomp
 
@@ -542,7 +542,7 @@ The chop method removes and returns the last character of the string.
 
 =signature chop
 
-  chop() (Str)
+  chop() (string)
 
 =metadata chop
 
@@ -578,7 +578,7 @@ The concat method returns the string with the argument list appended to it.
 
 =signature concat
 
-  concat(Str @parts) (Str)
+  concat(string @parts) (string)
 
 =metadata concat
 
@@ -615,7 +615,7 @@ true or false if found.
 
 =signature contains
 
-  contains(Str $expr) (Bool)
+  contains(string $expr) (boolean)
 
 =metadata contains
 
@@ -695,7 +695,7 @@ The default method returns the default value, i.e. C<''>.
 
 =signature default
 
-  default() (Str)
+  default() (string)
 
 =metadata default
 
@@ -727,7 +727,7 @@ The eq method performs an I<"equals"> operation using the argument provided.
 
 =signature eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 =metadata eq
 
@@ -957,7 +957,7 @@ argument provided.
 
 =signature ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 =metadata ge
 
@@ -1187,7 +1187,7 @@ argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
 
 =signature gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 =metadata gele
 
@@ -1416,7 +1416,7 @@ The gt method performs a I<"greater-than"> operation using the argument provided
 
 =signature gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 =metadata gt
 
@@ -1646,7 +1646,7 @@ I<"lesser-than"> operation on the 2nd argument.
 
 =signature gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 =metadata gtlt
 
@@ -1876,7 +1876,7 @@ string and arguments provided and returns the result.
 
 =signature format
 
-  format(Any @args) (Str)
+  format(any @args) (string)
 
 =metadata format
 
@@ -1937,7 +1937,7 @@ hex string.
 
 =signature hex
 
-  hex() (Str)
+  hex() (string)
 
 =metadata hex
 
@@ -1974,7 +1974,7 @@ position of the first occurrence of the argument.
 
 =signature index
 
-  index(Str $substr, Int $start) (Num)
+  index(string $substr, number $start) (number)
 
 =metadata index
 
@@ -2054,7 +2054,7 @@ The kebabcase method converts the string to kebabcase.
 
 =signature kebabcase
 
-  kebabcase() (Str)
+  kebabcase() (string)
 
 =metadata kebabcase
 
@@ -2086,7 +2086,7 @@ The lc method returns a lowercased version of the string.
 
 =signature lc
 
-  lc() (Str)
+  lc() (string)
 
 =metadata lc
 
@@ -2122,7 +2122,7 @@ The lcfirst method returns a the string with the first character lowercased.
 
 =signature lcfirst
 
-  lcfirst() (Str)
+  lcfirst() (string)
 
 =metadata lcfirst
 
@@ -2159,7 +2159,7 @@ argument provided.
 
 =signature le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 =metadata le
 
@@ -2388,7 +2388,7 @@ The length method returns the number of characters within the string.
 
 =signature length
 
-  length() (Int)
+  length() (number)
 
 =metadata length
 
@@ -2421,7 +2421,7 @@ characters.
 
 =signature lines
 
-  lines() (ArrayRef[Str])
+  lines() (within[arrayref, string])
 
 =metadata lines
 
@@ -2475,7 +2475,7 @@ The lt method performs a I<"lesser-than"> operation using the argument provided.
 
 =signature lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 =metadata lt
 
@@ -2704,7 +2704,7 @@ The ne method performs a I<"not-equal-to"> operation using the argument provided
 
 =signature ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 =metadata ne
 
@@ -2933,7 +2933,7 @@ The pascalcase method converts the string to pascalcase.
 
 =signature pascalcase
 
-  pascalcase() (Str)
+  pascalcase() (string)
 
 =metadata pascalcase
 
@@ -2965,7 +2965,7 @@ The prepend method prepends arugments to the string using spaces.
 
 =signature prepend
 
-  prepend(Str @parts) (Str)
+  prepend(string @parts) (string)
 
 =metadata prepend
 
@@ -2998,7 +2998,7 @@ provided.
 
 =signature prepend_with
 
-  prepend_with(Str $delimiter, Str @parts) (Str)
+  prepend_with(string $delimiter, string @parts) (string)
 
 =metadata prepend_with
 
@@ -3030,7 +3030,7 @@ The lowercase method is an alias to the lc method.
 
 =signature lowercase
 
-  lowercase() (Str)
+  lowercase() (string)
 
 =metadata lowercase
 
@@ -3068,7 +3068,7 @@ and be place between the occurences.
 
 =signature repeat
 
-  repeat(Num $number, Str $delimiter) (Str)
+  repeat(number $number, string $delimiter) (string)
 
 =metadata repeat
 
@@ -3128,7 +3128,7 @@ like a number, or C<0>.
 
 =signature numified
 
-  numified() (Int)
+  numified() (number)
 
 =metadata numified
 
@@ -3183,7 +3183,7 @@ replacement using the argument provided.
 
 =signature render
 
-  render(HashRef $tokens) (Str)
+  render(hashref $tokens) (string)
 
 =metadata render
 
@@ -3220,7 +3220,7 @@ object.
 
 =signature search
 
-  search(Regexp $regexp) (Search)
+  search(regexp $regexp) (Venus::Search)
 
 =metadata search
 
@@ -3258,7 +3258,7 @@ L<Venus::Replace> object.
 
 =signature replace
 
-  replace(Regexp $regexp, Str $replace, Str $flags) (Replace)
+  replace(regexp $regexp, string $replace, string $flags) (Venus::Replace)
 
 =metadata replace
 
@@ -3297,7 +3297,7 @@ the opposite order.
 
 =signature reverse
 
-  reverse() (Str)
+  reverse() (string)
 
 =metadata reverse
 
@@ -3330,7 +3330,7 @@ position of the last occurrence of the argument.
 
 =signature rindex
 
-  rindex(Str $substr, Int $start) (Str)
+  rindex(string $substr, number $start) (string)
 
 =metadata rindex
 
@@ -3410,7 +3410,7 @@ The snakecase method converts the string to snakecase.
 
 =signature snakecase
 
-  snakecase() (Str)
+  snakecase() (string)
 
 =metadata snakecase
 
@@ -3442,7 +3442,7 @@ The split method returns an arrayref by splitting the string on the argument.
 
 =signature split
 
-  split(Str | Regexp $expr, Maybe[Int] $limit) (ArrayRef)
+  split(string | regexp $expr, maybe[number] $limit) (arrayref)
 
 =metadata split
 
@@ -3523,7 +3523,7 @@ object's value).
 
 =signature stringified
 
-  stringified() (Str)
+  stringified() (string)
 
 =metadata stringified
 
@@ -3578,7 +3578,7 @@ whitespaces with a single whitespace.
 
 =signature strip
 
-  strip() (Str)
+  strip() (string)
 
 =metadata strip
 
@@ -3615,7 +3615,7 @@ value. In list context returns the result and the subject.
 
 =signature substr
 
-  substr(Num $offset, Num $length, Str $replace) (Str)
+  substr(number $offset, number $length, string $replace) (string)
 
 =metadata substr
 
@@ -3719,7 +3719,7 @@ L<Venus::Template> object, or dispatches to the coderef or method provided.
 
 =signature template
 
-  template(Str | CodeRef $code, Any @args) (Any)
+  template(string | coderef $code, any @args) (any)
 
 =metadata template
 
@@ -3783,7 +3783,7 @@ each word.
 
 =signature titlecase
 
-  titlecase() (Str)
+  titlecase() (string)
 
 =metadata titlecase
 
@@ -3816,7 +3816,7 @@ from the string.
 
 =signature trim
 
-  trim() (Str)
+  trim() (string)
 
 =metadata trim
 
@@ -3853,7 +3853,7 @@ provided.
 
 =signature tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 =metadata tv
 
@@ -4082,7 +4082,7 @@ The uc method returns an uppercased version of the string.
 
 =signature uc
 
-  uc() (Str)
+  uc() (string)
 
 =metadata uc
 
@@ -4114,7 +4114,7 @@ The ucfirst method returns a the string with the first character uppercased.
 
 =signature ucfirst
 
-  ucfirst() (Str)
+  ucfirst() (string)
 
 =metadata ucfirst
 
@@ -4146,7 +4146,7 @@ The uppercase method is an alias to the uc method.
 
 =signature uppercase
 
-  uppercase() (Str)
+  uppercase() (string)
 
 =metadata uppercase
 
@@ -4179,7 +4179,7 @@ spaces.
 
 =signature words
 
-  words() (ArrayRef[Str])
+  words() (within[arrayref, string])
 
 =metadata words
 
@@ -4318,7 +4318,7 @@ $test->for('operator', '(ne)');
 
   my $result = $string ne 'Hello world';
 
-  1;
+  # 1
 
 =cut
 
@@ -4345,7 +4345,7 @@ $test->for('example', 1, '(ne)', sub {
 
 =cut
 
-$test->for('example', 1, '(ne)', sub {
+$test->for('example', 2, '(ne)', sub {
   my ($tryable) = @_;
   ok my $result = $tryable->result;
   ok $result == 1;
@@ -4381,8 +4381,8 @@ $test->for('example', 1, '(qr)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -143,7 +143,7 @@ elements.
 
 =signature all
 
-  all(CodeRef $code) (Bool)
+  all(coderef $code) (boolean)
 
 =metadata all
 
@@ -200,7 +200,7 @@ elements.
 
 =signature any
 
-  any(CodeRef $code) (Bool)
+  any(coderef $code) (boolean)
 
 =metadata any
 
@@ -255,7 +255,7 @@ the iterable method.
 
 =signature call
 
-  call(Str $iterable, Str $method) (Any)
+  call(string $iterable, string $method) (any)
 
 =metadata call
 
@@ -311,7 +311,7 @@ method will return C<undef> if the invocant is not a L<Venus::Kind::Value>.
 
 =signature cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 =metadata cast
 
@@ -564,7 +564,7 @@ The count method returns the number of elements within the array.
 
 =signature count
 
-  count() (Int)
+  count() (number)
 
 =metadata count
 
@@ -596,7 +596,7 @@ The default method returns the default value, i.e. C<[]>.
 
 =signature default
 
-  default() (ArrayRef)
+  default() (arrayref)
 
 =metadata default
 
@@ -629,7 +629,7 @@ removing it from the array.
 
 =signature delete
 
-  delete(Int $index) (Any)
+  delete(number $index) (any)
 
 =metadata delete
 
@@ -663,7 +663,7 @@ list-context.
 
 =signature each
 
-  each(CodeRef $code) (ArrayRef)
+  each(coderef $code) (arrayref)
 
 =metadata each
 
@@ -739,7 +739,7 @@ The empty method drops all elements from the array.
 
 =signature empty
 
-  empty() (Array)
+  empty() (Venus::Array)
 
 =metadata empty
 
@@ -772,7 +772,7 @@ The eq method performs an I<"equals"> operation using the argument provided.
 
 =signature eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 =metadata eq
 
@@ -1002,7 +1002,7 @@ otherwise it returns false.
 
 =signature exists
 
-  exists(Int $index) (Bool)
+  exists(number $index) (boolean)
 
 =metadata exists
 
@@ -1037,7 +1037,7 @@ match was successful.
 
 =signature find
 
-  find(Str @keys) (Any)
+  find(string @keys) (any)
 
 =metadata find
 
@@ -1118,7 +1118,7 @@ argument provided.
 
 =signature ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 =metadata ge
 
@@ -1348,7 +1348,7 @@ argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
 
 =signature gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 =metadata gele
 
@@ -1577,7 +1577,7 @@ The first method returns the value of the first element.
 
 =signature first
 
-  first() (Any)
+  first() (any)
 
 =metadata first
 
@@ -1612,7 +1612,7 @@ list-context.
 
 =signature grep
 
-  grep(CodeRef $code) (ArrayRef)
+  grep(coderef $code) (arrayref)
 
 =metadata grep
 
@@ -1668,7 +1668,7 @@ The gt method performs a I<"greater-than"> operation using the argument provided
 
 =signature gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 =metadata gt
 
@@ -1898,7 +1898,7 @@ I<"lesser-than"> operation on the 2nd argument.
 
 =signature gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 =metadata gtlt
 
@@ -2128,7 +2128,7 @@ specified.
 
 =signature head
 
-  head(Int $size) (ArrayRef)
+  head(number $size) (arrayref)
 
 =metadata head
 
@@ -2236,7 +2236,7 @@ value in list-context.
 
 =signature iterator
 
-  iterator() (CodeRef)
+  iterator() (coderef)
 
 =metadata iterator
 
@@ -2301,7 +2301,7 @@ omitted, an empty string will be used as the join-string.
 
 =signature join
 
-  join(Str $seperator) (Str)
+  join(string $seperator) (string)
 
 =metadata join
 
@@ -2352,7 +2352,7 @@ and the elements of the array become the values.
 
 =signature keyed
 
-  keyed(Str @keys) (HashRef)
+  keyed(string @keys) (hashref)
 
 =metadata keyed
 
@@ -2389,7 +2389,7 @@ array.
 
 =signature keys
 
-  keys() (ArrayRef)
+  keys() (arrayref)
 
 =metadata keys
 
@@ -2421,7 +2421,7 @@ The last method returns the value of the last element in the array.
 
 =signature last
 
-  last() (Any)
+  last() (any)
 
 =metadata last
 
@@ -2454,7 +2454,7 @@ argument provided.
 
 =signature le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 =metadata le
 
@@ -2684,7 +2684,7 @@ alias for the L</count> method.
 
 =signature length
 
-  length() (Int)
+  length() (number)
 
 =metadata length
 
@@ -2717,7 +2717,7 @@ array reference.
 
 =signature list
 
-  list() (Any)
+  list() (any)
 
 =metadata list
 
@@ -2767,7 +2767,7 @@ The lt method performs a I<"lesser-than"> operation using the argument provided.
 
 =signature lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 =metadata lt
 
@@ -3000,7 +3000,7 @@ can return a list of values in list-context.
 
 =signature map
 
-  map(CodeRef $code) (ArrayRef)
+  map(coderef $code) (arrayref)
 
 =metadata map
 
@@ -3078,7 +3078,7 @@ merge and clones the datasets to ensure no side-effects.
 
 =signature merge
 
-  merge(ArrayRef @data) (ArrayRef)
+  merge(arrayref @data) (arrayref)
 
 =metadata merge
 
@@ -3128,7 +3128,7 @@ The ne method performs a I<"not-equal-to"> operation using the argument provided
 
 =signature ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 =metadata ne
 
@@ -3358,7 +3358,7 @@ criteria set by the operand and rvalue.
 
 =signature none
 
-  none(CodeRef $code) (Bool)
+  none(coderef $code) (boolean)
 
 =metadata none
 
@@ -3415,7 +3415,7 @@ criteria set by the operand and rvalue.
 
 =signature one
 
-  one(CodeRef $code) (Bool)
+  one(coderef $code) (boolean)
 
 =metadata one
 
@@ -3472,7 +3472,7 @@ returns the invocant.
 
 =signature order
 
-  order(Int @indices) (Array)
+  order(number @indices) (Venus::Array)
 
 =metadata order
 
@@ -3541,7 +3541,7 @@ a list of values in list-context.
 
 =signature pairs
 
-  pairs() (ArrayRef)
+  pairs() (arrayref)
 
 =metadata pairs
 
@@ -3596,7 +3596,7 @@ successful.
 
 =signature path
 
-  path(Str $expr) (Any)
+  path(string $expr) (any)
 
 =metadata path
 
@@ -3703,7 +3703,7 @@ list of values in list-context.
 
 =signature part
 
-  part(CodeRef $code) (Tuple[ArrayRef, ArrayRef])
+  part(coderef $code) (tuple[arrayref, arrayref])
 
 =metadata part
 
@@ -3760,7 +3760,7 @@ Note, this method modifies the array.
 
 =signature pop
 
-  pop() (Any)
+  pop() (any)
 
 =metadata pop
 
@@ -3793,7 +3793,7 @@ itself.
 
 =signature push
 
-  push(Any @data) (ArrayRef)
+  push(any @data) (arrayref)
 
 =metadata push
 
@@ -3827,7 +3827,7 @@ reference and returns all the values selected.
 
 =signature puts
 
-  puts(Any @args) (ArrayRef)
+  puts(any @args) (arrayref)
 
 =metadata puts
 
@@ -3980,7 +3980,7 @@ The random method returns a random element from the array.
 
 =signature random
 
-  random() (Any)
+  random() (any)
 
 =metadata random
 
@@ -4016,7 +4016,7 @@ calling the L</slice> method with the computed range.
 
 =signature range
 
-  range(Int | Str @args) (ArrayRef)
+  range(number | string @args) (arrayref)
 
 =metadata range
 
@@ -4413,7 +4413,7 @@ array in reverse order.
 
 =signature reverse
 
-  reverse() (ArrayRef)
+  reverse() (arrayref)
 
 =metadata reverse
 
@@ -4447,7 +4447,7 @@ time this method is called.
 
 =signature rotate
 
-  rotate() (ArrayRef)
+  rotate() (arrayref)
 
 =metadata rotate
 
@@ -4480,7 +4480,7 @@ sorted alphanumerically in reverse.
 
 =signature rsort
 
-  rsort() (ArrayRef)
+  rsort() (arrayref)
 
 =metadata rsort
 
@@ -4512,7 +4512,7 @@ The shift method returns the first element of the array shortening it by one.
 
 =signature shift
 
-  shift() (Any)
+  shift() (any)
 
 =metadata shift
 
@@ -4544,7 +4544,7 @@ The shuffle method returns an array with the items in a randomized order.
 
 =signature shuffle
 
-  shuffle() (ArrayRef)
+  shuffle() (arrayref)
 
 =metadata shuffle
 
@@ -4579,7 +4579,7 @@ at the index(es) specified in the arguments.
 
 =signature slice
 
-  slice(Str @keys) (ArrayRef)
+  slice(string @keys) (arrayref)
 
 =metadata slice
 
@@ -4612,7 +4612,7 @@ sorted alphanumerically.
 
 =signature sort
 
-  sort() (ArrayRef)
+  sort() (arrayref)
 
 =metadata sort
 
@@ -4649,7 +4649,7 @@ specified.
 
 =signature tail
 
-  tail(Int $size) (ArrayRef)
+  tail(number $size) (arrayref)
 
 =metadata tail
 
@@ -4754,7 +4754,7 @@ provided.
 
 =signature tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 =metadata tv
 
@@ -4984,7 +4984,7 @@ in the array.
 
 =signature unique
 
-  unique() (ArrayRef)
+  unique() (arrayref)
 
 =metadata unique
 
@@ -5021,7 +5021,7 @@ returns itself.
 
 =signature unshift
 
-  unshift(Any @data) (ArrayRef)
+  unshift(any @data) (arrayref)
 
 =metadata unshift
 
@@ -5049,8 +5049,8 @@ $test->for('example', 1, 'unshift', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

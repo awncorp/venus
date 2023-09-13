@@ -126,7 +126,7 @@ The bit method returns a C<1> or C<0> value, randomly.
 
 =signature bit
 
-  bit() (Int)
+  bit() (number)
 
 =metadata bit
 
@@ -216,7 +216,7 @@ The boolean method returns a C<true> or C<false> value, randomly.
 
 =signature boolean
 
-  boolean() (Bool)
+  boolean() (boolean)
 
 =metadata boolean
 
@@ -306,7 +306,7 @@ The byte method returns random byte characters, randomly.
 
 =signature byte
 
-  byte() (Str)
+  byte() (string)
 
 =metadata byte
 
@@ -397,7 +397,7 @@ L</letter>, or L</symbol> value.
 
 =signature character
 
-  character() (Str)
+  character() (string)
 
 =metadata character
 
@@ -490,7 +490,7 @@ this method dispatches to L</digit>.
 
 =signature collect
 
-  collect(Int $times, Str|CodeRef $code, Any @args) (Int|Str)
+  collect(number $times, string | coderef $code, any @args) (number | string)
 
 =metadata collect
 
@@ -809,7 +809,7 @@ The digit method returns a random digit between C<0> and C<9>.
 
 =signature digit
 
-  digit() (Int)
+  digit() (number)
 
 =metadata digit
 
@@ -899,7 +899,7 @@ The float method returns a random float.
 
 =signature float
 
-  float(Int $place, Int $from, Int $upto) (Num)
+  float(number $place, number $from, number $upto) (number)
 
 =metadata float
 
@@ -1218,7 +1218,7 @@ L</lowercased> value.
 
 =signature letter
 
-  letter() (Str)
+  letter() (string)
 
 =metadata letter
 
@@ -1308,7 +1308,7 @@ The lowercased method returns a random lowercased letter.
 
 =signature lowercased
 
-  lowercased() (Str)
+  lowercased() (string)
 
 =metadata lowercased
 
@@ -1400,7 +1400,7 @@ By default, if no arguments are provided, this method dispatches to L</digit>.
 
 =signature nonzero
 
-  nonzero(Str|CodeRef $code, Any @args) (Int|Str)
+  nonzero(string | coderef $code, any @args) (number | string)
 
 =metadata nonzero
 
@@ -1720,7 +1720,7 @@ first argument is provided, it's treated as the desired length of the number.
 
 =signature number
 
-  number(Int $from, Int $upto) (Num)
+  number(number $from, number $upto) (number)
 
 =metadata number
 
@@ -2284,7 +2284,7 @@ arguments are provided, the range is from C<0> to C<2147483647>.
 
 =signature range
 
-  range(Str $from, Str $to) (Int)
+  range(string $from, string $to) (number)
 
 =metadata range
 
@@ -2605,7 +2605,7 @@ as a list, in scalar context the results are concatenated.
 
 =signature repeat
 
-  repeat(Int $times, Str|CodeRef $code, Any @args) (Int|Str)
+  repeat(number $times, string | coderef $code, any @args) (number | string)
 
 =metadata repeat
 
@@ -2876,7 +2876,7 @@ the constructor. This method returns the object that invoked it.
 
 =signature reseed
 
-  reseed(Str $seed) (Random)
+  reseed(string $seed) (Venus::Random)
 
 =metadata reseed
 
@@ -2943,7 +2943,7 @@ method returns the object that invoked it.
 
 =signature reset
 
-  reset() (Random)
+  reset() (Venus::Random)
 
 =metadata reset
 
@@ -2980,7 +2980,7 @@ invoked it.
 
 =signature restore
 
-  restore() (Random)
+  restore() (Venus::Random)
 
 =metadata restore
 
@@ -3016,7 +3016,7 @@ provided.
 
 =signature select
 
-  select(ArrayRef|HashRef $data) (Any)
+  select(arrayref | hashref $data) (any)
 
 =metadata select
 
@@ -3182,7 +3182,7 @@ The symbol method returns a random symbol.
 
 =signature symbol
 
-  symbol() (Str)
+  symbol() (string)
 
 =metadata symbol
 
@@ -3272,7 +3272,7 @@ The uppercased method returns a random uppercased letter.
 
 =signature uppercased
 
-  uppercased() (Str)
+  uppercased() (string)
 
 =metadata uppercased
 
@@ -3358,8 +3358,8 @@ $test->for('example', 1, 'uppercased', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

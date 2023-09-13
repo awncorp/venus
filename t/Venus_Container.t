@@ -100,7 +100,7 @@ name provided.
 
 =signature metadata
 
-  metadata(Str $name) (Any)
+  metadata(string $name) (any)
 
 =metadata metadata
 
@@ -197,7 +197,7 @@ name provided.
 
 =signature reify
 
-  reify(Str $name) (Any)
+  reify(string $name) (any)
 
 =metadata reify
 
@@ -350,7 +350,7 @@ configuration key or service name provided.
 
 =signature resolve
 
-  resolve(Str $name) (Any)
+  resolve(string $name) (any)
 
 =metadata resolve
 
@@ -563,7 +563,7 @@ name provided.
 
 =signature services
 
-  services(Str $name) (Any)
+  services(string $name) (any)
 
 =metadata services
 
@@ -1920,8 +1920,8 @@ $test->for('example', 1, '#service', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

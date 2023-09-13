@@ -41,16 +41,6 @@ sub build_self {
 
 # METHODS
 
-sub assertion {
-  my ($self) = @_;
-
-  my $assert = $self->SUPER::assertion;
-
-  $assert->clear->expression('hashref');
-
-  return $assert;
-}
-
 sub default {
   my ($self) = @_;
 

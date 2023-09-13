@@ -116,7 +116,7 @@ arguments and returns a blessable data structure.
 
 =signature args
 
-  ARGS(Any @args) (HashRef)
+  ARGS(any @args) (hashref)
 
 =metadata args
 
@@ -195,7 +195,7 @@ accessors in the calling package.
 
 =signature attr
 
-  ATTR(Str $name, Any @args) (Str | Object)
+  ATTR(string $name, any @args) (string | object)
 
 =metadata attr
 
@@ -285,7 +285,7 @@ executed as a callback when the consuming class invokes the L</TEST> hook.
 
 =signature audit
 
-  AUDIT(Str $role) (Str | Object)
+  AUDIT(string $role) (string | object)
 
 =metadata audit
 
@@ -366,7 +366,7 @@ invoke the L</AUDIT> hook.
 
 =signature base
 
-  BASE(Str $name) (Str | Object)
+  BASE(string $name) (string | object)
 
 =metadata base
 
@@ -484,7 +484,7 @@ instance of the calling package.
 
 =signature bless
 
-  BLESS(Any @args) (Object)
+  BLESS(any @args) (object)
 
 =metadata bless
 
@@ -649,7 +649,7 @@ although its return value is ignored by the L</BLESS> hook.
 
 =signature build
 
-  BUILD(HashRef $data) (Object)
+  BUILD(hashref $data) (object)
 
 =metadata build
 
@@ -748,7 +748,7 @@ of arguments, a hashref, or key/value pairs.
 
 =signature buildargs
 
-  BUILDARGS(Any @args) (Any @args | HashRef $data)
+  BUILDARGS(any @args) (any @args | hashref $data)
 
 =metadata buildargs
 
@@ -874,7 +874,7 @@ the last reference to the object goes away.
 
 =signature destroy
 
-  DESTROY() (Any)
+  DESTROY() (any)
 
 =metadata destroy
 
@@ -924,7 +924,7 @@ interface provided.
 
 =signature does
 
-  DOES(Str $name) (Bool)
+  DOES(string $name) (boolean)
 
 =metadata does
 
@@ -1020,7 +1020,7 @@ the L</ROLE> or L</TEST> hooks are used.
 
 =signature export
 
-  EXPORT(Any @args) (ArrayRef)
+  EXPORT(any @args) (arrayref)
 
 =metadata export
 
@@ -1073,7 +1073,7 @@ hooks on the base class.
 
 =signature from
 
-  FROM(Str $name) (Str | Object)
+  FROM(string $name) (string | object)
 
 =metadata from
 
@@ -1174,7 +1174,7 @@ attributes I<"getters"> are dispatched to this method.
 
 =signature get
 
-  GET(Str $name) (Any)
+  GET(string $name) (any)
 
 =metadata get
 
@@ -1219,7 +1219,7 @@ L</EXPORT> lifecycle hook whenever the L</ROLE> or L</TEST> hooks are used.
 
 =signature import
 
-  IMPORT(Str $into, Any @args) (Str | Object)
+  IMPORT(string $into, any @args) (string | object)
 
 =metadata import
 
@@ -1286,7 +1286,7 @@ class attributes are dispatched to this method.
 
 =signature item
 
-  ITEM(Str $name, Any @args) (Str | Object)
+  ITEM(string $name, any @args) (string | object)
 
 =metadata item
 
@@ -1359,7 +1359,7 @@ configuration.
 
 =signature meta
 
-  META() (Meta)
+  META() (Venus::Meta)
 
 =metadata meta
 
@@ -1404,7 +1404,7 @@ wins.
 
 =signature mixin
 
-  MIXIN(Str $name) (Str | Object)
+  MIXIN(string $name) (string | object)
 
 =metadata mixin
 
@@ -1446,7 +1446,7 @@ the package.
 
 =signature name
 
-  NAME() (Str)
+  NAME() (string)
 
 =metadata name
 
@@ -1511,7 +1511,7 @@ same name (i.e. naming collisions) the first routine copied wins.
 
 =signature role
 
-  ROLE(Str $name) (Str | Object)
+  ROLE(string $name) (string | object)
 
 =metadata role
 
@@ -1597,7 +1597,7 @@ attributes I<"setters"> are dispatched to this method.
 
 =signature set
 
-  SET(Str $name, Any @args) (Any)
+  SET(string $name, any @args) (any)
 
 =metadata get
 
@@ -1642,7 +1642,7 @@ roles, but not inherited by superclasses.
 
 =signature subs
 
-  SUBS() (ArrayRef)
+  SUBS() (arrayref)
 
 =metadata subs
 
@@ -1680,7 +1680,7 @@ L</AUDIT> hook if defined.
 
 =signature test
 
-  TEST(Str $name) (Str | Object)
+  TEST(string $name) (string | object)
 
 =metadata test
 
@@ -1744,7 +1744,7 @@ whenever the L<perlfunc/no> declaration is used.
 
 =signature unimport
 
-  UNIMPORT(Str $into, Any @args) (Any)
+  UNIMPORT(string $into, any @args) (any)
 
 =metadata unimport
 
@@ -1781,7 +1781,7 @@ whenever the L<perlfunc/use> declaration is used.
 
 =signature use
 
-  USE(Str $into, Any @args) (Any)
+  USE(string $into, any @args) (any)
 
 =metadata use
 
@@ -1813,8 +1813,8 @@ $test->for('example', 1, 'use', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

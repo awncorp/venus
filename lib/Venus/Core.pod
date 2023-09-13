@@ -50,7 +50,7 @@ This package provides the following methods:
 
 =head2 args
 
-  ARGS(Any @args) (HashRef)
+  ARGS(any @args) (hashref)
 
 The ARGS method is a object construction lifecycle hook which accepts a list of
 arguments and returns a blessable data structure.
@@ -103,7 +103,7 @@ I<Since C<1.00>>
 
 =head2 attr
 
-  ATTR(Str $name, Any @args) (Str | Object)
+  ATTR(string $name, any @args) (string | object)
 
 The ATTR method is a class building lifecycle hook which installs an attribute
 accessors in the calling package.
@@ -166,7 +166,7 @@ I<Since C<1.00>>
 
 =head2 audit
 
-  AUDIT(Str $role) (Str | Object)
+  AUDIT(string $role) (string | object)
 
 The AUDIT method is a class building lifecycle hook which exist in roles and is
 executed as a callback when the consuming class invokes the L</TEST> hook.
@@ -229,7 +229,7 @@ I<Since C<1.00>>
 
 =head2 base
 
-  BASE(Str $name) (Str | Object)
+  BASE(string $name) (string | object)
 
 The BASE method is a class building lifecycle hook which registers a base class
 for the calling package. B<Note:> Unlike the L</FROM> hook, this hook doesn't
@@ -311,7 +311,7 @@ I<Since C<1.00>>
 
 =head2 bless
 
-  BLESS(Any @args) (Object)
+  BLESS(any @args) (object)
 
 The BLESS method is an object construction lifecycle hook which returns an
 instance of the calling package.
@@ -430,7 +430,7 @@ I<Since C<1.00>>
 
 =head2 build
 
-  BUILD(HashRef $data) (Object)
+  BUILD(hashref $data) (object)
 
 The BUILD method is an object construction lifecycle hook which receives an
 object and the data structure that was blessed, and should return an object
@@ -504,7 +504,7 @@ I<Since C<1.00>>
 
 =head2 buildargs
 
-  BUILDARGS(Any @args) (Any @args | HashRef $data)
+  BUILDARGS(any @args) (any @args | hashref $data)
 
 The BUILDARGS method is an object construction lifecycle hook which receives
 the arguments provided to the constructor (unaltered) and should return a list
@@ -598,7 +598,7 @@ I<Since C<1.00>>
 
 =head2 destroy
 
-  DESTROY() (Any)
+  DESTROY() (any)
 
 The DESTROY method is an object destruction lifecycle hook which is called when
 the last reference to the object goes away.
@@ -637,7 +637,7 @@ I<Since C<1.00>>
 
 =head2 does
 
-  DOES(Str $name) (Bool)
+  DOES(string $name) (boolean)
 
 The DOES method returns true or false if the invocant consumed the role or
 interface provided.
@@ -716,7 +716,7 @@ I<Since C<1.00>>
 
 =head2 export
 
-  EXPORT(Any @args) (ArrayRef)
+  EXPORT(any @args) (arrayref)
 
 The EXPORT method is a class building lifecycle hook which returns an arrayref
 of routine names to be automatically imported by the calling package whenever
@@ -758,7 +758,7 @@ I<Since C<1.00>>
 
 =head2 from
 
-  FROM(Str $name) (Str | Object)
+  FROM(string $name) (string | object)
 
 The FROM method is a class building lifecycle hook which registers a base class
 for the calling package, automatically invoking the L</AUDIT> and L</IMPORT>
@@ -837,7 +837,7 @@ I<Since C<1.00>>
 
 =head2 get
 
-  GET(Str $name) (Any)
+  GET(string $name) (any)
 
 The GET method is a class instance lifecycle hook which is responsible for
 I<"getting"> instance items (or attribute values). By default, all class
@@ -871,7 +871,7 @@ I<Since C<2.91>>
 
 =head2 import
 
-  IMPORT(Str $into, Any @args) (Str | Object)
+  IMPORT(string $into, any @args) (string | object)
 
 The IMPORT method is a class building lifecycle hook which dispatches the
 L</EXPORT> lifecycle hook whenever the L</ROLE> or L</TEST> hooks are used.
@@ -924,7 +924,7 @@ I<Since C<1.00>>
 
 =head2 item
 
-  ITEM(Str $name, Any @args) (Str | Object)
+  ITEM(string $name, any @args) (string | object)
 
 The ITEM method is a class instance lifecycle hook which is responsible for
 I<"getting"> and I<"setting"> instance items (or attributes). By default, all
@@ -982,7 +982,7 @@ I<Since C<1.11>>
 
 =head2 meta
 
-  META() (Meta)
+  META() (Venus::Meta)
 
 The META method return a L<Venus::Meta> object which describes the invocant's
 configuration.
@@ -1009,7 +1009,7 @@ I<Since C<1.00>>
 
 =head2 mixin
 
-  MIXIN(Str $name) (Str | Object)
+  MIXIN(string $name) (string | object)
 
 The MIXIN method is a class building lifecycle hook which consumes the mixin
 provided, automatically invoking the mixin's L</IMPORT> hook. The role
@@ -1047,7 +1047,7 @@ I<Since C<1.02>>
 
 =head2 name
 
-  NAME() (Str)
+  NAME() (string)
 
 The NAME method is a class building lifecycle hook which returns the name of
 the package.
@@ -1090,7 +1090,7 @@ I<Since C<1.00>>
 
 =head2 role
 
-  ROLE(Str $name) (Str | Object)
+  ROLE(string $name) (string | object)
 
 The ROLE method is a class building lifecycle hook which consumes the role
 provided, automatically invoking the role's L</IMPORT> hook. B<Note:> Unlike
@@ -1162,7 +1162,7 @@ I<Since C<1.00>>
 
 =head2 set
 
-  SET(Str $name, Any @args) (Any)
+  SET(string $name, any @args) (any)
 
 The SET method is a class instance lifecycle hook which is responsible for
 I<"setting"> instance items (or attribute values). By default, all class
@@ -1194,7 +1194,7 @@ attributes I<"setters"> are dispatched to this method.
 
 =head2 subs
 
-  SUBS() (ArrayRef)
+  SUBS() (arrayref)
 
 The SUBS method returns the routines defined on the package and consumed from
 roles, but not inherited by superclasses.
@@ -1221,7 +1221,7 @@ I<Since C<1.00>>
 
 =head2 test
 
-  TEST(Str $name) (Str | Object)
+  TEST(string $name) (string | object)
 
 The TEST method is a class building lifecycle hook which consumes the role
 provided, automatically invoking the role's L</IMPORT> hook as well as the
@@ -1274,7 +1274,7 @@ I<Since C<1.00>>
 
 =head2 unimport
 
-  UNIMPORT(Str $into, Any @args) (Any)
+  UNIMPORT(string $into, any @args) (any)
 
 The UNIMPORT method is a class building lifecycle hook which is invoked
 whenever the L<perlfunc/no> declaration is used.
@@ -1307,7 +1307,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

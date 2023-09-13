@@ -8,6 +8,7 @@ use warnings;
 use Test::More;
 use Venus::Test;
 use File::Temp;
+use Venus;
 
 my $test = test(__FILE__);
 my $path = File::Temp::tempdir(CLEANUP => 1);
@@ -73,6 +74,8 @@ method: name
 method: parent
 method: parse
 method: parts
+method: patch
+method: patched
 method: pfile
 method: prepend
 method: purge
@@ -92,6 +95,8 @@ method: tfile
 method: tryload
 method: use
 method: unload
+method: unloaded
+method: unpatch
 method: variables
 method: visible
 method: version
@@ -144,7 +149,7 @@ whose return value will be acted on by this method.
 
 =signature all
 
-  all(Str $method, Any @args) (ArrayRef[Tuple[Str, Any]])
+  all(string $method, any @args) (within[arrayref, tuple[string, any]])
 
 =metadata all
 
@@ -251,7 +256,7 @@ parts.
 
 =signature append
 
-  append(Str @path) (Space)
+  append(string @path) (Venus::Space)
 
 =metadata append
 
@@ -303,7 +308,7 @@ The array method gets or sets the value for the given package array variable nam
 
 =signature array
 
-  array(Str $name, Any @data) (ArrayRef)
+  array(string $name, any @data) (arrayref)
 
 =metadata array
 
@@ -366,7 +371,7 @@ names.
 
 =signature arrays
 
-  arrays() (ArrayRef)
+  arrays() (arrayref)
 
 =metadata arrays
 
@@ -406,7 +411,7 @@ their names. This will not include attributes from roles, mixins, or superclasse
 
 =signature attributes
 
-  attributes() (ArrayRef)
+  attributes() (arrayref)
 
 =metadata attributes
 
@@ -486,7 +491,7 @@ if any.
 
 =signature authority
 
-  authority() (Maybe[Str])
+  authority() (maybe[string])
 
 =metadata authority
 
@@ -549,7 +554,7 @@ The basename method returns the last segment of the package namespace parts.
 
 =signature basename
 
-  basename() (Str)
+  basename() (string)
 
 =metadata basename
 
@@ -647,7 +652,7 @@ successful returns the resulting object.
 
 =signature build
 
-  build(Any @args) (Self)
+  build(any @args) (Self)
 
 =metadata build
 
@@ -745,7 +750,7 @@ and if successful returns the resulting value.
 
 =signature call
 
-  call(Any @args) (Any)
+  call(any @args) (any)
 
 =metadata call
 
@@ -846,7 +851,7 @@ The chain method chains one or more method calls and returns the result.
 
 =signature chain
 
-  chain(Str | Tuple[Str, Any] @steps) (Any)
+  chain(string | tuple[string, any] @steps) (any)
 
 =metadata chain
 
@@ -961,7 +966,7 @@ package namespace.
 
 =signature child
 
-  child(Str @path) (Space)
+  child(string @path) (Venus::Space)
 
 =metadata child
 
@@ -995,7 +1000,7 @@ L<Venus::Space> objects for each child namespace found (one level deep).
 
 =signature children
 
-  children() (ArrayRef[Object])
+  children() (within[arrayref, object])
 
 =metadata children
 
@@ -1040,7 +1045,7 @@ this method.
 
 =signature cop
 
-  cop(Str $method, Any @args) (CodeRef)
+  cop(string $method, any @args) (coderef)
 
 =metadata cop
 
@@ -1115,7 +1120,7 @@ section of the package namespace.
 
 =signature data
 
-  data() (Str)
+  data() (string)
 
 =metadata data
 
@@ -1147,7 +1152,7 @@ represented by the instance.
 
 =signature eval
 
-  eval(Str @data) (Any)
+  eval(string @data) (any)
 
 =metadata eval
 
@@ -1208,7 +1213,7 @@ operations.
 
 =signature explain
 
-  explain() (Str)
+  explain() (string)
 
 =metadata explain
 
@@ -1240,7 +1245,7 @@ The hash method gets or sets the value for the given package hash variable name.
 
 =signature hash
 
-  hash(Str $name, Any @data) (HashRef)
+  hash(string $name, any @data) (hashref)
 
 =metadata hash
 
@@ -1307,7 +1312,7 @@ names.
 
 =signature hashes
 
-  hashes() (ArrayRef)
+  hashes() (arrayref)
 
 =metadata hashes
 
@@ -1351,7 +1356,7 @@ The id method returns the fully-qualified package name as a label.
 
 =signature id
 
-  id() (Str)
+  id() (string)
 
 =metadata id
 
@@ -1383,7 +1388,7 @@ The lfile method returns a C<.pm> file path for the underlying package.
 
 =signature lfile
 
-  lfile() (Str)
+  lfile() (string)
 
 =metadata lfile
 
@@ -1418,7 +1423,7 @@ created in-memory or on-disk, is flagged as being loaded and loadable.
 
 =signature init
 
-  init() (Str)
+  init() (string)
 
 =metadata init
 
@@ -1455,7 +1460,7 @@ derived from.
 
 =signature inherits
 
-  inherits() (ArrayRef)
+  inherits() (arrayref)
 
 =metadata inherits
 
@@ -1523,7 +1528,7 @@ The included method returns the path of the namespace if it exists in C<%INC>.
 
 =signature included
 
-  included() (Str | Undef)
+  included() (string | undef)
 
 =metadata included
 
@@ -1561,7 +1566,7 @@ fully-qualified subroutine name.
 
 =signature inject
 
-  inject(Str $name, Maybe[CodeRef] $coderef) (Any)
+  inject(string $name, maybe[coderef] $coderef) (any)
 
 =metadata inject
 
@@ -1601,7 +1606,7 @@ package.
 
 =signature integrates
 
-  integrates() (ArrayRef)
+  integrates() (arrayref)
 
 =metadata integrates
 
@@ -1662,7 +1667,7 @@ C<meta>, or C<import> routine it will be recognized as having been loaded.
 
 =signature load
 
-  load() (Str)
+  load() (string)
 
 =metadata load
 
@@ -1722,7 +1727,7 @@ returns truthy or falsy.
 
 =signature loaded
 
-  loaded() (Bool)
+  loaded() (boolean)
 
 =metadata loaded
 
@@ -1787,7 +1792,7 @@ string.
 
 =signature locate
 
-  locate() (Str)
+  locate() (string)
 
 =metadata locate
 
@@ -1848,7 +1853,7 @@ superclass' L<Venus::Core/META> method.
 
 =signature meta
 
-  meta() (Meta)
+  meta() (Venus::Meta)
 
 =metadata meta
 
@@ -1905,7 +1910,7 @@ package that derives from the invoking package.
 
 =signature mock
 
-  mock() (Space)
+  mock() (Venus::Space)
 
 =metadata mock
 
@@ -1943,7 +1948,7 @@ The name method returns the fully-qualified package name.
 
 =signature name
 
-  name() (Str)
+  name() (string)
 
 =metadata name
 
@@ -1976,7 +1981,7 @@ namespace.
 
 =signature parent
 
-  parent() (Space)
+  parent() (Venus::Space)
 
 =metadata parent
 
@@ -2010,7 +2015,7 @@ namespace segments (parts).
 
 =signature parse
 
-  parse() (ArrayRef)
+  parse() (arrayref)
 
 =metadata parse
 
@@ -2130,7 +2135,7 @@ The parts method returns an arrayref of package namespace segments (parts).
 
 =signature parts
 
-  parts() (ArrayRef)
+  parts() (arrayref)
 
 =metadata parts
 
@@ -2204,13 +2209,205 @@ $test->for('example', 3, 'parts', sub {
   $result
 });
 
+=method patch
+
+The patch method overwrites the named subroutine in the underlying package
+using the L</swap> operation, stashing the original subroutine reference to be
+reset later using L</unpatch>.
+
+=signature patch
+
+  patch(string $name, coderef $code) (Venus::Space)
+
+=metadata patch
+
+{
+  since => '0.01',
+}
+
+=cut
+
+=example-1 patch
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  my $patch = $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  # bless(..., "Venus::Space")
+
+  # $patch->patched;
+
+  # true
+
+  # Foo::Far->new->execute;
+
+  # 2
+
+=cut
+
+$test->for('example', 1, 'patch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+  is $result->patched, true;
+  is Foo::Far->new->execute, 2;
+  ok $result->unpatch('execute');
+  is Foo::Far->new->execute, 1;
+  $result->unload;
+
+  $result
+});
+
+=method patched
+
+The patched method confirms whether a subroutine in the underlying namespace
+has been patched using the L</patch> operation. If no name is provided, this
+method will return true if any subroutines have been patched.  If a name is
+provided, this method will return true only if the named subroutine has been
+patched, and otherwise returns false.
+
+=signature patched
+
+  patched(string $name) (boolean)
+
+=metadata patched
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 patched
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $patched = $space->patched;
+
+  # true
+
+=cut
+
+$test->for('example', 1, 'patched', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, true;
+  Venus::Space->new('foo/far')->unload;
+
+  $result
+});
+
+=example-2 patched
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $patched = $space->patched('execute');
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'patched', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, true;
+  Venus::Space->new('foo/far')->unload;
+
+  $result
+});
+
+=example-3 patched
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $patched = $space->patched('prepare');
+
+  # false
+
+=cut
+
+$test->for('example', 3, 'patched', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, false;
+  Venus::Space->new('foo/far')->unload;
+
+  !$result
+});
+
 =method pfile
 
 The pfile method returns a C<.pod> file path for the underlying package.
 
 =signature pfile
 
-  pfile() (Str)
+  pfile() (string)
 
 =metadata pfile
 
@@ -2245,7 +2442,7 @@ parts.
 
 =signature prepend
 
-  prepend(Str @path) (Space)
+  prepend(string @path) (Venus::Space)
 
 =metadata prepend
 
@@ -2354,7 +2551,7 @@ specified to the base of the current object's namespace.
 
 =signature rebase
 
-  rebase(Str @path) (Space)
+  rebase(string @path) (Venus::Space)
 
 =metadata rebase
 
@@ -2389,7 +2586,7 @@ symbols but does not remove symbols.
 
 =signature reload
 
-  reload() (Str)
+  reload() (string)
 
 =metadata reload
 
@@ -2478,7 +2675,7 @@ specified.
 
 =signature require
 
-  require(Str $target) (Any)
+  require(string $target) (any)
 
 =metadata require
 
@@ -2512,7 +2709,7 @@ objects were derived.
 
 =signature root
 
-  root() (Str)
+  root() (string)
 
 =metadata root
 
@@ -2545,7 +2742,7 @@ name.
 
 =signature routine
 
-  routine(Str $name, CodeRef $code) (CodeRef)
+  routine(string $name, coderef $code) (coderef)
 
 =metadata routine
 
@@ -2625,7 +2822,7 @@ their names.
 
 =signature routines
 
-  routines() (ArrayRef)
+  routines() (arrayref)
 
 =metadata routines
 
@@ -2671,7 +2868,7 @@ The scalar method gets or sets the value for the given package scalar variable n
 
 =signature scalar
 
-  scalar(Str $name, Any @data) (Any)
+  scalar(string $name, any @data) (any)
 
 =metadata scalar
 
@@ -2734,7 +2931,7 @@ names.
 
 =signature scalars
 
-  scalars() (ArrayRef)
+  scalars() (arrayref)
 
 =metadata scalars
 
@@ -2775,7 +2972,7 @@ namespace.
 
 =signature sibling
 
-  sibling(Str $path) (Space)
+  sibling(string $path) (Venus::Space)
 
 =metadata sibling
 
@@ -2809,7 +3006,7 @@ L<Venus::Space> objects for each sibling namespace found (one level deep).
 
 =signature siblings
 
-  siblings() (ArrayRef[Object])
+  siblings() (within[arrayref, object])
 
 =metadata siblings
 
@@ -2853,7 +3050,7 @@ namespace.
 
 =signature splice
 
-  splice(Int $offset, Int $length, Any @list) (Space)
+  splice(number $offset, number $length, any @list) (Venus::Space)
 
 =metadata splice
 
@@ -2962,7 +3159,7 @@ subroutine as its first argument.
 
 =signature swap
 
-  swap(Str $name, CodeRef $code) (CodeRef)
+  swap(string $name, coderef $code) (coderef)
 
 =metadata swap
 
@@ -3046,7 +3243,7 @@ The tfile method returns a C<.t> file path for the underlying package.
 
 =signature tfile
 
-  tfile() (Str)
+  tfile() (string)
 
 =metadata tfile
 
@@ -3082,7 +3279,7 @@ loaded.
 
 =signature tryload
 
-  tryload() (Bool)
+  tryload() (boolean)
 
 =metadata tryload
 
@@ -3140,7 +3337,7 @@ specified.
 
 =signature use
 
-  use(Str | Tuple[Str, Str] $target, Any @params) (Space)
+  use(string | tuple[string, string] $target, any @params) (Venus::Space)
 
 =metadata use
 
@@ -3298,7 +3495,7 @@ returns truthy or falsy.
 
 =signature unloaded
 
-  unloaded() (Bool)
+  unloaded() (boolean)
 
 =metadata unloaded
 
@@ -3356,6 +3553,137 @@ $test->for('example', 2, 'unloaded', sub {
   !$result
 });
 
+=method unpatch
+
+The unpatch method restores a subroutine which has been patched using the
+L</patch> operation to its original subroutine reference. If no name is
+provided, this method will restore all subroutines have been patched. If a name
+is provided, this method will only restore the named subroutine has been
+patched.
+
+=signature unpatch
+
+  unpatch(string @names) (Venus::Space)
+
+=metadata unpatch
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 unpatch
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $unpatch = $space->unpatch;
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 1, 'unpatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+  is $result->patched, false;
+  Venus::Space->new('foo/far')->unload;
+
+  $result
+});
+
+=example-2 unpatch
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $unpatch = $space->unpatch('execute');
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 2, 'unpatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+  is $result->patched, false;
+  Venus::Space->new('foo/far')->unload;
+
+  $result
+});
+
+=example-3 unpatch
+
+  package Foo::Far;
+
+  use Venus::Class;
+
+  sub execute {
+    1
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo/far');
+
+  $space->patch('execute', sub {
+    $_[0]->() + 1
+  });
+
+  my $unpatch = $space->unpatch('prepare');
+
+  # bless(..., "Venus::Space")
+
+=cut
+
+$test->for('example', 3, 'unpatch', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Space";
+  is $result->patched, true;
+  Venus::Space->new('foo/far')->unload;
+
+  $result
+});
+
 =method variables
 
 The variables method searches the package namespace for variables and returns
@@ -3363,7 +3691,7 @@ their names.
 
 =signature variables
 
-  variables() (ArrayRef[Tuple[Str, ArrayRef]])
+  variables() (within[arrayref, tuple[string, arrayref]])
 
 =metadata variables
 
@@ -3415,7 +3743,7 @@ symbols defined.
 
 =signature visible
 
-  visible() (Bool)
+  visible() (boolean)
 
 =metadata visible
 
@@ -3526,7 +3854,7 @@ any.
 
 =signature version
 
-  version() (Maybe[Str])
+  version() (maybe[string])
 
 =metadata version
 
@@ -3953,8 +4281,8 @@ $test->for('example', 1, 'error_on_swap', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

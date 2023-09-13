@@ -118,7 +118,7 @@ passed the log level and the log messages.
 
 =signature handler
 
-  handler(CodeRef $code) (CodeRef)
+  handler(coderef $code) (coderef)
 
 =metadata handler
 
@@ -156,7 +156,7 @@ in that order. Invalid log levels effectively disable logging.
 
 =signature level
 
-  level(Str $name) (Str)
+  level(string $name) (string)
 
 =metadata level
 
@@ -194,7 +194,7 @@ The separator attribute holds the value used to join multiple log message argume
 
 =signature separator
 
-  separator(Any $data) (Any)
+  separator(any $data) (any)
 
 =metadata separator
 
@@ -232,7 +232,7 @@ The debug method logs C<debug> information and returns the invocant.
 
 =signature debug
 
-  debug(Str @data) (Log)
+  debug(string @data) (Venus::Log)
 
 =metadata debug
 
@@ -299,7 +299,7 @@ The error method logs C<error> information and returns the invocant.
 
 =signature error
 
-  error(Str @data) (Log)
+  error(string @data) (Venus::Log)
 
 =metadata error
 
@@ -366,7 +366,7 @@ The fatal method logs C<fatal> information and returns the invocant.
 
 =signature fatal
 
-  fatal(Str @data) (Log)
+  fatal(string @data) (Venus::Log)
 
 =metadata fatal
 
@@ -433,7 +433,7 @@ The info method logs C<info> information and returns the invocant.
 
 =signature info
 
-  info(Str @data) (Log)
+  info(string @data) (Venus::Log)
 
 =metadata info
 
@@ -501,7 +501,7 @@ the L</output>, and can be overridden by subclasses.
 
 =signature input
 
-  input(Str @data) (Str)
+  input(string @data) (string)
 
 =metadata input
 
@@ -535,7 +535,7 @@ The new method returns a new instance of this package.
 
 =signature new
 
-  new(Str $level | Any %args | HashRef $args) (Log)
+  new(string $level | any %args | hashref $args) (Venus::Log)
 
 =metadata new
 
@@ -625,7 +625,7 @@ the log handler, and can be overridden by subclasses.
 
 =signature output
 
-  output(Str @data) (Str)
+  output(string @data) (string)
 
 =metadata output
 
@@ -660,7 +660,7 @@ and is used by the L</output> method.
 
 =signature string
 
-  string(Any $data) (Str)
+  string(any $data) (string)
 
 =metadata string
 
@@ -755,7 +755,7 @@ The trace method logs C<trace> information and returns the invocant.
 
 =signature trace
 
-  trace(Str @data) (Log)
+  trace(string @data) (Venus::Log)
 
 =metadata trace
 
@@ -822,7 +822,7 @@ The warn method logs C<warn> information and returns the invocant.
 
 =signature warn
 
-  warn(Str @data) (Log)
+  warn(string @data) (Venus::Log)
 
 =metadata warn
 
@@ -889,7 +889,7 @@ The write method invokes the log handler, i.e. L</handler>, and returns the invo
 
 =signature write
 
-  write(Str $level, Any @data) (Log)
+  write(string $level, any @data) (Venus::Log)
 
 =metadata write
 
@@ -926,8 +926,8 @@ $test->for('example', 1, 'write', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

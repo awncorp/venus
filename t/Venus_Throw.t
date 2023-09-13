@@ -107,7 +107,7 @@ The as method sets a L</name> for the error and returns the invocant.
 
 =signature as
 
-  as(Str $name) (Throw)
+  as(string $name) (Venus::Throw)
 
 =metadata as
 
@@ -145,7 +145,7 @@ the object stash, and returns the invocant.
 
 =signature capture
 
-  capture(Any @args) (Throw)
+  capture(any @args) (Venus::Throw)
 
 =metadata capture
 
@@ -184,7 +184,7 @@ The error method throws the prepared error object.
 
 =signature error
 
-  error(HashRef $data) (Error)
+  error(hashref $data) (Venus::Error)
 
 =metadata error
 
@@ -415,7 +415,7 @@ returns the invocant.
 
 =signature on
 
-  on(Str $name) (Throw)
+  on(string $name) (Venus::Throw)
 
 =metadata on
 
@@ -529,8 +529,8 @@ $test->for('example', 1, '(~~)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

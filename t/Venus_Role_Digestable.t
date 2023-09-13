@@ -103,7 +103,7 @@ arguments whose return value will be acted on by this method.
 
 =signature digest
 
-  digest(Str $algo, Str $method, Any @args) (Str)
+  digest(string $algo, string $method, any @args) (string)
 
 =metadata digest
 
@@ -180,7 +180,7 @@ arguments whose return value will be acted on by this method.
 
 =signature digester
 
-  digester(Str $algo, Str $method, Any @args) (Str)
+  digester(string $algo, string $method, any @args) (string)
 
 =metadata digester
 
@@ -237,7 +237,7 @@ return value will be acted on by this method.
 
 =signature b64digest
 
-  b64digest(Str $algo, Str $method, Any @args) (Str)
+  b64digest(string $algo, string $method, any @args) (string)
 
 =metadata b64digest
 
@@ -314,7 +314,7 @@ return value will be acted on by this method.
 
 =signature bindigest
 
-  bindigest(Str $algo, Str $method, Any @args) (Str)
+  bindigest(string $algo, string $method, any @args) (string)
 
 =metadata bindigest
 
@@ -391,7 +391,7 @@ return value will be acted on by this method.
 
 =signature hexdigest
 
-  hexdigest(Str $algo, Str $method, Any @args) (Str)
+  hexdigest(string $algo, string $method, any @args) (string)
 
 =metadata hexdigest
 
@@ -461,8 +461,8 @@ $test->for('example', 3, 'hexdigest', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -164,7 +164,7 @@ attribute accessor named.
 
 =signature attr
 
-  attr(Str $name) (Bool)
+  attr(string $name) (boolean)
 
 =metadata attr
 
@@ -219,7 +219,7 @@ referenced.
 
 =signature attrs
 
-  attrs() (ArrayRef)
+  attrs() (arrayref)
 
 =metadata attrs
 
@@ -268,7 +268,7 @@ the package named.
 
 =signature base
 
-  base(Str $name) (Bool)
+  base(string $name) (boolean)
 
 =metadata base
 
@@ -323,7 +323,7 @@ referenced.
 
 =signature bases
 
-  bases() (ArrayRef)
+  bases() (arrayref)
 
 =metadata bases
 
@@ -366,7 +366,7 @@ for the package referenced.
 
 =signature data
 
-  data() (HashRef)
+  data() (hashref)
 
 =metadata data
 
@@ -423,7 +423,7 @@ and returns the result.
 
 =signature emit
 
-  emit(Str $name, Any @args) (Any)
+  emit(string $name, any @args) (any)
 
 =metadata emit
 
@@ -463,7 +463,7 @@ be any one of C<attr>, C<base>, C<mixin>, or C<role>.
 
 =signature find
 
-  find(Str $type, Str $name) (Tuple[Str,Tuple[Int,ArrayRef]])
+  find(string $type, string $name) (tuple[string,tuple[number,arrayref]])
 
 =metadata find
 
@@ -567,7 +567,7 @@ can be either C<attrs>, C<bases>, C<roles>, or C<subs>.
 
 =signature local
 
-  local(Str $type) (ArrayRef)
+  local(string $type) (arrayref)
 
 =metadata local
 
@@ -690,7 +690,7 @@ the mixin named.
 
 =signature mixin
 
-  mixin(Str $name) (Bool)
+  mixin(string $name) (boolean)
 
 =metadata mixin
 
@@ -743,7 +743,7 @@ referenced.
 
 =signature mixins
 
-  mixins() (ArrayRef)
+  mixins() (arrayref)
 
 =metadata mixins
 
@@ -779,7 +779,7 @@ The new method returns a new instance of this package.
 
 =signature new
 
-  new(Any %args | HashRef $args) (Object)
+  new(any %args | hashref $args) (object)
 
 =metadata new
 
@@ -836,7 +836,7 @@ the role named.
 
 =signature role
 
-  role(Str $name) (Bool)
+  role(string $name) (boolean)
 
 =metadata role
 
@@ -890,7 +890,7 @@ The roles method returns all of the roles composed into the package referenced.
 
 =signature roles
 
-  roles() (ArrayRef)
+  roles() (arrayref)
 
 =metadata roles
 
@@ -930,7 +930,7 @@ be any one of C<attr>, C<base>, C<mixin>, or C<role>.
 
 =signature search
 
-  search(Str $from, Str $type, Str $name) (ArrayRef[Tuple[Str,Tuple[Int,ArrayRef]]])
+  search(string $from, string $type, string $name) (within[arrayref, tuple[string,tuple[number,arrayref]]])
 
 =metadata search
 
@@ -1036,7 +1036,7 @@ subroutine named on the package directly, or any of its superclasses.
 
 =signature sub
 
-  sub(Str $name) (Bool)
+  sub(string $name) (boolean)
 
 =metadata sub
 
@@ -1091,7 +1091,7 @@ referenced.
 
 =signature subs
 
-  subs() (ArrayRef)
+  subs() (arrayref)
 
 =metadata subs
 
@@ -1149,8 +1149,8 @@ $test->for('example', 1, 'subs', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

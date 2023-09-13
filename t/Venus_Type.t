@@ -101,7 +101,7 @@ The code method returns the name of the value's data type.
 
 =signature code
 
-  code() (Str | Undef)
+  code() (string | undef)
 
 =metadata code
 
@@ -178,7 +178,7 @@ the result of L</code>.
 
 =signature coded
 
-  coded(Str $code) (Bool)
+  coded(string $code) (boolean)
 
 =metadata coded
 
@@ -227,7 +227,7 @@ The deduce methods returns the argument as a data type object.
 
 =signature deduce
 
-  deduce() (Object)
+  deduce() (object)
 
 =metadata deduce
 
@@ -326,7 +326,7 @@ nested data.
 
 =signature deduce_deep
 
-  deduce_deep() (Object)
+  deduce_deep() (object)
 
 =metadata deduce_deep
 
@@ -404,7 +404,7 @@ The detract method returns the argument as native Perl data type value.
 
 =signature detract
 
-  detract() (Any)
+  detract() (any)
 
 =metadata detract
 
@@ -511,7 +511,7 @@ including nested data.
 
 =signature detract_deep
 
-  detract_deep() (Any)
+  detract_deep() (any)
 
 =metadata detract_deep
 
@@ -574,7 +574,7 @@ method will return "scalar" as the data type.
 
 =signature identify
 
-  identify() (Bool, Bool, Str)
+  identify() (boolean, boolean, string)
 
 =metadata identify
 
@@ -683,7 +683,7 @@ C<ref()>.
 
 =signature package
 
-  package() (Str)
+  package() (string)
 
 =metadata package
 
@@ -733,8 +733,8 @@ $test->for('example', 2, 'package', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

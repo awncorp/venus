@@ -92,7 +92,7 @@ L<"boolean"|Venus::Boolean> values.
 
 =signature is_false
 
-  is_false(Str | CodeRef $method, Any @args) (Bool)
+  is_false(string | coderef $method, any @args) (boolean)
 
 =metadata is_false
 
@@ -168,7 +168,7 @@ L<"boolean"|Venus::Boolean> values.
 
 =signature is_true
 
-  is_true(Str | CodeRef $method, Any @args) (Bool)
+  is_true(string | coderef $method, any @args) (boolean)
 
 =metadata is_true
 
@@ -238,8 +238,8 @@ $test->for('example', 3, 'is_true', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -224,6 +224,7 @@ function: array
 function: arrayref
 function: assert
 function: async
+function: atom
 function: await
 function: bool
 function: box
@@ -235,6 +236,7 @@ function: chain
 function: check
 function: clargs
 function: cli
+function: clone
 function: code
 function: config
 function: container
@@ -242,10 +244,12 @@ function: cop
 function: data
 function: date
 function: docs
+function: enum
 function: error
 function: false
 function: fault
 function: float
+function: future
 function: gather
 function: hash
 function: hashref
@@ -437,7 +441,7 @@ the coderef or method provided.
 
 =signature args
 
-  args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  args(arrayref $value, string | coderef $code, any @args) (any)
 
 =metadata args
 
@@ -494,7 +498,7 @@ to the coderef or method provided.
 
 =signature array
 
-  array(ArrayRef | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  array(arrayref | hashref $value, string | coderef $code, any @args) (any)
 
 =metadata array
 
@@ -551,7 +555,7 @@ The arrayref function takes a list of arguments and returns a arrayref.
 
 =signature arrayref
 
-  arrayref(Any @args) (ArrayRef)
+  arrayref(any @args) (arrayref)
 
 =metadata arrayref
 
@@ -626,7 +630,7 @@ a L<Venus::Assert/validate> operation.
 
 =signature assert
 
-  assert(Any $data, Str $expr) (Any)
+  assert(any $data, string $expr) (any)
 
 =metadata assert
 
@@ -664,7 +668,7 @@ $test->for('example', 1, 'assert', sub {
 
   my $assert = assert(1234567890, 'float');
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =cut
 
@@ -672,7 +676,28 @@ $test->for('example', 2, 'assert', sub {
   my ($tryable) = @_;
   my $result = $tryable->error->result;
   ok defined $result;
-  isa_ok $result, 'Venus::Assert::Error';
+  isa_ok $result, 'Venus::Check::Error';
+
+  $result
+});
+
+=example-3 assert
+
+  package main;
+
+  use Venus 'assert';
+
+  my $assert = assert(1234567890, 'number | float');
+
+  # 1234567890
+
+=cut
+
+$test->for('example', 3, 'assert', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->error->result;
+  ok defined $result;
+  is $result, 1234567890;
 
   $result
 });
@@ -680,13 +705,12 @@ $test->for('example', 2, 'assert', sub {
 =function async
 
 The async function accepts a callback and executes it asynchronously via
-L<Venus::Process/async>. This function returns a
-L<"dyadic"|Venus::Process/is_dyadic> L<Venus::Process> object which can be used
-with L</await>.
+L<Venus::Process/future>. This function returns a L<Venus::Future> object which
+can be fulfilled via L<Venus::Future/wait>.
 
 =signature async
 
-  async(CodeRef $code, Any @args) (Process)
+  async(coderef $code, any @args) (Venus::Future)
 
 =metadata async
 
@@ -706,7 +730,7 @@ with L</await>.
     'done'
   };
 
-  # bless({...}, 'Venus::Process')
+  # bless({...}, 'Venus::Future')
 
 =cut
 
@@ -718,22 +742,64 @@ $test->for('example', 1, 'async', sub {
   }
   my ($tryable) = @_;
   local $TEST_VENUS_PROCESS_FORK = 0;
-  ok my $result = $tryable->result;
-  ok $result->{directory};
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Future";
+
+  $result
+});
+
+=function atom
+
+The atom function builds and returns a L<Venus::Atom> object.
+
+=signature atom
+
+  atom(any $value) (Venus::Atom)
+
+=metadata atom
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 atom
+
+  package main;
+
+  use Venus 'atom';
+
+  my $atom = atom 'super-admin';
+
+  # bless({scope => sub{...}}, "Venus::Atom")
+
+  # "$atom"
+
+  # "super-admin"
+
+=cut
+
+$test->for('example', 1, 'atom', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Atom";
+  is $result->get, "super-admin";
 
   $result
 });
 
 =function await
 
-The await function accepts a L<"dyadic"|Venus::Process/is_dyadic>
-L<Venus::Process> object and eventually returns a value (or values) for it. The
-value(s) returned are the return values or emissions from the asychronous
-callback executed with L</async> which produced the process object.
+The await function accepts a L<Venus::Future> object and eventually returns a
+value (or values) for it. The value(s) returned are the return values or
+emissions from the asychronous callback executed with L</async> which produced
+the process object.
 
 =signature await
 
-  await(Process $process, Int $timeout) (Any)
+  await(Venus::Future $future, number $timeout) (any)
 
 =metadata await
 
@@ -752,14 +818,12 @@ callback executed with L</async> which produced the process object.
   my $process;
 
   my $async = async sub{
-    ($process) = @_;
-    # in forked process ...
     return 'done';
   };
 
   my $await = await $async;
 
-  # ['done']
+  # bless(..., "Venus::Future")
 
 =cut
 
@@ -774,8 +838,8 @@ $test->for('example', 1, 'await', sub {
   local $TEST_VENUS_PROCESS_PING = 0;
   local $TEST_VENUS_PROCESS_TIME = time + 1;
   local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
-  ok my $result = $tryable->result;
-  is_deeply $result, ['done'];
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Future";
 
   $result
 });
@@ -786,7 +850,7 @@ The bool function builds and returns a L<Venus::Boolean> object.
 
 =signature bool
 
-  bool(Any $value) (Boolean)
+  bool(any $value) (Venus::Boolean)
 
 =metadata bool
 
@@ -844,7 +908,7 @@ The box function returns a L<Venus::Box> object for the argument provided.
 
 =signature box
 
-  box(Any $data) (Box)
+  box(any $data) (Venus::Box)
 
 =metadata box
 
@@ -903,7 +967,7 @@ the result.
 
 =signature call
 
-  call(Str | Object | CodeRef $data, Any @args) (Any)
+  call(string | object | coderef $data, any @args) (any)
 
 =metadata call
 
@@ -1010,7 +1074,7 @@ name of the type for the object to cast to explicitly.
 
 =signature cast
 
-  cast(Any $data, Str $type) (Object)
+  cast(any $data, string $type) (object)
 
 =metadata cast
 
@@ -1110,7 +1174,7 @@ argument in list context.
 
 =signature catch
 
-  catch(CodeRef $block) (Error, Any)
+  catch(coderef $block) (Venus::Error, any)
 
 =metadata catch
 
@@ -1193,7 +1257,7 @@ the exception object on success and C<undef> on failure.
 
 =signature caught
 
-  caught(Object $error, Str | Tuple[Str, Str] $identity, CodeRef $block) (Any)
+  caught(object $error, string | tuple[string, string] $identity, coderef $block) (any)
 
 =metadata caught
 
@@ -1440,7 +1504,7 @@ values) and returns the result.
 
 =signature chain
 
-  chain(Str | Object | CodeRef $self, Str | ArrayRef[Str] @args) (Any)
+  chain(string | object | coderef $self, string | within[arrayref, string] @args) (any)
 
 =metadata chain
 
@@ -1495,7 +1559,7 @@ a L<Venus::Assert/check> operation.
 
 =signature check
 
-  check(Any $data, Str $expr) (Bool)
+  check(any $data, string $expr) (boolean)
 
 =metadata check
 
@@ -1555,7 +1619,7 @@ will be taken from C<@ARGV>.
 
 =signature clargs
 
-  clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+  clargs(arrayref $args, arrayref $spec) (Venus::Args, Venus::Opts, Venus::Vars)
 
 =metadata clargs
 
@@ -1658,7 +1722,7 @@ The cli function builds and returns a L<Venus::Cli> object.
 
 =signature cli
 
-  cli(ArrayRef $args) (Cli)
+  cli(arrayref $args) (Venus::Cli)
 
 =metadata cli
 
@@ -1713,6 +1777,77 @@ $test->for('example', 2, 'cli', sub {
   $result
 });
 
+=function clone
+
+The clone function uses L<Storable/dclone> to perform a deep clone of the
+reference provided and returns a copy.
+
+=signature clone
+
+  clone(ref $value) (ref)
+
+=metadata clone
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 clone
+
+  package main;
+
+  use Venus 'clone';
+
+  my $orig = {1..4};
+
+  my $clone = clone $orig;
+
+  $orig->{3} = 5;
+
+  my $result = $clone;
+
+  # {1..4}
+
+=cut
+
+$test->for('example', 1, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is_deeply $result, {1..4};
+
+  $result
+});
+
+=example-2 clone
+
+  package main;
+
+  use Venus 'clone';
+
+  my $orig = {1,2,3,{1..4}};
+
+  my $clone = clone $orig;
+
+  $orig->{3}->{3} = 5;
+
+  my $result = $clone;
+
+  # {1,2,3,{1..4}}
+
+=cut
+
+$test->for('example', 2, 'clone', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is_deeply $result, {1,2,3,{1..4}};
+
+  $result
+});
+
 =function code
 
 The code function builds and returns a L<Venus::Code> object, or dispatches
@@ -1720,7 +1855,7 @@ to the coderef or method provided.
 
 =signature code
 
-  code(CodeRef $value, Str | CodeRef $code, Any @args) (Any)
+  code(coderef $value, string | coderef $code, any @args) (any)
 
 =metadata code
 
@@ -1781,7 +1916,7 @@ to the coderef or method provided.
 
 =signature config
 
-  config(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  config(hashref $value, string | coderef $code, any @args) (any)
 
 =metadata config
 
@@ -1840,7 +1975,7 @@ dispatches to the coderef or method provided.
 
 =signature container
 
-  container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  container(hashref $value, string | coderef $code, any @args) (any)
 
 =metadata container
 
@@ -1913,7 +2048,7 @@ and if successful returns a closure.
 
 =signature cop
 
-  cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
+  cop(string | object | coderef $self, string $name) (coderef)
 
 =metadata cop
 
@@ -1970,7 +2105,7 @@ to the coderef or method provided.
 
 =signature data
 
-  data(Str $value, Str | CodeRef $code, Any @args) (Any)
+  data(string $value, string | coderef $code, any @args) (any)
 
 =metadata data
 
@@ -2028,7 +2163,7 @@ the coderef or method provided.
 
 =signature date
 
-  date(Int $value, Str | CodeRef $code, Any @args) (Any)
+  date(number $value, string | coderef $code, any @args) (any)
 
 =metadata date
 
@@ -2110,7 +2245,7 @@ the result of a L<Venus::Data/string> operation using the arguments provided.
 
 =signature docs
 
-  docs(Any @args) (Any)
+  docs(any @args) (any)
 
 =metadata docs
 
@@ -2180,6 +2315,89 @@ $test->for('example', 2, 'docs', sub {
   $result
 });
 
+=function enum
+
+The enum function builds and returns a L<Venus::Enum> object.
+
+=signature enum
+
+  enum(arrayref | hashref $value) (Venus::Enum)
+
+=metadata enum
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 enum
+
+  package main;
+
+  use Venus 'enum';
+
+  my $themes = enum ['light', 'dark'];
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # my $result = $themes->get('dark');
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # "$result"
+
+  # "dark"
+
+=cut
+
+$test->for('example', 1, 'enum', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Enum";
+  my $returned = $result->get('dark');
+  isa_ok $returned, "Venus::Enum";
+  is "$returned", "dark";
+
+  !$result
+});
+
+=example-2 enum
+
+  package main;
+
+  use Venus 'enum';
+
+  my $themes = enum {
+    light => 'light_theme',
+    dark => 'dark_theme',
+  };
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # my $result = $themes->get('dark');
+
+  # bless({scope => sub{...}}, "Venus::Enum")
+
+  # "$result"
+
+  # "dark_theme"
+
+=cut
+
+$test->for('example', 2, 'enum', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Enum";
+  my $returned = $result->get('dark');
+  isa_ok $returned, "Venus::Enum";
+  is "$returned", "dark_theme";
+
+  !$result
+});
+
 =function error
 
 The error function throws a L<Venus::Error> exception object using the
@@ -2187,7 +2405,7 @@ exception object arguments provided.
 
 =signature error
 
-  error(Maybe[HashRef] $args) (Error)
+  error(maybe[hashref] $args) (Venus::Error)
 
 =metadata error
 
@@ -2248,7 +2466,7 @@ practically indistinguishable from the conventional numerical C<0> value.
 
 =signature false
 
-  false() (Bool)
+  false() (boolean)
 
 =metadata false
 
@@ -2302,7 +2520,7 @@ system failure, and isn't meant to be caught.
 
 =signature fault
 
-  fault(Str $args) (Fault)
+  fault(string $args) (Venus::Fault)
 
 =metadata fault
 
@@ -2361,7 +2579,7 @@ to the coderef or method provided.
 
 =signature float
 
-  float(Str $value, Str | CodeRef $code, Any @args) (Any)
+  float(string $value, string | coderef $code, any @args) (any)
 
 =metadata float
 
@@ -2412,6 +2630,52 @@ $test->for('example', 2, 'float', sub {
   $result
 });
 
+=function future
+
+The future function builds and returns a L<Venus::Future> object.
+
+=signature future
+
+  future(coderef $code) (Venus::Future)
+
+=metadata future
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 future
+
+  package main;
+
+  use Venus 'future';
+
+  my $future = future(sub{
+    my ($resolve, $reject) = @_;
+
+    return int(rand(2)) ? $resolve->result('pass') : $reject->result('fail');
+  });
+
+  # bless(..., "Venus::Future")
+
+  # $future->is_pending;
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'future', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  isa_ok $result, "Venus::Future";
+  ok !$result->is_pending;
+
+  $result
+});
+
 =function gather
 
 The gather function builds a L<Venus::Gather> object, passing it and the value
@@ -2420,7 +2684,7 @@ L<Venus::Gather/result>.
 
 =signature gather
 
-  gather(Any $value, CodeRef $callback) (Any)
+  gather(any $value, coderef $callback) (any)
 
 =metadata gather
 
@@ -2558,7 +2822,7 @@ to the coderef or method provided.
 
 =signature hash
 
-  hash(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  hash(hashref $value, string | coderef $code, any @args) (any)
 
 =metadata hash
 
@@ -2615,7 +2879,7 @@ The hashref function takes a list of arguments and returns a hashref.
 
 =signature hashref
 
-  hashref(Any @args) (HashRef)
+  hashref(any @args) (hashref)
 
 =metadata hashref
 
@@ -2710,7 +2974,7 @@ not merely truthy, and L</false> otherwise.
 
 =signature is_bool
 
-  is_bool(Any $arg) (Bool)
+  is_bool(any $arg) (boolean)
 
 =metadata is_bool
 
@@ -2811,7 +3075,7 @@ falsy.
 
 =signature is_false
 
-  is_false(Any $data) (Bool)
+  is_false(any $data) (boolean)
 
 =metadata is_false
 
@@ -2870,7 +3134,7 @@ truthy.
 
 =signature is_true
 
-  is_true(Any $data) (Bool)
+  is_true(any $data) (boolean)
 
 =metadata is_true
 
@@ -2930,7 +3194,7 @@ and returns the result.
 
 =signature json
 
-  json(Str $call, Any $data) (Any)
+  json(string $call, any $data) (any)
 
 =metadata json
 
@@ -3041,7 +3305,7 @@ returning a list of scalars.
 
 =signature list
 
-  list(Any @args) (Any)
+  list(any @args) (any)
 
 =metadata list
 
@@ -3117,7 +3381,7 @@ The load function loads the package provided and returns a L<Venus::Space> objec
 
 =signature load
 
-  load(Any $name) (Space)
+  load(any $name) (Venus::Space)
 
 =metadata load
 
@@ -3156,7 +3420,7 @@ the C<VENUS_LOG_LEVEL> environment variable and defaults to C<trace>.
 
 =signature log
 
-  log(Any @args) (Log)
+  log(any @args) (Venus::Log)
 
 =metadata log
 
@@ -3197,7 +3461,7 @@ returns the result which should be a package string or an object.
 
 =signature make
 
-  make(Str $package, Any @args) (Any)
+  make(string $package, any @args) (any)
 
 =metadata make
 
@@ -3253,7 +3517,7 @@ L<Venus::Match/result>.
 
 =signature match
 
-  match(Any $value, CodeRef $callback) (Any)
+  match(any $value, coderef $callback) (any)
 
 =metadata match
 
@@ -3416,7 +3680,7 @@ provided.
 
 =signature merge
 
-  merge(Any @args) (Any)
+  merge(any @args) (any)
 
 =metadata merge
 
@@ -3471,7 +3735,7 @@ the coderef or method provided.
 
 =signature meta
 
-  meta(Str $value, Str | CodeRef $code, Any @args) (Any)
+  meta(string $value, string | coderef $code, any @args) (any)
 
 =metadata meta
 
@@ -3529,7 +3793,7 @@ the coderef or method provided.
 
 =signature name
 
-  name(Str $value, Str | CodeRef $code, Any @args) (Any)
+  name(string $value, string | coderef $code, any @args) (any)
 
 =metadata name
 
@@ -3587,7 +3851,7 @@ to the coderef or method provided.
 
 =signature number
 
-  number(Num $value, Str | CodeRef $code, Any @args) (Any)
+  number(Num $value, string | coderef $code, any @args) (any)
 
 =metadata number
 
@@ -3645,7 +3909,7 @@ the coderef or method provided.
 
 =signature opts
 
-  opts(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  opts(arrayref $value, string | coderef $code, any @args) (any)
 
 =metadata opts
 
@@ -3708,7 +3972,7 @@ arrayref for all other values provided. Returns a list in list context.
 
 =signature pairs
 
-  pairs(Any $data) (ArrayRef)
+  pairs(any $data) (arrayref)
 
 =metadata pairs
 
@@ -3805,7 +4069,7 @@ to the coderef or method provided.
 
 =signature path
 
-  path(Str $value, Str | CodeRef $code, Any @args) (Any)
+  path(string $value, string | coderef $code, any @args) (any)
 
 =metadata path
 
@@ -3865,7 +4129,7 @@ and returns the result.
 
 =signature perl
 
-  perl(Str $call, Any $data) (Any)
+  perl(string $call, any $data) (any)
 
 =metadata perl
 
@@ -3964,7 +4228,7 @@ dispatches to the coderef or method provided.
 
 =signature process
 
-  process(Str | CodeRef $code, Any @args) (Any)
+  process(string | coderef $code, any @args) (any)
 
 =metadata process
 
@@ -4022,7 +4286,7 @@ dispatches to the coderef or method provided.
 
 =signature proto
 
-  proto(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  proto(hashref $value, string | coderef $code, any @args) (any)
 
 =metadata proto
 
@@ -4089,7 +4353,7 @@ the preceeding scalar reference and returns all the values selected.
 
 =signature puts
 
-  puts(Any @args) (ArrayRef)
+  puts(any @args) (arrayref)
 
 =metadata puts
 
@@ -4141,7 +4405,7 @@ provided.
 
 =signature raise
 
-  raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+  raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
 
 =metadata raise
 
@@ -4227,7 +4491,7 @@ to the coderef or method provided.
 
 =signature random
 
-  random(Str | CodeRef $code, Any @args) (Any)
+  random(string | coderef $code, any @args) (any)
 
 =metadata random
 
@@ -4289,7 +4553,7 @@ The range function returns the result of a L<Venus::Array/range> operation.
 
 =signature range
 
-  range(Int | Str @args) (ArrayRef)
+  range(number | string @args) (arrayref)
 
 =metadata range
 
@@ -4346,7 +4610,7 @@ to the coderef or method provided.
 
 =signature regexp
 
-  regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
+  regexp(string $value, string | coderef $code, any @args) (any)
 
 =metadata regexp
 
@@ -4408,7 +4672,7 @@ L<Venus::Template>, and returns the result.
 
 =signature render
 
-  render(Str $data, HashRef $args) (Str)
+  render(string $data, hashref $args) (string)
 
 =metadata render
 
@@ -4447,7 +4711,7 @@ dispatches to the coderef or method provided.
 
 =signature replace
 
-  replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  replace(arrayref $value, string | coderef $code, any @args) (any)
 
 =metadata replace
 
@@ -4506,7 +4770,7 @@ The resolve function builds and returns an object via L<Venus::Container/resolve
 
 =signature resolve
 
-  resolve(HashRef $value, Any @args) (Any)
+  resolve(hashref $value, any @args) (any)
 
 =metadata resolve
 
@@ -4573,7 +4837,7 @@ L</call> function.
 
 =signature roll
 
-  roll(Str $name, Any @args) (Any)
+  roll(string $name, any @args) (any)
 
 =metadata roll
 
@@ -4629,7 +4893,7 @@ to the coderef or method provided.
 
 =signature search
 
-  search(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+  search(arrayref $value, string | coderef $code, any @args) (any)
 
 =metadata search
 
@@ -4687,7 +4951,7 @@ The space function returns a L<Venus::Space> object for the package provided.
 
 =signature space
 
-  space(Any $name) (Space)
+  space(any $name) (Venus::Space)
 
 =metadata space
 
@@ -4723,7 +4987,7 @@ to the coderef or method provided.
 
 =signature schema
 
-  schema(Str $value, Str | CodeRef $code, Any @args) (Any)
+  schema(string $value, string | coderef $code, any @args) (any)
 
 =metadata schema
 
@@ -4781,7 +5045,7 @@ to the coderef or method provided.
 
 =signature string
 
-  string(Str $value, Str | CodeRef $code, Any @args) (Any)
+  string(string $value, string | coderef $code, any @args) (any)
 
 =metadata string
 
@@ -4840,7 +5104,7 @@ list context, returns the output of the operation and the exit code.
 
 =signature syscall
 
-  syscall(Int | Str @args) (Any)
+  syscall(number | string @args) (any)
 
 =metadata syscall
 
@@ -4951,7 +5215,7 @@ dispatches to the coderef or method provided.
 
 =signature template
 
-  template(Str $value, Str | CodeRef $code, Any @args) (Any)
+  template(string $value, string | coderef $code, any @args) (any)
 
 =metadata template
 
@@ -5011,7 +5275,7 @@ the coderef or method provided.
 
 =signature test
 
-  test(Str $value, Str | CodeRef $code, Any @args) (Any)
+  test(string $value, string | coderef $code, any @args) (any)
 
 =metadata test
 
@@ -5071,7 +5335,7 @@ the result of a L<Venus::Data/string> operation using the arguments provided.
 
 =signature text
 
-  text(Any @args) (Any)
+  text(any @args) (any)
 
 =metadata text
 
@@ -5205,7 +5469,7 @@ the result as a list, prepended with the invocant.
 
 =signature then
 
-  then(Str | Object | CodeRef $self, Any @args) (Any)
+  then(string | object | coderef $self, any @args) (any)
 
 =metadata then
 
@@ -5240,7 +5504,7 @@ to the coderef or method provided.
 
 =signature throw
 
-  throw(Str | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  throw(string | hashref $value, string | coderef $code, any @args) (any)
 
 =metadata throw
 
@@ -5329,7 +5593,7 @@ practically indistinguishable from the conventional numerical C<1> value.
 
 =signature true
 
-  true() (Bool)
+  true() (boolean)
 
 =metadata true
 
@@ -5383,7 +5647,7 @@ the coderef or method provided.
 
 =signature try
 
-  try(Any $data, Str | CodeRef $code, Any @args) (Any)
+  try(any $data, string | coderef $code, any @args) (any)
 
 =metadata try
 
@@ -5473,7 +5737,7 @@ the coderef or method provided.
 
 =signature type
 
-  type(Any $data, Str | CodeRef $code, Any @args) (Any)
+  type(any $data, string | coderef $code, any @args) (any)
 
 =metadata type
 
@@ -5535,7 +5799,7 @@ The unpack function builds and returns a L<Venus::Unpack> object.
 
 =signature unpack
 
-  unpack(Any @args) (Unpack)
+  unpack(any @args) (Venus::Unpack)
 
 =metadata unpack
 
@@ -5614,7 +5878,7 @@ the coderef or method provided.
 
 =signature vars
 
-  vars(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+  vars(hashref $value, string | coderef $code, any @args) (any)
 
 =metadata vars
 
@@ -5671,7 +5935,7 @@ the name provided and returns an instance of that package.
 
 =signature venus
 
-  venus(Str $name, Any @args) (Any)
+  venus(string $name, any @args) (any)
 
 =metadata venus
 
@@ -5751,7 +6015,7 @@ returns an instance of L<Venus::Process> representing the current process.
 
 =signature work
 
-  work(CodeRef $callback) (Process)
+  work(coderef $callback) (Venus::Process)
 
 =metadata work
 
@@ -5800,7 +6064,7 @@ are stripped from the package to create the function name.
 
 =signature wrap
 
-  wrap(Str $data, Str $name) (CodeRef)
+  wrap(string $data, string $name) (coderef)
 
 =metadata wrap
 
@@ -5876,7 +6140,7 @@ and returns the result.
 
 =signature yaml
 
-  yaml(Str $call, Any $data) (Any)
+  yaml(string $call, any $data) (any)
 
 =metadata yaml
 
@@ -6422,7 +6686,7 @@ $test->for('authors');
 
 =license
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

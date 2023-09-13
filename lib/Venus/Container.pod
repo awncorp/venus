@@ -57,7 +57,7 @@ This package provides the following methods:
 
 =head2 metadata
 
-  metadata(Str $name) (Any)
+  metadata(string $name) (any)
 
 The metadata method returns the C<$metadata> section of the configuration data
 if no name is provided, otherwise returning the specific metadata keyed on the
@@ -131,7 +131,7 @@ I<Since C<3.20>>
 
 =head2 reify
 
-  reify(Str $name) (Any)
+  reify(string $name) (any)
 
 The reify method resolves and returns an object or value based on the service
 name provided.
@@ -254,7 +254,7 @@ I<Since C<3.20>>
 
 =head2 resolve
 
-  resolve(Str $name) (Any)
+  resolve(string $name) (any)
 
 The resolve method resolves and returns an object or value based on the
 configuration key or service name provided.
@@ -437,7 +437,7 @@ I<Since C<3.20>>
 
 =head2 services
 
-  services(Str $name) (Any)
+  services(string $name) (any)
 
 The services method returns the C<$services> section of the configuration data
 if no name is provided, otherwise returning the specific service keyed on the
@@ -520,285 +520,6 @@ I<Since C<3.20>>
 This package provides the following features:
 
 =cut
-
-=over 4
-
-=item $callback
-
-This package supports resolving services as callbacks to be passed around
-and/or resolved by other services. The C<$callback> directive is used to
-specify the name of a service to be resolved and passed as an argument.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$services' => {
-      log => {
-        package => "Venus/Path",
-        argument => '.',
-      },
-      lazy_log => {
-        package => "Venus/Code",
-        argument => {
-          '$callback' => 'log',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('lazy_log');
-
-  # bless(..., 'Venus::Code')
-
-  # my $return = $result->call;
-
-  # bless(..., 'Venus::Path')
-
-=back
-
-=over 4
-
-=item $envvar
-
-This package supports inlining environment variables as arguments to services.
-The C<$envvar> directive is used to specify the name of an environment variable,
-and can also be used in metadata for reusability.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$services' => {
-      home => {
-        package => "Venus/Path",
-        argument => {
-          '$envvar' => 'home',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('home');
-
-  # bless(..., 'Venus::Path')
-
-B<example 2>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$metadata' => {
-      home => {
-        '$envvar' => 'home',
-      }
-    },
-    '$services' => {
-      home => {
-        package => "Venus/Path",
-        argument => {
-          '$metadata' => 'home',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('home');
-
-  # bless(..., 'Venus::Path')
-
-=back
-
-=over 4
-
-=item $function
-
-This package supports inlining the result of a service resolution and function
-call as arguments to services. The C<#> delimited C<$function> directive is
-used to specify the name of an existing service on the right-hand side, and an
-arbitrary function to be call on the result on the left-hand side.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$services' => {
-      filespec => {
-        package => 'File/Spec/Functions',
-      },
-      tempdir => {
-        package => "Venus/Path",
-        argument => {
-          '$function' => 'filespec#tmpdir',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('tempdir');
-
-  # bless(..., 'Venus::Path')
-
-=back
-
-=over 4
-
-=item $metadata
-
-This package supports inlining configuration data as arguments to services. The
-C<$metadata> directive is used to specify the name of a stashed configuration
-value or data structure.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$metadata' => {
-      home => '/home/ubuntu',
-    },
-    '$services' => {
-      home => {
-        package => "Venus/Path",
-        argument => {
-          '$metadata' => 'home',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('home');
-
-  # bless(..., 'Venus::Path')
-
-=back
-
-=over 4
-
-=item $method
-
-This package supports inlining the result of a service resolution and method
-call as arguments to services. The C<#> delimited C<$method> directive is used
-to specify the name of an existing service on the right-hand side, and an
-arbitrary method to be call on the result on the left-hand side.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$services' => {
-      filespec => {
-        package => 'File/Spec',
-      },
-      tempdir => {
-        package => "Venus/Path",
-        argument => {
-          '$method' => 'filespec#tmpdir',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('tempdir');
-
-  # bless(..., 'Venus::Path')
-
-=back
-
-=over 4
-
-=item $routine
-
-This package supports inlining the result of a service resolution and routine
-call as arguments to services. The C<#> delimited C<$routine> directive is used
-to specify the name of an existing service on the right-hand side, and an
-arbitrary routine to be call on the result on the left-hand side.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$services' => {
-      filespec => {
-        package => 'File/Spec',
-      },
-      tempdir => {
-        package => "Venus/Path",
-        argument => {
-          '$routine' => 'filespec#tmpdir',
-        }
-      }
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('tempdir');
-
-  # bless(..., 'Venus::Path')
-
-=back
-
-=over 4
-
-=item $service
-
-This package supports inlining resolved services as arguments to other
-services. The C<$service> directive is used to specify the name of a service to
-be resolved and passed as an argument.
-
-B<example 1>
-
-  package main;
-
-  use Venus::Container;
-
-  my $container = Venus::Container->new({
-    '$services' => {
-      'path' => {
-        'package' => 'Venus/Path',
-      },
-    }
-  });
-
-  # bless(..., 'Venus::Container')
-
-  # my $result = $container->resolve('path');
-
-  # bless(..., 'Venus::Path')
-
-=back
 
 =over 4
 
@@ -1398,6 +1119,285 @@ B<example 1>
 
 =back
 
+=over 4
+
+=item $callback
+
+This package supports resolving services as callbacks to be passed around
+and/or resolved by other services. The C<$callback> directive is used to
+specify the name of a service to be resolved and passed as an argument.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$services' => {
+      log => {
+        package => "Venus/Path",
+        argument => '.',
+      },
+      lazy_log => {
+        package => "Venus/Code",
+        argument => {
+          '$callback' => 'log',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('lazy_log');
+
+  # bless(..., 'Venus::Code')
+
+  # my $return = $result->call;
+
+  # bless(..., 'Venus::Path')
+
+=back
+
+=over 4
+
+=item $envvar
+
+This package supports inlining environment variables as arguments to services.
+The C<$envvar> directive is used to specify the name of an environment variable,
+and can also be used in metadata for reusability.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$services' => {
+      home => {
+        package => "Venus/Path",
+        argument => {
+          '$envvar' => 'home',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('home');
+
+  # bless(..., 'Venus::Path')
+
+B<example 2>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$metadata' => {
+      home => {
+        '$envvar' => 'home',
+      }
+    },
+    '$services' => {
+      home => {
+        package => "Venus/Path",
+        argument => {
+          '$metadata' => 'home',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('home');
+
+  # bless(..., 'Venus::Path')
+
+=back
+
+=over 4
+
+=item $function
+
+This package supports inlining the result of a service resolution and function
+call as arguments to services. The C<#> delimited C<$function> directive is
+used to specify the name of an existing service on the right-hand side, and an
+arbitrary function to be call on the result on the left-hand side.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$services' => {
+      filespec => {
+        package => 'File/Spec/Functions',
+      },
+      tempdir => {
+        package => "Venus/Path",
+        argument => {
+          '$function' => 'filespec#tmpdir',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('tempdir');
+
+  # bless(..., 'Venus::Path')
+
+=back
+
+=over 4
+
+=item $metadata
+
+This package supports inlining configuration data as arguments to services. The
+C<$metadata> directive is used to specify the name of a stashed configuration
+value or data structure.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$metadata' => {
+      home => '/home/ubuntu',
+    },
+    '$services' => {
+      home => {
+        package => "Venus/Path",
+        argument => {
+          '$metadata' => 'home',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('home');
+
+  # bless(..., 'Venus::Path')
+
+=back
+
+=over 4
+
+=item $method
+
+This package supports inlining the result of a service resolution and method
+call as arguments to services. The C<#> delimited C<$method> directive is used
+to specify the name of an existing service on the right-hand side, and an
+arbitrary method to be call on the result on the left-hand side.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$services' => {
+      filespec => {
+        package => 'File/Spec',
+      },
+      tempdir => {
+        package => "Venus/Path",
+        argument => {
+          '$method' => 'filespec#tmpdir',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('tempdir');
+
+  # bless(..., 'Venus::Path')
+
+=back
+
+=over 4
+
+=item $routine
+
+This package supports inlining the result of a service resolution and routine
+call as arguments to services. The C<#> delimited C<$routine> directive is used
+to specify the name of an existing service on the right-hand side, and an
+arbitrary routine to be call on the result on the left-hand side.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$services' => {
+      filespec => {
+        package => 'File/Spec',
+      },
+      tempdir => {
+        package => "Venus/Path",
+        argument => {
+          '$routine' => 'filespec#tmpdir',
+        }
+      }
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('tempdir');
+
+  # bless(..., 'Venus::Path')
+
+=back
+
+=over 4
+
+=item $service
+
+This package supports inlining resolved services as arguments to other
+services. The C<$service> directive is used to specify the name of a service to
+be resolved and passed as an argument.
+
+B<example 1>
+
+  package main;
+
+  use Venus::Container;
+
+  my $container = Venus::Container->new({
+    '$services' => {
+      'path' => {
+        'package' => 'Venus/Path',
+      },
+    }
+  });
+
+  # bless(..., 'Venus::Container')
+
+  # my $result = $container->resolve('path');
+
+  # bless(..., 'Venus::Path')
+
+=back
+
 =head1 AUTHORS
 
 Awncorp, C<awncorp@cpan.org>
@@ -1406,7 +1406,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

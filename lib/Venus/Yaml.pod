@@ -87,7 +87,7 @@ This package provides the following methods:
 
 =head2 decode
 
-  decode(Str $yaml) (Any)
+  decode(string $yaml) (any)
 
 The decode method decodes the YAML string, sets the object value, and returns
 the decoded value.
@@ -110,7 +110,7 @@ I<Since C<0.01>>
 
 =head2 encode
 
-  encode() (Str)
+  encode() (string)
 
 The encode method encodes the objects value as a YAML string and returns the
 encoded string.
@@ -171,7 +171,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

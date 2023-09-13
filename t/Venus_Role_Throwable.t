@@ -81,13 +81,13 @@ $test->for('description');
 
 The error method dispatches to the L</throw> method, excepts a hashref of
 options to be provided to the L</throw> method, and returns the result unless
-an exception is raised automatically. If the C<throw> argument
-is provided it is excepte to be the name of a method used as a callback to
-provide arguments to the thrower.
+an exception is raised automatically. If the C<throw> option is provided it is
+excepted to be the name of a method used as a callback to provide arguments to
+the thrower.
 
 =signature error
 
-  error(HashRef $data) (Any)
+  error(hashref $data) (any)
 
 =metadata error
 
@@ -273,7 +273,7 @@ throw the exception.
 
 =signature throw
 
-  throw(Maybe[Str | HashRef] $data, Any @args) (Any)
+  throw(maybe[string | hashref] $data, any @args) (any)
 
 =metadata throw
 
@@ -442,8 +442,8 @@ $test->for('example', 5, 'throw', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

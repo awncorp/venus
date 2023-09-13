@@ -89,7 +89,7 @@ unpacking and validating arbitrary argument lists.
 
 =signature unpack
 
-  unpack(Any @args) (Venus::Unpack)
+  unpack(any @args) (Venus::Unpack)
 
 =metadata unpack
 
@@ -168,8 +168,8 @@ $test->for('example', 3, 'unpack', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

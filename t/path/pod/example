@@ -1,0 +1,270 @@
+=encoding
+
+utf8
+
+=cut
+
+=name
+
+Example
+
+=cut
+
+=tagline
+
+Example Class
+
+=cut
+
+=abstract
+
+Example Test Documentation
+
+=cut
+
+=version
+
+1.2.3
+
+=cut
+
+=includes
+
+function: eg
+
+method: prepare
+method: execute
+
+=cut
+
+=synopsis
+
+  use Example;
+
+  my $example = Example->new;
+
+  # bless(..., "Example")
+
+=cut
+
+=description
+
+This package provides an example class.
+
+=cut
+
+=inherits
+
+Venus::Core::Class
+
+=cut
+
+=integrates
+
+Venus::Role::Catchable
+Venus::Role::Throwable
+
+=cut
+
+=libraries
+
+Venus::Check
+
+=cut
+
+=attribute name
+
+The name attribute is read-write, optional, and holds a string.
+
+=cut
+
+=example-1 name
+
+  # given: synopsis
+
+  my $name = $example->name;
+
+  # "..."
+
+=cut
+
+=function eg
+
+The eg function returns a new instance of Example.
+
+=cut
+
+=example-1 name
+
+  # given: synopsis
+
+  my $example = eg();
+
+  # "..."
+
+=cut
+
+=message accept
+
+The accept message represents acceptance.
+
+=cut
+
+=example-1 accept
+
+  # given: synopsis
+
+  my $accept = $example->accept;
+
+  # "..."
+
+=cut
+
+=message reject
+
+The reject message represents a lack of acceptance.
+
+=cut
+
+=example-1 reject
+
+  # given: synopsis
+
+  my $reject = $example->reject;
+
+  # "..."
+
+=cut
+
+=method prepare
+
+The prepare method prepares for execution.
+
+=cut
+
+=signature prepare
+
+  prepare() (boolean)
+
+=cut
+
+=metadata prepare
+
+{since => "1.2.3"}
+
+=cut
+
+=example-1 prepare
+
+  # given: synopsis
+
+  my $prepare = $example->prepare;
+
+  # "..."
+
+=cut
+
+=method execute
+
+The execute method executes the logic.
+
+=cut
+
+=signature execute
+
+  execute() (boolean)
+
+=cut
+
+=metadata execute
+
+{since => "1.2.3"}
+
+=cut
+
+=example-1 execute
+
+  # given: synopsis
+
+  my $execute = $example->execute;
+
+  # "..."
+
+=cut
+
+=error error_on_unknown
+
+This package may raise an error_on_unknown error.
+
+=cut
+
+=example-1 error_on_unknown
+
+  # given: synopsis
+
+  my $error = $example->catch('error', {
+    with => 'error_on_unknown',
+  });
+
+  # "..."
+
+=cut
+
+=operator ("")
+
+This package overloads the C<""> operator.
+
+=cut
+
+=example-1 ("")
+
+  # given: synopsis
+
+  my $string = "$example";
+
+  # "..."
+
+=cut
+
+=feature noop
+
+This package is no particularly useful features.
+
+=cut
+
+=layout
+
+encoding
+name
+synopsis
+description
+attributes: attribute
+authors
+license
+
+=cut
+
+=partials
+
+t/path/to/other.t: present: authors
+t/path/to/other.t: present: license
+
+=cut
+
+=authors
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=license
+
+No license granted.
+
+=cut
+
+=project
+
+https://github.com/awncorp/example
+
+=cut

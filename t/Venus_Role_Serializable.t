@@ -93,7 +93,7 @@ dispatched method call, and returns the result.
 
 =signature serialize
 
-  serialize(Str | CodeRef $code, Any @args) (Any)
+  serialize(string | coderef $code, any @args) (any)
 
 =metadata serialize
 
@@ -458,8 +458,8 @@ $test->for('example', 10, 'serialize', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

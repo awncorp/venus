@@ -98,7 +98,7 @@ invocant.
 
 =signature publish
 
-  publish(Str $name, Any @args) (Self)
+  publish(string $name, any @args) (object)
 
 =metadata publish
 
@@ -201,7 +201,7 @@ and returns the invocant.
 
 =signature subscribe
 
-  subscribe(Str $name, CodeRef $code) (Self)
+  subscribe(string $name, coderef $code) (object)
 
 =metadata subscribe
 
@@ -279,7 +279,7 @@ given event.
 
 =signature subscribers
 
-  subscribers(Str $name) (Int)
+  subscribers(string $name) (number)
 
 =metadata subscribers
 
@@ -360,7 +360,7 @@ event, or a specific callback if provided, and returns the invocant.
 
 =signature unsubscribe
 
-  unsubscribe(Str $name, CodeRef $code) (Self)
+  unsubscribe(string $name, coderef $code) (object)
 
 =metadata unsubscribe
 
@@ -484,8 +484,8 @@ $test->for('example', 4, 'unsubscribe', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -121,7 +121,7 @@ The default method returns the default value, i.e. C<{%ENV}>.
 
 =signature default
 
-  default() (HashRef)
+  default() (hashref)
 
 =metadata default
 
@@ -154,7 +154,7 @@ value exists.
 
 =signature exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 =metadata exists
 
@@ -240,7 +240,7 @@ The get method takes a name or index and returns the associated value.
 
 =signature get
 
-  get(Str $key) (Any)
+  get(string $key) (any)
 
 =metadata get
 
@@ -327,7 +327,7 @@ value exists.
 
 =signature name
 
-  name(Str $key) (Str | Undef)
+  name(string $key) (string | undef)
 
 =metadata name
 
@@ -414,7 +414,7 @@ associated argument exists.
 
 =signature set
 
-  set(Str $key, Any $value) (Any)
+  set(string $key, any $value) (any)
 
 =metadata set
 
@@ -501,7 +501,7 @@ using the C<named> attribute.
 
 =signature unnamed
 
-  unnamed() (HashRef)
+  unnamed() (hashref)
 
 =metadata unnamed
 
@@ -536,8 +536,8 @@ $test->for('example', 1, 'unnamed', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

@@ -119,7 +119,7 @@ elements provided.
 
 =signature all
 
-  all(CodeRef $code) (Bool)
+  all(coderef $code) (boolean)
 
 =metadata all
 
@@ -153,7 +153,7 @@ elements provided.
 
 =signature any
 
-  any(CodeRef $code) (Bool)
+  any(coderef $code) (boolean)
 
 =metadata any
 
@@ -187,7 +187,7 @@ structure.
 
 =signature count
 
-  count() (Num)
+  count() (number)
 
 =metadata count
 
@@ -219,7 +219,7 @@ the key provided, returning the item.
 
 =signature delete
 
-  delete(Str $key) (Any)
+  delete(string $key) (any)
 
 =metadata delete
 
@@ -251,7 +251,7 @@ passing the key and value as arguments.
 
 =signature each
 
-  each(CodeRef $code) (ArrayRef)
+  each(coderef $code) (arrayref)
 
 =metadata each
 
@@ -316,7 +316,7 @@ otherwise it returns false.
 
 =signature exists
 
-  exists(Str $key) (Bool)
+  exists(string $key) (boolean)
 
 =metadata exists
 
@@ -349,7 +349,7 @@ returned true.
 
 =signature grep
 
-  grep(CodeRef $code) (ArrayRef)
+  grep(coderef $code) (arrayref)
 
 =metadata grep
 
@@ -385,7 +385,7 @@ the iterator will return an undefined value.
 
 =signature iterator
 
-  iterator() (CodeRef)
+  iterator() (coderef)
 
 =metadata iterator
 
@@ -417,7 +417,7 @@ data structure.
 
 =signature keys
 
-  keys() (ArrayRef)
+  keys() (arrayref)
 
 =metadata keys
 
@@ -451,7 +451,7 @@ the items for which the argument returns a value or non-empty list.
 
 =signature map
 
-  map(CodeRef $code) (ArrayRef)
+  map(coderef $code) (arrayref)
 
 =metadata map
 
@@ -485,7 +485,7 @@ meet the criteria set by the operand and rvalue.
 
 =signature none
 
-  none(CodeRef $code) (Bool)
+  none(coderef $code) (boolean)
 
 =metadata none
 
@@ -519,7 +519,7 @@ structure meet the criteria set by the operand and rvalue.
 
 =signature one
 
-  one(CodeRef $code) (Bool)
+  one(coderef $code) (boolean)
 
 =metadata one
 
@@ -554,7 +554,7 @@ item in the data structure.
 
 =signature pairs
 
-  pairs(CodeRef $code) (Tuple[ArrayRef, ArrayRef])
+  pairs(coderef $code) (tuple[arrayref, arrayref])
 
 =metadata pairs
 
@@ -587,7 +587,7 @@ The random method should return a random item from the data structure.
 
 =signature random
 
-  random() (Any)
+  random() (any)
 
 =metadata random
 
@@ -620,7 +620,7 @@ ordered.
 
 =signature reverse
 
-  reverse() (ArrayRef)
+  reverse() (arrayref)
 
 =metadata reverse
 
@@ -652,7 +652,7 @@ the invocant at the key(s) specified in the arguments.
 
 =signature slice
 
-  slice(Str @keys) (ArrayRef)
+  slice(string @keys) (arrayref)
 
 =metadata slice
 
@@ -678,8 +678,8 @@ the invocant at the key(s) specified in the arguments.
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

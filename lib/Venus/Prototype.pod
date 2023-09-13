@@ -69,7 +69,7 @@ This package provides the following methods:
 
 =head2 apply
 
-  apply(HashRef $data) (Prototype)
+  apply(hashref $data) (Venus::Prototype)
 
 The apply method extends the underlying data structure by merging the data
 provided, and then returns the invocant.
@@ -133,7 +133,7 @@ I<Since C<1.50>>
 
 =head2 call
 
-  call(Str $method, Any @args) (Any)
+  call(string $method, any @args) (any)
 
 The call method dispatches method calls based on the method name provided and
 the state of the object, and returns the results. If the method name provided
@@ -183,7 +183,7 @@ I<Since C<1.50>>
 
 =head2 extend
 
-  extend(HashRef $data) (Prototype)
+  extend(hashref $data) (Venus::Prototype)
 
 The extend method copies the underlying data structure, merging the data
 provided if any, and then returns a new prototype object.
@@ -260,7 +260,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -1,0 +1,103 @@
+
+=head1 NAME
+
+Venus::Role::Superable - Superable Role
+
+=cut
+
+=head1 ABSTRACT
+
+Superable Role for Perl 5
+
+=cut
+
+=head1 SYNOPSIS
+
+  package Example;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Superable';
+
+  package main;
+
+  my $example = Example->new;
+
+  # $example->super;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package modifies the consuming package and provides methods for
+dispatching to superclasses using L<mro/next::method>.
+
+=cut
+
+=head1 METHODS
+
+This package provides the following methods:
+
+=cut
+
+=head2 super
+
+  super(any @args) (any)
+
+The super method dispatches to superclasses uses the C3 method resolution order
+to get better consistency in multiple inheritance situations.
+
+I<Since C<3.55>>
+
+=over 4
+
+=item super example 1
+
+  package Example::A;
+
+  use Venus::Class;
+
+  sub test {
+    my ($self, @args) = @_;
+
+    return [$self, @args];
+  }
+
+  package Example::B;
+
+  use Venus::Class;
+
+  base 'Example::A';
+
+  with 'Venus::Role::Superable';
+
+  sub test {
+    my ($self) = @_;
+
+    return $self->super(1..4);
+  }
+
+  package main;
+
+  my $example = Example::B->new;
+
+  my $result = $example->test;
+
+=back
+
+=cut
+
+=head1 AUTHORS
+
+Awncorp, C<awncorp@cpan.org>
+
+=cut
+
+=head1 LICENSE
+
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Apache license version 2.0.
+
+=cut

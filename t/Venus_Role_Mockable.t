@@ -100,7 +100,7 @@ as the subroutine mock.
 
 =signature mock
 
-  mock(Str $name, CodeRef $code) (CodeRef)
+  mock(string $name, coderef $code) (coderef)
 
 =metadata mock
 
@@ -146,8 +146,8 @@ $test->for('example', 1, 'mock', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

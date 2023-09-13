@@ -47,7 +47,7 @@ This package provides the following methods:
 
 =head2 try
 
-  try(Str | CodeRef $method, Any @args) (Try)
+  try(string | coderef $method, any @args) (Venus::Try)
 
 The try method returns a L<Venus::Try> object having the invocant, callback,
 arguments pre-configured. This method supports dispatching, i.e. providing a
@@ -79,7 +79,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

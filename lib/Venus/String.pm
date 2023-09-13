@@ -35,11 +35,25 @@ sub append_with {
 sub assertion {
   my ($self) = @_;
 
-  my $assert = $self->SUPER::assertion;
+  my $assertion = $self->SUPER::assertion;
 
-  $assert->clear->expression('string | number | float | boolean');
+  $assertion->match('bool')->format(sub{
+    (ref $self || $self)->new($_)
+  });
 
-  return $assert;
+  $assertion->match('float')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  $assertion->match('number')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  $assertion->match('string')->format(sub{
+    (ref $self || $self)->new($_)
+  });
+
+  return $assertion;
 }
 
 sub camelcase {

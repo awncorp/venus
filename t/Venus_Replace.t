@@ -121,7 +121,7 @@ This method can return a list of values in list-context.
 
 =signature captures
 
-  captures() (ArrayRef)
+  captures() (arrayref)
 
 =metadata captures
 
@@ -155,7 +155,7 @@ operation.
 
 =signature count
 
-  count() (Num)
+  count() (number)
 
 =metadata count
 
@@ -188,7 +188,7 @@ arrayref representation of the results.
 
 =signature evaluate
 
-  evaluate() (ArrayRef)
+  evaluate() (arrayref)
 
 =metadata evaluate
 
@@ -264,7 +264,7 @@ is used in stringification operations.
 
 =signature explain
 
-  explain() (Str)
+  explain() (string)
 
 =metadata explain
 
@@ -296,7 +296,7 @@ The get method returns the subject of the regular expression operation.
 
 =signature get
 
-  get() (Str)
+  get() (string)
 
 =metadata get
 
@@ -329,7 +329,7 @@ contains information about the results of the regular expression operation.
 
 =signature initial
 
-  initial() (Str)
+  initial() (string)
 
 =metadata initial
 
@@ -363,7 +363,7 @@ information about the results of the regular expression operation.
 
 =signature last_match_end
 
-  last_match_end() (Maybe[ArrayRef[Int]])
+  last_match_end() (maybe[within[arrayref, number]])
 
 =metadata last_match_end
 
@@ -397,7 +397,7 @@ information about the results of the regular expression operation.
 
 =signature last_match_start
 
-  last_match_start() (Maybe[ArrayRef[Int]])
+  last_match_start() (maybe[within[arrayref, number]])
 
 =metadata last_match_start
 
@@ -431,7 +431,7 @@ expression operation.
 
 =signature matched
 
-  matched() (Maybe[Str])
+  matched() (maybe[string])
 
 =metadata matched
 
@@ -465,7 +465,7 @@ information about the results of the regular expression operation.
 
 =signature named_captures
 
-  named_captures() (HashRef)
+  named_captures() (hashref)
 
 =metadata named_captures
 
@@ -525,7 +525,7 @@ results of the regular expression operation.
 
 =signature prematched
 
-  prematched() (Maybe[Str)
+  prematched() (Maybe[string])
 
 =metadata prematched
 
@@ -559,7 +559,7 @@ results of the regular expression operation.
 
 =signature postmatched
 
-  postmatched() (Maybe[Str)
+  postmatched() (Maybe[string])
 
 =metadata postmatched
 
@@ -591,7 +591,7 @@ The set method sets the subject of the regular expression operation.
 
 =signature set
 
-  set(Str $data) (Str)
+  set(string $data) (string)
 
 =metadata set
 
@@ -830,8 +830,8 @@ $test->for('example', 1, 'error_on_evaluate', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

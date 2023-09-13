@@ -49,7 +49,7 @@ This package provides the following methods:
 
 =head2 clear
 
-  clear(Str $name) (Any)
+  clear(string $name) (any)
 
 The clear method deletes an attribute and returns the removed value.
 
@@ -105,7 +105,7 @@ I<Since C<1.55>>
 
 =head2 has
 
-  has(Str $name) (Boolean)
+  has(string $name) (boolean)
 
 The has method returns truthy if the attribute specified exists, otherwise
 returns falsy.
@@ -144,7 +144,7 @@ I<Since C<1.55>>
 
 =head2 reset
 
-  reset(Str $name) (Any)
+  reset(string $name) (any)
 
 The reset method rebuilds an attribute and returns the deleted value.
 
@@ -274,7 +274,7 @@ B<example 2>
     lname => 1234567890,
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 B<example 3>
 
@@ -303,7 +303,7 @@ B<example 3>
     lname => 'Alderson',
   );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 B<example 4>
 
@@ -337,7 +337,7 @@ B<example 4>
   #   progress => '1',
   # );
 
-  # Exception! (isa Venus::Assert::Error)
+  # Exception! (isa Venus::Check::Error)
 
 =back
 
@@ -1012,12 +1012,12 @@ B<example 1>
 
 =over 4
 
-=item writing
+=item readonly
 
-This library provides a mechanism for hooking into the class attribute writer
-(accessor) for writing values via the the attribute writer callback. The
-callback should be in the form of C<write_${name}>, and should set and return
-the value for the attribute specified.
+This library provides a mechanism for marking class attributes as I<"readonly">
+(or not) based on the return value of the attribute callback. The callback
+should be in the form of C<readonly_${name}>, and should return truthy to
+automatically throw an exception if a change is attempted.
 
 B<example 1>
 
@@ -1031,31 +1031,213 @@ B<example 1>
   attr 'lname';
   attr 'email';
 
-  sub write_fname {
+  sub readonly_fname {
     my ($self, $value) = @_;
 
-    return $self->{fname} = ucfirst $value;
+    return true;
   }
 
-  sub write_lname {
+  sub readonly_lname {
     my ($self, $value) = @_;
 
-    return $self->{lname} = ucfirst $value;
+    return true;
   }
 
   package main;
 
-  my $person = Person->new;
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
 
-  # bless({}, 'Person')
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
 
-  # $person->fname('elliot');
+  $person->fname('Mister');
 
-  # "Elliot"
+  # Exception! (isa Person::Error)
 
-  # $person->lname('alderson');
+  # $person->lname('Johnston');
 
-  # "Alderson"
+  # Exception! (isa Person::Error)
+
+=back
+
+=over 4
+
+=item readwrite
+
+This library provides a mechanism for marking class attributes as I<"readwrite">
+(or not) based on the return value of the attribute callback. The callback
+should be in the form of C<readwrite_${name}>, and should return falsy to
+automatically throw an exception if a change is attempted.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub readwrite_fname {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  sub readwrite_lname {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+  $person->fname('Mister');
+
+  # Exception! (isa Person::Error)
+
+  # $person->lname('Johnston');
+
+  # Exception! (isa Person::Error)
+
+=back
+
+=over 4
+
+=item requiring
+
+This library provides a mechanism for marking class attributes as I<"required">
+(i.e. to be provided to the constructor) based on the return value of the
+attribute callback. The callback should be in the form of C<require_${name}>,
+and should return truthy to automatically throw an exception if the related
+attribute is missing.
+
+B<example 1>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub require_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_email {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+    lname => 'Alderson',
+  );
+
+  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+
+B<example 2>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub require_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_email {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    fname => 'Elliot',
+  );
+
+  # Exception! (isa Person::Error)
+
+B<example 3>
+
+  package Person;
+
+  use Venus::Class;
+
+  with 'Venus::Role::Optional';
+
+  attr 'fname';
+  attr 'lname';
+  attr 'email';
+
+  sub require_fname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_lname {
+    my ($self, $value) = @_;
+
+    return true;
+  }
+
+  sub require_email {
+    my ($self, $value) = @_;
+
+    return false;
+  }
+
+  package main;
+
+  my $person = Person->new(
+    lname => 'Alderson',
+  );
+
+  # Exception! (isa Person::Error)
 
 =back
 
@@ -1315,64 +1497,12 @@ B<example 1>
 
 =over 4
 
-=item readonly
+=item writing
 
-This library provides a mechanism for marking class attributes as I<"readonly">
-(or not) based on the return value of the attribute callback. The callback
-should be in the form of C<readonly_${name}>, and should return truthy to
-automatically throw an exception if a change is attempted.
-
-B<example 1>
-
-  package Person;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Optional';
-
-  attr 'fname';
-  attr 'lname';
-  attr 'email';
-
-  sub readonly_fname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub readonly_lname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  package main;
-
-  my $person = Person->new(
-    fname => 'Elliot',
-    lname => 'Alderson',
-  );
-
-  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
-
-  $person->fname('Mister');
-
-  # Exception! (isa Person::Error)
-
-  # $person->lname('Johnston');
-
-  # Exception! (isa Person::Error)
-
-=back
-
-=over 4
-
-=item readwrite
-
-This library provides a mechanism for marking class attributes as I<"readwrite">
-(or not) based on the return value of the attribute callback. The callback
-should be in the form of C<readwrite_${name}>, and should return falsy to
-automatically throw an exception if a change is attempted.
+This library provides a mechanism for hooking into the class attribute writer
+(accessor) for writing values via the the attribute writer callback. The
+callback should be in the form of C<write_${name}>, and should set and return
+the value for the attribute specified.
 
 B<example 1>
 
@@ -1386,161 +1516,31 @@ B<example 1>
   attr 'lname';
   attr 'email';
 
-  sub readwrite_fname {
+  sub write_fname {
     my ($self, $value) = @_;
 
-    return false;
+    return $self->{fname} = ucfirst $value;
   }
 
-  sub readwrite_lname {
+  sub write_lname {
     my ($self, $value) = @_;
 
-    return false;
-  }
-
-  package main;
-
-  my $person = Person->new(
-    fname => 'Elliot',
-    lname => 'Alderson',
-  );
-
-  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
-
-  $person->fname('Mister');
-
-  # Exception! (isa Person::Error)
-
-  # $person->lname('Johnston');
-
-  # Exception! (isa Person::Error)
-
-=back
-
-=over 4
-
-=item requiring
-
-This library provides a mechanism for marking class attributes as I<"required">
-(i.e. to be provided to the constructor) based on the return value of the
-attribute callback. The callback should be in the form of C<require_${name}>,
-and should return truthy to automatically throw an exception if the related
-attribute is missing.
-
-B<example 1>
-
-  package Person;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Optional';
-
-  attr 'fname';
-  attr 'lname';
-  attr 'email';
-
-  sub require_fname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub require_lname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub require_email {
-    my ($self, $value) = @_;
-
-    return false;
+    return $self->{lname} = ucfirst $value;
   }
 
   package main;
 
-  my $person = Person->new(
-    fname => 'Elliot',
-    lname => 'Alderson',
-  );
+  my $person = Person->new;
 
-  # bless({fname => 'Elliot', lname => 'Alderson'}, 'Person')
+  # bless({}, 'Person')
 
-B<example 2>
+  # $person->fname('elliot');
 
-  package Person;
+  # "Elliot"
 
-  use Venus::Class;
+  # $person->lname('alderson');
 
-  with 'Venus::Role::Optional';
-
-  attr 'fname';
-  attr 'lname';
-  attr 'email';
-
-  sub require_fname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub require_lname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub require_email {
-    my ($self, $value) = @_;
-
-    return false;
-  }
-
-  package main;
-
-  my $person = Person->new(
-    fname => 'Elliot',
-  );
-
-  # Exception! (isa Person::Error)
-
-B<example 3>
-
-  package Person;
-
-  use Venus::Class;
-
-  with 'Venus::Role::Optional';
-
-  attr 'fname';
-  attr 'lname';
-  attr 'email';
-
-  sub require_fname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub require_lname {
-    my ($self, $value) = @_;
-
-    return true;
-  }
-
-  sub require_email {
-    my ($self, $value) = @_;
-
-    return false;
-  }
-
-  package main;
-
-  my $person = Person->new(
-    lname => 'Alderson',
-  );
-
-  # Exception! (isa Person::Error)
+  # "Alderson"
 
 =back
 
@@ -1552,7 +1552,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -87,7 +87,7 @@ return value will be acted on by this method.
 
 =signature dump
 
-  dump(Str | CodeRef $method, Any @args) (Str)
+  dump(string | coderef $method, any @args) (string)
 
 =metadata dump
 
@@ -124,7 +124,7 @@ be acted on by this method.
 
 =signature dump_pretty
 
-  dump_pretty(Str | CodeRef $method, Any @args) (Str)
+  dump_pretty(string | coderef $method, any @args) (string)
 
 =metadata dump_pretty
 
@@ -156,8 +156,8 @@ $test->for('example', 1, 'dump_pretty', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

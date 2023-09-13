@@ -123,7 +123,7 @@ hashrefs.
 
 =signature render
 
-  render(Str $template, HashRef $variables) (Str)
+  render(string $template, hashref $variables) (string)
 
 =metadata render
 
@@ -475,8 +475,8 @@ $test->for('example', 1, '(~~)', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

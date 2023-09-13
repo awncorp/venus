@@ -93,7 +93,7 @@ The default method returns the default value, i.e. C<undef>.
 
 =signature default
 
-  default() (Any)
+  default() (any)
 
 =metadata default
 
@@ -127,7 +127,7 @@ The get method gets and returns the value.
 
 =signature get
 
-  get() (Any)
+  get() (any)
 
 =metadata get
 
@@ -161,7 +161,7 @@ The set method set the value and returns the value set.
 
 =signature set
 
-  set(Any $value) (Any)
+  set(any $value) (any)
 
 =metadata set
 
@@ -191,8 +191,8 @@ $test->for('example', 1, 'set', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

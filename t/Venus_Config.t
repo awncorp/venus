@@ -112,7 +112,7 @@ and writes the results of the method or callback to the file.
 
 =signature edit_file
 
-  edit_file(Str $file, Str | CodeRef $code) (Config)
+  edit_file(string $file, string | coderef $code) (Venus::Config)
 
 =metadata edit_file
 
@@ -165,7 +165,7 @@ the file extension, and returns a new L<Venus::Config> object.
 
 =signature read_file
 
-  read_file(Str $path) (Config)
+  read_file(string $path) (Venus::Config)
 
 =metadata read_file
 
@@ -265,7 +265,7 @@ string provided.
 
 =signature read_json
 
-  read_json(Str $data) (Config)
+  read_json(string $data) (Venus::Config)
 
 =metadata read_json
 
@@ -320,7 +320,7 @@ object based on the file provided.
 
 =signature read_json_file
 
-  read_json_file(Str $file) (Config)
+  read_json_file(string $file) (Venus::Config)
 
 =metadata read_json_file
 
@@ -366,7 +366,7 @@ string provided.
 
 =signature read_perl
 
-  read_perl(Str $data) (Config)
+  read_perl(string $data) (Venus::Config)
 
 =metadata read_perl
 
@@ -413,7 +413,7 @@ object based on the file provided.
 
 =signature read_perl_file
 
-  read_perl_file(Str $file) (Config)
+  read_perl_file(string $file) (Venus::Config)
 
 =metadata read_perl_file
 
@@ -452,7 +452,7 @@ string provided.
 
 =signature read_yaml
 
-  read_yaml(Str $data) (Config)
+  read_yaml(string $data) (Venus::Config)
 
 =metadata read_yaml
 
@@ -506,7 +506,7 @@ object based on the YAML string provided.
 
 =signature read_yaml_file
 
-  read_yaml_file(Str $file) (Config)
+  read_yaml_file(string $file) (Venus::Config)
 
 =metadata read_yaml_file
 
@@ -552,7 +552,7 @@ the file extension, and returns a new L<Venus::Config> object.
 
 =signature write_file
 
-  write_file(Str $path) (Config)
+  write_file(string $path) (Venus::Config)
 
 =metadata write_file
 
@@ -672,7 +672,7 @@ by the underlying L<Venus::Config> object.
 
 =signature write_json
 
-  write_json() (Str)
+  write_json() (string)
 
 =metadata write_json
 
@@ -720,7 +720,7 @@ L<Venus::Config> object.
 
 =signature write_json_file
 
-  write_json_file(Str $path) (Config)
+  write_json_file(string $path) (Venus::Config)
 
 =metadata write_json_file
 
@@ -770,7 +770,7 @@ by the underlying L<Venus::Config> object.
 
 =signature write_perl
 
-  write_perl() (Str)
+  write_perl() (string)
 
 =metadata write_perl
 
@@ -810,7 +810,7 @@ L<Venus::Config> object.
 
 =signature write_perl_file
 
-  write_perl_file(Str $path) (Config)
+  write_perl_file(string $path) (Venus::Config)
 
 =metadata write_perl_file
 
@@ -852,7 +852,7 @@ by the underlying L<Venus::Config> object.
 
 =signature write_yaml
 
-  write_yaml() (Str)
+  write_yaml() (string)
 
 =metadata write_yaml
 
@@ -900,7 +900,7 @@ L<Venus::Config> object.
 
 =signature write_yaml_file
 
-  write_yaml_file(Str $path) (Config)
+  write_yaml_file(string $path) (Venus::Config)
 
 =metadata write_yaml_file
 
@@ -945,8 +945,8 @@ $test->for('example', 1, 'write_yaml_file', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

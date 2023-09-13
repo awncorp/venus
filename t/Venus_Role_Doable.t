@@ -90,7 +90,7 @@ and arguments whose return value will be acted on by this method.
 
 =signature do
 
-  do(Str | CodeRef $method, Any @args) (Self)
+  do(string | coderef $method, any @args) (object)
 
 =metadata do
 
@@ -123,8 +123,8 @@ $test->for('example', 1, 'do', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

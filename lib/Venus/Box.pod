@@ -50,7 +50,7 @@ This package provides the following methods:
 
 =head2 unbox
 
-  unbox(Str $method, Any @args) (Any)
+  unbox(string $method, any @args) (any)
 
 The unbox method returns the un-boxed underlying object. This is a virtual
 method that dispatches to C<__handle__unbox>. This method supports dispatching,
@@ -93,7 +93,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

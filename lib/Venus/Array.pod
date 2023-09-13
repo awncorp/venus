@@ -53,7 +53,7 @@ This package provides the following methods:
 
 =head2 all
 
-  all(CodeRef $code) (Bool)
+  all(coderef $code) (boolean)
 
 The all method returns true if the callback returns true for all of the
 elements.
@@ -94,7 +94,7 @@ I<Since C<0.01>>
 
 =head2 any
 
-  any(CodeRef $code) (Bool)
+  any(coderef $code) (boolean)
 
 The any method returns true if the callback returns true for any of the
 elements.
@@ -131,7 +131,7 @@ I<Since C<0.01>>
 
 =head2 call
 
-  call(Str $iterable, Str $method) (Any)
+  call(string $iterable, string $method) (any)
 
 The call method executes the given method (named using the first argument)
 which performs an iteration (i.e. takes a callback) and calls the method (named
@@ -172,7 +172,7 @@ I<Since C<1.02>>
 
 =head2 cast
 
-  cast(Str $kind) (Object | Undef)
+  cast(string $kind) (object | undef)
 
 The cast method converts L<"value"|Venus::Kind::Value> objects between
 different I<"value"> object types, based on the name of the type provided. This
@@ -344,7 +344,7 @@ I<Since C<0.08>>
 
 =head2 count
 
-  count() (Int)
+  count() (number)
 
 The count method returns the number of elements within the array.
 
@@ -366,7 +366,7 @@ I<Since C<0.01>>
 
 =head2 default
 
-  default() (ArrayRef)
+  default() (arrayref)
 
 The default method returns the default value, i.e. C<[]>.
 
@@ -388,7 +388,7 @@ I<Since C<0.01>>
 
 =head2 delete
 
-  delete(Int $index) (Any)
+  delete(number $index) (any)
 
 The delete method returns the value of the element at the index specified after
 removing it from the array.
@@ -411,7 +411,7 @@ I<Since C<0.01>>
 
 =head2 each
 
-  each(CodeRef $code) (ArrayRef)
+  each(coderef $code) (arrayref)
 
 The each method executes a callback for each element in the array passing the
 index and value as arguments. This method can return a list of values in
@@ -463,7 +463,7 @@ I<Since C<0.01>>
 
 =head2 empty
 
-  empty() (Array)
+  empty() (Venus::Array)
 
 The empty method drops all elements from the array.
 
@@ -485,7 +485,7 @@ I<Since C<0.01>>
 
 =head2 eq
 
-  eq(Any $arg) (Bool)
+  eq(any $arg) (boolean)
 
 The eq method performs an I<"equals"> operation using the argument provided.
 
@@ -656,7 +656,7 @@ I<Since C<0.08>>
 
 =head2 exists
 
-  exists(Int $index) (Bool)
+  exists(number $index) (boolean)
 
 The exists method returns true if the element at the index specified exists,
 otherwise it returns false.
@@ -679,7 +679,7 @@ I<Since C<0.01>>
 
 =head2 find
 
-  find(Str @keys) (Any)
+  find(string @keys) (any)
 
 The find method traverses the data structure using the keys and indices
 provided, returning the value found or undef. In list-context, this method
@@ -740,7 +740,7 @@ I<Since C<0.01>>
 
 =head2 first
 
-  first() (Any)
+  first() (any)
 
 The first method returns the value of the first element.
 
@@ -762,7 +762,7 @@ I<Since C<0.01>>
 
 =head2 ge
 
-  ge(Any $arg) (Bool)
+  ge(any $arg) (boolean)
 
 The ge method performs a I<"greater-than-or-equal-to"> operation using the
 argument provided.
@@ -934,7 +934,7 @@ I<Since C<0.08>>
 
 =head2 gele
 
-  gele(Any $arg1, Any $arg2) (Bool)
+  gele(any $arg1, any $arg2) (boolean)
 
 The gele method performs a I<"greater-than-or-equal-to"> operation on the 1st
 argument, and I<"lesser-than-or-equal-to"> operation on the 2nd argument.
@@ -1106,7 +1106,7 @@ I<Since C<0.08>>
 
 =head2 grep
 
-  grep(CodeRef $code) (ArrayRef)
+  grep(coderef $code) (arrayref)
 
 The grep method executes a callback for each element in the array passing the
 value as an argument, returning a new array reference containing the elements
@@ -1149,7 +1149,7 @@ I<Since C<0.01>>
 
 =head2 gt
 
-  gt(Any $arg) (Bool)
+  gt(any $arg) (boolean)
 
 The gt method performs a I<"greater-than"> operation using the argument provided.
 
@@ -1320,7 +1320,7 @@ I<Since C<0.08>>
 
 =head2 gtlt
 
-  gtlt(Any $arg1, Any $arg2) (Bool)
+  gtlt(any $arg1, any $arg2) (boolean)
 
 The gtlt method performs a I<"greater-than"> operation on the 1st argument, and
 I<"lesser-than"> operation on the 2nd argument.
@@ -1492,7 +1492,7 @@ I<Since C<0.08>>
 
 =head2 iterator
 
-  iterator() (CodeRef)
+  iterator() (coderef)
 
 The iterator method returns a code reference which can be used to iterate over
 the array. Each time the iterator is executed it will return the next element
@@ -1538,7 +1538,7 @@ I<Since C<0.01>>
 
 =head2 join
 
-  join(Str $seperator) (Str)
+  join(string $seperator) (string)
 
 The join method returns a string consisting of all the elements in the array
 joined by the join-string specified by the argument. Note: If the argument is
@@ -1574,7 +1574,7 @@ I<Since C<0.01>>
 
 =head2 keyed
 
-  keyed(Str @keys) (HashRef)
+  keyed(string @keys) (hashref)
 
 The keyed method returns a hash reference where the arguments become the keys,
 and the elements of the array become the values.
@@ -1601,7 +1601,7 @@ I<Since C<0.01>>
 
 =head2 keys
 
-  keys() (ArrayRef)
+  keys() (arrayref)
 
 The keys method returns an array reference consisting of the indicies of the
 array.
@@ -1624,7 +1624,7 @@ I<Since C<0.01>>
 
 =head2 last
 
-  last() (Any)
+  last() (any)
 
 The last method returns the value of the last element in the array.
 
@@ -1646,7 +1646,7 @@ I<Since C<0.01>>
 
 =head2 le
 
-  le(Any $arg) (Bool)
+  le(any $arg) (boolean)
 
 The le method performs a I<"lesser-than-or-equal-to"> operation using the
 argument provided.
@@ -1818,7 +1818,7 @@ I<Since C<0.08>>
 
 =head2 length
 
-  length() (Int)
+  length() (number)
 
 The length method returns the number of elements within the array, and is an
 alias for the L</count> method.
@@ -1841,7 +1841,7 @@ I<Since C<0.08>>
 
 =head2 list
 
-  list() (Any)
+  list() (any)
 
 The list method returns a shallow copy of the underlying array reference as an
 array reference.
@@ -1876,7 +1876,7 @@ I<Since C<0.01>>
 
 =head2 lt
 
-  lt(Any $arg) (Bool)
+  lt(any $arg) (boolean)
 
 The lt method performs a I<"lesser-than"> operation using the argument provided.
 
@@ -2047,7 +2047,7 @@ I<Since C<0.08>>
 
 =head2 map
 
-  map(CodeRef $code) (ArrayRef)
+  map(coderef $code) (arrayref)
 
 The map method iterates over each element in the array, executing the code
 reference supplied in the argument, passing the routine the value at the
@@ -2101,7 +2101,7 @@ I<Since C<0.01>>
 
 =head2 merge
 
-  merge(ArrayRef @data) (ArrayRef)
+  merge(arrayref @data) (arrayref)
 
 The merge method returns an array reference where the elements in the array and
 the elements in the argument(s) are merged. This operation performs a deep
@@ -2137,7 +2137,7 @@ I<Since C<3.30>>
 
 =head2 ne
 
-  ne(Any $arg) (Bool)
+  ne(any $arg) (boolean)
 
 The ne method performs a I<"not-equal-to"> operation using the argument provided.
 
@@ -2308,7 +2308,7 @@ I<Since C<0.08>>
 
 =head2 none
 
-  none(CodeRef $code) (Bool)
+  none(coderef $code) (boolean)
 
 The none method returns true if none of the elements in the array meet the
 criteria set by the operand and rvalue.
@@ -2349,7 +2349,7 @@ I<Since C<0.01>>
 
 =head2 one
 
-  one(CodeRef $code) (Bool)
+  one(coderef $code) (boolean)
 
 The one method returns true if only one of the elements in the array meet the
 criteria set by the operand and rvalue.
@@ -2390,7 +2390,7 @@ I<Since C<0.01>>
 
 =head2 order
 
-  order(Int @indices) (Array)
+  order(number @indices) (Venus::Array)
 
 The order method reorders the array items based on the indices provided and
 returns the invocant.
@@ -2437,7 +2437,7 @@ I<Since C<2.01>>
 
 =head2 pairs
 
-  pairs() (ArrayRef)
+  pairs() (arrayref)
 
 The pairs method is an alias to the pairs_array method. This method can return
 a list of values in list-context.
@@ -2470,7 +2470,7 @@ I<Since C<0.01>>
 
 =head2 part
 
-  part(CodeRef $code) (Tuple[ArrayRef, ArrayRef])
+  part(coderef $code) (tuple[arrayref, arrayref])
 
 The part method iterates over each element in the array, executing the code
 reference supplied in the argument, using the result of the code reference to
@@ -2513,7 +2513,7 @@ I<Since C<0.01>>
 
 =head2 path
 
-  path(Str $expr) (Any)
+  path(string $expr) (any)
 
 The path method traverses the data structure using the path expr provided,
 returning the value found or undef. In list-context, this method returns a
@@ -2590,7 +2590,7 @@ I<Since C<0.01>>
 
 =head2 pop
 
-  pop() (Any)
+  pop() (any)
 
 The pop method returns the last element of the array shortening it by one.
 Note, this method modifies the array.
@@ -2613,7 +2613,7 @@ I<Since C<0.01>>
 
 =head2 push
 
-  push(Any @data) (ArrayRef)
+  push(any @data) (arrayref)
 
 The push method appends the array by pushing the agruments onto it and returns
 itself.
@@ -2636,7 +2636,7 @@ I<Since C<0.01>>
 
 =head2 puts
 
-  puts(Any @args) (ArrayRef)
+  puts(any @args) (arrayref)
 
 The puts method select values from within the underlying data structure using
 L<Venus::Array/path>, optionally assigning the value to the preceeding scalar
@@ -2761,7 +2761,7 @@ I<Since C<3.20>>
 
 =head2 random
 
-  random() (Any)
+  random() (any)
 
 The random method returns a random element from the array.
 
@@ -2787,7 +2787,7 @@ I<Since C<0.01>>
 
 =head2 range
 
-  range(Int | Str @args) (ArrayRef)
+  range(number | string @args) (arrayref)
 
 The range method accepts a I<"range expression"> and returns the result of
 calling the L</slice> method with the computed range.
@@ -3064,7 +3064,7 @@ I<Since C<2.55>>
 
 =head2 reverse
 
-  reverse() (ArrayRef)
+  reverse() (arrayref)
 
 The reverse method returns an array reference containing the elements in the
 array in reverse order.
@@ -3087,7 +3087,7 @@ I<Since C<0.01>>
 
 =head2 rotate
 
-  rotate() (ArrayRef)
+  rotate() (arrayref)
 
 The rotate method rotates the elements in the array such that first elements
 becomes the last element and the second element becomes the first element each
@@ -3111,7 +3111,7 @@ I<Since C<0.01>>
 
 =head2 rsort
 
-  rsort() (ArrayRef)
+  rsort() (arrayref)
 
 The rsort method returns an array reference containing the values in the array
 sorted alphanumerically in reverse.
@@ -3134,7 +3134,7 @@ I<Since C<0.01>>
 
 =head2 shift
 
-  shift() (Any)
+  shift() (any)
 
 The shift method returns the first element of the array shortening it by one.
 
@@ -3156,7 +3156,7 @@ I<Since C<0.01>>
 
 =head2 shuffle
 
-  shuffle() (ArrayRef)
+  shuffle() (arrayref)
 
 The shuffle method returns an array with the items in a randomized order.
 
@@ -3180,7 +3180,7 @@ I<Since C<1.40>>
 
 =head2 slice
 
-  slice(Str @keys) (ArrayRef)
+  slice(string @keys) (arrayref)
 
 The slice method returns a hash reference containing the elements in the array
 at the index(es) specified in the arguments.
@@ -3203,7 +3203,7 @@ I<Since C<0.01>>
 
 =head2 sort
 
-  sort() (ArrayRef)
+  sort() (arrayref)
 
 The sort method returns an array reference containing the values in the array
 sorted alphanumerically.
@@ -3230,7 +3230,7 @@ I<Since C<0.01>>
 
 =head2 tv
 
-  tv(Any $arg) (Bool)
+  tv(any $arg) (boolean)
 
 The tv method performs a I<"type-and-value-equal-to"> operation using argument
 provided.
@@ -3402,7 +3402,7 @@ I<Since C<0.08>>
 
 =head2 unique
 
-  unique() (ArrayRef)
+  unique() (arrayref)
 
 The unique method returns an array reference consisting of the unique elements
 in the array.
@@ -3429,7 +3429,7 @@ I<Since C<0.01>>
 
 =head2 unshift
 
-  unshift(Any @data) (ArrayRef)
+  unshift(any @data) (arrayref)
 
 The unshift method prepends the array by pushing the agruments onto it and
 returns itself.
@@ -3458,7 +3458,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Al Newkirk.
+Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

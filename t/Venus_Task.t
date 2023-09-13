@@ -171,7 +171,7 @@ optional.
 
 =signature data
 
-  data(ArrayRef $data) (ArrayRef)
+  data(arrayref $data) (arrayref)
 
 =metadata data
 
@@ -233,7 +233,7 @@ positional argument.
 
 =signature args
 
-  args() (HashRef)
+  args() (hashref)
 
 =metadata args
 
@@ -313,7 +313,7 @@ L<Venus::Cli> object is configured automatically when L</prepare> is executed.
 
 =signature cli
 
-  cli() (Cli)
+  cli() (Venus::Cli)
 
 =metadata cli
 
@@ -352,7 +352,7 @@ which maps to an positional argument declare by L</args>.
 
 =signature cmds
 
-  cmds() (HashRef)
+  cmds() (hashref)
 
 =metadata cmds
 
@@ -445,7 +445,7 @@ arguments, options, and commands text).
 
 =signature description
 
-  description() (Task)
+  description() (Venus::Task)
 
 =metadata description
 
@@ -506,7 +506,7 @@ method.
 
 =signature execute
 
-  execute() (Task)
+  execute() (Venus::Task)
 
 =metadata execute
 
@@ -691,7 +691,7 @@ the exit code will be determined by the result of the dispatching.
 
 =signature exit
 
-  exit(Int $code, Str|CodeRef $code, Any @args) (Any)
+  exit(number $code, string | coderef $code, any @args) (any)
 
 =metadata exit
 
@@ -796,7 +796,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 
 =signature fail
 
-  fail(Str|CodeRef $code, Any @args) (Any)
+  fail(string | coderef $code, any @args) (any)
 
 =metadata fail
 
@@ -858,7 +858,7 @@ options, and commands text).
 
 =signature footer
 
-  footer() (Task)
+  footer() (Venus::Task)
 
 =metadata footer
 
@@ -918,7 +918,7 @@ not overriden this method calls L</usage> if a "help" flag is detected.
 
 =signature handler
 
-  handler(HashRef $data) (Task)
+  handler(hashref $data) (Venus::Task)
 
 =metadata handler
 
@@ -1020,7 +1020,7 @@ the arguments, options, and commands text).
 
 =signature header
 
-  header() (Task)
+  header() (Venus::Task)
 
 =metadata header
 
@@ -1080,7 +1080,7 @@ based on the L</cli> object.
 
 =signature help
 
-  help() (Str)
+  help() (string)
 
 =metadata help
 
@@ -1154,7 +1154,7 @@ L<Venus::Log> object is configured automatically when L</prepare> is executed.
 
 =signature log
 
-  log(Log $data) (Log)
+  log(Venus::Log $data) (Venus::Log)
 
 =metadata log
 
@@ -1192,7 +1192,7 @@ result.
 
 =signature log_debug
 
-  log_debug(Any @log_debug) (Log)
+  log_debug(any @log_debug) (Venus::Log)
 
 =metadata log_debug
 
@@ -1232,7 +1232,7 @@ result.
 
 =signature log_error
 
-  log_error(Any @log_error) (Log)
+  log_error(any @log_error) (Venus::Log)
 
 =metadata log_error
 
@@ -1272,7 +1272,7 @@ result.
 
 =signature log_fatal
 
-  log_fatal(Any @log_fatal) (Log)
+  log_fatal(any @log_fatal) (Venus::Log)
 
 =metadata log_fatal
 
@@ -1312,7 +1312,7 @@ result.
 
 =signature log_info
 
-  log_info(Any @log_info) (Log)
+  log_info(any @log_info) (Venus::Log)
 
 =metadata log_info
 
@@ -1352,7 +1352,7 @@ value. This method defaults to returning L<info>.
 
 =signature log_level
 
-  log_level() (Str)
+  log_level() (string)
 
 =metadata log_level
 
@@ -1390,7 +1390,7 @@ result.
 
 =signature log_trace
 
-  log_trace(Any @log_trace) (Log)
+  log_trace(any @log_trace) (Venus::Log)
 
 =metadata log_trace
 
@@ -1430,7 +1430,7 @@ result.
 
 =signature log_warn
 
-  log_warn(Any @log_warn) (Log)
+  log_warn(any @log_warn) (Venus::Log)
 
 =metadata log_warn
 
@@ -1470,7 +1470,7 @@ application). This method defaults to C<$0> if not overridden.
 
 =signature name
 
-  name() (Task)
+  name() (Venus::Task)
 
 =metadata name
 
@@ -1542,7 +1542,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 
 =signature okay
 
-  okay(Str|CodeRef $code, Any @args) (Any)
+  okay(string | coderef $code, any @args) (any)
 
 =metadata okay
 
@@ -1602,7 +1602,7 @@ to the L<Venus::Cli/set> method as type C<"opt">. An C<"opt"> is a CLI option
 
 =signature opts
 
-  opts() (HashRef)
+  opts() (hashref)
 
 =metadata opts
 
@@ -1685,7 +1685,7 @@ can be overridden and returns the invocant.
 
 =signature output
 
-  output(Str $level, Str @messages) (Task)
+  output(string $level, string @messages) (Venus::Task)
 
 =metadata output
 
@@ -1728,7 +1728,7 @@ after returns the invocant.
 
 =signature prepare
 
-  prepare() (Task)
+  prepare() (Venus::Task)
 
 =metadata prepare
 
@@ -1943,7 +1943,7 @@ dispatch before exiting by providing a method name or coderef, and arguments.
 
 =signature pass
 
-  pass(Str|CodeRef $code, Any @args) (Any)
+  pass(string | coderef $code, any @args) (any)
 
 =metadata pass
 
@@ -2005,7 +2005,7 @@ package space and the C<VENUS_TASK_AUTO> environment variable is truthy.
 
 =signature run
 
-  run(Any @args) (Task)
+  run(any @args) (Venus::Task)
 
 =metadata run
 
@@ -2097,7 +2097,7 @@ and is passed the result of L<Venus::Cli/parsed>.
 
 =signature startup
 
-  startup(HashRef $data) (Task)
+  startup(hashref $data) (Venus::Task)
 
 =metadata startup
 
@@ -2138,7 +2138,7 @@ of L<Venus::Cli/parsed>.
 
 =signature shutdown
 
-  shutdown(HashRef $data) (Task)
+  shutdown(hashref $data) (Venus::Task)
 
 =metadata shutdown
 
@@ -2178,7 +2178,7 @@ invocant. If the system call is unsuccessful an error is thrown.
 
 =signature system
 
-  system(Str @args) (Task)
+  system(string @args) (Venus::Task)
 
 =metadata system
 
@@ -2237,7 +2237,7 @@ returns the value(s) associated. This method dispatches to L<Venus::Cli/test>.
 
 =signature test
 
-  test(Str $type, Str $name) (Any)
+  test(string $type, string $name) (any)
 
 =metadata test
 
@@ -2330,7 +2330,7 @@ the default help text and end the program if some condition isn't met.
 
 =signature usage
 
-  usage() (Task)
+  usage() (Venus::Task)
 
 =metadata usage
 
@@ -2413,8 +2413,8 @@ $test->for('example', 1, 'error_on_system_call', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

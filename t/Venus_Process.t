@@ -219,6 +219,8 @@ method: exit
 method: followers
 method: fork
 method: forks
+method: future
+method: is_dyadic
 method: is_follower
 method: is_leader
 method: is_registered
@@ -337,7 +339,7 @@ installing an alarm in the forked process if set.
 
 =signature alarm
 
-  alarm(Int $seconds) (Int)
+  alarm(number $seconds) (number)
 
 =metadata alarm
 
@@ -396,7 +398,7 @@ returns the newly created L<"dyadic"|/is_dyadic> process object.
 
 =signature async
 
-  async(CodeRef $code, Any @args) (Process)
+  async(coderef $code, any @args) (Venus::Process)
 
 =metadata async
 
@@ -440,7 +442,7 @@ block indefinitely.
 
 =signature await
 
-  await(Int $timeout) (Any)
+  await(number $timeout) (arrayref)
 
 =metadata await
 
@@ -616,7 +618,7 @@ within.
 
 =signature chdir
 
-  chdir(Str $path) (Process)
+  chdir(string $path) (Venus::Process)
 
 =metadata chdir
 
@@ -689,7 +691,7 @@ terminated).
 
 =signature check
 
-  check(Int $pid) (Int, Int)
+  check(number $pid) (number, number)
 
 =metadata check
 
@@ -798,7 +800,7 @@ call.
 
 =signature count
 
-  count(Str | CodeRef $code, Any @args) (Int)
+  count(string | coderef $code, any @args) (number)
 
 =metadata count
 
@@ -886,7 +888,7 @@ L</setsid> and attempts to change the working directory to the root directory.
 
 =signature daemon
 
-  daemon() (Process)
+  daemon() (Venus::Process)
 
 =metadata daemon
 
@@ -923,7 +925,7 @@ returned is based on the PIDs returned from L</watchlist>.
 
 =signature data
 
-  data(Int @pids) (Int)
+  data(number @pids) (number)
 
 =metadata data
 
@@ -1127,7 +1129,7 @@ the Perl value.
 
 =signature decode
 
-  decode(Str $data) (Any)
+  decode(string $data) (any)
 
 =metadata decode
 
@@ -1166,7 +1168,7 @@ changes can be undone by calling the L</engage> method.
 
 =signature disengage
 
-  disengage() (Process)
+  disengage() (Venus::Process)
 
 =metadata disengage
 
@@ -1198,7 +1200,7 @@ that Perl value.
 
 =signature encode
 
-  encode(Any $data) (Str)
+  encode(any $data) (string)
 
 =metadata encode
 
@@ -1237,7 +1239,7 @@ This method effectively does the opposite of the L</disengage> method.
 
 =signature engage
 
-  engage() (Process)
+  engage() (Venus::Process)
 
 =metadata engage
 
@@ -1272,7 +1274,7 @@ another exchange (or context).
 
 =signature exchange
 
-  exchange(Str $name) (Any)
+  exchange(string $name) (any)
 
 =metadata exchange
 
@@ -1352,7 +1354,7 @@ The exit method exits the program immediately.
 
 =signature exit
 
-  exit(Int $status) (Int)
+  exit(number $status) (number)
 
 =metadata exit
 
@@ -1405,7 +1407,7 @@ L</exchange> who are not the L</leader>.
 
 =signature followers
 
-  followers() (ArrayRef)
+  followers() (arrayref)
 
 =metadata followers
 
@@ -1484,7 +1486,7 @@ argument is provided it will be executed in the child process.
 
 =signature fork
 
-  fork(Str | CodeRef $code, Any @args) (Process, Int)
+  fork(string | coderef $code, any @args) (Venus::Process, number)
 
 =metadata fork
 
@@ -1664,7 +1666,7 @@ executed in each child process.
 
 =signature forks
 
-  forks(Str | CodeRef $code, Any @args) (Process, ArrayRef[Int])
+  forks(string | coderef $code, any @args) (Venus::Process, within[arrayref, number])
 
 =metadata forks
 
@@ -1773,6 +1775,260 @@ $test->for('example', 3, 'forks', sub {
   $result
 });
 
+=method future
+
+The future method creates a new object via L</async> which runs the callback
+asynchronously and returns a L<Venus::Future> object with a promise which
+eventually resolves to the value emitted or error raised.
+
+=signature future
+
+  future(coderef $code, any @args) (Venus::Future)
+
+=metadata future
+
+{
+  since => '3.55',
+}
+
+=cut
+
+=example-1 future
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    my ($process) = @_;
+    # in forked process ...
+    $process->exit;
+  });
+
+  # bless({...}, 'Venus::Future')
+
+=cut
+
+$test->for('example', 1, 'future', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Future';
+  ok $result->is_fulfilled;
+
+  $result
+});
+
+=example-2 future
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    return 'done';
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # $future->value;
+
+  # 'done'
+
+=cut
+
+$test->for('example', 2, 'future', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Future";
+  $result->fulfill;
+  ok $result->is_fulfilled;
+  is_deeply $result->value, 'done';
+
+  $result
+});
+
+=example-3 future
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    return {status => 'done'};
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # $future->value
+
+  # {status => 'done'}
+
+=cut
+
+$test->for('example', 3, 'future', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Future";
+  $result->fulfill;
+  ok $result->is_fulfilled;
+  is_deeply $result->value, {status => 'done'};
+
+  $result
+});
+
+=example-4 future
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    return ['done'];
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # my ($await) = $future->value;
+
+  # ['done']
+
+=cut
+
+$test->for('example', 4, 'future', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Future";
+  $result->fulfill;
+  ok $result->is_fulfilled;
+  is_deeply $result->value, ['done'];
+
+  $result
+
+});
+
+=example-5 future
+
+  # given: synopsis;
+
+  my $future = $parent->future(sub{
+    ($process) = @_;
+    # in forked process ...
+    $process->sendall(['send 1', 'send 2', 'send 3']);
+    $process->sendall(['send 4']);
+    $process->sendall(['send 5']);
+    return;
+  });
+
+  # $future->fulfill;
+
+  # true
+
+  # my ($await) = $future->value;
+
+  # ['send 1', 'send 2', 'send 3']
+
+=cut
+
+$test->for('example', 5, 'future', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = 0;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  my $result = $tryable->result;
+  isa_ok $result, "Venus::Future";
+  $result->fulfill;
+  ok $result->is_fulfilled;
+  is_deeply $result->value, ['send 1', 'send 2', 'send 3'];
+
+  $result
+});
+
+=method is_dyadic
+
+The is_dyadic method returns true is the process is configured to exclusively
+communicate with one other process, otherwise returns false.
+
+=signature is_dyadic
+
+  is_dyadic() (boolean)
+
+=metadata is_dyadic
+
+{
+  since => '3.40',
+}
+
+=cut
+
+=example-1 is_dyadic
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new;
+
+  my $is_dyadic = $process->is_dyadic;
+
+  # false
+
+=cut
+
+$test->for('example', 1, 'is_dyadic', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok defined $result;
+  is $result, 0;
+
+  !$result
+});
+
+=example-2 is_dyadic
+
+  package main;
+
+  use Venus::Process;
+
+  my $process = Venus::Process->new->async(sub{
+    return 'done';
+  });
+
+  my $is_dyadic = $process->is_dyadic;
+
+  # true
+
+=cut
+
+$test->for('example', 2, 'is_dyadic', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_PROCESS_FORK = undef;
+  local $TEST_VENUS_PROCESS_PING = 0;
+  local $TEST_VENUS_PROCESS_TIME = time + 1;
+  local $Venus::Process::PPID = $TEST_VENUS_PROCESS_PPID = undef;
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
 =method is_follower
 
 The is_follower method returns true if the process is not the L</leader>, otherwise
@@ -1780,7 +2036,7 @@ returns false.
 
 =signature is_follower
 
-  is_follower() (Bool)
+  is_follower() (boolean)
 
 =metadata is_follower
 
@@ -1892,7 +2148,7 @@ returns false.
 
 =signature is_leader
 
-  is_leader() (Bool)
+  is_leader() (boolean)
 
 =metadata is_leader
 
@@ -2004,7 +2260,7 @@ L</register> method, otherwise returns false.
 
 =signature is_registered
 
-  is_registered() (Bool)
+  is_registered() (boolean)
 
 =metadata is_registered
 
@@ -2069,7 +2325,7 @@ false.
 
 =signature is_unregistered
 
-  is_unregistered() (Bool)
+  is_unregistered() (boolean)
 
 =metadata is_unregistered
 
@@ -2157,7 +2413,7 @@ using L</register>, and clears the L</watchlist>, then returns the invocant.
 
 =signature join
 
-  join(Str $name) (Process)
+  join(string $name) (Venus::Process)
 
 =metadata join
 
@@ -2225,7 +2481,7 @@ doesn't necessarily mean all processes were successfully signalled.
 
 =signature kill
 
-  kill(Str $signal, Int @pids) (Int)
+  kill(string $signal, number @pids) (number)
 
 =metadata kill
 
@@ -2267,7 +2523,7 @@ Returns a list in list context.
 
 =signature killall
 
-  killall(Str $name, Int @pids) (ArrayRef)
+  killall(string $name, number @pids) (arrayref)
 
 =metadata killall
 
@@ -2341,7 +2597,7 @@ lowest value active PID (i.e. that responds to L</ping>).
 
 =signature leader
 
-  leader() (Int)
+  leader() (number)
 
 =metadata leader
 
@@ -2435,7 +2691,7 @@ using L</unregister>, and clears the L</watchlist>, then returns the invocant.
 
 =signature leave
 
-  leave(Str $name) (Process)
+  leave(string $name) (Venus::Process)
 
 =metadata leave
 
@@ -2504,7 +2760,7 @@ the limit has yet to be reached.
 
 =signature limit
 
-  limit(Int $count) (Bool)
+  limit(number $count) (boolean)
 
 =metadata limit
 
@@ -2584,7 +2840,7 @@ i.e. all other registered process PIDs whether active or inactive.
 
 =signature others
 
-  others() (ArrayRef)
+  others() (arrayref)
 
 =metadata others
 
@@ -2659,7 +2915,7 @@ to L</ping>.
 
 =signature others_active
 
-  others_active() (ArrayRef)
+  others_active() (arrayref)
 
 =metadata others_active
 
@@ -2715,7 +2971,7 @@ respond to L</ping>.
 
 =signature others_inactive
 
-  others_inactive() (ArrayRef)
+  others_inactive() (arrayref)
 
 =metadata others_inactive
 
@@ -2771,7 +3027,7 @@ name is provided this method will default to calling L</recvall>.
 
 =signature poll
 
-  poll(Int $timeout, Str | CodeRef $code, Any @args) (ArrayRef)
+  poll(number $timeout, string | coderef $code, any @args) (arrayref)
 
 =metadata poll
 
@@ -2873,7 +3129,7 @@ invocant when successful, or throws an exception if the operation timed out.
 
 =signature pool
 
-  pool(Int $count, Int $timeout) (Process)
+  pool(number $count, number $timeout) (Venus::Process)
 
 =metadata pool
 
@@ -3001,7 +3257,7 @@ The pid method returns the PID of the current process.
 
 =signature pid
 
-  pid() (Int)
+  pid() (number)
 
 =metadata pid
 
@@ -3040,7 +3296,7 @@ child processes.
 
 =signature pids
 
-  pids() (ArrayRef)
+  pids() (arrayref)
 
 =metadata pids
 
@@ -3103,7 +3359,7 @@ multiple PIDs are provided, this method will return the count of active PIDs.
 
 =signature ping
 
-  ping(Int @pids) (Int)
+  ping(number @pids) (number)
 
 =metadata ping
 
@@ -3144,7 +3400,7 @@ forked the current process, if any).
 
 =signature ppid
 
-  ppid() (Int)
+  ppid() (number)
 
 =metadata ppid
 
@@ -3201,7 +3457,7 @@ The prune method removes all stopped processes and returns the invocant.
 
 =signature prune
 
-  prune() (Process)
+  prune() (Venus::Process)
 
 =metadata prune
 
@@ -3311,7 +3567,7 @@ responding to L</ping>).
 
 =signature recall
 
-  recall(Int $pid) (Any)
+  recall(number $pid) (any)
 
 =metadata recall
 
@@ -3367,7 +3623,7 @@ L</ppid> and any process listed in the L</watchlist>, and returns the results.
 
 =signature recallall
 
-  recallall() (ArrayRef)
+  recallall() (arrayref)
 
 =metadata recallall
 
@@ -3432,7 +3688,7 @@ by the PID provided.
 
 =signature recv
 
-  recv(Int $pid) (Any)
+  recv(number $pid) (any)
 
 =metadata recv
 
@@ -3509,7 +3765,7 @@ L</ppid> and any process listed in the L</watchlist>, and returns the results.
 
 =signature recvall
 
-  recvall() (ArrayRef)
+  recvall() (arrayref)
 
 =metadata recvall
 
@@ -3621,7 +3877,7 @@ other processes, and returns the invocant.
 
 =signature register
 
-  register() (Process)
+  register() (Venus::Process)
 
 =metadata register
 
@@ -3659,7 +3915,7 @@ using the L</register> method whether they're currently active or not.
 
 =signature registrants
 
-  registrants() (ArrayRef)
+  registrants() (arrayref)
 
 =metadata registrants
 
@@ -3712,7 +3968,7 @@ list context, this method returns a list.
 
 =signature restart
 
-  restart(CodeRef $callback) (ArrayRef)
+  restart(coderef $callback) (arrayref)
 
 =metadata restart
 
@@ -3760,7 +4016,7 @@ the PID provided.
 
 =signature send
 
-  send(Int $pid, Any $data) (Process)
+  send(number $pid, any $data) (Venus::Process)
 
 =metadata send
 
@@ -3837,7 +4093,7 @@ L</ppid> and any process listed in the L</watchlist>, and returns the invocant.
 
 =signature sendall
 
-  sendall(Any $data) (Process)
+  sendall(any $data) (Venus::Process)
 
 =metadata sendall
 
@@ -3902,7 +4158,7 @@ or gracefully shutdown.
 
 =signature serve
 
-  serve(Int $count, CodeRef $callback) (Process)
+  serve(number $count, coderef $callback) (Venus::Process)
 
 =metadata serve
 
@@ -3983,7 +4239,7 @@ identifier of the current process.
 
 =signature setsid
 
-  setsid() (Int)
+  setsid() (number)
 
 =metadata setsid
 
@@ -4035,7 +4291,7 @@ which have not terminated. Returns a list in list context.
 
 =signature started
 
-  started() (ArrayRef)
+  started() (arrayref)
 
 =metadata started
 
@@ -4099,7 +4355,7 @@ this method returns a list.
 
 =signature status
 
-  status(CodeRef $callback) (ArrayRef)
+  status(coderef $callback) (arrayref)
 
 =metadata status
 
@@ -4213,7 +4469,7 @@ restored to its default.
 
 =signature stderr
 
-  stderr(Str $path) (Process)
+  stderr(string $path) (Venus::Process)
 
 =metadata stderr
 
@@ -4267,7 +4523,7 @@ restored to its default.
 
 =signature stdin
 
-  stdin(Str $path) (Process)
+  stdin(string $path) (Venus::Process)
 
 =metadata stdin
 
@@ -4321,7 +4577,7 @@ restored to its default.
 
 =signature stdout
 
-  stdout(Str $path) (Process)
+  stdout(string $path) (Venus::Process)
 
 =metadata stdout
 
@@ -4374,7 +4630,7 @@ Returns a list in list context.
 
 =signature stopped
 
-  stopped() (ArrayRef)
+  stopped() (arrayref)
 
 =metadata stopped
 
@@ -4439,7 +4695,7 @@ successful, or throws an exception if the operation timed out.
 
 =signature sync
 
-  sync(Int $count, Int $timeout) (Process)
+  sync(number $count, number $timeout) (Venus::Process)
 
 =metadata sync
 
@@ -4582,7 +4838,7 @@ method.
 
 =signature trap
 
-  trap(Str $name, Str | CodeRef $expr) (Process)
+  trap(string $name, string | coderef $expr) (Venus::Process)
 
 =metadata trap
 
@@ -4619,7 +4875,7 @@ terminated).
 
 =signature wait
 
-  wait(Int $pid) (Int, Int)
+  wait(number $pid) (number, number)
 
 =metadata wait
 
@@ -4729,7 +4985,7 @@ list in list context.
 
 =signature waitall
 
-  waitall(Int @pids) (ArrayRef)
+  waitall(number @pids) (arrayref)
 
 =metadata waitall
 
@@ -4824,7 +5080,7 @@ and returns all PIDs being watched. Returns a list in list context.
 
 =signature watch
 
-  watch(Int @pids) (ArrayRef)
+  watch(number @pids) (arrayref)
 
 =metadata watch
 
@@ -4952,7 +5208,7 @@ The watchlist method returns the recorded PIDs. Returns a list in list context.
 
 =signature watchlist
 
-  watchlist() (ArrayRef)
+  watchlist() (arrayref)
 
 =metadata watchlist
 
@@ -5018,7 +5274,7 @@ where the parent process might exit before the child process is done working.
 
 =signature work
 
-  work(Str | CodeRef $code, Any @args) (Int)
+  work(string | coderef $code, any @args) (number)
 
 =metadata work
 
@@ -5061,7 +5317,7 @@ process might exit before the child process is done working.
 
 =signature works
 
-  works(Int $count, CodeRef $callback, Any @args) (ArrayRef)
+  works(number $count, coderef $callback, any @args) (arrayref)
 
 =metadata works
 
@@ -5108,7 +5364,7 @@ be discoverable by other processes, and returns the invocant.
 
 =signature unregister
 
-  unregister() (Process)
+  unregister() (Venus::Process)
 
 =metadata unregister
 
@@ -5147,7 +5403,7 @@ any user-defined signal traps in the current process.
 
 =signature untrap
 
-  untrap(Str $name) (Process)
+  untrap(string $name) (Venus::Process)
 
 =metadata untrap
 
@@ -5210,7 +5466,7 @@ list of PIDs remaining to be watched. In list context returns a list.
 
 =signature unwatch
 
-  unwatch(Int @pids) (ArrayRef)
+  unwatch(number @pids) (arrayref)
 
 =metadata unwatch
 
@@ -5483,6 +5739,53 @@ $test->for('example', 1, 'error_on_fork_support', sub {
   is $message, "Can't fork process 123: Fork emulation not supported";
   my $pid = $result->stash('pid');
   is $pid, 123;
+
+  $result
+});
+
+=error error_on_ping
+
+This package may raise an error_on_ping exception.
+
+=cut
+
+$test->for('error', 'error_on_ping');
+
+=example-1 error_on_ping
+
+  # given: synopsis;
+
+  my $input = {
+    throw => 'error_on_ping',
+    pid => 123,
+  };
+
+  my $error = $parent->catch('error', $input);
+
+  # my $name = $error->name;
+
+  # "on_ping"
+
+  # my $message = $error->render;
+
+  # "Process 123 not responding to ping"
+
+  # my $pid = $error->stash('pid');
+
+  # "123"
+
+=cut
+
+$test->for('example', 1, 'error_on_ping', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Error';
+  my $name = $result->name;
+  is $name, "on_ping";
+  my $message = $result->render;
+  is $message, "Process 123 not responding to ping";
+  my $pid = $result->stash('pid');
+  is $pid, "123";
 
   $result
 });
@@ -5900,8 +6203,8 @@ $test->for('example', 1, 'error_on_timeout_sync', sub {
 
 =partials
 
-t/Venus.t: pdml: authors
-t/Venus.t: pdml: license
+t/Venus.t: present: authors
+t/Venus.t: present: license
 
 =cut
 

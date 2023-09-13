@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    3.55
+    4.11
 
 SYNOPSIS
 
@@ -93,7 +93,7 @@ FUNCTIONS
 
  args
 
-      args(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+      args(arrayref $value, string | coderef $code, any @args) (any)
 
     The args function builds and returns a Venus::Args object, or
     dispatches to the coderef or method provided.
@@ -122,7 +122,7 @@ FUNCTIONS
 
  array
 
-      array(ArrayRef | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      array(arrayref | hashref $value, string | coderef $code, any @args) (any)
 
     The array function builds and returns a Venus::Array object, or
     dispatches to the coderef or method provided.
@@ -151,7 +151,7 @@ FUNCTIONS
 
  arrayref
 
-      arrayref(Any @args) (ArrayRef)
+      arrayref(any @args) (arrayref)
 
     The arrayref function takes a list of arguments and returns a arrayref.
 
@@ -189,7 +189,7 @@ FUNCTIONS
 
  assert
 
-      assert(Any $data, Str $expr) (Any)
+      assert(any $data, string $expr) (any)
 
     The assert function builds a Venus::Assert object and returns the
     result of a "validate" in Venus::Assert operation.
@@ -214,15 +214,25 @@ FUNCTIONS
       
         my $assert = assert(1234567890, 'float');
       
-        # Exception! (isa Venus::Assert::Error)
+        # Exception! (isa Venus::Check::Error)
+
+    assert example 3
+
+        package main;
+      
+        use Venus 'assert';
+      
+        my $assert = assert(1234567890, 'number | float');
+      
+        # 1234567890
 
  async
 
-      async(CodeRef $code, Any @args) (Process)
+      async(coderef $code, any @args) (Venus::Future)
 
     The async function accepts a callback and executes it asynchronously
-    via "async" in Venus::Process. This function returns a "dyadic"
-    Venus::Process object which can be used with "await".
+    via "future" in Venus::Process. This function returns a Venus::Future
+    object which can be fulfilled via "wait" in Venus::Future.
 
     Since 3.40
 
@@ -236,16 +246,38 @@ FUNCTIONS
           'done'
         };
       
-        # bless({...}, 'Venus::Process')
+        # bless({...}, 'Venus::Future')
+
+ atom
+
+      atom(any $value) (Venus::Atom)
+
+    The atom function builds and returns a Venus::Atom object.
+
+    Since 3.55
+
+    atom example 1
+
+        package main;
+      
+        use Venus 'atom';
+      
+        my $atom = atom 'super-admin';
+      
+        # bless({scope => sub{...}}, "Venus::Atom")
+      
+        # "$atom"
+      
+        # "super-admin"
 
  await
 
-      await(Process $process, Int $timeout) (Any)
+      await(Venus::Future $future, number $timeout) (any)
 
-    The await function accepts a "dyadic" Venus::Process object and
-    eventually returns a value (or values) for it. The value(s) returned
-    are the return values or emissions from the asychronous callback
-    executed with "async" which produced the process object.
+    The await function accepts a Venus::Future object and eventually
+    returns a value (or values) for it. The value(s) returned are the
+    return values or emissions from the asychronous callback executed with
+    "async" which produced the process object.
 
     Since 3.40
 
@@ -258,18 +290,16 @@ FUNCTIONS
         my $process;
       
         my $async = async sub{
-          ($process) = @_;
-          # in forked process ...
           return 'done';
         };
       
         my $await = await $async;
       
-        # ['done']
+        # bless(..., "Venus::Future")
 
  bool
 
-      bool(Any $value) (Boolean)
+      bool(any $value) (Venus::Boolean)
 
     The bool function builds and returns a Venus::Boolean object.
 
@@ -297,7 +327,7 @@ FUNCTIONS
 
  box
 
-      box(Any $data) (Box)
+      box(any $data) (Venus::Box)
 
     The box function returns a Venus::Box object for the argument provided.
 
@@ -325,7 +355,7 @@ FUNCTIONS
 
  call
 
-      call(Str | Object | CodeRef $data, Any @args) (Any)
+      call(string | object | coderef $data, any @args) (any)
 
     The call function dispatches function and method calls to a package and
     returns the result.
@@ -382,7 +412,7 @@ FUNCTIONS
 
  cast
 
-      cast(Any $data, Str $type) (Object)
+      cast(any $data, string $type) (object)
 
     The cast function returns the argument provided as an object, promoting
     native Perl data types to data type objects. The optional second
@@ -433,7 +463,7 @@ FUNCTIONS
 
  catch
 
-      catch(CodeRef $block) (Error, Any)
+      catch(coderef $block) (Venus::Error, any)
 
     The catch function executes the code block trapping errors and
     returning the caught exception in scalar context, and also returning
@@ -479,7 +509,7 @@ FUNCTIONS
 
  caught
 
-      caught(Object $error, Str | Tuple[Str, Str] $identity, CodeRef $block) (Any)
+      caught(object $error, string | tuple[string, string] $identity, coderef $block) (any)
 
     The caught function evaluates the exception object provided and
     validates its identity and name (if provided) then executes the code
@@ -614,7 +644,7 @@ FUNCTIONS
 
  chain
 
-      chain(Str | Object | CodeRef $self, Str | ArrayRef[Str] @args) (Any)
+      chain(string | object | coderef $self, string | within[arrayref, string] @args) (any)
 
     The chain function chains function and method calls to a package (and
     return values) and returns the result.
@@ -643,7 +673,7 @@ FUNCTIONS
 
  check
 
-      check(Any $data, Str $expr) (Bool)
+      check(any $data, string $expr) (boolean)
 
     The check function builds a Venus::Assert object and returns the result
     of a "check" in Venus::Assert operation.
@@ -672,7 +702,7 @@ FUNCTIONS
 
  clargs
 
-      clargs(ArrayRef $args, ArrayRef $spec) (Args, Opts, Vars)
+      clargs(arrayref $args, arrayref $spec) (Venus::Args, Venus::Opts, Venus::Vars)
 
     The clargs function accepts a single arrayref of Getopt::Long specs, or
     an arrayref of arguments followed by an arrayref of Getopt::Long specs,
@@ -727,7 +757,7 @@ FUNCTIONS
 
  cli
 
-      cli(ArrayRef $args) (Cli)
+      cli(arrayref $args) (Venus::Cli)
 
     The cli function builds and returns a Venus::Cli object.
 
@@ -757,9 +787,50 @@ FUNCTIONS
       
         # 1
 
+ clone
+
+      clone(ref $value) (ref)
+
+    The clone function uses "dclone" in Storable to perform a deep clone of
+    the reference provided and returns a copy.
+
+    Since 3.55
+
+    clone example 1
+
+        package main;
+      
+        use Venus 'clone';
+      
+        my $orig = {1..4};
+      
+        my $clone = clone $orig;
+      
+        $orig->{3} = 5;
+      
+        my $result = $clone;
+      
+        # {1..4}
+
+    clone example 2
+
+        package main;
+      
+        use Venus 'clone';
+      
+        my $orig = {1,2,3,{1..4}};
+      
+        my $clone = clone $orig;
+      
+        $orig->{3}->{3} = 5;
+      
+        my $result = $clone;
+      
+        # {1,2,3,{1..4}}
+
  code
 
-      code(CodeRef $value, Str | CodeRef $code, Any @args) (Any)
+      code(coderef $value, string | coderef $code, any @args) (any)
 
     The code function builds and returns a Venus::Code object, or
     dispatches to the coderef or method provided.
@@ -788,7 +859,7 @@ FUNCTIONS
 
  config
 
-      config(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      config(hashref $value, string | coderef $code, any @args) (any)
 
     The config function builds and returns a Venus::Config object, or
     dispatches to the coderef or method provided.
@@ -817,7 +888,7 @@ FUNCTIONS
 
  container
 
-      container(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      container(hashref $value, string | coderef $code, any @args) (any)
 
     The container function builds and returns a Venus::Container object, or
     dispatches to the coderef or method provided.
@@ -860,7 +931,7 @@ FUNCTIONS
 
  cop
 
-      cop(Str | Object | CodeRef $self, Str $name) (CodeRef)
+      cop(string | object | coderef $self, string $name) (coderef)
 
     The cop function attempts to curry the given subroutine on the object
     or class and if successful returns a closure.
@@ -891,7 +962,7 @@ FUNCTIONS
 
  data
 
-      data(Str $value, Str | CodeRef $code, Any @args) (Any)
+      data(string $value, string | coderef $code, any @args) (any)
 
     The data function builds and returns a Venus::Data object, or
     dispatches to the coderef or method provided.
@@ -920,7 +991,7 @@ FUNCTIONS
 
  date
 
-      date(Int $value, Str | CodeRef $code, Any @args) (Any)
+      date(number $value, string | coderef $code, any @args) (any)
 
     The date function builds and returns a Venus::Date object, or
     dispatches to the coderef or method provided.
@@ -963,7 +1034,7 @@ FUNCTIONS
 
  docs
 
-      docs(Any @args) (Any)
+      docs(any @args) (any)
 
     The docs function builds a Venus::Data object using "docs" in
     Venus::Data for the current file, i.e. "__FILE__" in perlfunc or
@@ -1010,9 +1081,56 @@ FUNCTIONS
       
         # "Example #1\nExample #2"
 
+ enum
+
+      enum(arrayref | hashref $value) (Venus::Enum)
+
+    The enum function builds and returns a Venus::Enum object.
+
+    Since 3.55
+
+    enum example 1
+
+        package main;
+      
+        use Venus 'enum';
+      
+        my $themes = enum ['light', 'dark'];
+      
+        # bless({scope => sub{...}}, "Venus::Enum")
+      
+        # my $result = $themes->get('dark');
+      
+        # bless({scope => sub{...}}, "Venus::Enum")
+      
+        # "$result"
+      
+        # "dark"
+
+    enum example 2
+
+        package main;
+      
+        use Venus 'enum';
+      
+        my $themes = enum {
+          light => 'light_theme',
+          dark => 'dark_theme',
+        };
+      
+        # bless({scope => sub{...}}, "Venus::Enum")
+      
+        # my $result = $themes->get('dark');
+      
+        # bless({scope => sub{...}}, "Venus::Enum")
+      
+        # "$result"
+      
+        # "dark_theme"
+
  error
 
-      error(Maybe[HashRef] $args) (Error)
+      error(maybe[hashref] $args) (Venus::Error)
 
     The error function throws a Venus::Error exception object using the
     exception object arguments provided.
@@ -1043,7 +1161,7 @@ FUNCTIONS
 
  false
 
-      false() (Bool)
+      false() (boolean)
 
     The false function returns a falsy boolean value which is designed to
     be practically indistinguishable from the conventional numerical 0
@@ -1073,7 +1191,7 @@ FUNCTIONS
 
  fault
 
-      fault(Str $args) (Fault)
+      fault(string $args) (Venus::Fault)
 
     The fault function throws a Venus::Fault exception object and
     represents a system failure, and isn't meant to be caught.
@@ -1102,7 +1220,7 @@ FUNCTIONS
 
  float
 
-      float(Str $value, Str | CodeRef $code, Any @args) (Any)
+      float(string $value, string | coderef $code, any @args) (any)
 
     The float function builds and returns a Venus::Float object, or
     dispatches to the coderef or method provided.
@@ -1129,9 +1247,35 @@ FUNCTIONS
       
         # 1
 
+ future
+
+      future(coderef $code) (Venus::Future)
+
+    The future function builds and returns a Venus::Future object.
+
+    Since 3.55
+
+    future example 1
+
+        package main;
+      
+        use Venus 'future';
+      
+        my $future = future(sub{
+          my ($resolve, $reject) = @_;
+      
+          return int(rand(2)) ? $resolve->result('pass') : $reject->result('fail');
+        });
+      
+        # bless(..., "Venus::Future")
+      
+        # $future->is_pending;
+      
+        # false
+
  gather
 
-      gather(Any $value, CodeRef $callback) (Any)
+      gather(any $value, coderef $callback) (any)
 
     The gather function builds a Venus::Gather object, passing it and the
     value provided to the callback provided, and returns the return value
@@ -1212,7 +1356,7 @@ FUNCTIONS
 
  hash
 
-      hash(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      hash(hashref $value, string | coderef $code, any @args) (any)
 
     The hash function builds and returns a Venus::Hash object, or
     dispatches to the coderef or method provided.
@@ -1241,7 +1385,7 @@ FUNCTIONS
 
  hashref
 
-      hashref(Any @args) (HashRef)
+      hashref(any @args) (hashref)
 
     The hashref function takes a list of arguments and returns a hashref.
 
@@ -1289,7 +1433,7 @@ FUNCTIONS
 
  is_bool
 
-      is_bool(Any $arg) (Bool)
+      is_bool(any $arg) (boolean)
 
     The is_bool function returns "true" if the value provided is a boolean
     value, not merely truthy, and "false" otherwise.
@@ -1338,7 +1482,7 @@ FUNCTIONS
 
  is_false
 
-      is_false(Any $data) (Bool)
+      is_false(any $data) (boolean)
 
     The is_false function accepts a scalar value and returns true if the
     value is falsy.
@@ -1367,7 +1511,7 @@ FUNCTIONS
 
  is_true
 
-      is_true(Any $data) (Bool)
+      is_true(any $data) (boolean)
 
     The is_true function accepts a scalar value and returns true if the
     value is truthy.
@@ -1396,7 +1540,7 @@ FUNCTIONS
 
  json
 
-      json(Str $call, Any $data) (Any)
+      json(string $call, any $data) (any)
 
     The json function builds a Venus::Json object and will either "decode"
     in Venus::Json or "encode" in Venus::Json based on the argument
@@ -1446,7 +1590,7 @@ FUNCTIONS
 
  list
 
-      list(Any @args) (Any)
+      list(any @args) (any)
 
     The list function accepts a list of values and flattens any arrayrefs,
     returning a list of scalars.
@@ -1485,7 +1629,7 @@ FUNCTIONS
 
  load
 
-      load(Any $name) (Space)
+      load(any $name) (Venus::Space)
 
     The load function loads the package provided and returns a Venus::Space
     object.
@@ -1504,7 +1648,7 @@ FUNCTIONS
 
  log
 
-      log(Any @args) (Log)
+      log(any @args) (Venus::Log)
 
     The log function prints the arguments provided to STDOUT, stringifying
     complex values, and returns a Venus::Log object. If the first argument
@@ -1531,7 +1675,7 @@ FUNCTIONS
 
  make
 
-      make(Str $package, Any @args) (Any)
+      make(string $package, any @args) (any)
 
     The make function "calls" the new routine on the invocant and returns
     the result which should be a package string or an object.
@@ -1560,7 +1704,7 @@ FUNCTIONS
 
  match
 
-      match(Any $value, CodeRef $callback) (Any)
+      match(any $value, coderef $callback) (any)
 
     The match function builds a Venus::Match object, passing it and the
     value provided to the callback provided, and returns the return value
@@ -1656,7 +1800,7 @@ FUNCTIONS
 
  merge
 
-      merge(Any @args) (Any)
+      merge(any @args) (any)
 
     The merge function returns a value which is a merger of all of the
     arguments provided.
@@ -1685,7 +1829,7 @@ FUNCTIONS
 
  meta
 
-      meta(Str $value, Str | CodeRef $code, Any @args) (Any)
+      meta(string $value, string | coderef $code, any @args) (any)
 
     The meta function builds and returns a Venus::Meta object, or
     dispatches to the coderef or method provided.
@@ -1714,7 +1858,7 @@ FUNCTIONS
 
  name
 
-      name(Str $value, Str | CodeRef $code, Any @args) (Any)
+      name(string $value, string | coderef $code, any @args) (any)
 
     The name function builds and returns a Venus::Name object, or
     dispatches to the coderef or method provided.
@@ -1743,7 +1887,7 @@ FUNCTIONS
 
  number
 
-      number(Num $value, Str | CodeRef $code, Any @args) (Any)
+      number(Num $value, string | coderef $code, any @args) (any)
 
     The number function builds and returns a Venus::Number object, or
     dispatches to the coderef or method provided.
@@ -1772,7 +1916,7 @@ FUNCTIONS
 
  opts
 
-      opts(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+      opts(arrayref $value, string | coderef $code, any @args) (any)
 
     The opts function builds and returns a Venus::Opts object, or
     dispatches to the coderef or method provided.
@@ -1805,7 +1949,7 @@ FUNCTIONS
 
  pairs
 
-      pairs(Any $data) (ArrayRef)
+      pairs(any $data) (arrayref)
 
     The pairs function accepts an arrayref or hashref and returns an
     arrayref of arrayrefs holding keys (or indices) and values. The
@@ -1856,7 +2000,7 @@ FUNCTIONS
 
  path
 
-      path(Str $value, Str | CodeRef $code, Any @args) (Any)
+      path(string $value, string | coderef $code, any @args) (any)
 
     The path function builds and returns a Venus::Path object, or
     dispatches to the coderef or method provided.
@@ -1885,7 +2029,7 @@ FUNCTIONS
 
  perl
 
-      perl(Str $call, Any $data) (Any)
+      perl(string $call, any $data) (any)
 
     The perl function builds a Venus::Dump object and will either "decode"
     in Venus::Dump or "encode" in Venus::Dump based on the argument
@@ -1935,7 +2079,7 @@ FUNCTIONS
 
  process
 
-      process(Str | CodeRef $code, Any @args) (Any)
+      process(string | coderef $code, any @args) (any)
 
     The process function builds and returns a Venus::Process object, or
     dispatches to the coderef or method provided.
@@ -1964,7 +2108,7 @@ FUNCTIONS
 
  proto
 
-      proto(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      proto(hashref $value, string | coderef $code, any @args) (any)
 
     The proto function builds and returns a Venus::Prototype object, or
     dispatches to the coderef or method provided.
@@ -1998,7 +2142,7 @@ FUNCTIONS
 
  puts
 
-      puts(Any @args) (ArrayRef)
+      puts(any @args) (arrayref)
 
     The puts function select values from within the underlying data
     structure using "path" in Venus::Array or "path" in Venus::Hash,
@@ -2033,7 +2177,7 @@ FUNCTIONS
 
  raise
 
-      raise(Str $class | Tuple[Str, Str] $class, Maybe[HashRef] $args) (Error)
+      raise(string $class | tuple[string, string] $class, maybe[hashref] $args) (Venus::Error)
 
     The raise function generates and throws a named exception object
     derived from Venus::Error, or provided base class, using the exception
@@ -2075,7 +2219,7 @@ FUNCTIONS
 
  random
 
-      random(Str | CodeRef $code, Any @args) (Any)
+      random(string | coderef $code, any @args) (any)
 
     The random function builds and returns a Venus::Random object, or
     dispatches to the coderef or method provided.
@@ -2104,7 +2248,7 @@ FUNCTIONS
 
  range
 
-      range(Int | Str @args) (ArrayRef)
+      range(number | string @args) (arrayref)
 
     The range function returns the result of a "range" in Venus::Array
     operation.
@@ -2133,7 +2277,7 @@ FUNCTIONS
 
  regexp
 
-      regexp(Str $value, Str | CodeRef $code, Any @args) (Any)
+      regexp(string $value, string | coderef $code, any @args) (any)
 
     The regexp function builds and returns a Venus::Regexp object, or
     dispatches to the coderef or method provided.
@@ -2166,7 +2310,7 @@ FUNCTIONS
 
  render
 
-      render(Str $data, HashRef $args) (Str)
+      render(string $data, hashref $args) (string)
 
     The render function accepts a string as a template and renders it using
     Venus::Template, and returns the result.
@@ -2187,7 +2331,7 @@ FUNCTIONS
 
  replace
 
-      replace(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+      replace(arrayref $value, string | coderef $code, any @args) (any)
 
     The replace function builds and returns a Venus::Replace object, or
     dispatches to the coderef or method provided.
@@ -2216,7 +2360,7 @@ FUNCTIONS
 
  resolve
 
-      resolve(HashRef $value, Any @args) (Any)
+      resolve(hashref $value, any @args) (any)
 
     The resolve function builds and returns an object via "resolve" in
     Venus::Container.
@@ -2253,7 +2397,7 @@ FUNCTIONS
 
  roll
 
-      roll(Str $name, Any @args) (Any)
+      roll(string $name, any @args) (any)
 
     The roll function takes a list of arguments, assuming the first
     argument is invokable, and reorders the list such that the routine name
@@ -2284,7 +2428,7 @@ FUNCTIONS
 
  schema
 
-      schema(Str $value, Str | CodeRef $code, Any @args) (Any)
+      schema(string $value, string | coderef $code, any @args) (any)
 
     The schema function builds and returns a Venus::Schema object, or
     dispatches to the coderef or method provided.
@@ -2313,7 +2457,7 @@ FUNCTIONS
 
  search
 
-      search(ArrayRef $value, Str | CodeRef $code, Any @args) (Any)
+      search(arrayref $value, string | coderef $code, any @args) (any)
 
     The search function builds and returns a Venus::Search object, or
     dispatches to the coderef or method provided.
@@ -2342,7 +2486,7 @@ FUNCTIONS
 
  space
 
-      space(Any $name) (Space)
+      space(any $name) (Venus::Space)
 
     The space function returns a Venus::Space object for the package
     provided.
@@ -2361,7 +2505,7 @@ FUNCTIONS
 
  string
 
-      string(Str $value, Str | CodeRef $code, Any @args) (Any)
+      string(string $value, string | coderef $code, any @args) (any)
 
     The string function builds and returns a Venus::String object, or
     dispatches to the coderef or method provided.
@@ -2390,7 +2534,7 @@ FUNCTIONS
 
  syscall
 
-      syscall(Int | Str @args) (Any)
+      syscall(number | string @args) (any)
 
     The syscall function perlforms system call, i.e. a "qx" in perlfunc
     operation, and returns true if the command succeeds, otherwise returns
@@ -2441,7 +2585,7 @@ FUNCTIONS
 
  template
 
-      template(Str $value, Str | CodeRef $code, Any @args) (Any)
+      template(string $value, string | coderef $code, any @args) (any)
 
     The template function builds and returns a Venus::Template object, or
     dispatches to the coderef or method provided.
@@ -2472,7 +2616,7 @@ FUNCTIONS
 
  test
 
-      test(Str $value, Str | CodeRef $code, Any @args) (Any)
+      test(string $value, string | coderef $code, any @args) (any)
 
     The test function builds and returns a Venus::Test object, or
     dispatches to the coderef or method provided.
@@ -2501,7 +2645,7 @@ FUNCTIONS
 
  text
 
-      text(Any @args) (Any)
+      text(any @args) (any)
 
     The text function builds a Venus::Data object using "text" in
     Venus::Data for the current file, i.e. "__FILE__" in perlfunc or
@@ -2596,7 +2740,7 @@ FUNCTIONS
 
  then
 
-      then(Str | Object | CodeRef $self, Any @args) (Any)
+      then(string | object | coderef $self, any @args) (any)
 
     The then function proxies the call request to the "call" function and
     returns the result as a list, prepended with the invocant.
@@ -2615,7 +2759,7 @@ FUNCTIONS
 
  throw
 
-      throw(Str | HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      throw(string | hashref $value, string | coderef $code, any @args) (any)
 
     The throw function builds and returns a Venus::Throw object, or
     dispatches to the coderef or method provided.
@@ -2661,7 +2805,7 @@ FUNCTIONS
 
  true
 
-      true() (Bool)
+      true() (boolean)
 
     The true function returns a truthy boolean value which is designed to
     be practically indistinguishable from the conventional numerical 1
@@ -2691,7 +2835,7 @@ FUNCTIONS
 
  try
 
-      try(Any $data, Str | CodeRef $code, Any @args) (Any)
+      try(any $data, string | coderef $code, any @args) (any)
 
     The try function builds and returns a Venus::Try object, or dispatches
     to the coderef or method provided.
@@ -2742,7 +2886,7 @@ FUNCTIONS
 
  type
 
-      type(Any $data, Str | CodeRef $code, Any @args) (Any)
+      type(any $data, string | coderef $code, any @args) (any)
 
     The type function builds and returns a Venus::Type object, or
     dispatches to the coderef or method provided.
@@ -2775,7 +2919,7 @@ FUNCTIONS
 
  unpack
 
-      unpack(Any @args) (Unpack)
+      unpack(any @args) (Venus::Unpack)
 
     The unpack function builds and returns a Venus::Unpack object.
 
@@ -2819,7 +2963,7 @@ FUNCTIONS
 
  vars
 
-      vars(HashRef $value, Str | CodeRef $code, Any @args) (Any)
+      vars(hashref $value, string | coderef $code, any @args) (any)
 
     The vars function builds and returns a Venus::Vars object, or
     dispatches to the coderef or method provided.
@@ -2848,7 +2992,7 @@ FUNCTIONS
 
  venus
 
-      venus(Str $name, Any @args) (Any)
+      venus(string $name, any @args) (any)
 
     The venus function build a Venus package via the "chain" function based
     on the name provided and returns an instance of that package.
@@ -2887,7 +3031,7 @@ FUNCTIONS
 
  work
 
-      work(CodeRef $callback) (Process)
+      work(coderef $callback) (Venus::Process)
 
     The work function builds a Venus::Process object, forks the current
     process using the callback provided via the "work" in Venus::Process
@@ -2912,7 +3056,7 @@ FUNCTIONS
 
  wrap
 
-      wrap(Str $data, Str $name) (CodeRef)
+      wrap(string $data, string $name) (coderef)
 
     The wrap function installs a wrapper function in the calling package
     which when called either returns the package string if no arguments are
@@ -2961,7 +3105,7 @@ FUNCTIONS
 
  yaml
 
-      yaml(Str $call, Any $data) (Any)
+      yaml(string $call, any $data) (any)
 
     The yaml function builds a Venus::Yaml object and will either "decode"
     in Venus::Yaml or "encode" in Venus::Yaml based on the argument
@@ -3264,7 +3408,7 @@ AUTHORS
 
 LICENSE
 
-    Copyright (C) 2000, Al Newkirk.
+    Copyright (C) 2000, Awncorp, awncorp@cpan.org.
 
     This program is free software, you can redistribute it and/or modify it
     under the terms of the Apache license version 2.0.
